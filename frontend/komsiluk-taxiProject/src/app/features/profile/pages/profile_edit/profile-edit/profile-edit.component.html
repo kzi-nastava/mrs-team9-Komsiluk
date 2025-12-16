@@ -1,0 +1,42 @@
+<div class="pe-screen">
+  <div class="pe-card">
+    <div class="pe-title text-semibold">EDIT</div>
+
+    <form class="pe-form" autocomplete="off">
+      <label class="pe-field">
+        <span class="pe-label text-semibold">Firstname</span>
+        <input class="pe-input text-medium" type="text" value="Name" />
+      </label>
+
+      <label class="pe-field">
+        <span class="pe-label text-semibold">Lastname</span>
+        <input class="pe-input text-medium" type="text" value="Surname" />
+      </label>
+
+      <label class="pe-field">
+        <span class="pe-label text-semibold">Address(Street and number)</span>
+        <input class="pe-input text-medium" type="text" value="Address 100" />
+      </label>
+
+      <label class="pe-field">
+        <span class="pe-label text-semibold">City</span>
+        <input class="pe-input text-medium" type="text" value="City" />
+      </label>
+
+      <label class="pe-field">
+        <span class="pe-label text-semibold">Phone number</span>
+        <input class="pe-input text-medium" type="text" value="11111111" />
+      </label>
+
+      <div class="pe-actions">
+        <button type="button" class="pe-btn pe-btn--ghost text-semibold" (click)="close()">
+          Cancel
+        </button>
+
+        <button type="button" class="pe-btn pe-btn--primary text-semibold" (click)="close()">
+          Save
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

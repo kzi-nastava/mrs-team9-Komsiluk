@@ -5,8 +5,10 @@
   --color-primary: #111111;
   --color-secondary: #ffee02;
   --color-sidepanel: #111111f2;
+  --color-form-bg: #1D17174a;
   --color-text: #323232;
   --color-white: #ffffff;
+  --blur-form: 8px;
 }
 
 /* Global Styles */
@@ -17,6 +19,12 @@ body {
   color: var(--color-text);
   background-color: var(--color-primary);
 }
+
+button,input,select,textarea {
+  font: inherit;
+  color: inherit;
+}
+
 
 /* Utility classes for font weights */
 .text-regular {

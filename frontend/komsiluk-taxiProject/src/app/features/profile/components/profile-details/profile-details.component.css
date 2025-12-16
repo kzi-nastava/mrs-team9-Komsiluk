@@ -6,76 +6,90 @@
 }
 
 .profile-details {
-  padding: 24px 28px;
-  /* ostatak stilova za sadržaj */
-}
+  height: 100%;
+  padding: 40px 60px;
+  box-sizing: border-box;
 
-
-/* Header: title + opis + dugme Edit */
-.profile-details__header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 16px;
-}
-
-.profile-details__title {
-  margin: 0;
-  font-size: 24px;
-  font-weight: 600;
-}
-
-.profile-details__subtitle {
-  margin: 4px 0 0;
-  font-size: 14px;
-  opacity: 0.7;
-}
-
-.profile-details__edit-btn {
-  padding: 8px 18px;
-  border-radius: 999px;
-  border: none;
-  background-color: var(--color-primary);
-  color: var(--color-bg-main);
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.15s ease, transform 0.1s ease;
-}
-
-.profile-details__edit-btn:hover {
-  background-color: var(--color-primary-soft);
-  transform: translateY(-1px);
-}
-
-/* Grid za polja */
-.profile-details__grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px 40px;
-}
-
-.profile-details__field {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  justify-content: space-between;
+
+  position: relative;
 }
 
-.field-label {
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  opacity: 0.7;
+/* Centering content */
+.profile-details__content {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: 35px;
 }
 
-.field-value {
-  font-size: 15px;
-  font-weight: 500;
+/* grid: 2 columns 3 rows */
+.pd-grid {
+  display: grid;
+  grid-template-columns: 320px 320px;
+  column-gap: 110px;
+  row-gap: 34px;
 }
 
-/* Na manjim ekranima jedan stupac */
+/* labels */
+.pd-label {
+  font-size: 17px;
+  line-height: 1.1;
+  margin-bottom: 2px;
+}
+
+/* textbox */
+.pd-box {
+  height: 42px;
+  border-radius: 6px;
+  background: var(--color-white);
+
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+
+  color: var(--color-text);
+  font-size: 16px;
+  box-sizing: border-box;
+}
+
+/* third row center */
+.pd-field--center {
+  grid-column: 1 / -1;
+  justify-self: center;
+  width: 320px;
+}
+
+/* Edit button bottom right */
+.profile-details__edit-btn {
+  align-self: flex-end;
+
+  padding: 10px 44px;
+  border-radius: 999px;
+  border: none;
+
+  background: var(--color-secondary);
+  color: var(--color-text);
+
+  cursor: pointer;
+}
+
+/* responsive */
 @media (max-width: 900px) {
-  .profile-details__grid {
+  .profile-details {
+    padding: 28px;
+  }
+
+  .pd-grid {
     grid-template-columns: 1fr;
+    width: min(320px, 100%);
+    column-gap: 0;
+  }
+
+  .pd-field--center {
+    width: 100%;
   }
 }
