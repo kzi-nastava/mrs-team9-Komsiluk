@@ -1,0 +1,81 @@
+:host {
+  display: block;
+  background-color: #1D171780;;
+  color: var(--color-white);
+  box-sizing: border-box;
+}
+
+.profile-details {
+  padding: 24px 28px;
+  /* ostatak stilova za sadržaj */
+}
+
+
+/* Header: title + opis + dugme Edit */
+.profile-details__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.profile-details__title {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.profile-details__subtitle {
+  margin: 4px 0 0;
+  font-size: 14px;
+  opacity: 0.7;
+}
+
+.profile-details__edit-btn {
+  padding: 8px 18px;
+  border-radius: 999px;
+  border: none;
+  background-color: var(--color-primary);
+  color: var(--color-bg-main);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s ease, transform 0.1s ease;
+}
+
+.profile-details__edit-btn:hover {
+  background-color: var(--color-primary-soft);
+  transform: translateY(-1px);
+}
+
+/* Grid za polja */
+.profile-details__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px 40px;
+}
+
+.profile-details__field {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.field-label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  opacity: 0.7;
+}
+
+.field-value {
+  font-size: 15px;
+  font-weight: 500;
+}
+
+/* Na manjim ekranima jedan stupac */
+@media (max-width: 900px) {
+  .profile-details__grid {
+    grid-template-columns: 1fr;
+  }
+}
