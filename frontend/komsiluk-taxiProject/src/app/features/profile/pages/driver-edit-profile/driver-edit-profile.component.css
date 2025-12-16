@@ -1,0 +1,121 @@
+:host {
+  display: block;
+  height: 100%;
+}
+
+/* full-screen layer */
+.pe-screen {
+  height: calc(100vh - 64px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: grid;
+  place-items: center;
+  padding: 0 16px;
+  box-sizing: border-box;
+}
+
+/* glass panel */
+.driver-edit-panel {
+  width: min(980px, 92vw);
+  padding: 22px 34px 20px;
+}
+
+.pe-title {
+  text-align: center;
+  letter-spacing: 0.12em;
+  margin-bottom: 12px;
+  font-size: 22px;
+  font-weight: var(--weight-medium);
+}
+
+/* 2 collumns */
+.pe-form--driver {
+  width: min(860px, 100%);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 70px;
+  row-gap: 12px;
+  margin: 0 auto;
+}
+
+.pe-col {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.pe-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.pe-label {
+  font-size: 17px;
+  line-height: 1.1;
+  margin-bottom: 2px;
+}
+
+.pe-input {
+  height: 42px;
+  border-radius: 6px;
+  border: none;
+  outline: none;
+  background: var(--color-white);
+  color: var(--color-text);
+  font-size: 16px;
+  padding: 0 16px;
+  box-sizing: border-box;
+}
+
+/* checkbox row */
+.pe-check-row {
+  display: flex;
+  gap: 22px;
+  align-items: center;
+  margin-top: 32px;
+}
+
+.pe-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--color-white);
+  font-size: 18px;
+}
+
+.pe-check input {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--color-secondary);
+}
+
+/* actions */
+.pe-actions {
+  grid-column: 1 / -1;
+  margin-top: 16px;
+  display: flex;
+  gap: 14px;
+}
+
+.pe-actions--center {
+  justify-content: center;
+}
+
+/* responsive */
+@media (max-width: 900px) {
+  .driver-edit-panel {
+    width: min(520px, 92vw);
+    padding: 18px 24px 16px;
+  }
+
+  .pe-form--driver {
+    grid-template-columns: 1fr;
+    width: 100%;
+    column-gap: 0;
+  }
+
+  .pe-actions--center {
+    justify-content: flex-end; /* da stane bolje na mobilnom */
+  }
+}

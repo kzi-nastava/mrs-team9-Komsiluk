@@ -38,8 +38,17 @@
         </button>
     }
 
-    <button type="button" class="btn btn--primary profile-details__action-btn btn-scale text-semibold" routerLink="/profile/edit">
-        Edit
-    </button>
+    @if (!isDriver)
+    {
+        <button type="button" class="btn btn--primary profile-details__action-btn btn-scale text-semibold" routerLink="/profile/edit">
+            Edit
+        </button>
+    }
+    @else 
+    {
+        <button type="button" class="btn btn--primary profile-details__action-btn btn-scale text-semibold" routerLink="/profile/driver-edit">
+            Edit
+        </button>
+    }
     </div>
 </div>
