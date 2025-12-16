@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { UserProfilePageComponent } from './features/profile/pages/user-profile-page/user-profile-page.component';
 import { ProfileViewComponent } from './features/profile/pages/profile_view/profile-view/profile-view.component';
 import { ProfileEditComponent } from './features/profile/pages/profile_edit/profile-edit/profile-edit.component';
+import { ProfileChangePasswordComponent } from './features/profile/pages/profile_password/profile-change-password/profile-change-password.component';
 
 export const routes: Routes = [
   {
@@ -10,6 +11,7 @@ export const routes: Routes = [
     children: [
       { path: '', component: ProfileViewComponent },
       { path: 'edit', component: ProfileEditComponent },
+      {path: 'change-password', component: ProfileChangePasswordComponent}
     ],
   },
 

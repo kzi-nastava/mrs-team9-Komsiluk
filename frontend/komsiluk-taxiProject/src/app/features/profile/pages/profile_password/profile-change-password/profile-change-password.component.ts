@@ -3,12 +3,12 @@ import { Router } from '@angular/router';
 import { ToastService } from '../../../../../shared/components/toast/toast.service';
 
 @Component({
-  selector: 'app-profile-edit',
+  selector: 'app-profile-change-password',
   imports: [],
-  templateUrl: './profile-edit.component.html',
-  styleUrl: './profile-edit.component.css',
+  templateUrl: './profile-change-password.component.html',
+  styleUrl: './profile-change-password.component.css',
 })
-export class ProfileEditComponent {
+export class ProfileChangePasswordComponent {
   constructor(private toast: ToastService, private router: Router) {}
 
   close() {
@@ -16,7 +16,7 @@ export class ProfileEditComponent {
   }
 
   save() {
-    this.toast.show('Profile updated successfully!');
+    this.toast.show('Password changed successfully!');
     this.router.navigate(['/profile']);
   }
 }
