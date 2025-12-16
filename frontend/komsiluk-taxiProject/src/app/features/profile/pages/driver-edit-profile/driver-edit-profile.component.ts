@@ -15,6 +15,6 @@ export class DriverEditProfileComponent {
   }
 
   save() {
-    
+    this.router.navigate(['/message', 'driver-profile-edit-submitted']);
   }
 }
