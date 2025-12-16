@@ -84,17 +84,25 @@
         </button>
     </nav>
 
-    <button type="button" class="profile-sidebar__logout btn-scale text-medium">
-        <span class="profile-sidebar__logout-text">Log out</span>
-        <span class="profile-sidebar__logout-icon" aria-hidden="true">
-        <!-- LOGOUT ARROW -->
-        <svg viewBox="0 0 24 24">
-            <path d="M10 17l5-5-5-5" />
-            <path d="M15 12H3" />
-            <path d="M21 3h-8a2 2 0 0 0-2 2v3" />
-            <path d="M11 16v3a2 2 0 0 0 2 2h8" />
-        </svg>
-        </span>
-    </button>
+    <div class="profile-sidebar__footer">
+        <!-- Active today -->
+        @if (isDriver) {
+        <div class="profile-sidebar__active text-semibold">
+            Active today: {{ activeToday }}
+        </div>
+        }
+
+        <button type="button" class="profile-sidebar__logout btn-scale text-medium">
+            <span class="profile-sidebar__logout-text">Log out</span>
+            <span class="profile-sidebar__logout-icon" aria-hidden="true">
+            <!-- LOGOUT ARROW -->
+            <svg viewBox="0 0 24 24">
+                <path d="M10 17l5-5-5-5" />
+                <path d="M15 12H3" />
+                <path d="M21 3h-8a2 2 0 0 0-2 2v3" />
+                <path d="M11 16v3a2 2 0 0 0 2 2h8" />
+            </svg>
+            </span>
+        </button>
   </div>
 </div>

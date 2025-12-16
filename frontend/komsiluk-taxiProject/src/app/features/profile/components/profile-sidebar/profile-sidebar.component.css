@@ -122,7 +122,7 @@
   align-items: center;
   gap: 14px;
 
-  width: 50%;
+  width: 100%;
   padding: 10px 0;
 
   background: transparent;
@@ -155,7 +155,19 @@
   color: var(--color-secondary);
 }
 
-/* Logout (bottom-right, icon AFTER text) */
+/* Footer */
+.profile-sidebar__footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+.profile-sidebar__active {
+  color: var(--color-text);
+  font-size: 15px;
+}
+
 .profile-sidebar__logout {
   align-self: flex-end;
 
@@ -172,6 +184,8 @@
   font-size: 17px;
   font-weight: 600;
   opacity: 0.95;
+
+  margin-left: auto;
 }
 
 .profile-sidebar__logout:hover {

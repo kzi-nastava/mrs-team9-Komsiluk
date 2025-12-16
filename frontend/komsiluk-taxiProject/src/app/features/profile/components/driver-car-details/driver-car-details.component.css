@@ -88,3 +88,30 @@
     width: 100%;
   }
 }
+
+.driver-car-details {
+  position: relative;
+}
+
+.driver-car-details::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+
+  filter: brightness(0.75);
+
+  background: url("../../../../../assets/taxi.png") center / 900px auto no-repeat;
+
+  pointer-events: none;
+  z-index: 0;
+}
+
+.driver-car-details .profile-details__content,
+.driver-car-details .profile-details__actions {
+  position: relative;
+  z-index: 1;
+}
+
+.dd-label {
+  font-size: 20px;
+}

@@ -31,7 +31,15 @@
     </div>
   </div>
 
-  <button type="button" class="profile-details__edit-btn btn-scale text-semibold" routerLink="/profile/edit">
-    Edit
-  </button>
+  <div class="profile-details__actions">
+    @if (isDriver) {
+        <button type="button" class=" btn btn--ghost profile-details__action-btn btn-scale text-semibold"routerLink="/profile/car">
+        Car
+        </button>
+    }
+
+    <button type="button" class="btn btn--primary profile-details__action-btn btn-scale text-semibold" routerLink="/profile/edit">
+        Edit
+    </button>
+    </div>
 </div>
