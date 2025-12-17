@@ -1,0 +1,45 @@
+:host {
+  display: block;
+  height: 100%;
+}
+
+.msg-screen {
+  min-height: calc(100vh - 64px); /* ispod navbara */
+  display: grid;
+  place-items: center;
+  padding: 0 16px;
+  box-sizing: border-box;
+}
+
+.msg-panel {
+  width: min(420px, 92vw);
+  padding: 22px 28px 18px;
+}
+
+.msg-title {
+  font-size: 22px;
+  margin-bottom: 20px;
+  font-weight: var(--weight-regular);
+}
+
+.msg-divider {
+  height: 2px;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.75);
+  margin-bottom: 14px;
+}
+
+.msg-text {
+  font-size: 14px;
+  line-height: 1.25;
+  max-width: 360px;
+  margin-top: 30px;
+  margin-bottom: 35px;
+  font-weight: var(--weight-regular);
+}
+
+.msg-actions {
+  margin-top: 25px;
+  display: flex;
+  justify-content: flex-end;
+}

@@ -1,0 +1,85 @@
+<div class="pe-screen">
+  <div class="glass-panel glass-panel--ep driver-edit-panel">
+    <div class="pe-title text-semibold">EDIT</div>
+
+    <form class="pe-form pe-form--driver" autocomplete="off">
+      <!-- LEFT COLUMN (profile) -->
+      <div class="pe-col">
+        <label class="pe-field">
+          <span class="pe-label text-semibold">Firstname</span>
+          <input class="pe-input text-medium" type="text" value="Name" />
+        </label>
+
+        <label class="pe-field">
+          <span class="pe-label text-semibold">Lastname</span>
+          <input class="pe-input text-medium" type="text" value="Surname" />
+        </label>
+
+        <label class="pe-field">
+          <span class="pe-label text-semibold">Address (Street and number)</span>
+          <input class="pe-input text-medium" type="text" value="Address 100" />
+        </label>
+
+        <label class="pe-field">
+          <span class="pe-label text-semibold">City</span>
+          <input class="pe-input text-medium" type="text" value="City" />
+        </label>
+
+        <label class="pe-field">
+          <span class="pe-label text-semibold">Phone number</span>
+          <input class="pe-input text-medium" type="text" value="11111111" />
+        </label>
+      </div>
+
+      <!-- RIGHT COLUMN (car) -->
+      <div class="pe-col">
+        <label class="pe-field">
+          <span class="pe-label text-semibold">Model</span>
+          <input class="pe-input text-medium" type="text" value="1978 Volkswagen Type 2 T2" />
+        </label>
+
+        <label class="pe-field">
+          <span class="pe-label text-semibold">Type</span>
+          <select class="pe-input text-medium">
+            <option>Luxury</option>
+            <option>Standard</option>
+            <option>Economy</option>
+          </select>
+        </label>
+
+        <label class="pe-field">
+          <span class="pe-label text-semibold">License plate</span>
+          <input class="pe-input text-medium" type="text" value="NS-111-AB" />
+        </label>
+
+        <label class="pe-field">
+          <span class="pe-label text-semibold">Number of seats</span>
+          <input class="pe-input text-medium" type="text" value="5" />
+        </label>
+
+        <div class="pe-check-row">
+          <label class="pe-check text-semibold">
+            <input type="checkbox" checked />
+            <span>Pet friendly</span>
+          </label>
+
+          <label class="pe-check text-semibold">
+            <input type="checkbox" />
+            <span>Child seat available</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- ACTIONS -->
+      <div class="pe-actions pe-actions--center">
+        <button type="button" class="btn btn--ghost text-semibold btn-scale" (click)="close()">
+          Cancel
+        </button>
+
+        <button type="button" class="btn btn--primary text-semibold btn-scale" (click)="save()">
+          Confirm
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

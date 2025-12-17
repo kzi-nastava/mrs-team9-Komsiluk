@@ -1,6 +1,7 @@
 import { Component, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { NavbarComponent } from './core/layout/navbar/navbar.component';
+import { ToastComponent } from './shared/components/toast/toast/toast.component';
 import { LeftSidebarComponent } from './core/layout/leftsidebar/leftsidebar.component';
 import { RightsidebarComponent } from './core/layout/rightsidebar.component/rightsidebar.component';
 
@@ -8,7 +9,7 @@ import { RightsidebarComponent } from './core/layout/rightsidebar.component/righ
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, NavbarComponent, LeftSidebarComponent,RightsidebarComponent],
+  imports: [RouterOutlet, NavbarComponent, LeftSidebarComponent,RightsidebarComponent, ToastComponent],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })

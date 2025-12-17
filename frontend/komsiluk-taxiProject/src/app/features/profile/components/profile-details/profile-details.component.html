@@ -1,44 +1,54 @@
 <div class="profile-details">
-  <div class="profile-details__header">
-    <div>
-      <h1 class="profile-details__title">Profile</h1>
-      <p class="profile-details__subtitle">
-        Basic information about your account.
-      </p>
-    </div>
+  <div class="profile-details__content">
+    <div class="pd-grid">
+      <!-- Row 1 -->
+      <div class="pd-field">
+        <div class="pd-label text-semibold">Firstname</div>
+        <div class="pd-box text-medium">Name</div>
+      </div>
 
-    <button class="profile-details__edit-btn">Edit</button>
-  </div>
+      <div class="pd-field">
+        <div class="pd-label text-semibold">Lastname</div>
+        <div class="pd-box text-medium">Surname</div>
+      </div>
 
-  <div class="profile-details__grid">
-    <div class="profile-details__field">
-      <span class="field-label">First name</span>
-      <span class="field-value">Name</span>
-    </div>
+      <!-- Row 2 -->
+      <div class="pd-field">
+        <div class="pd-label text-semibold">Address</div>
+        <div class="pd-box text-medium">Address 100</div>
+      </div>
 
-    <div class="profile-details__field">
-      <span class="field-label">Last name</span>
-      <span class="field-value">Surname</span>
-    </div>
+      <div class="pd-field">
+        <div class="pd-label text-semibold">City</div>
+        <div class="pd-box text-medium">City</div>
+      </div>
 
-    <div class="profile-details__field">
-      <span class="field-label">Email</span>
-      <span class="field-value">name.surname@email.com</span>
-    </div>
-
-    <div class="profile-details__field">
-      <span class="field-label">Phone number</span>
-      <span class="field-value">+381 60 123 456</span>
-    </div>
-
-    <div class="profile-details__field">
-      <span class="field-label">City</span>
-      <span class="field-value">Belgrade</span>
-    </div>
-
-    <div class="profile-details__field">
-      <span class="field-label">Address</span>
-      <span class="field-value">Street 12</span>
+      <!-- Row 3 (center) -->
+      <div class="pd-field pd-field--center">
+        <div class="pd-label text-semibold">Phone number</div>
+        <div class="pd-box text-medium">11111111</div>
+      </div>
     </div>
   </div>
+
+  <div class="profile-details__actions">
+    @if (isDriver) {
+        <button type="button" class=" btn btn--ghost profile-details__action-btn btn-scale text-semibold"routerLink="/profile/car">
+        Car
+        </button>
+    }
+
+    @if (!isDriver)
+    {
+        <button type="button" class="btn btn--primary profile-details__action-btn btn-scale text-semibold" routerLink="/profile/edit">
+            Edit
+        </button>
+    }
+    @else 
+    {
+        <button type="button" class="btn btn--primary profile-details__action-btn btn-scale text-semibold" routerLink="/profile/driver-edit">
+            Edit
+        </button>
+    }
+    </div>
 </div>

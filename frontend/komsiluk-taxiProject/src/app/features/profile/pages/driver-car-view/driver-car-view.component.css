@@ -1,0 +1,37 @@
+.profile-page {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+
+  width: 100%;
+  min-height: calc(100vh - 64px);
+
+  padding: 0;
+  gap: 0;
+  box-sizing: border-box;
+}
+
+app-profile-sidebar {
+  flex: 0 0 33.333%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+app-driver-car-details {
+  flex: 0 0 66.667%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+@media (max-width: 1000px) {
+  .profile-page {
+    flex-direction: column;
+    min-height: auto;
+  }
+
+  app-profile-sidebar,
+  app-driver-car-details {
+    flex: 0 0 auto;
+    width: 100%;
+  }
+}

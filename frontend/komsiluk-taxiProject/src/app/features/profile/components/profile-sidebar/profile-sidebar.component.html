@@ -1,22 +1,108 @@
 <div class="profile-sidebar">
-  <!-- GORNJI DEO: avatar, ime, mail, change image/password -->
   <div class="profile-sidebar__top">
-    <!-- avatar krug -->
-    <!-- ime i email -->
-    <!-- "Change image" / "Change password" linkovi -->
+    <!-- Avatar -->
+    <div class="profile-sidebar__avatar" aria-hidden="true">
+        <svg class="profile-sidebar__avatar-icon" viewBox="0 0 64 64" role="img">
+        <circle cx="32" cy="22" r="12" fill="currentColor"></circle>
+        <path
+            d="M12 58c0-11 9-20 20-20s20 9 20 20v2H12v-2z"
+            fill="currentColor"
+        ></path>
+        </svg>
+    </div>
+
+    <!-- Name + email -->
+    <div class="profile-sidebar__identity">
+        <div class="profile-sidebar__name text-semibold">Name Surname</div>
+        <div class="profile-sidebar__email text-semibold">email@gmail.com</div>
+    </div>
+
+    <!-- Actions -->
+    <button type="button" class="profile-sidebar__link profile-sidebar__link--image">
+        Change image
+    </button>
+
+    <button type="button" class="profile-sidebar__link profile-sidebar__link--password" routerLink="/profile/change-password">
+        Change password
+    </button>
   </div>
 
-  <!-- “border” između (onaj sa rombovima može kasnije kao slika/pseudo-element) -->
+  <!-- Divider -->
   <div class="profile-sidebar__divider"></div>
 
-  <!-- DONJI DEO: meni + logout -->
   <div class="profile-sidebar__bottom">
-    <nav class="profile-sidebar__menu">
-      <!-- Favorite rides, Ride history, Usage report, Support -->
+    <nav class="profile-sidebar__menu" aria-label="Profile menu">
+        <button type="button" class="profile-sidebar__menu-item btn-scale text-semibold">
+        <span class="profile-sidebar__menu-icon" aria-hidden="true">
+            <!-- STAR -->
+            <svg viewBox="0 0 24 24">
+            <path
+                d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.6 7-6.2-3.7-6.2 3.7 1.6-7L2 9.2l7.1-.6L12 2z"
+            />
+            </svg>
+        </span>
+        <span class="profile-sidebar__menu-text">Favorite Rides</span>
+        </button>
+
+        <button type="button" class="profile-sidebar__menu-item btn-scale text-semibold">
+        <span class="profile-sidebar__menu-icon" aria-hidden="true">
+            <!-- HISTORY -->
+            <svg viewBox="0 0 24 24">
+            <path d="M12 8v5l3 2" />
+            <path d="M21 12a9 9 0 1 1-3-6.7" />
+            <path d="M21 3v6h-6" />
+            </svg>
+        </span>
+        <span class="profile-sidebar__menu-text">Ride History</span>
+        </button>
+
+        <button type="button" class="profile-sidebar__menu-item btn-scale text-semibold">
+        <span class="profile-sidebar__menu-icon" aria-hidden="true">
+            <!-- REPORT -->
+            <svg viewBox="0 0 24 24">
+            <path d="M14 2H7a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z" />
+            <path d="M14 2v6h6" />
+            <path d="M8 13h8" />
+            <path d="M8 17h8" />
+            <path d="M8 9h4" />
+            </svg>
+        </span>
+        <span class="profile-sidebar__menu-text">Usage Report</span>
+        </button>
+
+        <button type="button" class="profile-sidebar__menu-item btn-scale text-semibold">
+        <span class="profile-sidebar__menu-icon" aria-hidden="true">
+            <!-- SUPPORT -->
+            <svg viewBox="0 0 24 24">
+            <path d="M4 12a8 8 0 0 1 16 0" />
+            <path d="M4 12v4a2 2 0 0 0 2 2h1v-6H6a2 2 0 0 0-2 2z" />
+            <path d="M20 12v4a2 2 0 0 1-2 2h-1v-6h1a2 2 0 0 1 2 2z" />
+            <path d="M12 20h4" />
+            </svg>
+        </span>
+        <span class="profile-sidebar__menu-text">Support</span>
+        </button>
     </nav>
 
-    <button class="profile-sidebar__logout">
-      Log out
-    </button>
+    <div class="profile-sidebar__footer">
+        <!-- Active today -->
+        @if (isDriver) {
+        <div class="profile-sidebar__active text-semibold">
+            Active today: {{ activeToday }}
+        </div>
+        }
+
+        <button type="button" class="profile-sidebar__logout btn-scale text-medium">
+            <span class="profile-sidebar__logout-text">Log out</span>
+            <span class="profile-sidebar__logout-icon" aria-hidden="true">
+            <!-- LOGOUT ARROW -->
+            <svg viewBox="0 0 24 24">
+                <path d="M10 17l5-5-5-5" />
+                <path d="M15 12H3" />
+                <path d="M21 3h-8a2 2 0 0 0-2 2v3" />
+                <path d="M11 16v3a2 2 0 0 0 2 2h8" />
+            </svg>
+            </span>
+        </button>
   </div>
 </div>

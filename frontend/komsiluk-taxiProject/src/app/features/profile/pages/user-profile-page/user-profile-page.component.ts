@@ -1,11 +1,10 @@
 import { Component } from '@angular/core';
-import { ProfileSidebarComponent } from '../../components/profile-sidebar/profile-sidebar.component';
-import { ProfileDetailsComponent } from '../../components/profile-details/profile-details.component';
+import { RouterOutlet } from '@angular/router';
 
 @Component({
   selector: 'app-user-profile-page',
   standalone: true,
-  imports: [ProfileSidebarComponent, ProfileDetailsComponent],
+  imports: [RouterOutlet],
   templateUrl: './user-profile-page.component.html',
   styleUrl: './user-profile-page.component.css',
 })
