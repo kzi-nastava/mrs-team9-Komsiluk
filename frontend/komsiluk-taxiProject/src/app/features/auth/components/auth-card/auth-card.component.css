@@ -1,0 +1,37 @@
+.card-screen {
+  min-height: calc(100vh - 64px); /* ispod navbara */
+  display: grid;
+  place-items: center;
+  padding: 0 16px;
+  box-sizing: border-box;
+}
+
+.card-panel {
+  width: min(420px, 92vw);
+  padding: 35px;
+}
+
+.card-title {
+  font-size: 22px;
+  margin-bottom: 20px;
+  font-weight: var(--weight-regular);
+}
+
+.card-divider {
+  height: 2px;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.75);
+  margin-bottom: 14px;
+}
+
+.card-text{
+  font-size: 14px;
+  line-height: 1.25;
+  font-weight: var(--weight-regular);
+}
+
+.card-actions {
+  margin-top: 25px;
+  display: flex;
+  justify-content: flex-end;
+}

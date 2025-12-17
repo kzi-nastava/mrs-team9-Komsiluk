@@ -1,0 +1,21 @@
+a {
+    color: var(--color-secondary);
+    display:inline-block;
+}
+
+.first-link {
+    margin-block: 18px;
+}
+
+
+mat-form-field {
+  width: 100%;
+}
+
+.text-dark {
+  color: rgba(0, 0, 0, 0.85);
+}
+
+input {
+  --mat-form-field-filled-container-color: rgba(255, 255, 255, 0.5);
+}

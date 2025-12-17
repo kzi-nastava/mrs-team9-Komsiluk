@@ -1,1 +1,36 @@
-<p>login-page works!</p>
+<app-auth-card title="Log in" buttonText="Log in">
+  <form 
+  [formGroup]="LoginForm"
+  id="loginForm"
+  (ngSubmit)="onSubmit()"
+  >
+    <mat-form-field appearance="fill">
+        <mat-label>Email</mat-label>
+        <input matInput placeholder="Enter your email" formControlName="email">
+
+        <mat-error *ngIf="LoginForm.get('email')?.hasError('required')">
+            Email is required
+        </mat-error>
+
+        <mat-error *ngIf="LoginForm.get('email')?.hasError('email')">
+            Please enter a valid email address
+        </mat-error>
+    </mat-form-field>
+    <mat-form-field appearance="fill">
+        <mat-label>Password</mat-label>
+        <input matInput type="password" placeholder="Enter your password" formControlName="password">
+
+         <mat-error *ngIf="LoginForm.get('password')?.hasError('required')">
+            Password is required
+        </mat-error>
+
+        <mat-error *ngIf="LoginForm.get('password')?.hasError('minlength')">
+            Password must be at least 6 characters
+        </mat-error>
+    </mat-form-field>
+</form>
+
+    <a routerLink="/forgot-password" class="first-link">Forgot password?</a>
+    <br>
+    <a routerLink="/register">Don't have an account? Sign up</a>
+</app-auth-card>
