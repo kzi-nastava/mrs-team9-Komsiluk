@@ -19,3 +19,7 @@ mat-form-field {
 input {
   --mat-form-field-filled-container-color: rgba(255, 255, 255, 0.5);
 }
+
+a {
+    cursor:pointer;
+}
