@@ -10,4 +10,5 @@ import { Input } from '@angular/core';
 export class AuthCardComponent {
   @Input() title!: string;
   @Input() buttonText = 'Continue';
+  @Input() formId!: string;
 }

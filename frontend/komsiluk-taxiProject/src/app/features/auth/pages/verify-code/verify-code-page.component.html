@@ -1,1 +1,25 @@
-<p>verify-code-page works!</p>
+<app-auth-card title="Verify Code" buttonText="Confirm" formId="verifyCodeForm">
+  <form 
+  [formGroup]="VerifyCodeForm"
+  id="verifyCodeForm"
+  (ngSubmit)="onSubmit()"
+  >
+    <mat-form-field appearance="fill">
+        <mat-label>Please check your email for the verification code</mat-label>
+        <input matInput placeholder="Enter code" formControlName="verificationCode">
+
+        <mat-error *ngIf="VerifyCodeForm.get('verificationCode')?.hasError('required')">
+            Verification code is required
+        </mat-error>
+        <mat-error *ngIf="VerifyCodeForm.get('verificationCode')?.hasError('minlength') || VerifyCodeForm.get('verificationCode')?.hasError('maxlength')">
+            Verification code must be 6 characters long
+        </mat-error>
+    </mat-form-field>
+    </form>
+    <a routerLink="/forgot-password">Didn't recieve the code</a>
+    <button 
+      class="btn btn--ghost btn-scale text-semibold"
+      [routerLink]="'/login'"
+      type="button"
+      auth-card-footer>Cancel</button>
+</app-auth-card>

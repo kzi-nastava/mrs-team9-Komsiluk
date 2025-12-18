@@ -1,0 +1,22 @@
+button {
+    margin-right:10px;
+}
+
+a {
+    color: var(--color-secondary);
+    display:inline-block;
+}
+
+.first-link {
+    margin-block: 18px;
+}
+
+
+mat-form-field {
+  width: 100%;
+}
+
+
+a {
+    cursor:pointer;
+}

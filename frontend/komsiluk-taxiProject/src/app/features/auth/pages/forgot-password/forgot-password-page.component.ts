@@ -5,7 +5,7 @@ import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatInputModule} from "@angular/material/input";
 import {MatButtonModule} from "@angular/material/button";
 import {FormControl, FormGroup, Validators, ReactiveFormsModule} from "@angular/forms";
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-forgot-password-page',
@@ -19,12 +19,16 @@ export class ForgotPasswordPage {
       password: new FormControl('', [Validators.required, Validators.minLength(6)]),
     });
 
+    constructor(private router: Router) {
+
+    }
+
     onSubmit() {
       if (this.ForgotPasswordForm.invalid) {
         this.ForgotPasswordForm.markAllAsTouched();
         return;
       }
 
-      console.log(this.ForgotPasswordForm.value);
+      this.router.navigate(['/verify-recovery-code']);
     }
 }
