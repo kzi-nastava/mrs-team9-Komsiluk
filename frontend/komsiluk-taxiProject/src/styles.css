@@ -153,3 +153,15 @@ button,input,select,textarea {
   outline-offset: 3px;
   border-radius: 6px;
 }
+
+/* Form input styles */
+.pe-input.ng-invalid.ng-touched,
+.cp-input.ng-invalid.ng-touched,
+select.pe-input.ng-invalid.ng-touched {
+  box-shadow: 0 0 0 1.5px rgb(255, 0, 0);
+}
+
+.form-error {
+  font-size: var(--fs-sm);
+  color: #ff0000;
+}

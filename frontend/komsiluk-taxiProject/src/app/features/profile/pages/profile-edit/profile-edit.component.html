@@ -2,30 +2,45 @@
   <div class="glass-panel glass-panel--ep">
     <div class="pe-title text-semibold">EDIT</div>
 
-    <form class="pe-form" autocomplete="off">
+    <form class="pe-form" [formGroup]="form" (ngSubmit)="save()" autocomplete="off">
       <label class="pe-field">
         <span class="pe-label text-semibold">Firstname</span>
-        <input class="pe-input text-medium" type="text" value="Name" />
+        <input class="pe-input text-medium" type="text" formControlName="firstName" />
+        @if (show('firstName')) {
+          <div class="form-error">Enter at least 2 letters. No numbers.</div>
+        }
       </label>
 
       <label class="pe-field">
         <span class="pe-label text-semibold">Lastname</span>
-        <input class="pe-input text-medium" type="text" value="Surname" />
+        <input class="pe-input text-medium" type="text" formControlName="lastName" />
+        @if (show('lastName')) {
+          <div class="form-error">Enter at least 2 letters. No numbers.</div>
+        }
       </label>
 
       <label class="pe-field">
         <span class="pe-label text-semibold">Address(Street and number)</span>
-        <input class="pe-input text-medium" type="text" value="Address 100" />
+        <input class="pe-input text-medium" type="text" formControlName="address" />
+         @if (show('address')) {
+            <div class="form-error">Address is required.</div>
+          }
       </label>
 
       <label class="pe-field">
         <span class="pe-label text-semibold">City</span>
-        <input class="pe-input text-medium" type="text" value="City" />
+        <input class="pe-input text-medium" type="text" formControlName="city" />
+        @if (show('city')) {
+          <div class="form-error">City is required.</div>
+        }
       </label>
 
       <label class="pe-field">
         <span class="pe-label text-semibold">Phone number</span>
-        <input class="pe-input text-medium" type="text" value="11111111" />
+        <input class="pe-input text-medium" type="text" formControlName="phone" />
+        @if (show('phone')) {
+          <div class="form-error">Use digits only (optionally +), 7–15 digits.</div>
+        }
       </label>
 
       <div class="btn-actions">
@@ -33,7 +48,7 @@
           Cancel
         </button>
 
-        <button type="button" class="btn btn--primary btn-scale text-semibold" (click)="save()">
+        <button type="submit" class="btn btn--primary btn-scale text-semibold">
           Save
         </button>
       </div>
