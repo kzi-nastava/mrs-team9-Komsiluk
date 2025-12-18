@@ -17,7 +17,7 @@
 }
 
 .msg-title {
-  font-size: 22px;
+  font-size: var(--fs-h1);
   margin-bottom: 20px;
   font-weight: var(--weight-regular);
 }
@@ -30,7 +30,7 @@
 }
 
 .msg-text {
-  font-size: 14px;
+  font-size: var(--fs-md);
   line-height: 1.25;
   max-width: 360px;
   margin-top: 30px;
