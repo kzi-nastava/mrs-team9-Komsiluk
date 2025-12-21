@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { UserModeService } from '../../../shared/components/user_mode/user-mode.service';
+import { UserModeService } from '../../../shared/util/user_mode/user-mode.service';
 
 @Component({
   selector: 'app-start-menu',
