@@ -9,8 +9,21 @@
   --color-text: #323232;
   --color-white: #ffffff;
 
-  --blur-form: 8px;
+  /* Font Weights */
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
 
+  /* Font sizes */
+  --fs-display: 28px;
+  --fs-h1: 22px;
+  --fs-h2: 20px;
+  --fs-lg: 16px;
+  --fs-md: 14px;
+  --fs-sm: 12px;
+
+  /* Glass panel */
+  --blur-form: 8px;
   --glass-radius: 14px;
   --glass-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
 }
@@ -139,4 +152,16 @@ button,input,select,textarea {
   outline: 2px solid var(--color-secondary);
   outline-offset: 3px;
   border-radius: 6px;
+}
+
+/* Form input styles */
+.pe-input.ng-invalid.ng-touched,
+.cp-input.ng-invalid.ng-touched,
+select.pe-input.ng-invalid.ng-touched {
+  box-shadow: 0 0 0 1.5px rgb(255, 0, 0);
+}
+
+.form-error {
+  font-size: var(--fs-sm);
+  color: #ff0000;
 }
