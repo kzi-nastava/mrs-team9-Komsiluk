@@ -1,10 +1,11 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
+import { MapComponent } from '../../../shared/components/map/map';
 import { UserModeService } from '../../../shared/util/user_mode/user-mode.service';
 
 @Component({
   selector: 'app-start-menu',
-  imports: [],
+  imports: [MapComponent],
   templateUrl: './start-menu.component.html',
   styleUrl: './start-menu.component.css',
 })

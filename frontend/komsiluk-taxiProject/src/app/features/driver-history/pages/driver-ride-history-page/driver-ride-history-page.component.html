@@ -1,0 +1,18 @@
+<div class="history-page app-bg-textured">
+  <div class="history-page__container">
+    <div class="history-page__list">
+      <app-ride-history-card
+        *ngFor="let r of filteredRides; let i = index"
+        [ride]="r"
+        [selected]="i % 2 === 0"
+        (details)="onDetails($event)">
+      </app-ride-history-card>
+    </div>
+  </div>
+</div>
+@if (detailsOpen && detailsVm) {
+  <app-ride-history-details-modal
+    [data]="detailsVm"
+    (close)="closeDetails()">
+  </app-ride-history-details-modal>
+}

@@ -1,0 +1,112 @@
+<div class="rh-modal" (click)="onBackdropClick()">
+  <div class="rh-modal__dialog" (click)="onDialogClick($event)">
+    <div class="rh-modal__content">
+      <!-- LEFT -->
+      <section class="rh-left">
+        <h3 class="rh-title">Passengers:</h3>
+        <ul class="rh-list">
+          <li *ngFor="let p of data.passengers">{{ p }}</li>
+        </ul>
+
+        <h3 class="rh-title rh-title--spaced">Ratings:</h3>
+
+        <div class="rh-rating" *ngFor="let r of data.ratings">
+          <div class="rh-rating__email">{{ r.email }}</div>
+
+          <div class="rh-rating__row">
+            <span class="rh-label">Driver rating:</span>
+            <span class="rh-value">{{ fmtRating(r.driverRating) }}</span>
+          </div>
+
+          <div class="rh-rating__row">
+            <span class="rh-label">Vehicle rating:</span>
+            <span class="rh-value">{{ fmtRating(r.vehicleRating) }}</span>
+          </div>
+
+          <div class="rh-rating__row">
+            <span class="rh-label">Comment:</span>
+            <span class="rh-value">{{ fmtText(r.comment) }}</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- CENTER -->
+      <section class="rh-center">
+        <img class="rh-map" [src]="data.mapImageUrl" alt="Map" />
+      </section>
+
+      <!-- RIGHT -->
+      <section class="rh-right">
+        <div class="rh-info">
+          <div class="rh-info__row">
+            <span class="rh-label">Pickup location:</span>
+            <span class="rh-value">{{ data.pickupLocation }}</span>
+          </div>
+
+          <div class="rh-info__row" *ngIf="data.station1">
+            <span class="rh-label">Station 1:</span>
+            <span class="rh-value">{{ data.station1 }}</span>
+          </div>
+
+          <div class="rh-info__row" *ngIf="data.station2">
+            <span class="rh-label">Station 2:</span>
+            <span class="rh-value">{{ data.station2 }}</span>
+          </div>
+
+          <div class="rh-info__row">
+            <span class="rh-label">Destination:</span>
+            <span class="rh-value">{{ data.destination }}</span>
+          </div>
+
+          <div class="rh-info__row">
+            <span class="rh-label">Start time:</span>
+            <span class="rh-value">{{ data.startTime }}</span>
+          </div>
+
+          <div class="rh-info__row">
+            <span class="rh-label">End time:</span>
+            <span class="rh-value">{{ data.endTime }}</span>
+          </div>
+        </div>
+
+        <div class="rh-stats">
+          <div class="rh-stat">
+            <img class="rh-icon" src="assets/icons/taxi.png" alt="" />
+            <span class="rh-label">Kilometers:</span>
+            <span class="rh-value">{{ data.kilometers }}</span>
+          </div>
+
+          <div class="rh-stat">
+            <img class="rh-icon" src="assets/icons/clock.png" alt="" />
+            <span class="rh-label">Time:</span>
+            <span class="rh-value">{{ data.durationText }}</span>
+          </div>
+
+          <div class="rh-stat">
+            <img class="rh-icon" src="assets/icons/dollar.png" alt="" />
+            <span class="rh-label">Price:</span>
+            <span class="rh-value">{{ data.price }}$</span>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- BOTTOM LINE -->
+    <div class="details-bottom-row">
+  <div class="details-bottom-item">
+    <span class="details-bottom-label">Panic button pressed:</span>
+    <b class="details-bottom-value">{{ data.panicPressed ? 'True' : 'False' }}</b>
+  </div>
+
+  <div class="details-bottom-item">
+    <span class="details-bottom-label">Inconsistency report:</span>
+    <b class="details-bottom-value">{{ data.inconsistencyReport || 'N/A' }}</b>
+  </div>
+</div>
+
+    <!-- CLOSE -->
+    <div class="rh-actions">
+      <button class="rh-close" type="button" (click)="close.emit()">Close</button>
+    </div>
+  </div>
+</div>
