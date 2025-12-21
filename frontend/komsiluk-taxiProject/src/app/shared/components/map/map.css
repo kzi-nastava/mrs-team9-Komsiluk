@@ -1,0 +1,26 @@
+.map-frame{
+  height: calc(100vh - 64px); /* ispod navbara do dna ekrana */
+  width: 100%;
+}
+
+#map{
+  height: 100%;
+  width: 100%;
+}
+/* wrapper oko mape */
+.map-frame {
+  position: relative;
+  z-index: 1; /* mapa ispod UI-a */
+}
+
+/* sam Leaflet container */
+#map,
+.leaflet-container {
+  position: relative;
+  z-index: 1;
+}
+.map-frame, #map {
+  width: 100%;
+  height: 100%;
+}
+

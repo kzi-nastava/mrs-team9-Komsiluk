@@ -116,3 +116,29 @@
 .app-navbar__avatar-btn:hover .app-navbar__avatar-icon {
   fill: var(--color-primary);
 }
+.app-navbar__center{
+  font-family: 'Faster One', system-ui, sans-serif; /* ako ti već radi u projektu */
+}
+
+/* FILTER dugme */
+.app-navbar__filter-btn{
+  height: 28px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: transparent;
+  color: var(--color-secondary);
+  font-weight: 700;
+  cursor: pointer;
+  opacity: 0.95;
+  margin-right: 10px; /* razmak od avatara */
+}
+
+.app-navbar__filter-btn:hover{
+  opacity: 1;
+}
+
+/* (opciono) malo tanji izgled u driver history modu */
+.app-navbar--driver-history{
+  box-shadow: none;
+}

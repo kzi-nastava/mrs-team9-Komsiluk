@@ -1,4 +1,8 @@
-<div style="display:flex; gap:16px; padding:24px;">
-  <button type="button" (click)="openUser()">User</button>
-  <button type="button" (click)="openDriver()">Driver</button>
+<div class="home-map">
+  <app-map></app-map>
+
+  <div class="home-map__controls">
+    <button type="button" class="home-map__btn" (click)="openUser()">User</button>
+    <button type="button" class="home-map__btn" (click)="openDriver()">Driver</button>
+  </div>
 </div>

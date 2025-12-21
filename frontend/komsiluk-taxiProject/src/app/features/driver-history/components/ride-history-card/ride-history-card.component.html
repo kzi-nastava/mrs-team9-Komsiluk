@@ -1,0 +1,81 @@
+<div class="ride-card" [class.ride-card--selected]="selected">
+  <img class="ride-card__map" [src]="ride.mapImageUrl" alt="Map" />
+
+  <div class="ride-card__col ride-card__col--time">
+    <div class="ride-card__date">{{ ride.date }}</div>
+
+    <div class="ride-card__row">
+      <span class="ride-card__label">Start time:</span>
+      <b class="ride-card__value">{{ ride.startTime }}</b>
+    </div>
+
+    <div class="ride-card__row">
+      <span class="ride-card__label">End time:</span>
+      <b class="ride-card__value">{{ ride.endTime }}</b>
+    </div>
+
+    <!-- DESKTOP dugme -->
+    <button class="ride-card__details ride-card__details--desktop"
+            type="button"
+            (click)="onDetailsClick($event)">
+      Details
+    </button>
+  </div>
+
+  <div class="ride-card__col ride-card__col--route">
+    <div class="ride-card__row">
+      <span class="ride-card__label">Pickup location:</span>
+      <b class="ride-card__value">{{ ride.pickup }}</b>
+    </div>
+
+    <div class="ride-card__row">
+      <span class="ride-card__label">Destination:</span>
+      <b class="ride-card__value">{{ ride.destination }}</b>
+    </div>
+  </div>
+
+  <div class="ride-card__col ride-card__col--meta">
+    <div class="ride-card__row">
+      <span class="ride-card__label">Status:</span>
+      <b class="ride-card__value">{{ ride.status }}</b>
+    </div>
+
+    <div class="ride-card__row">
+      <span class="ride-card__label">Passengers:</span>
+      <b class="ride-card__value">{{ ride.passengers }}</b>
+    </div>
+  </div>
+
+  <div class="ride-card__col ride-card__col--stats">
+    <div class="ride-card__stat">
+      <img class="ride-card__icon" src="assets/icons/taxi.png" alt="" />
+      <span>
+        <span class="ride-card__label">Kilometers:</span>
+        <b class="ride-card__value">{{ ride.kilometers }}</b>
+      </span>
+    </div>
+
+    <div class="ride-card__stat">
+      <img class="ride-card__icon" src="assets/icons/clock.png" alt="" />
+      <span>
+        <span class="ride-card__label">Time:</span>
+        <b class="ride-card__value">{{ ride.durationText }}</b>
+      </span>
+    </div>
+
+    <div class="ride-card__stat">
+      <img class="ride-card__icon" src="assets/icons/dollar.png" alt="" />
+      <span>
+        <span class="ride-card__label">Price:</span>
+        <b class="ride-card__value">{{ ride.price }}$</b>
+      </span>
+    </div>
+  </div>
+
+  <!-- MOBILE dugme (na dnu) -->
+  <button class="ride-card__details ride-card__details--mobile"
+          type="button"
+          (click)="onDetailsClick($event)">
+    Details
+  </button>
+</div>
