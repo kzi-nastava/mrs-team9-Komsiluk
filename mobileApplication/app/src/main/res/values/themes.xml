@@ -1,9 +1,45 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
     <style name="Base.Theme.Taxi_Project" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <!-- status bar gore -->
+        <item name="android:statusBarColor">@color/primary</item>
+
+        <!-- navigation bar dole -->
+        <item name="android:navigationBarColor">@color/primary</item>
+
+        <!-- kaže: NE želim "light" barove (tj. ne želim tamne ikonice) -->
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar">false</item>
+
+        <!-- za svaki slučaj -->
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+    </style>
+    <style name="Theme.Taxi_Project" parent="Base.Theme.Taxi_Project" />
+
+    <style name="Widget.Button.Primary" parent="Widget.MaterialComponents.Button">
+        <item name="android:minWidth">120dp</item>
+        <item name="android:height">40dp</item>
+        <item name="shapeAppearance">@style/RoundedFull</item>
+        <item name="backgroundTint">@color/secondary</item>
+        <item name="android:textColor">@color/text</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:fontFamily">@font/roboto_serif_semibold</item>
     </style>
 
-    <style name="Theme.Taxi_Project" parent="Base.Theme.Taxi_Project" />
+    <style name="Widget.Button.Ghost" parent="Widget.MaterialComponents.Button">
+        <item name="android:minWidth">120dp</item>
+        <item name="android:layout_height">40dp</item>
+        <item name="shapeAppearance">@style/RoundedFull</item>
+        <item name="backgroundTint">@color/white</item>
+        <item name="strokeColor">@color/secondary</item>
+        <item name="strokeWidth">4dp</item>
+        <item name="android:textColor">@color/text</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:fontFamily">@font/roboto_serif_semibold</item>
+    </style>
+
+    <style name="RoundedFull">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">999dp</item>
+    </style>
+
 </resources>

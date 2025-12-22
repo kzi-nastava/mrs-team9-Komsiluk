@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+    <!-- font sizes -->
+    <dimen name="fs_display">28sp</dimen>
+    <dimen name="fs_h1">22sp</dimen>
+    <dimen name="fs_h2">20sp</dimen>
+    <dimen name="fs_lg">16sp</dimen>
+    <dimen name="fs_md">14sp</dimen>
+    <dimen name="fs_sm">12sp</dimen>
+
+    <!-- glass panel radius -->
+    <dimen name="glass_radius">14dp</dimen>
+</resources>
