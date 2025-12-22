@@ -1,10 +1,19 @@
 <aside class="rightsidebar" [class.open]="open">
   <div class="rightsidebar__content">
     <nav class="rightmenu">
-      <a class="rightmenu__item rightmenu__item--active" href="#">Login</a>
-      <a class="rightmenu__item" href="#">Register</a>
+      <!-- Prikazuj samo kada korisnik nije ulogovan -->
+      <a *ngIf="!isLoggedIn" class="rightmenu__item rightmenu__item--active" href="#">Login</a>
+      <a *ngIf="!isLoggedIn" class="rightmenu__item" href="#">Register</a>
+
+      <!-- Kada je korisnik ulogovan -->
+      <a *ngIf="isLoggedIn" class="rightmenu__item rightmenu__item--active" href="#">Profile</a>
+      <a *ngIf="isLoggedIn" class="rightmenu__item" href="#">Usage report</a>
+      <a *ngIf="isLoggedIn" class="rightmenu__item" href="#">Ride history</a>
+
+
+
       <a class="rightmenu__item" href="#">Support</a>
-      <a class="rightmenu__item" href="#">About us</a>
+      <a  class="rightmenu__item" href="#">About us</a>
     </nav>
   </div>
 </aside>
