@@ -1,19 +1,55 @@
 <aside class="rightsidebar" [class.open]="open">
   <div class="rightsidebar__content">
     <nav class="rightmenu">
-      <!-- Prikazuj samo kada korisnik nije ulogovan -->
-      <a *ngIf="!isLoggedIn" class="rightmenu__item rightmenu__item--active" href="#">Login</a>
-      <a *ngIf="!isLoggedIn" class="rightmenu__item" href="#">Register</a>
 
-      <!-- Kada je korisnik ulogovan -->
-      <a *ngIf="isLoggedIn" class="rightmenu__item rightmenu__item--active" href="#">Profile</a>
-      <a *ngIf="isLoggedIn" class="rightmenu__item" href="#">Usage report</a>
-      <a *ngIf="isLoggedIn" class="rightmenu__item" href="#">Ride history</a>
+      <!-- GUEST -->
+      <ng-container *ngIf="userRole() === UserRole.GUEST">
+        <a class="rightmenu__item rightmenu__item--active" routerLink="/login">
+          Login
+        </a>
+        <a class="rightmenu__item" routerLink="/register">
+          Register
+        </a>
+        <a class="rightmenu__item" routerLink="/about">
+          About us
+        </a>
+      </ng-container>
 
+      <!-- PASSENGER & DRIVER -->
+      <ng-container *ngIf="
+        userRole() === UserRole.PASSENGER ||
+        userRole() === UserRole.DRIVER
+      ">
+        <a class="rightmenu__item rightmenu__item--active" routerLink="/profile">
+          Profile
+        </a>
+        <a class="rightmenu__item" routerLink="/usage-report">
+          Usage report
+        </a>
+        <a class="rightmenu__item" routerLink="/ride-history">
+          Ride history
+        </a>
+        <a class="rightmenu__item" routerLink="/support">
+          Support
+        </a>
+        <a class="rightmenu__item" routerLink="/about">
+          About us
+        </a>
+      </ng-container>
 
+      <!-- ADMIN -->
+      <ng-container *ngIf="userRole() === UserRole.ADMIN">
+        <a class="rightmenu__item rightmenu__item--active" routerLink="/profile">
+          Profile
+        </a>
+        <a class="rightmenu__item" routerLink="/support">
+          Support
+        </a>
+        <a class="rightmenu__item" routerLink="/about">
+          About us
+        </a>
+      </ng-container>
 
-      <a class="rightmenu__item" href="#">Support</a>
-      <a  class="rightmenu__item" href="#">About us</a>
     </nav>
   </div>
 </aside>

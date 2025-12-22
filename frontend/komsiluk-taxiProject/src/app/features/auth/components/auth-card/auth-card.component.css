@@ -1,5 +1,5 @@
 .card-screen {
-  min-height: calc(100vh - 64px); /* ispod navbara */
+  min-height: calc(100vh - 64px);
   display: grid;
   place-items: center;
   padding: 0 16px;
@@ -12,9 +12,10 @@
 }
 
 .card-title {
-  font-size: 22px;
+  font-size: var(--fs-h1);
   margin-bottom: 20px;
-  font-weight: var(--weight-regular);
+  font-weight: var(--weight-medium);
+  text-transform: uppercase;
 }
 
 .card-divider {
@@ -23,11 +24,8 @@
   background: rgba(255, 255, 255, 0.75);
   margin-bottom: 14px;
 }
-
-.card-text{
-  font-size: 14px;
-  line-height: 1.25;
-  font-weight: var(--weight-regular);
+.card-body {
+  margin-block:30px;
 }
 
 .card-actions {

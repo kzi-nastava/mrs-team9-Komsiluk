@@ -1,26 +1,23 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, NavigationEnd } from '@angular/router';
-import { filter } from 'rxjs/operators';
+import { Router, RouterLink } from '@angular/router';
+import { AuthService, UserRole } from '../../../features/auth/services/auth';
+import { Signal } from '@angular/core';
 
 @Component({
   selector: 'app-rightsidebar',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink],
   templateUrl: './rightsidebar.component.html',
   styleUrls: ['./rightsidebar.component.css'],
 })
 export class RightsidebarComponent {
   @Input() open = false;
-  isLoggedIn: boolean = false;
-  isDriverHistory: boolean = false;
+  userRole: Signal<UserRole>;
+  UserRole = UserRole;
 
-  constructor(private router: Router) {
-    // Ovaj kod prati promene u URL-u
-    this.router.events.pipe(filter(e => e instanceof NavigationEnd)).subscribe(() => {
-      this.isDriverHistory = this.router.url.startsWith('/driver-history');
-      // Postavljamo isLoggedIn vrednost prema URL-u
-      this.isLoggedIn = this.isDriverHistory; // Pretpostavljamo da ako je URL za driver-history, korisnik je ulogovan
-    });
+
+  constructor(private auth: AuthService) {
+    this.userRole = this.auth.role.asReadonly();
   }
 }
