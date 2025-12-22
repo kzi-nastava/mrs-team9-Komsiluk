@@ -4,9 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="48dp"
-    android:background="@color/primary"
-    android:paddingStart="16dp"
-    android:paddingEnd="16dp">
+    android:background="@color/primary">
 
     <!-- Left button -->
     <ImageButton
@@ -15,6 +13,7 @@
         android:layout_height="30dp"
         android:background="@android:color/transparent"
         android:padding="8dp"
+        android:layout_marginStart="8dp"
         android:contentDescription="@string/nav_left"
         android:src="@drawable/ic_launcher_foreground"
         app:layout_constraintStart_toStartOf="parent"
@@ -43,10 +42,20 @@
         android:layout_height="30dp"
         android:background="@android:color/transparent"
         android:padding="8dp"
+        android:layout_marginEnd="8dp"
         android:contentDescription="@string/nav_right"
         android:src="@drawable/ic_launcher_foreground"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <View
+        android:id="@+id/navbarBottomBorder"
+        android:layout_width="0dp"
+        android:layout_height="2dp"
+        android:background="@android:color/black"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
