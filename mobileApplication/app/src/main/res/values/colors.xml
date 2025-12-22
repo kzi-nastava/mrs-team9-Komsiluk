@@ -9,6 +9,6 @@
     <color name="black">#000000</color>
 
     <color name="profile_sidebar_top">#E0FFEE02</color>
-    <color name="profile_sidebar_bottom">#BEFFEE02</color>
+    <color name="profile_sidebar_bottom">#BEC1B300</color>
     <color name="profile_details_bg">#BE000000</color>
 </resources>

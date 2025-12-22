@@ -5,6 +5,14 @@
 
     <string name="btn_save">Save</string>
     <string name="btn_edit">Edit</string>
+    <string name="btn_car">Car</string>
+    <string name="btn_back">Back</string>
+
+    <string name="profile_avatar_content_description">User Avatar</string>
+    <string name="profile_change_image">Change image</string>
+    <string name="profile_change_password">Change password</string>
+    <string name="profile_default_name">Name Surname</string>
+    <string name="profile_default_email">email@gmail.com</string>
 
     <string name="label_first_name">Name</string>
     <string name="label_last_name">Surname</string>
@@ -14,7 +22,24 @@
     <string name="label_address">Address</string>
     <string name="label_city">City</string>
 
+    <string name="label_car_model">Model</string>
+    <string name="label_licence_plate">Licence plate</string>
+    <string name="label_type">Type</string>
+    <string name="label_num_seats">Number of seats</string>
+    <string name="label_child_seat">Child seat available</string>
+    <string name="label_pet_friendly">Address</string>
+    <string name="label_pet_friendly_full">Pet friendly: Yes</string>
+    <string name="label_child_seat_full">Child seat available: No</string>
+
+
     <string name="nav_left">Left action</string>
     <string name="nav_right">Right action</string>
-    <string name="profile_title">Profile</string>
+
+    <string name="profile_menu_favorite_rides">Favorite Rides</string>
+    <string name="profile_menu_ride_history">Ride History</string>
+    <string name="profile_menu_usage_report">Usage Report</string>
+    <string name="profile_menu_support">Support</string>
+    <string name="profile_active_today_placeholder">Active today: 5h</string>
+    <string name="profile_logout">Log out</string>
+
 </resources>

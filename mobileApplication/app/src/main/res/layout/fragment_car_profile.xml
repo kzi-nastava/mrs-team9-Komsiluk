@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/carGuideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.25" />
+
+    <!-- Image -->
+    <ImageView
+        android:id="@+id/imgCarBg"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:src="@drawable/bg_car_profile_dark"
+        android:scaleType="centerCrop"
+        android:scaleX="1.5"
+        android:scaleY="1.5"
+        android:translationX="-32dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@id/carGuideline"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Content -->
+    <ScrollView
+        android:id="@+id/scrollContent"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        android:background="@android:color/transparent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="24dp">
+
+            <!-- Row 1 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_horizontal"
+                android:layout_marginBottom="16dp">
+
+                <!-- Model -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tvLabelModel"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/label_car_model"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/fs_lg"
+                        android:fontFamily="@font/roboto_serif_semibold" />
+
+                    <TextView
+                        android:id="@+id/tvValueModel"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:minHeight="42dp"
+                        android:background="@drawable/profile_box"
+                        android:gravity="center_vertical"
+                        android:paddingHorizontal="16dp"
+                        android:text="1978 Volkswagen Type 2 T2"
+                        android:textColor="@color/text"
+                        android:textSize="@dimen/fs_lg"
+                        android:fontFamily="@font/roboto_serif_medium" />
+                </LinearLayout>
+
+                <View
+                    android:layout_width="24dp"
+                    android:layout_height="0dp" />
+
+                <!-- Type -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tvLabelType"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/label_type"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/fs_lg"
+                        android:fontFamily="@font/roboto_serif_semibold" />
+
+                    <TextView
+                        android:id="@+id/tvValueType"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:minHeight="42dp"
+                        android:background="@drawable/profile_box"
+                        android:gravity="center_vertical"
+                        android:paddingHorizontal="16dp"
+                        android:text="Luxury"
+                        android:textColor="@color/text"
+                        android:textSize="@dimen/fs_lg"
+                        android:fontFamily="@font/roboto_serif_medium" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Row 2-->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_horizontal"
+                android:layout_marginBottom="16dp">
+
+                <!-- Licence plate -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tvLabelLicencePlate"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/label_licence_plate"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/fs_lg"
+                        android:fontFamily="@font/roboto_serif_semibold" />
+
+                    <TextView
+                        android:id="@+id/tvValueLicencePlate"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:minHeight="42dp"
+                        android:background="@drawable/profile_box"
+                        android:gravity="center_vertical"
+                        android:paddingHorizontal="16dp"
+                        android:text="NS-111-AB"
+                        android:textColor="@color/text"
+                        android:textSize="@dimen/fs_lg"
+                        android:fontFamily="@font/roboto_serif_medium" />
+                </LinearLayout>
+
+                <View
+                    android:layout_width="24dp"
+                    android:layout_height="0dp" />
+
+                <!-- Number of seats -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tvLabelSeats"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/label_num_seats"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/fs_lg"
+                        android:fontFamily="@font/roboto_serif_semibold" />
+
+                    <TextView
+                        android:id="@+id/tvValueSeats"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:minHeight="42dp"
+                        android:background="@drawable/profile_box"
+                        android:gravity="center_vertical"
+                        android:paddingHorizontal="16dp"
+                        android:text="5"
+                        android:textColor="@color/text"
+                        android:textSize="@dimen/fs_lg"
+                        android:fontFamily="@font/roboto_serif_medium" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Row 3 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="24dp">
+
+                <TextView
+                    android:id="@+id/tvPetFriendlyCombined"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/label_pet_friendly_full"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/fs_lg"
+                    android:fontFamily="@font/roboto_serif_semibold" />
+
+                <TextView
+                    android:id="@+id/tvChildSeatCombined"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/label_child_seat_full"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/fs_lg"
+                    android:fontFamily="@font/roboto_serif_semibold" />
+            </LinearLayout>
+
+            <!-- Back + Edit -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="end">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnBack"
+                    style="@style/Widget.Button.Ghost"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/btn_back" />
+
+                <View
+                    android:layout_width="16dp"
+                    android:layout_height="0dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnEditCar"
+                    style="@style/Widget.Button.Primary"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/btn_edit" />
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
+</androidx.constraintlayout.widget.ConstraintLayout>

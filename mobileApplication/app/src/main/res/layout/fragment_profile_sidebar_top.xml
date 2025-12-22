@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center_horizontal"
+    android:padding="24dp"
+    android:background="@color/profile_sidebar_top">
+
+    <!-- Avatar -->
+    <FrameLayout
+        android:id="@+id/avatarContainer"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:background="@drawable/profile_avatar_circle">
+
+        <ImageView
+            android:id="@+id/imgAvatar"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_launcher_foreground"
+            android:contentDescription="@string/profile_avatar_content_description"
+            android:scaleType="centerInside" />
+    </FrameLayout>
+
+    <!-- Change image -->
+    <TextView
+        android:id="@+id/btnChangeImage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="@string/profile_change_image"
+        android:textColor="@color/text"
+        android:fontFamily="@font/roboto_serif_semibold"
+        android:textSize="@dimen/fs_sm"
+        android:textStyle="normal" />
+
+    <!-- Name Surname -->
+    <TextView
+        android:id="@+id/tvName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/profile_default_name"
+        android:textColor="@color/text"
+        android:fontFamily="@font/roboto_serif_semibold"
+        android:textSize="@dimen/fs_h1" />
+
+    <!-- Email -->
+    <TextView
+        android:id="@+id/tvEmail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="1dp"
+        android:text="@string/profile_default_email"
+        android:textColor="@color/text"
+        android:fontFamily="@font/roboto_serif_semibold"
+        android:textSize="@dimen/fs_lg" />
+
+    <!-- Change password -->
+    <TextView
+        android:id="@+id/btnChangePassword"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="@string/profile_change_password"
+        android:textColor="@color/text"
+        android:fontFamily="@font/roboto_serif_semibold"
+        android:textSize="@dimen/fs_sm"
+        android:textStyle="normal" />
+
+</LinearLayout>
