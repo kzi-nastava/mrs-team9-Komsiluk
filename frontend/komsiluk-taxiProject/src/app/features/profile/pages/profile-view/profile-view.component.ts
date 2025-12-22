@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { ProfileSidebarComponent } from '../../components/profile-sidebar/profile-sidebar.component';
 import { ProfileDetailsComponent } from '../../components/profile-details/profile-details.component';
-import { UserModeService } from '../../../../shared/components/user_mode/user-mode.service';
+import { UserModeService } from '../../../../shared/util/user_mode/user-mode.service';
 
 @Component({
   selector: 'app-profile-view',

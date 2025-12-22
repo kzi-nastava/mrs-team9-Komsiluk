@@ -1,0 +1,23 @@
+<div class="filter-panel">
+  <div class="filter-chip">{{ formatRange() }}</div>
+
+  <div class="filter-row">
+    <label class="filter-label">From</label>
+    <input class="filter-date" type="date" [(ngModel)]="from" />
+  </div>
+
+  <div class="filter-row">
+    <label class="filter-label">To</label>
+    <input class="filter-date" type="date" [(ngModel)]="to" />
+  </div>
+
+<div class="filter-actions">
+  <button type="button" class="filter-btn filter-btn--reset" (click)="reset()">
+    Reset
+  </button>
+
+  <button type="button" class="filter-btn filter-btn--apply" (click)="applyFilter()">
+    Apply
+  </button>
+</div>
+</div>

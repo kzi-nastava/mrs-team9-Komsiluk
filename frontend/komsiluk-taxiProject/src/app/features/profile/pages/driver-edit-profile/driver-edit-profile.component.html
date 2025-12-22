@@ -2,32 +2,47 @@
   <div class="glass-panel glass-panel--ep driver-edit-panel">
     <div class="pe-title text-semibold">EDIT</div>
 
-    <form class="pe-form pe-form--driver" autocomplete="off">
+    <form class="pe-form pe-form--driver" [formGroup]="form" (ngSubmit)="save()" autocomplete="off">
       <!-- LEFT COLUMN (profile) -->
       <div class="pe-col">
         <label class="pe-field">
           <span class="pe-label text-semibold">Firstname</span>
-          <input class="pe-input text-medium" type="text" value="Name" />
+          <input class="pe-input text-medium" type="text" formControlName="firstName" />
+          @if (isInvalid('firstName')) {
+            <div class="form-error">Minimum 2 letters. No numbers.</div>
+          }
         </label>
 
         <label class="pe-field">
           <span class="pe-label text-semibold">Lastname</span>
-          <input class="pe-input text-medium" type="text" value="Surname" />
+          <input class="pe-input text-medium" type="text" formControlName="lastName" />
+          @if (isInvalid('lastName')) {
+            <div class="form-error">Minimum 2 letters. No numbers.</div>
+          }
         </label>
 
         <label class="pe-field">
           <span class="pe-label text-semibold">Address (Street and number)</span>
-          <input class="pe-input text-medium" type="text" value="Address 100" />
+          <input class="pe-input text-medium" type="text" formControlName="address" />
+          @if (isInvalid('address')) {
+            <div class="form-error">Address is required.</div>
+          }
         </label>
 
         <label class="pe-field">
           <span class="pe-label text-semibold">City</span>
-          <input class="pe-input text-medium" type="text" value="City" />
+          <input class="pe-input text-medium" type="text" formControlName="city" />
+          @if (isInvalid('city')) {
+            <div class="form-error">City is required.</div>
+          }
         </label>
 
         <label class="pe-field">
           <span class="pe-label text-semibold">Phone number</span>
-          <input class="pe-input text-medium" type="text" value="11111111" />
+          <input class="pe-input text-medium" type="text" formControlName="phone" />
+          @if (isInvalid('phone')) {
+            <div class="form-error">Use digits only (optionally +), 7–15 digits.</div>
+          }
         </label>
       </div>
 
@@ -35,36 +50,48 @@
       <div class="pe-col">
         <label class="pe-field">
           <span class="pe-label text-semibold">Model</span>
-          <input class="pe-input text-medium" type="text" value="1978 Volkswagen Type 2 T2" />
+          <input class="pe-input text-medium" type="text" formControlName="model" />
+          @if (isInvalid('model')) {
+            <div class="form-error">Model is required.</div>
+          }
         </label>
 
         <label class="pe-field">
           <span class="pe-label text-semibold">Type</span>
-          <select class="pe-input text-medium">
-            <option>Luxury</option>
+          <select class="pe-input text-medium" formControlName="type">
             <option>Standard</option>
-            <option>Economy</option>
+            <option>Van</option>
+            <option>Luxury</option>
           </select>
+          @if (isInvalid('type')) {
+            <div class="form-error">Type is required.</div>
+          }
         </label>
 
         <label class="pe-field">
           <span class="pe-label text-semibold">License plate</span>
-          <input class="pe-input text-medium" type="text" value="NS-111-AB" />
+          <input class="pe-input text-medium" type="text" formControlName="licensePlate" />
+          @if (isInvalid('licensePlate')) {
+            <div class="form-error">Format must be: AA-123-AA (e.g. NS-111-AB).</div>
+          }
         </label>
 
         <label class="pe-field">
           <span class="pe-label text-semibold">Number of seats</span>
-          <input class="pe-input text-medium" type="text" value="5" />
+          <input class="pe-input text-medium" type="text" formControlName="seats" />
+          @if (isInvalid('seats')) {
+            <div class="form-error">Seats must be a whole number (1–8).</div>
+          }
         </label>
 
         <div class="pe-check-row">
           <label class="pe-check text-semibold">
-            <input type="checkbox" checked />
+            <input type="checkbox" formControlName="petFriendly" />
             <span>Pet friendly</span>
           </label>
 
           <label class="pe-check text-semibold">
-            <input type="checkbox" />
+            <input type="checkbox" formControlName="childSeatAvailable" />
             <span>Child seat available</span>
           </label>
         </div>
@@ -76,7 +103,7 @@
           Cancel
         </button>
 
-        <button type="button" class="btn btn--primary text-semibold btn-scale" (click)="save()">
+        <button type="submit" class="btn btn--primary text-semibold btn-scale">
           Confirm
         </button>
       </div>

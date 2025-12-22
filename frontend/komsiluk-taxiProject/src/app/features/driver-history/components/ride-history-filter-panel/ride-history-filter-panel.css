@@ -1,0 +1,91 @@
+.filter-panel{
+  position: fixed;
+  top: 64px;          /* ispod navbara */
+  right: 24px;
+  width: min(360px, 92vw);
+  padding: 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.25);
+  background: rgba(0,0,0,0.65);
+  backdrop-filter: blur(8px);
+  color: #fff;
+  z-index: 50;
+}
+
+.filter-chip{
+  display: inline-flex;
+  align-items: center;
+  height: 28px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: rgba(255,238,2,0.22);
+  border: 1px solid rgba(255,238,2,0.35);
+  color: var(--color-secondary);
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.filter-row{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.filter-label{
+  font-size: 12px;
+  opacity: 0.85;
+}
+
+.filter-date{
+  height: 34px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.20);
+  background: rgba(255,255,255,0.10);
+  color: #fff;
+  padding: 0 10px;
+  outline: none;
+}
+.filter-actions{
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.filter-btn{
+  height: 28px;
+  padding: 0 18px;
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.02em;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  box-shadow: 0 6px 16px rgba(0,0,0,0.35);
+}
+
+.filter-btn--reset{
+  background: var(--color-secondary); /* žuta */
+  color: #111;
+}
+
+.filter-btn--apply{
+  background: #111;
+  color: var(--color-secondary);
+  border: 1px solid rgba(255, 238, 2, 0.55);
+}
+
+.filter-btn:hover{
+  opacity: 0.95;
+}
+
+.filter-btn:active{
+  transform: translateY(1px);
+}

@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { ProfileSidebarComponent } from '../../components/profile-sidebar/profile-sidebar.component';
 import { DriverCarDetailsComponent } from '../../components/driver-car-details/driver-car-details.component';
-import { UserModeService } from '../../../../shared/components/user_mode/user-mode.service';
+import { UserModeService } from '../../../../shared/util/user_mode/user-mode.service';
 
 @Component({
   selector: 'app-driver-car-view',

@@ -1,0 +1,135 @@
+.ride-card{
+  display: flex;
+  align-items: stretch;
+  gap: 18px;
+
+  border: 1px solid rgba(255,255,255,0.28);
+  border-radius: 10px;
+  --head-offset: 28px;
+  padding: 14px;
+  box-sizing: border-box;
+
+  background: rgba(0,0,0,0.55);
+  color: rgba(255,255,255,0.9);
+}
+
+.ride-card--selected{
+  background: rgba(255, 238, 2, 0.80);
+  color: #111;
+  border-color: rgba(255,255,255,0.15);
+}
+
+.ride-card__map{
+  width: 110px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid rgba(255,255,255,0.18);
+}
+
+.ride-card__col{
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.ride-card__col--time{ width: 180px; }
+.ride-card__col--route,
+.ride-card__col--meta,
+.ride-card__col--stats{
+  padding-top: var(--head-offset);
+  box-sizing: border-box;
+}
+
+.ride-card__date{
+  font-weight: 700;
+  color: var(--color-secondary);
+  height: 22px;
+  display: flex;
+  align-items: center;
+  margin: 0;
+}
+.ride-card--selected .ride-card__date{
+  color: #111;
+}
+.ride-card--selected .ride-card__icon{
+  filter: brightness(0) saturate(100%);
+}
+.ride-card__row{
+  font-size: 12px;
+  line-height: 1.2;
+}
+.ride-card__row span{ opacity: 0.85; }
+.ride-card__row b{ font-weight: 700; }
+
+.ride-card__details{
+  margin-top: auto;
+  height: 28px;
+  width: 88px;
+
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+
+  background: var(--color-secondary);
+  color: #111;
+  font-weight: 700;
+  font-size: 12px;
+}
+.ride-card--selected .ride-card__details{
+  background: #111;
+  color: var(--color-secondary);
+}
+
+.ride-card__stat{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+}
+
+.ride-card__icon{
+  width: 18px;
+  height: 18px;
+}
+.ride-card__details--mobile {
+  display: none;
+}
+
+/* crna kartica */
+.ride-card__label { color: rgba(255,255,255,0.85); }
+.ride-card__value { color: var(--color-secondary); }
+
+/* zuta kartica */
+.ride-card--selected .ride-card__label { color: #fefefe; }
+.ride-card--selected .ride-card__value { color: #000000; }
+
+@media (max-width: 900px){
+  .ride-card{
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .ride-card__map{
+    width: 100%;
+    height: 140px;
+  }
+
+  .ride-card__col--time,
+  .ride-card__col--meta,
+  .ride-card__col--stats{
+    width: 100%;
+  }
+
+  .ride-card__details--desktop {
+    display: none; /* sakrij desktop dugme */
+  }
+
+  .ride-card__details--mobile {
+    display: block; /* pokaži mobile dugme */
+    width: 100%;
+    margin-top: 6px;
+  }
+}
+

@@ -33,7 +33,7 @@
 }
 
 .toast__msg {
-  font-size: 14px;
+  font-size: var(--fs-md);
 }
 
 .toast__close {
@@ -42,7 +42,7 @@
   background: transparent;
   color: var(--color-white);
   cursor: pointer;
-  font-size: 20px;
+  font-size: var(--fs-h2);
   line-height: 1;
   padding: 0 4px;
 }
