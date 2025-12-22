@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterLink } from '@angular/router';
+import {  RouterLink } from '@angular/router';
 import { AuthService, UserRole } from '../../../features/auth/services/auth';
 import { Signal } from '@angular/core';
 
