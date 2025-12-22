@@ -1,16 +1,12 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <style name="Base.Theme.Taxi_Project" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- status bar gore -->
-        <item name="android:statusBarColor">@color/primary</item>
 
-        <!-- navigation bar dole -->
+        <item name="android:statusBarColor">@color/primary</item>
         <item name="android:navigationBarColor">@color/primary</item>
 
-        <!-- kaže: NE želim "light" barove (tj. ne želim tamne ikonice) -->
         <item name="android:windowLightStatusBar">false</item>
         <item name="android:windowLightNavigationBar">false</item>
 
-        <!-- za svaki slučaj -->
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
     </style>
     <style name="Theme.Taxi_Project" parent="Base.Theme.Taxi_Project" />

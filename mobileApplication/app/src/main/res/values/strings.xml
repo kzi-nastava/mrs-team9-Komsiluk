@@ -3,8 +3,6 @@
 
     <string name="company_name">NEIGHBOURHOOD TAXI</string>
 
-    <string name="profile_title">Profile</string>
-
     <string name="btn_save">Save</string>
     <string name="btn_edit">Edit</string>
 
@@ -15,4 +13,8 @@
     <string name="label_password">Password</string>
     <string name="label_address">Address</string>
     <string name="label_city">City</string>
+
+    <string name="nav_left">Left action</string>
+    <string name="nav_right">Right action</string>
+    <string name="profile_title">Profile</string>
 </resources>
