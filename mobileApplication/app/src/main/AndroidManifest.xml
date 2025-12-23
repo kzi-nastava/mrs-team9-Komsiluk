@@ -12,6 +12,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Taxi_Project">
         <activity
+            android:name=".ui.shared.InfoMessageActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.profile.EditProfileActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.profile.ChangePasswordActivity"
             android:exported="false" />
         <activity

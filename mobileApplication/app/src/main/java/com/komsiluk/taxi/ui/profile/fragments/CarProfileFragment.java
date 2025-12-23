@@ -16,8 +16,11 @@ import com.komsiluk.taxi.R;
 
 public class CarProfileFragment extends Fragment {
 
+    private boolean isDriver = true;
+
     public interface Host {
         void onBackFromCarProfile();
+        void onEditProfileClicked(boolean isDriver);
     }
 
     private Host host;
@@ -55,7 +58,11 @@ public class CarProfileFragment extends Fragment {
             }
         });
 
-        // btnEditCar functionality to be implemented
+        btnEditCar.setOnClickListener(v -> {
+            if (host != null) {
+                host.onEditProfileClicked(isDriver);
+            }
+        });
     }
 
     @Override

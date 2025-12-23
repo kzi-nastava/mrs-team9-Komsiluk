@@ -28,7 +28,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <!-- LEVI PANEL (sidebar) sa scrollom, ~ 1/3 širine -->
+        <!-- LEFT PANEL -->
         <ScrollView
             android:id="@+id/sidebar_scroll"
             android:layout_width="0dp"
@@ -42,14 +42,14 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <!-- Gornji deo sidebara (fragment ide ovde) -->
+                <!--Top part -->
                 <FrameLayout
                     android:id="@+id/sidebar_top_container"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@color/profile_sidebar_top" />
 
-                <!-- Divider sa rombovima -->
+                <!-- Divider -->
                 <LinearLayout
                     android:id="@+id/sidebar_divider"
                     android:layout_width="match_parent"
@@ -79,7 +79,7 @@
                         android:rotation="45" />
                 </LinearLayout>
 
-                <!-- Donji deo sidebara (drugi fragment ide ovde) -->
+                <!-- Bottom part -->
                 <FrameLayout
                     android:id="@+id/sidebar_bottom_container"
                     android:layout_width="match_parent"
@@ -88,7 +88,7 @@
             </LinearLayout>
         </ScrollView>
 
-        <!-- DESNI PANEL (details) ~ 2/3 širine -->
+        <!-- RIGHT PANEL -->
         <FrameLayout
             android:id="@+id/details_panel"
             android:layout_width="0dp"

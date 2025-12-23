@@ -1,5 +1,8 @@
 package com.komsiluk.taxi.ui.profile;
 
+import static androidx.core.content.ContentProviderCompat.requireContext;
+
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
@@ -58,9 +61,9 @@ public class ProfileActivity extends AppCompatActivity implements ProfileDetails
 
     @Override
     public void onEditProfileClicked(boolean isDriver) {
-        //
-        // if (isDriver) startActivity(new Intent(this, DriverEditActivity.class));
-        // else startActivity(new Intent(this, UserEditActivity.class));
+        Intent intent = new Intent(this, EditProfileActivity.class);
+        intent.putExtra(EditProfileActivity.EXTRA_IS_DRIVER, isDriver);
+        startActivity(intent);
     }
 
     @Override
