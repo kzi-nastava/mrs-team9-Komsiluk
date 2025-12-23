@@ -2,14 +2,13 @@
 
     <div>We've sent you a verification email. Please check your inbox and click the activation link.</div>
 
-    <div card-actions>
 
-        <button class="btn btn--ghost btn-scale text-semibold" [routerLink]="'/login'" type="button" auth-card-footer>
-            Cancel
-        </button>
+    <button card-actions class="btn btn--ghost btn-scale text-semibold" [routerLink]="'/login'" type="button">
+        Cancel
+    </button>
 
-        <button type="submit" class="btn btn--primary btn-scale text-semibold" [attr.form]="formId">
-            Resend Email
-        </button>
-    </div>
+    <button card-actions type="button" class="btn btn--primary btn-scale text-semibold"
+        (click)="resendActivationEmail()">
+        Resend Email
+    </button>
 </app-auth-card>

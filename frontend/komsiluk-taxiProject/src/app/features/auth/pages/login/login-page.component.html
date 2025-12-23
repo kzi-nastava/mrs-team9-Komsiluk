@@ -1,4 +1,4 @@
-<app-auth-card title="Log in" buttonText="Log in" formId="loginForm">
+<app-auth-card title="Log in">
 
     <form id="loginForm" class="auth-form" [formGroup]="form" (ngSubmit)="save()" autocomplete="off">
         <div class="auth-field">
@@ -30,4 +30,9 @@
     <a routerLink="/forgot-password" class="first-link">Forgot password?</a>
     <br>
     <a routerLink="/register">Don't have an account? Sign up</a>
+
+
+    <button card-actions type="submit" class="btn btn--primary btn-scale text-semibold" form="loginForm">
+        Log in
+    </button>
 </app-auth-card>

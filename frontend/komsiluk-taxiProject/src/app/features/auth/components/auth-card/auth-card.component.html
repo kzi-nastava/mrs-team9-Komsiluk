@@ -13,14 +13,7 @@
 
     <div class="card-actions">
       
-      <ng-content select="card-actions"></ng-content>
-      <button
-        type="submit"
-        class="btn btn--primary btn-scale text-semibold"
-        [attr.form]="formId"
-      >
-        {{ buttonText }}
-      </button>
+      <ng-content select="[card-actions]"></ng-content>
 
     </div>
 
