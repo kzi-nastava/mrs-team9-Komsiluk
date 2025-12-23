@@ -14,18 +14,16 @@ export class ForgotPasswordPage {
   submitted = false;
 
   form: ReturnType<FormBuilder['group']>;
-  router: Router;
 
   constructor(
     private fb: FormBuilder,
-    private rout: Router
+    private router: Router
   ) {
     this.form = this.fb.group(
       {
         email: ['', [trimRequired, Validators.email]],
       }
     );
-    this.router = rout;
   }
 
   c(name: string) {
@@ -42,6 +40,6 @@ export class ForgotPasswordPage {
     this.form.markAllAsTouched();
     if (this.form.invalid) return;
 
-    this.router.navigate(['/auth/recovery-activation']);
+    this.router.navigate(['/recovery-activation']);
   }
 }

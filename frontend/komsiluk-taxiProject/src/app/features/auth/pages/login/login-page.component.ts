@@ -14,17 +14,14 @@ import { AuthService } from '../../services/auth';
 })
 export class LoginPage {
   submitted = false;
-
   form: ReturnType<FormBuilder['group']>;
-  authService: AuthService;
 
   constructor(
     private fb: FormBuilder,
     private toast: ToastService,
     private router: Router,
-    authService: AuthService
+    private authService: AuthService
   ) {
-    this.authService = authService;
     this.form = this.fb.group(
       {
         password: ['', [trimRequired, strongPassword]],
