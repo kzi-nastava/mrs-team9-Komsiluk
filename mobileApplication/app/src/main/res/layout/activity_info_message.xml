@@ -3,28 +3,17 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
+    android:id="@+id/info_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.shared.InfoMessageActivity">
-
-    <include
-        android:id="@+id/infoBackground"
-        layout="@layout/view_textured_bg" />
-
-    <include
-        android:id="@+id/topAppBar"
-        layout="@layout/view_navbar"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
 
     <ScrollView
         android:id="@+id/infoScroll"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:fillViewport="true"
-        app:layout_constraintTop_toBottomOf="@id/topAppBar"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
@@ -78,7 +67,6 @@
                     android:layout_marginTop="24dp"
                     android:layout_gravity="end"
                     android:text="@string/btn_done" />
-
             </LinearLayout>
         </LinearLayout>
     </ScrollView>

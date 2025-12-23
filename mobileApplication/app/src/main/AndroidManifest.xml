@@ -12,6 +12,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Taxi_Project">
         <activity
+            android:name=".ui.menu.BaseNavDrawerActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.shared.InfoMessageActivity"
             android:exported="false" />
         <activity

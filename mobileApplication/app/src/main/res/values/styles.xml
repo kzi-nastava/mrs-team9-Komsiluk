@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="NavigationDrawerItemText" parent="@style/TextAppearance.MaterialComponents.Body1">
+        <item name="fontFamily">@font/roboto_serif_medium</item>
+        <item name="android:textSize">@dimen/fs_lg</item>
+        <item name="android:textColor">@color/secondary</item>
+    </style>
+
+</resources>
+

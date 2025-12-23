@@ -1,74 +1,51 @@
 package com.komsiluk.taxi.ui.profile;
 
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
-import android.view.Window;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowCompat;
-import androidx.core.view.WindowInsetsCompat;
-import androidx.core.view.WindowInsetsControllerCompat;
 
-import com.komsiluk.taxi.R;
 import com.google.android.material.button.MaterialButton;
-import com.komsiluk.taxi.databinding.ActivityChangePasswordBinding;
+import com.komsiluk.taxi.R;
+import com.komsiluk.taxi.ui.menu.BaseNavDrawerActivity;
 
-public class ChangePasswordActivity extends AppCompatActivity {
+public class ChangePasswordActivity extends BaseNavDrawerActivity {
 
     private EditText etPassword;
     private EditText etRepeat;
     private TextView tvPasswordError;
     private TextView tvRepeatError;
 
-    private android.graphics.drawable.Drawable normalBg;
-    private android.graphics.drawable.Drawable errorBg;
+    private Drawable normalBg;
+    private Drawable errorBg;
+
+    @Override
+    protected int getContentLayoutId() {
+        return R.layout.activity_change_password;
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        EdgeToEdge.enable(this);
-
-        ActivityChangePasswordBinding binding = ActivityChangePasswordBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
-
-        View root = binding.getRoot();
-        Window window = getWindow();
-
-        root.setBackgroundColor(ContextCompat.getColor(this, R.color.black));
-
-        WindowInsetsControllerCompat controller = WindowCompat.getInsetsController(window, root);
-        controller.setAppearanceLightStatusBars(false);
-        controller.setAppearanceLightNavigationBars(false);
-
-        ViewCompat.setOnApplyWindowInsetsListener(binding.main, (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
-
+        // fields
         etPassword = findViewById(R.id.etPassword);
         etRepeat = findViewById(R.id.etRepeat);
         tvPasswordError = findViewById(R.id.tvPasswordError);
         tvRepeatError = findViewById(R.id.tvRepeatError);
 
-        normalBg = ContextCompat.getDrawable(this, R.drawable.bg_input_normal);
-        errorBg = ContextCompat.getDrawable(this, R.drawable.bg_input_error);
+        normalBg = getDrawable(R.drawable.bg_input_normal);
+        errorBg = getDrawable(R.drawable.bg_input_error);
 
         MaterialButton btnCancel = findViewById(R.id.btnCancel);
         MaterialButton btnConfirm = findViewById(R.id.btnConfirm);
 
-        // live validation
         TextWatcher watcher = new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
@@ -90,7 +67,6 @@ public class ChangePasswordActivity extends AppCompatActivity {
             if (!ok1 || !ok2) return;
 
             Toast.makeText(this, getString(R.string.change_password_success), Toast.LENGTH_SHORT).show();
-
             finish();
         });
     }

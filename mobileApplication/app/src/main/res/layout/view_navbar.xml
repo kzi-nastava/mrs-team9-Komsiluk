@@ -4,58 +4,31 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="48dp"
-    android:background="@color/primary">
+    android:background="@color/primary_dark">
 
-    <!-- Left button -->
-    <ImageButton
-        android:id="@+id/btnNavLeft"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:background="@android:color/transparent"
-        android:padding="8dp"
-        android:layout_marginStart="8dp"
-        android:contentDescription="@string/nav_left"
-        android:src="@drawable/ic_launcher_foreground"
+    <!-- Logo left -->
+    <ImageView
+        android:id="@+id/imgNavLogo"
+        android:layout_width="115dp"
+        android:layout_height="115dp"
+        android:src="@drawable/app_logo"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent" />
 
-    <!-- Text -->
-    <TextView
-        android:id="@+id/navTitle"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="@string/company_name"
-        android:textColor="@color/secondary"
-        android:textSize="@dimen/fs_lg"
-        android:fontFamily="@font/roboto_serif_semibold"
-        android:gravity="center"
-        app:layout_constraintStart_toEndOf="@id/btnNavLeft"
-        app:layout_constraintEnd_toStartOf="@id/btnNavRight"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent" />
-
-    <!-- Right button -->
+    <!-- Menu (hamburger) right -->
     <ImageButton
-        android:id="@+id/btnNavRight"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
+        android:id="@+id/btnNavMenu"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
         android:background="@android:color/transparent"
-        android:padding="8dp"
+        android:padding="4dp"
         android:layout_marginEnd="8dp"
-        android:contentDescription="@string/nav_right"
-        android:src="@drawable/ic_launcher_foreground"
+        android:contentDescription="@string/nav_menu"
+        android:src="@drawable/drawer_menu"
+        app:tint="@color/secondary"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent" />
-
-    <View
-        android:id="@+id/navbarBottomBorder"
-        android:layout_width="0dp"
-        android:layout_height="2dp"
-        android:background="@android:color/black"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

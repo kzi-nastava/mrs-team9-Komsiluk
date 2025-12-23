@@ -3,6 +3,8 @@
 
     <string name="company_name">NEIGHBOURHOOD TAXI</string>
 
+    <string name="nav_menu">Navigation menu</string>
+
     <string name="btn_save">Save</string>
     <string name="btn_edit">Edit</string>
     <string name="btn_car">Car</string>
@@ -10,6 +12,14 @@
     <string name="btn_cancel">Cancel</string>
     <string name="btn_confirm">Confirm</string>
     <string name="btn_done">Done</string>
+    <string name="btn_close">Close</string>
+
+    <string name="menu_profile">Profile</string>
+    <string name="menu_favorite_rides">Favorite Rides</string>
+    <string name="menu_ride_history">Ride History</string>
+    <string name="menu_usage_report">Usage Report</string>
+    <string name="menu_chat">Support</string>
+    <string name="menu_about_us">About Us</string>
 
     <string name="profile_avatar_content_description">User Avatar</string>
     <string name="profile_change_image">Change image</string>

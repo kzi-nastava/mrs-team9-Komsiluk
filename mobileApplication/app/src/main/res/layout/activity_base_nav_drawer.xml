@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.drawerlayout.widget.DrawerLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/drawerLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- Main content area -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/rootContent"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <!-- Background -->
+        <include
+            android:id="@+id/globalBackground"
+            layout="@layout/view_textured_bg" />
+
+        <!-- Navbar -->
+        <include
+            android:id="@+id/topAppBar"
+            layout="@layout/view_navbar"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <!-- Screen -->
+        <FrameLayout
+            android:id="@+id/contentContainer"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintTop_toBottomOf="@id/topAppBar"
+            app:layout_constraintBottom_toBottomOf="@id/bottomNav"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <!-- Bottom navigation -->
+        <LinearLayout
+            android:id="@+id/bottomNav"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:orientation="horizontal"
+            android:background="@color/primary_dark"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <ImageButton
+                android:id="@+id/navHome"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                app:tint="@color/secondary"
+                android:src="@drawable/favorite"
+                android:layout_gravity="center"
+                android:contentDescription="@string/menu_favorite_rides" />
+
+            <ImageButton
+                android:id="@+id/navRides"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                app:tint="@color/secondary"
+                android:src="@drawable/home"
+                android:layout_gravity="center"
+                android:contentDescription="@string/nav_menu" />
+
+            <ImageButton
+                android:id="@+id/navProfile"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                app:tint="@color/secondary"
+                android:src="@drawable/profile"
+                android:layout_gravity="center"
+                android:contentDescription="@string/menu_profile" />
+
+        </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- Drawer -->
+    <com.google.android.material.navigation.NavigationView
+        android:id="@+id/navigationView"
+        android:layout_width="260dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="end"
+        android:background="@color/primary_dark"
+        app:itemTextColor="@color/nav_item_text"
+        app:itemIconTint="@color/nav_item_icon"
+        app:itemTextAppearance="@style/NavigationDrawerItemText"
+        app:headerLayout="@layout/view_drawer_header"
+        app:menu="@menu/menu_app_drawer" />
+
+</androidx.drawerlayout.widget.DrawerLayout>

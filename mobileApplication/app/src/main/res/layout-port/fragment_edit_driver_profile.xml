@@ -311,7 +311,7 @@
                 android:fontFamily="@font/roboto_serif_semibold" />
 
             <View
-                android:layout_width="32dp"
+                android:layout_width="15dp"
                 android:layout_height="0dp" />
 
             <CheckBox
