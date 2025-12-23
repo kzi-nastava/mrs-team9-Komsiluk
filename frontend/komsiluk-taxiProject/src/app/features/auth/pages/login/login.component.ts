@@ -7,10 +7,10 @@ import { trimRequired, strongPassword } from '../../../../shared/util/validators
 import { AuthService } from '../../services/auth';
 
 @Component({
-  selector: 'app-login-page',
+  selector: 'app-login',
   imports: [AuthCardComponent, ReactiveFormsModule, RouterModule],
-  templateUrl: './login-page.component.html',
-  styleUrl: './login-page.component.css',
+  templateUrl: './login.component.html',
+  styleUrl: './login.component.css',
 })
 export class LoginPage {
   submitted = false;

@@ -5,10 +5,10 @@ import { Router, RouterModule } from '@angular/router';
 import { trimRequired } from '../../../../shared/util/validators/field-validators.service';
 
 @Component({
-  selector: 'app-forgot-password-page',
+  selector: 'app-forgot-password',
   imports: [AuthCardComponent, ReactiveFormsModule, RouterModule],
-  templateUrl: './forgot-password-page.component.html',
-  styleUrl: './forgot-password-page.component.css',
+  templateUrl: './forgot-password.component.html',
+  styleUrl: './forgot-password.component.css',
 })
 export class ForgotPasswordPage {
   submitted = false;
@@ -40,6 +40,6 @@ export class ForgotPasswordPage {
     this.form.markAllAsTouched();
     if (this.form.invalid) return;
 
-    this.router.navigate(['/recovery-activation']);
+    this.router.navigate(['/activation-message']);
   }
 }

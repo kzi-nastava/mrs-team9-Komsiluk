@@ -3,13 +3,13 @@ import { AuthCardComponent } from '../../components/auth-card/auth-card.componen
 import { ToastService } from '../../../../shared/components/toast/toast.service';
 import { RouterLink } from '@angular/router';
 
-@Component({
-  selector: 'app-recovery-activation',
+@Component({ // mogao bi da se posalje mail preko inputa u buducnosti
+  selector: 'app-activation-message',
   imports: [AuthCardComponent, RouterLink],
-  templateUrl: './recovery-activation.html',
-  styleUrl: './recovery-activation.css',
+  templateUrl: './activation-message.component.html',
+  styleUrl: './activation-message.component.css',
 })
-export class RecoveryActivation {
+export class ActivationMessage {
 
   constructor(
     private toast: ToastService
