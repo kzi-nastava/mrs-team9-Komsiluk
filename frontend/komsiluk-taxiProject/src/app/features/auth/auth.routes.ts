@@ -1,12 +1,14 @@
 import { Routes } from '@angular/router';
-import { LoginPage } from './pages/login/login.component';
-import { ResetPasswordPage } from './pages/reset-password/reset-password-page.component';
-import { ForgotPasswordPage } from './pages/forgot-password/forgot-password.component';
-import { ActivationMessage } from './pages/activation-message/activation-message.component';
+import { LoginComponent } from './pages/login/login.component';
+import { ResetPasswordComponent } from './pages/reset-password/reset-password-page.component';
+import { ForgotPasswordComponent } from './pages/forgot-password/forgot-password.component';
+import { ActivationMessageComponent } from './pages/activation-message/activation-message.component';
+import { RiderRegistrationComponent } from './pages/rider-registration/rider-registration.component';
 
 export const AUTH_ROUTES: Routes = [
-  { path: 'login', component: LoginPage },
-  { path: 'forgot-password', component: ForgotPasswordPage },
-  { path: 'reset-password', component: ResetPasswordPage },
-  { path: 'activation-message', component: ActivationMessage },
+  { path: 'login', component: LoginComponent },
+  { path: 'forgot-password', component: ForgotPasswordComponent },
+  { path: 'reset-password', component: ResetPasswordComponent },
+  { path: 'activation-message', component: ActivationMessageComponent },
+  { path: 'register-rider', component: RiderRegistrationComponent }
 ];

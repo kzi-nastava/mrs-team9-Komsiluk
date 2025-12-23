@@ -9,7 +9,7 @@ import { RouterLink } from '@angular/router';
   templateUrl: './activation-message.component.html',
   styleUrl: './activation-message.component.css',
 })
-export class ActivationMessage {
+export class ActivationMessageComponent {
 
   constructor(
     private toast: ToastService

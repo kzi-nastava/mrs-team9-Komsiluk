@@ -12,7 +12,7 @@ import { AuthService } from '../../services/auth';
   templateUrl: './login.component.html',
   styleUrl: './login.component.css',
 })
-export class LoginPage {
+export class LoginComponent {
   submitted = false;
   form: ReturnType<FormBuilder['group']>;
 

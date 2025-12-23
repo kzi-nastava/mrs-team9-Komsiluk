@@ -1,1 +1,102 @@
-<p>rider-registration.component works!</p>
+<app-auth-card title="Registration" class="auth-card--wide">
+
+    <form id="riderRegistrationForm" class="auth-form auth-form-wide" [formGroup]="form" (ngSubmit)="save()"
+        autocomplete="off">
+        <div class="auth-col">
+            <div class="auth-field">
+                <label class="auth-label text-semibold">Firstname</label>
+                <input class="auth-input text-medium" type="text" formControlName="firstName" />
+                @if (isInvalid('firstName')) {
+                <div class="form-error">Minimum 2 letters. No numbers.</div>
+                }
+            </div>
+
+            <div class="auth-field">
+                <label class="auth-label text-semibold">Lastname</label>
+                <input class="auth-input text-medium" type="text" formControlName="lastName" />
+                @if (isInvalid('lastName')) {
+                <div class="form-error">Minimum 2 letters. No numbers.</div>
+                }
+            </div>
+
+            <div class="auth-field">
+                <label class="auth-label text-semibold">Address (Street and number)</label>
+                <input class="auth-input text-medium" type="text" formControlName="address" />
+                @if (isInvalid('address')) {
+                <div class="form-error">Address is required.</div>
+                }
+            </div>
+
+            <div class="auth-field">
+                <label class="auth-label text-semibold">City</label>
+                <input class="auth-input text-medium" type="text" formControlName="city" />
+                @if (isInvalid('city')) {
+                <div class="form-error">City is required.</div>
+                }
+            </div>
+            <div class="auth-field">
+                <label class="auth-label text-semibold">Phone number</label>
+                <input class="auth-input text-medium" type="text" formControlName="phone" />
+                @if (isInvalid('phone')) {
+                <div class="form-error">Use digits only (optionally +), 7–15 digits.</div>
+                }
+            </div>
+        </div>
+
+        <div class="auth-col">
+            <div class="auth-field">
+                <label class="auth-label text-semibold">Email address</label>
+                <input class="auth-input text-medium" type="email" formControlName="email" />
+                @if (isInvalid('email')) {
+                <div class="form-error">
+                    @if (c('email').hasError('required')) {
+                    Email is required
+                    }
+                    @else if (c('email').hasError('email')) {
+                    Enter a valid email address
+                    }
+                </div>
+                }
+            </div>
+
+            <div class="auth-field">
+                <label class="auth-label text-semibold">Password</label>
+                <input class="auth-input text-medium" type="password" formControlName="password" />
+                @if (isInvalid('password')) {
+                <div class="form-error">Min 8 chars, at least 1 letter and 1 number.</div>
+                }
+            </div>
+
+            <div class="auth-field">
+                <label class="auth-label text-semibold">Repeat password</label>
+                <input class="auth-input text-medium" type="password" formControlName="repeat" />
+                @if (isInvalid('repeat')) {
+                <div class="form-error">Repeat password is required.</div>
+                }
+                @if (mismatch()) {
+                <div class="form-error">Passwords do not match.</div>
+                }
+            </div>
+
+            <div class="auth-field">
+                <label class="auth-label text-semibold">Profile photo</label>
+
+                <label class="auth-input file-input text-medium" [class.has-file]="form.get('profilePhoto')?.value">
+
+                    {{ form.get('profilePhoto')?.value?.name || 'Upload photo' }}
+
+                    <input type="file" accept="image/*" (change)="onFileSelected($event)" hidden />
+                </label>
+
+                @if (isInvalid('profilePhoto')) {
+                <div class="form-error">Photo is required.</div>
+                }
+            </div>
+
+        </div>
+    </form>
+
+    <button card-actions type="submit" class="btn btn--primary btn-scale text-semibold" form="riderRegistrationForm">
+        Register
+    </button>
+</app-auth-card>

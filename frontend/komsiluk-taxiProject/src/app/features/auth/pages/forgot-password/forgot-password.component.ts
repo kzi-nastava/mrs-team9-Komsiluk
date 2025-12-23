@@ -10,7 +10,7 @@ import { trimRequired } from '../../../../shared/util/validators/field-validator
   templateUrl: './forgot-password.component.html',
   styleUrl: './forgot-password.component.css',
 })
-export class ForgotPasswordPage {
+export class ForgotPasswordComponent {
   submitted = false;
 
   form: ReturnType<FormBuilder['group']>;
