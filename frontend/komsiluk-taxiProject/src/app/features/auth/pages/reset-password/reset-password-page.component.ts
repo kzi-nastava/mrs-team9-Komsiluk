@@ -12,7 +12,7 @@ import { ToastService } from '../../../../shared/components/toast/toast.service'
   templateUrl: './reset-password-page.component.html',
   styleUrl: './reset-password-page.component.css',
 })
-export class ResetPasswordPage {
+export class ResetPasswordComponent {
   submitted = false;
 
   form: ReturnType<FormBuilder['group']>;

@@ -1,3 +1,8 @@
+/* wide variant */
+:host(.auth-card--wide) .card-panel {
+  width: min(900px, 96vw);
+}
+
 .card-screen {
   min-height: calc(100vh - 64px);
   display: grid;
