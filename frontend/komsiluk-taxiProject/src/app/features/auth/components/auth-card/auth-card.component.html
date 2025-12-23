@@ -1,0 +1,21 @@
+<div class="app-bg-textured card-screen">
+  <div class="glass-panel glass-panel--ep card-panel">
+
+    <div class="card-title">
+      <div>{{ title }}</div>
+    </div>
+
+    <div class="card-divider"></div>
+
+    <div class="card-body">
+      <ng-content></ng-content>
+    </div>
+
+    <div class="card-actions">
+      
+      <ng-content select="[card-actions]"></ng-content>
+
+    </div>
+
+  </div>
+</div>

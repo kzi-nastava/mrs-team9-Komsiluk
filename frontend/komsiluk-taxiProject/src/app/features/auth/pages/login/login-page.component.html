@@ -1,0 +1,38 @@
+<app-auth-card title="Log in">
+
+    <form id="loginForm" class="auth-form" [formGroup]="form" (ngSubmit)="save()" autocomplete="off">
+        <div class="auth-field">
+            <label class="auth-label text-semibold">Email address</label>
+            <input class="auth-input text-medium" type="email" formControlName="email" />
+            @if (isInvalid('email')) {
+            <div class="form-error">
+                @if (c('email').hasError('required')) {
+                Email is required
+                }
+                @else if (c('email').hasError('email')) {
+                Enter a valid email address
+                }
+            </div>
+            }
+        </div>
+
+        <div class="auth-field">
+            <label class="auth-label text-semibold">Password</label>
+            <input class="auth-input text-medium" type="password" formControlName="password" />
+            @if (isInvalid('password')) {
+            <div class="form-error"> Min 8 chars, at least 1 letter and 1 number.</div>
+            }
+        </div>
+    </form>
+
+
+
+    <a routerLink="/forgot-password" class="first-link">Forgot password?</a>
+    <br>
+    <a routerLink="/register">Don't have an account? Sign up</a>
+
+
+    <button card-actions type="submit" class="btn btn--primary btn-scale text-semibold" form="loginForm">
+        Log in
+    </button>
+</app-auth-card>

@@ -9,27 +9,3 @@
   display: block;
   height: 100%;
 }
-
-/* dugmad overlay */
-.home-map__controls {
-  position: absolute;
-  top: 16px;
-  left: 72px;
-  display: flex;
-  gap: 16px;
-  z-index: 2000; /* iznad leaflet-a */
-}
-
-/* da bude vidljivo i "elegantno" */
-.home-map__btn {
-  padding: 10px 16px;
-  border-radius: 999px;
-  border: 1px solid rgba(255,255,255,0.25);
-  background: rgba(0,0,0,0.55);
-  color: #fff;
-  cursor: pointer;
-  backdrop-filter: blur(6px);
-}
-.home-map__btn:hover {
-  background: rgba(0,0,0,0.75);
-}
