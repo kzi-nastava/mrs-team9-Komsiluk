@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- Image -->
+    <ImageView
+        android:id="@+id/imgCarBg"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:src="@drawable/bg_car_profile_dark"
+        android:scaleType="centerCrop"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:translationY="40dp" />
+
+    <!-- Content -->
+    <ScrollView
+        android:id="@+id/scrollContent"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        android:background="@android:color/transparent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="24dp">
+
+            <!-- Model -->
+            <TextView
+                android:id="@+id/tvLabelModel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/label_car_model"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:fontFamily="@font/roboto_serif_semibold" />
+
+            <TextView
+                android:id="@+id/tvValueModel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="42dp"
+                android:background="@drawable/profile_box"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="16dp"
+                android:layout_marginBottom="16dp"
+                android:text="1978 Volkswagen Type 2 T2"
+                android:textColor="@color/text"
+                android:textSize="16sp"
+                android:fontFamily="@font/roboto_serif_medium" />
+
+            <!-- Type -->
+            <TextView
+                android:id="@+id/tvLabelType"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/label_type"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:fontFamily="@font/roboto_serif_semibold" />
+
+            <TextView
+                android:id="@+id/tvValueType"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="42dp"
+                android:background="@drawable/profile_box"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="16dp"
+                android:layout_marginBottom="16dp"
+                android:text="Luxury"
+                android:textColor="@color/text"
+                android:textSize="16sp"
+                android:fontFamily="@font/roboto_serif_medium" />
+
+            <!-- Licence plate -->
+            <TextView
+                android:id="@+id/tvLabelLicencePlate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/label_licence_plate"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:fontFamily="@font/roboto_serif_semibold" />
+
+            <TextView
+                android:id="@+id/tvValueLicencePlate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="42dp"
+                android:background="@drawable/profile_box"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="16dp"
+                android:layout_marginBottom="16dp"
+                android:text="NS-111-AB"
+                android:textColor="@color/text"
+                android:textSize="16sp"
+                android:fontFamily="@font/roboto_serif_medium" />
+
+            <!-- Number of seats -->
+            <TextView
+                android:id="@+id/tvLabelSeats"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/label_num_seats"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:fontFamily="@font/roboto_serif_semibold" />
+
+            <TextView
+                android:id="@+id/tvValueSeats"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="42dp"
+                android:background="@drawable/profile_box"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="16dp"
+                android:layout_marginBottom="24dp"
+                android:text="5"
+                android:textColor="@color/text"
+                android:textSize="16sp"
+                android:fontFamily="@font/roboto_serif_medium" />
+
+            <!-- Pet friendly / Child seat – SAMO LABELI, BEZ BOX-A -->
+
+            <LinearLayout
+                android:id="@+id/rowPetsChildSeat"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="24dp">
+
+                <TextView
+                    android:id="@+id/tvPetFriendly"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Pet friendly: Yes"
+                    android:textColor="@color/white"
+                    android:textSize="16sp"
+                    android:fontFamily="@font/roboto_serif_semibold" />
+
+                <TextView
+                    android:id="@+id/tvChildSeat"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="16dp"
+                    android:text="Child seat available: No"
+                    android:textColor="@color/white"
+                    android:textSize="16sp"
+                    android:fontFamily="@font/roboto_serif_semibold" />
+            </LinearLayout>
+
+            <!-- Buttons: Back + Edit -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="end">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnBack"
+                    style="@style/Widget.Button.Ghost"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/btn_back" />
+
+                <View
+                    android:layout_width="16dp"
+                    android:layout_height="0dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnEditCar"
+                    style="@style/Widget.Button.Primary"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/btn_edit" />
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
+</androidx.constraintlayout.widget.ConstraintLayout>

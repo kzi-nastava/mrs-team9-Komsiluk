@@ -1,9 +1,63 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
     <style name="Base.Theme.Taxi_Project" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+
+        <!-- Phone bars colors and styles -->
+        <item name="android:statusBarColor">@color/primary</item>
+        <item name="android:navigationBarColor">@color/primary</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar">false</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+    </style>
+    <style name="Theme.Taxi_Project" parent="Base.Theme.Taxi_Project" />
+
+    <!-- Custom button primary -->
+    <style name="Widget.Button.Primary" parent="Widget.MaterialComponents.Button">
+        <item name="android:minWidth">120dp</item>
+        <item name="android:height">40dp</item>
+        <item name="shapeAppearance">@style/RoundedFull</item>
+        <item name="backgroundTint">@color/secondary</item>
+        <item name="android:textColor">@color/text</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:fontFamily">@font/roboto_serif_semibold</item>
     </style>
 
-    <style name="Theme.Taxi_Project" parent="Base.Theme.Taxi_Project" />
+    <!-- Custom button ghost -->
+    <style name="Widget.Button.Ghost" parent="Widget.MaterialComponents.Button">
+        <item name="android:minWidth">120dp</item>
+        <item name="android:layout_height">40dp</item>
+        <item name="shapeAppearance">@style/RoundedFull</item>
+        <item name="backgroundTint">@color/white</item>
+        <item name="strokeColor">@color/secondary</item>
+        <item name="strokeWidth">4dp</item>
+        <item name="android:textColor">@color/text</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:fontFamily">@font/roboto_serif_semibold</item>
+    </style>
+
+    <!-- Rounded full corners style -->
+    <style name="RoundedFull">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">999dp</item>
+    </style>
+
+    <!-- Profile label style -->
+    <style name="ProfileLabel">
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">@dimen/fs_lg</item>
+        <item name="android:fontFamily">@font/roboto_serif_semibold</item>
+    </style>
+
+    <!-- Profile box style -->
+    <style name="ProfileBox">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">42dp</item>
+        <item name="android:background">@drawable/profile_box</item>
+        <item name="android:paddingLeft">16dp</item>
+        <item name="android:paddingRight">16dp</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:textColor">@color/text</item>
+        <item name="android:textSize">@dimen/fs_lg</item>
+        <item name="android:fontFamily">@font/roboto_serif_medium</item>
+    </style>
+
 </resources>

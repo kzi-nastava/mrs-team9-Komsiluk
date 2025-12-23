@@ -1,3 +1,102 @@
 <resources>
     <string name="app_name">Taxi_Project</string>
+
+    <string name="company_name">NEIGHBOURHOOD TAXI</string>
+
+    <string name="nav_menu">Navigation menu</string>
+
+    <string name="btn_save">Save</string>
+    <string name="btn_edit">Edit</string>
+    <string name="btn_car">Car</string>
+    <string name="btn_back">Back</string>
+    <string name="btn_cancel">Cancel</string>
+    <string name="btn_confirm">Confirm</string>
+    <string name="btn_done">Done</string>
+    <string name="btn_close">Close</string>
+
+    <string name="menu_profile">Profile</string>
+    <string name="menu_favorite_rides">Favorite Rides</string>
+    <string name="menu_ride_history">Ride History</string>
+    <string name="menu_usage_report">Usage Report</string>
+    <string name="menu_chat">Support</string>
+    <string name="menu_about_us">About Us</string>
+
+    <string name="profile_avatar_content_description">User Avatar</string>
+    <string name="profile_change_image">Change image</string>
+    <string name="profile_change_password">Change password</string>
+    <string name="profile_default_name">Name Surname</string>
+    <string name="profile_default_email">email@gmail.com</string>
+
+    <string name="label_first_name">Name</string>
+    <string name="label_last_name">Surname</string>
+    <string name="label_email">Email</string>
+    <string name="label_phone">Phone</string>
+    <string name="label_password">Password</string>
+    <string name="label_address">Address</string>
+    <string name="label_city">City</string>
+
+    <string name="label_car_model">Model</string>
+    <string name="label_licence_plate">Licence plate</string>
+    <string name="label_type">Type</string>
+    <string name="label_num_seats">Number of seats</string>
+    <string name="label_child_seat">Child seat available</string>
+    <string name="label_pet_friendly">Pet friendly</string>
+    <string name="label_pet_friendly_full">Pet friendly: Yes</string>
+    <string name="label_child_seat_full">Child seat available: No</string>
+
+
+    <string name="nav_left">Left action</string>
+    <string name="nav_right">Right action</string>
+
+    <string name="profile_menu_favorite_rides">Favorite Rides</string>
+    <string name="profile_menu_ride_history">Ride History</string>
+    <string name="profile_menu_usage_report">Usage Report</string>
+    <string name="profile_menu_support">Support</string>
+    <string name="profile_active_today_placeholder">Active today: 5h</string>
+    <string name="profile_logout">Log out</string>
+
+    <string name="change_password_title">Change password</string>
+    <string name="change_password_new_label">New password</string>
+    <string name="change_password_repeat_label">Repeat password</string>
+    <string name="change_password_cancel">Cancel</string>
+    <string name="change_password_confirm">Confirm</string>
+    <string name="change_password_success">Password changed successfully.</string>
+
+    <string name="error_password_required">Password is required.</string>
+    <string name="error_password_too_short">Password must be at least 8 characters long.</string>
+    <string name="error_password_letter_required">Password must contain at least one letter.</string>
+    <string name="error_password_digit_required">Password must contain at least one digit.</string>
+    <string name="error_repeat_required">Please repeat your password.</string>
+    <string name="error_repeat_mismatch">Passwords do not match.</string>
+
+    <string name="edit_title">EDIT</string>
+    <string name="edit_profile_success">Profile updated successfully.</string>
+    <string name="err_firstname_required">Firstname is required.</string>
+    <string name="err_firstname_short">Firstname must be at least 2 characters.</string>
+    <string name="err_lastname_required">Lastname is required.</string>
+    <string name="err_lastname_short">Lastname must be at least 2 characters.</string>
+    <string name="err_address_required">Address is required.</string>
+    <string name="err_city_required">City is required.</string>
+    <string name="err_phone_required">Phone number is required.</string>
+    <string name="err_phone_invalid">Phone number must contain at least 6 digits.</string>
+    <string name="err_model_required">Car model is required.</string>
+    <string name="err_type_required">Car type is required.</string>
+    <string name="err_licence_required">Licence plate is required.</string>
+    <string name="err_seats_required">Number of seats is required.</string>
+    <string name="err_seats_invalid">Number of seats must be at least 1.</string>
+    <string name="err_model_short">Car model is too short.</string>
+    <string name="err_licence_invalid">Licence plate format is invalid.</string>
+
+    <string name="car_type_standard">Standard</string>
+    <string name="car_type_luxury">Luxury</string>
+    <string name="car_type_van">Van</string>
+
+    <string name="info_default_title">Message</string>
+    <string name="info_default_message">Some information.</string>
+    <string name="profile_update_submitted_title">Profile update submitted</string>
+    <string name="profile_update_submitted_body">
+    Your profile changes have been submitted and are waiting for administrator approval.
+    They will become visible once approved.
+</string>
+
 </resources>
