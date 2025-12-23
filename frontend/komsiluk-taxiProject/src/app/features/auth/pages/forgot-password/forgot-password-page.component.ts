@@ -1,31 +1,47 @@
 import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { AuthCardComponent } from '../../components/auth-card/auth-card.component';
-import {FormControl, FormGroup, Validators, ReactiveFormsModule} from "@angular/forms";
+import {FormBuilder, Validators, ReactiveFormsModule} from "@angular/forms";
 import { Router, RouterModule } from '@angular/router';
+import { trimRequired } from '../../../../shared/util/validators/field-validators.service';
 
 @Component({
   selector: 'app-forgot-password-page',
-  imports: [AuthCardComponent, ReactiveFormsModule, CommonModule, RouterModule],
+  imports: [AuthCardComponent, ReactiveFormsModule, RouterModule],
   templateUrl: './forgot-password-page.component.html',
   styleUrl: './forgot-password-page.component.css',
 })
 export class ForgotPasswordPage {
-  ForgotPasswordForm: FormGroup = new FormGroup({
-      email: new FormControl('', [Validators.required, Validators.email]),
-      password: new FormControl('', [Validators.required, Validators.minLength(6)]),
-    });
+  submitted = false;
 
-    constructor(private router: Router) {
+  form: ReturnType<FormBuilder['group']>;
+  router: Router;
 
-    }
-
-    onSubmit() {
-      if (this.ForgotPasswordForm.invalid) {
-        this.ForgotPasswordForm.markAllAsTouched();
-        return;
+  constructor(
+    private fb: FormBuilder,
+    private rout: Router
+  ) {
+    this.form = this.fb.group(
+      {
+        email: ['', [trimRequired, Validators.email]],
       }
+    );
+    this.router = rout;
+  }
 
-      this.router.navigate(['/verify-recovery-code']);
-    }
+  c(name: string) {
+    return this.form.get(name)!;
+  }
+
+  isInvalid(name: string) {
+    const ctrl = this.c(name);
+    return (this.submitted || ctrl.touched) && ctrl.invalid;
+  }
+
+  save() {
+    this.submitted = true;
+    this.form.markAllAsTouched();
+    if (this.form.invalid) return;
+
+    this.router.navigate(['/auth/recovery-activation']);
+  }
 }

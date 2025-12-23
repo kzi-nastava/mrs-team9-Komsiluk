@@ -4,7 +4,7 @@ import { ReactiveFormsModule, FormBuilder, Validators } from "@angular/forms";
 import { ToastService } from '../../../../shared/components/toast/toast.service';
 import { Router, RouterModule } from '@angular/router';
 import { trimRequired, strongPassword } from '../../../../shared/util/validators/field-validators.service';
-import { AuthService, UserRole } from '../../services/auth';
+import { AuthService } from '../../services/auth';
 
 @Component({
   selector: 'app-login-page',
