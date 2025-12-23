@@ -14,6 +14,9 @@ import {
   PassengerRating
 } from '../../components/ride-history-details-modal/ride-history-details-modal.component';
 
+import { AuthService, UserRole } from '../../../auth/services/auth';
+import { Router } from '@angular/router';
+
 @Component({
   selector: 'app-driver-ride-history-page',
   standalone: true,
@@ -33,17 +36,23 @@ export class DriverRideHistoryPageComponent {
     { id: '8', date: '20.12.2025', startTime: '07:30', endTime: '09:00', pickup: 'Bulevar kralja Aleksandra 70', destination: 'Visnjiceva 10', status: 'completed', passengers: 2, kilometers: 80, durationText: '1h 30min', price: 190, mapImageUrl: 'assets/taxi.png' },
   ];
 
+  userRole: UserRole;
+
   filteredRides: RideHistoryCard[] = [...this.rides];
 
   // --- MODAL STATE ---
   detailsOpen = false;
   detailsVm: RideHistoryDetailsVm | null = null;
 
-  constructor(private filterSvc: RideHistoryFilterService) {
+  constructor(private filterSvc: RideHistoryFilterService, private auth: AuthService, private router: Router) {
     effect(() => {
       const { from, to } = this.filterSvc.range();
       this.filteredRides = this.applyDateFilter(this.rides, from, to);
     });
+    this.userRole = this.auth.role();
+    if (this.userRole !== UserRole.DRIVER) { // ovo treba izbaciti kada se implementiraju i istorije za ostale korisnike
+      this.router.navigate(['/']);
+    }
   }
 
   closeDetails() {
