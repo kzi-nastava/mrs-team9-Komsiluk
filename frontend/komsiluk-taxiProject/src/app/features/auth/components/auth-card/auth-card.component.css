@@ -33,7 +33,6 @@
   margin-block:30px;
   font-size: var(--fs-md);
   line-height: 1.25;
-  max-width: 360px;
   font-weight: var(--weight-regular);
 }
 
