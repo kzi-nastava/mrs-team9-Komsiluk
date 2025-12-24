@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/dialogRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    android:background="@drawable/bg_ride_card">
+
+    <!-- MAPA -->
+    <ImageView
+        android:id="@+id/imgMap"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:scaleType="centerCrop"
+        android:contentDescription="Map"
+        android:src="@drawable/bg_texture"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintWidth_percent="0.66"
+        app:layout_constraintDimensionRatio="1:1" />
+
+    <!-- SKROL TEKST -->
+    <ScrollView
+        android:id="@+id/scrollContent"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        android:overScrollMode="never"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="12dp"
+        app:layout_constraintTop_toBottomOf="@id/imgMap"
+        app:layout_constraintBottom_toTopOf="@id/btnClose"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:id="@+id/contentColumn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvRouteTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Route"
+                android:textStyle="bold"
+                android:textColor="@color/secondary" />
+
+            <TextView
+                android:id="@+id/tvPickup"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Pickup location: ..."
+                android:textColor="@android:color/white"
+                android:layout_marginTop="6dp" />
+
+            <TextView
+                android:id="@+id/tvStation1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Station 1: ..."
+                android:textColor="@android:color/white"
+                android:layout_marginTop="4dp" />
+
+            <TextView
+                android:id="@+id/tvStation2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Station 2: ..."
+                android:textColor="@android:color/white"
+                android:layout_marginTop="4dp" />
+
+            <TextView
+                android:id="@+id/tvDestination"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Destination: ..."
+                android:textColor="@android:color/white"
+                android:layout_marginTop="4dp" />
+
+            <TextView
+                android:id="@+id/tvStart"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Start time: ..."
+                android:textColor="@android:color/white"
+                android:layout_marginTop="10dp" />
+
+            <TextView
+                android:id="@+id/tvEnd"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="End time: ..."
+                android:textColor="@android:color/white"
+                android:layout_marginTop="4dp" />
+
+            <TextView
+                android:id="@+id/tvKm"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Kilometers: ..."
+                android:textColor="@android:color/white"
+                android:layout_marginTop="10dp" />
+
+            <TextView
+                android:id="@+id/tvDuration"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Time: ..."
+                android:textColor="@android:color/white"
+                android:layout_marginTop="4dp" />
+
+            <TextView
+                android:id="@+id/tvPrice"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Price: ..."
+                android:textColor="@color/secondary"
+                android:textStyle="bold"
+                android:layout_marginTop="4dp" />
+
+            <TextView
+                android:id="@+id/tvPassengersTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Passengers:"
+                android:textStyle="bold"
+                android:textColor="@color/secondary"
+                android:layout_marginTop="14dp" />
+
+            <TextView
+                android:id="@+id/tvPassengers"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="user1@gmail.com&#10;user2@gmail.com&#10;user3@gmail.com"
+                android:textColor="@android:color/white"
+                android:layout_marginTop="6dp" />
+
+            <TextView
+                android:id="@+id/tvRatingsTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Ratings:"
+                android:textStyle="bold"
+                android:textColor="@color/secondary"
+                android:layout_marginTop="14dp" />
+
+            <TextView
+                android:id="@+id/tvRatings"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="(ratings placeholder)"
+                android:textColor="@android:color/white"
+                android:layout_marginTop="6dp" />
+
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- CLOSE -->
+    <Button
+        android:id="@+id/btnClose"
+        android:layout_width="140dp"
+        android:layout_height="42dp"
+        android:text="Close"
+        android:textAllCaps="false"
+        android:backgroundTint="@color/secondary"
+        android:textColor="@color/black"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
