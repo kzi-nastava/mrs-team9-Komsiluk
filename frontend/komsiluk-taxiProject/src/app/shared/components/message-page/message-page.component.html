@@ -1,22 +1,16 @@
-<div class="app-bg-textured msg-screen">
-  <div class="glass-panel glass-panel--ep msg-panel">
-    <div class="msg-title text-semibold">{{ title }}</div>
-    <div class="msg-divider"></div>
-
-    <div class="msg-text text-medium">
-      {{ description }}
-    </div>
-
-    <div class="msg-actions">
-      <button
-        type="button"
-        class="btn btn--primary btn-scale text-semibold"
-        (click)="done()"
-      >
-        {{ buttonText }}
-      </button>
-
-      <ng-content></ng-content>
-    </div>
+<app-auth-card [title]="title">
+  <div class="msg-text text-medium">
+    {{ description }}
   </div>
-</div>
+
+  <div card-actions>
+    @for (a of actions; track a.text) {
+      <button type="button" class="btn btn-scale text-semibold"
+        [class.btn--primary]="(a.variant ?? 'primary') === 'primary'"
+        [class.btn--ghost]="(a.variant ?? 'primary') === 'ghost'"
+        (click)="run(a)">
+        {{ a.text }}
+      </button>
+    }
+  </div>
+</app-auth-card>

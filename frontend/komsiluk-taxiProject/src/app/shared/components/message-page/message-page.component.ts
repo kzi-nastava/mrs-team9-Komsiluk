@@ -1,20 +1,29 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { MESSAGE_REGISTRY, MessageId } from './message-registry';
+
+import { AuthCardComponent } from '../../../features/auth/components/auth-card/auth-card.component';
+import { ToastService } from '../toast/toast.service';
+import { AuthService } from '../../../features/auth/services/auth';
+
+import { MESSAGE_REGISTRY, MessageAction, MessageId } from './message-registry';
 
 @Component({
   selector: 'app-message-page',
-  imports: [],
+  imports: [AuthCardComponent],
   templateUrl: './message-page.component.html',
   styleUrl: './message-page.component.css',
 })
 export class MessagePageComponent {
   title = '';
   description = '';
-  doneUrl = '/';
-  buttonText = 'Done';
+  actions: MessageAction[] = [];
 
-  constructor(private route: ActivatedRoute, private router: Router) {
+  constructor(
+    private route: ActivatedRoute,
+    private router: Router,
+    private auth: AuthService,
+    private toast: ToastService
+  ) {
     const id = this.route.snapshot.paramMap.get('id') as MessageId | null;
 
     if (!id || !(id in MESSAGE_REGISTRY)) {
@@ -25,11 +34,17 @@ export class MessagePageComponent {
     const msg = MESSAGE_REGISTRY[id];
     this.title = msg.title;
     this.description = msg.description;
-    this.doneUrl = msg.doneUrl;
-    this.buttonText = msg.buttonText ?? 'Done';
+    this.actions = msg.actions;
   }
 
-  done() {
-    this.router.navigateByUrl(this.doneUrl);
+  run(a: MessageAction) {
+    if (a.kind === 'navigate') {
+      this.router.navigateByUrl(a.url);
+      return;
+    }
+
+    this.auth.logout();
+    if (a.toast) this.toast.show(a.toast);
+    this.router.navigateByUrl(a.urlAfter);
   }
 }

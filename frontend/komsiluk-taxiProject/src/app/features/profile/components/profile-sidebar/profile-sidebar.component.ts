@@ -19,7 +19,6 @@ export class ProfileSidebarComponent {
     this.router = rout;
   }
   logout() {
-    this.authService.logout();
-    this.router.navigate(['/']);
+    this.router.navigate(['/message', 'confirm-logout']);
   }
 }

@@ -1,14 +1,14 @@
-<app-auth-card title="Activation Message">
+<app-auth-card title="Verification Message">
 
-    <div>We've sent you a verification email. Please check your inbox and click the activation link.</div>
+    <div>We've sent you a verification email. Please check your inbox and click the link.</div>
 
 
     <button card-actions class="btn btn--ghost btn-scale text-semibold" [routerLink]="'/login'" type="button">
-        Cancel
+        Close
     </button>
 
     <button card-actions type="button" class="btn btn--primary btn-scale text-semibold"
         (click)="resendActivationEmail()">
-        Resend Email
+        Resend
     </button>
 </app-auth-card>
