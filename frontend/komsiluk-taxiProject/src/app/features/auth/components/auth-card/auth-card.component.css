@@ -20,7 +20,6 @@
   font-size: var(--fs-h1);
   margin-bottom: 20px;
   font-weight: var(--weight-regular);
-  text-transform: uppercase;
 }
 
 .card-divider {
@@ -33,7 +32,6 @@
   margin-block:30px;
   font-size: var(--fs-md);
   line-height: 1.25;
-  max-width: 360px;
   font-weight: var(--weight-regular);
 }
 

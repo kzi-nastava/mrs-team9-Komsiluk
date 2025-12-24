@@ -18,6 +18,6 @@ export class ActivationMessageComponent {
   }
 
   resendActivationEmail() {
-     this.toast.show('Activation link has been resent to your email.');
+     this.toast.show('Activation link has been sent to your email.');
   }
 }
