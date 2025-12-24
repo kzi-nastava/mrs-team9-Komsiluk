@@ -41,7 +41,7 @@ export const seatsCount: ValidatorFn = (control: AbstractControl): ValidationErr
   if (!v) return null;
   const n = Number(v);
   if (!Number.isInteger(n)) return { seats: true };
-  if (n < 1 || n > 8) return { seatsRange: true }; // prilagodi ako treba
+  if (n < 1 || n > 8) return { seatsRange: true };
   return null;
 };
 

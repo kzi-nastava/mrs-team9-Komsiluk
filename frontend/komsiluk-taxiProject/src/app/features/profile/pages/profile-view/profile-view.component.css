@@ -4,14 +4,13 @@
   align-items: stretch;
 
   width: 100%;
-  min-height: calc(100vh - 64px);   /* 64px ≈ visina navbara */
+  min-height: calc(100vh - 64px); /* minus navbar height */
 
   padding: 0;
   gap: 0;
   box-sizing: border-box;
 }
 
-/* raspodela širine */
 app-profile-sidebar {
   flex: 0 0 33.333%;
   min-width: 0;
@@ -27,7 +26,7 @@ app-profile-details {
 @media (max-width: 1000px) {
   .profile-page {
     flex-direction: column;
-    min-height: auto;   /* na mobilnom nek ide po sadržaju */
+    min-height: auto;
   }
 
   app-profile-sidebar,
