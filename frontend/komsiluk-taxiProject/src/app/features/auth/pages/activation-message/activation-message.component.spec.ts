@@ -1,18 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ActivationMessage } from './activation-message.component';
+import { ActivationMessageComponent } from './activation-message.component';
 
-describe('ActivationMessage', () => {
-  let component: ActivationMessage;
-  let fixture: ComponentFixture<ActivationMessage>;
-
+describe('ActivationMessageComponent', () => {
+  let component: ActivationMessageComponent;
+  let fixture: ComponentFixture<ActivationMessageComponent>;
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ActivationMessage]
+      imports: [ActivationMessageComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(ActivationMessage);
+    fixture = TestBed.createComponent(ActivationMessageComponent);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

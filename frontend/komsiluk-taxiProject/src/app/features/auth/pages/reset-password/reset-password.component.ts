@@ -7,10 +7,10 @@ import { matchFields } from '../../../../shared/util/validators/form-validators.
 import { ToastService } from '../../../../shared/components/toast/toast.service';
 
 @Component({
-  selector: 'app-reset-password-page',
+  selector: 'app-reset-password',
   imports: [AuthCardComponent, ReactiveFormsModule, RouterModule, RouterLink],
-  templateUrl: './reset-password-page.component.html',
-  styleUrl: './reset-password-page.component.css',
+  templateUrl: './reset-password.component.html',
+  styleUrl: './reset-password.component.css',
 })
 export class ResetPasswordComponent {
   submitted = false;

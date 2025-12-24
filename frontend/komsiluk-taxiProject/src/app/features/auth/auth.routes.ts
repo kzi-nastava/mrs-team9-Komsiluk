@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 import { LoginComponent } from './pages/login/login.component';
-import { ResetPasswordComponent } from './pages/reset-password/reset-password-page.component';
+import { ResetPasswordComponent } from './pages/reset-password/reset-password.component';
 import { ForgotPasswordComponent } from './pages/forgot-password/forgot-password.component';
 import { ActivationMessageComponent } from './pages/activation-message/activation-message.component';
 import { RiderRegistrationComponent } from './pages/rider-registration/rider-registration.component';
