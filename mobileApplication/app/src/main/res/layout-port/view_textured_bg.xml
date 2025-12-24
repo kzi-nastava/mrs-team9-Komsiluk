@@ -12,11 +12,17 @@
         android:src="@drawable/bg_texture"
         android:scaleType="centerCrop"
         android:rotation="-35"
+        android:clickable="false"
+        android:focusable="false"
+        android:importantForAccessibility="no"
+
+
         app:layout_constraintWidth_percent="1.8"
         app:layout_constraintHeight_percent="0.7"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

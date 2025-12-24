@@ -72,7 +72,8 @@ public abstract class BaseNavDrawerActivity extends AppCompatActivity {
 
         drawerLayout = binding.drawerLayout;
         navigationView = binding.navigationView;
-        btnNavMenu = findViewById(R.id.topAppBar).findViewById(R.id.btnNavMenu);
+        View topBar = findViewById(R.id.topAppBar); // include / container navbara
+        btnNavMenu = topBar.findViewById(R.id.btnNavLeft); // burger dugme
         bottomNav = binding.bottomNav;
 
         FrameLayout contentContainer = binding.contentContainer;
