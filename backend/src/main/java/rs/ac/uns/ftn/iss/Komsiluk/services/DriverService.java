@@ -17,6 +17,7 @@ import rs.ac.uns.ftn.iss.Komsiluk.services.exceptions.AlreadyExistsException;
 import rs.ac.uns.ftn.iss.Komsiluk.services.exceptions.NotFoundException;
 import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.IDriverService;
 import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.IUserTokenService;
+import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.IVehicleService;
 
 @Service
 public class DriverService implements IDriverService {
@@ -27,6 +28,8 @@ public class DriverService implements IDriverService {
     private DriverDTOMapper driverMapper;
 	@Autowired
     private IUserTokenService userTokenService;
+	@Autowired
+	private IVehicleService vehicleService;
 
     @Override
     public Collection<DriverResponseDTO> getAllDrivers() {
@@ -53,6 +56,10 @@ public class DriverService implements IDriverService {
         driver.setRole(UserRole.DRIVER);
         driver.setActive(false);
         driver.setDriverStatus(DriverStatus.INACTIVE);
+        
+        if (dto.getVehicle() != null) {
+			driver.getVehicle().setId(vehicleService.create(dto.getVehicle()).getId());
+		}
 
         userRepository.save(driver);
 

@@ -42,12 +42,14 @@ public class VehicleController {
 		return new ResponseEntity<VehicleResponseDTO>(vehicle, HttpStatus.OK);
 	}
 
+	// debug
 	@PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<VehicleResponseDTO> create(@RequestBody VehicleCreateDTO vehicle) throws Exception{
 		VehicleResponseDTO createdVehicle = vehicleService.create(vehicle);
 		return new ResponseEntity<VehicleResponseDTO>(createdVehicle, HttpStatus.CREATED);
 	}
 	
+	// debug
 	@PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<VehicleResponseDTO> update(@RequestBody VehicleUpdateDTO vehicle, @PathVariable Long id) throws Exception{
 		VehicleResponseDTO updatedVehicle = vehicleService.update(id,vehicle);

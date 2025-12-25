@@ -64,4 +64,11 @@ public class VehicleService implements IVehicleService {
         vehicleRepository.findById(id).orElseThrow(NotFoundException::new);
 		vehicleRepository.deleteById(id);
     }
+	
+	@Override
+	public Vehicle save(Vehicle vehicle) {
+		vehicleRepository.save(vehicle);
+		
+		return vehicle;
+	}
 }

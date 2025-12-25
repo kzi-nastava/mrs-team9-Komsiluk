@@ -2,6 +2,7 @@ package rs.ac.uns.ftn.iss.Komsiluk.services.interfaces;
 
 import java.util.Collection;
 
+import rs.ac.uns.ftn.iss.Komsiluk.beans.Vehicle;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.vehicle.VehicleCreateDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.vehicle.VehicleResponseDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.vehicle.VehicleUpdateDTO;
@@ -18,4 +19,5 @@ public interface IVehicleService {
 	
 	public void delete(Long vehicleId);
 	
+	public Vehicle save(Vehicle vehicle);
 }
