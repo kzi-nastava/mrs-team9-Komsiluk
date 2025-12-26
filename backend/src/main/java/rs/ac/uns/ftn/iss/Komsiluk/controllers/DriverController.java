@@ -9,12 +9,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.driver.DriverCreateDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.driver.DriverResponseDTO;
+import rs.ac.uns.ftn.iss.Komsiluk.dtos.driver.DriverStatusUpdateDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.IDriverService;
 
 @RestController
@@ -40,5 +42,11 @@ public class DriverController {
     public ResponseEntity<DriverResponseDTO> registerDriver(@RequestBody DriverCreateDTO dto) {
         DriverResponseDTO created = driverService.registerDriver(dto);
         return new ResponseEntity<>(created, HttpStatus.CREATED);
+    }
+    
+    @PutMapping("/{id}/status")
+    public ResponseEntity<DriverResponseDTO> updateStatus(@PathVariable Long id, @RequestBody DriverStatusUpdateDTO dto) {
+        DriverResponseDTO updated = driverService.updateDriverStatus(id, dto.getStatus());
+        return new ResponseEntity<>(updated, HttpStatus.OK);
     }
 }

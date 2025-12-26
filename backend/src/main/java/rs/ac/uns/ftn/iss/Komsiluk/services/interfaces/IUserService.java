@@ -22,4 +22,6 @@ public interface IUserService {
     public UserProfileResponseDTO updateProfile(Long id, UserProfileUpdateDTO userProfileUpdateDTO);
     
     public void changePassword(Long id, UserChangePasswordDTO userChangePasswordDTO);
+    
+    public User findByEmail(String email);
 }

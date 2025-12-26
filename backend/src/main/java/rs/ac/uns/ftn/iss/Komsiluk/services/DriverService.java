@@ -67,4 +67,18 @@ public class DriverService implements IDriverService {
 
         return driverMapper.toResponseDTO(driver);
     }
+    
+    @Override
+    public DriverResponseDTO updateDriverStatus(Long driverId, DriverStatus newStatus) {
+        User driver = userRepository.findById(driverId);
+        if (driver == null) {
+            throw new NotFoundException();
+        }
+
+        driver.setDriverStatus(newStatus);
+
+        userRepository.save(driver);
+
+        return driverMapper.toResponseDTO(driver);
+    }
 }
