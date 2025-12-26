@@ -26,6 +26,7 @@ import rs.ac.uns.ftn.iss.Komsiluk.dtos.route.RouteResponseDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.mappers.RideDTOMapper;
 import rs.ac.uns.ftn.iss.Komsiluk.mappers.RouteDTOMapper;
 import rs.ac.uns.ftn.iss.Komsiluk.repositories.RideRepository;
+import rs.ac.uns.ftn.iss.Komsiluk.services.exceptions.BadRequestException;
 import rs.ac.uns.ftn.iss.Komsiluk.services.exceptions.NotFoundException;
 import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.IDriverService;
 import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.INotificationService;
@@ -55,6 +56,10 @@ public class RideService implements IRideService {
     public RideResponseDTO orderRide(RideCreateDTO dto) {
 
         User creator = userService.findById(dto.getCreatorId());
+        
+        if (userHasActiveRide(creator.getId())) {
+            throw new BadRequestException();
+        }
 
         String stopsString = String.join("|",dto.getStops() == null ? List.<String>of() : dto.getStops());
         
@@ -144,6 +149,35 @@ public class RideService implements IRideService {
         }
 
         return rideMapper.toResponseDTO(ride);
+    }
+    
+    @Override
+    public RideResponseDTO startRide(Long rideId) {
+        Ride ride = rideRepository.findById(rideId).orElseThrow(NotFoundException::new);
+        if (ride == null) {
+            throw new NotFoundException();
+        }
+
+        if (ride.getStatus() != RideStatus.ASSIGNED && ride.getStatus() != RideStatus.SCHEDULED) {
+            throw new BadRequestException();
+        }
+
+        ride.setStatus(RideStatus.ACTIVE);
+        ride.setStartTime(LocalDateTime.now());
+
+        rideRepository.save(ride);
+
+        return rideMapper.toResponseDTO(ride);
+    }
+
+    @Override
+    public boolean userHasActiveRide(Long userId) {
+
+        return rideRepository.findAll().stream().filter(r -> r.getStatus() == RideStatus.ACTIVE).anyMatch(r -> isPassenger(r, userId));
+    }
+
+    private boolean isPassenger(Ride ride, Long userId) {
+        return ride.getPassengers() != null && ride.getPassengers().stream().anyMatch(u -> u.getId().equals(userId));
     }
 
     private BigDecimal calculatePrice(VehicleType type, double distanceKm) {

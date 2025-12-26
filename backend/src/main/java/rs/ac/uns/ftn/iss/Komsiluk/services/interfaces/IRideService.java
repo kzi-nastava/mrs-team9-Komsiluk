@@ -5,5 +5,9 @@ import rs.ac.uns.ftn.iss.Komsiluk.dtos.ride.RideResponseDTO;
 
 public interface IRideService {
 
-    RideResponseDTO orderRide(RideCreateDTO dto);
+    public RideResponseDTO orderRide(RideCreateDTO dto);
+    
+    public RideResponseDTO startRide(Long rideId);
+    
+    public boolean userHasActiveRide(Long userId);
 }
