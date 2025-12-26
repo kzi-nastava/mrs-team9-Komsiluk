@@ -12,6 +12,7 @@ public class UserProfileResponseDTO {
 	private String phoneNumber;
 	private String profileImageUrl;
 	private VehicleResponseDTO vehicle;
+	private long activeMinutesLast24h;
 	
 	public UserProfileResponseDTO() {
 		super();
@@ -79,5 +80,13 @@ public class UserProfileResponseDTO {
 	
 	public void setVehicle(VehicleResponseDTO vehicle) {
 		this.vehicle = vehicle;
+	}
+	
+	public long getActiveMinutesLast24h() {
+		return activeMinutesLast24h;
+	}
+	
+	public void setActiveMinutesLast24h(long activeMinutesLast24h) {
+		this.activeMinutesLast24h = activeMinutesLast24h;
 	}
 }

@@ -28,6 +28,7 @@ import rs.ac.uns.ftn.iss.Komsiluk.mappers.RouteDTOMapper;
 import rs.ac.uns.ftn.iss.Komsiluk.repositories.RideRepository;
 import rs.ac.uns.ftn.iss.Komsiluk.services.exceptions.BadRequestException;
 import rs.ac.uns.ftn.iss.Komsiluk.services.exceptions.NotFoundException;
+import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.IDriverActivityService;
 import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.IDriverService;
 import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.INotificationService;
 import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.IRideService;
@@ -51,6 +52,8 @@ public class RideService implements IRideService {
 	private IDriverService driverService;
 	@Autowired
 	private RouteDTOMapper routeMapper;
+	@Autowired
+	private IDriverActivityService driverActivityService;
 
     @Override
     public RideResponseDTO orderRide(RideCreateDTO dto) {
@@ -200,6 +203,7 @@ public class RideService implements IRideService {
         // this is a simplified version, better logic should be implemented
         return drivers.stream()
                 .filter(d -> d.getDriverStatus() == DriverStatus.ACTIVE)
+                .filter(d -> { return driverActivityService.canAcceptNewRide(d.getId());})
                 .filter(d -> !d.isBlocked())
                 .filter(d -> d.getVehicle() != null)
                 .filter(d -> d.getVehicle().getType() == vt)

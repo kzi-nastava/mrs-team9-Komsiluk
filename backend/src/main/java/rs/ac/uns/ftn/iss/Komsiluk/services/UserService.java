@@ -14,6 +14,7 @@ import rs.ac.uns.ftn.iss.Komsiluk.mappers.UserDTOMapper;
 import rs.ac.uns.ftn.iss.Komsiluk.repositories.UserRepository;
 import rs.ac.uns.ftn.iss.Komsiluk.services.exceptions.InvalidPasswordException;
 import rs.ac.uns.ftn.iss.Komsiluk.services.exceptions.NotFoundException;
+import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.IDriverActivityService;
 import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.IUserService;
 
 @Service
@@ -25,6 +26,8 @@ public class UserService implements IUserService {
 	private UserDTOMapper userMapper;
 	@Autowired
 	private PasswordEncoder passwordEncoder;
+	@Autowired
+	private IDriverActivityService driverActivityService;
 
     @Override
     public User findById(Long id) {
@@ -60,7 +63,14 @@ public class UserService implements IUserService {
 		if (user == null) {
 			throw new NotFoundException();
 		}
-		return userMapper.toResponseDTO(user);
+		
+		UserProfileResponseDTO userResponseDTO = userMapper.toResponseDTO(user);
+		
+		if(user.getRole().name().equals("DRIVER")) {
+			userResponseDTO.setActiveMinutesLast24h(driverActivityService.getWorkedMinutesLast24h(user));
+		}
+		
+		return userResponseDTO;
 	}
     
     @Override
