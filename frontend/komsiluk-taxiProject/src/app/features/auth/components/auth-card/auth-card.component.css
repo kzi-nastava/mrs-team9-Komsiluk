@@ -1,3 +1,8 @@
+/* wide variant */
+:host(.auth-card--wide) .card-panel {
+  width: min(900px, 96vw);
+}
+
 .card-screen {
   min-height: calc(100vh - 64px);
   display: grid;
@@ -14,8 +19,7 @@
 .card-title {
   font-size: var(--fs-h1);
   margin-bottom: 20px;
-  font-weight: var(--weight-medium);
-  text-transform: uppercase;
+  font-weight: var(--weight-regular);
 }
 
 .card-divider {
@@ -26,6 +30,9 @@
 }
 .card-body {
   margin-block:30px;
+  font-size: var(--fs-md);
+  line-height: 1.25;
+  font-weight: var(--weight-regular);
 }
 
 .card-actions {

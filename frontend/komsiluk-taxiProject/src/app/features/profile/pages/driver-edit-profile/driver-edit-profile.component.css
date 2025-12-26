@@ -116,6 +116,6 @@
   }
 
   .pe-actions--center {
-    justify-content: flex-end; /* da stane bolje na mobilnom */
+    justify-content: flex-end;
   }
 }
