@@ -1,5 +1,6 @@
 package com.komsiluk.taxi.ui.profile.fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -12,12 +13,20 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.komsiluk.taxi.MainActivity;
 import com.komsiluk.taxi.R;
+import com.komsiluk.taxi.auth.AuthManager;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.AndroidEntryPoint;
+
+@AndroidEntryPoint
 public class ProfileSidebarBottomFragment extends Fragment {
 
     private static final String ARG_IS_DRIVER = "is_driver";
-
+    @Inject
+    AuthManager authManager;
     public static ProfileSidebarBottomFragment newInstance(boolean isDriver) {
         ProfileSidebarBottomFragment f = new ProfileSidebarBottomFragment();
         Bundle args = new Bundle();
@@ -60,7 +69,12 @@ public class ProfileSidebarBottomFragment extends Fragment {
                         Toast.makeText(getContext(), "Favorite rides", Toast.LENGTH_SHORT).show());
 
         // ... same for other buttons
-        btnLogout.setOnClickListener(v ->
-                Toast.makeText(getContext(), "Logout clicked", Toast.LENGTH_SHORT).show());
+        btnLogout.setOnClickListener(v ->{
+                Intent intent = new Intent(requireActivity(), MainActivity.class);
+                authManager.logout();
+                requireActivity().finish();
+                startActivity(intent);
+                Toast.makeText(getContext(), "Successful logout!", Toast.LENGTH_SHORT).show();
+        });
     }
 }

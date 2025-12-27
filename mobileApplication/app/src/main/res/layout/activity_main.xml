@@ -17,18 +17,32 @@
         android:background="@color/primary">
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnUserProfile"
-            style="@style/Widget.Button.Primary"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="User" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnDriverProfile"
+            android:id="@+id/btnProfile"
             style="@style/Widget.Button.Ghost"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Driver"
+            android:text="Profile"
+            android:layout_marginTop="16dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnLogin"
+            style="@style/Widget.Button.Ghost"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Login"
+            android:layout_marginTop="16dp" />
+
+
+
+
+
+        <!--        OVO DUGME TREBA DA SE OBRISE KADA SE OMOGUCI SlANJE MEJLA-->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnGoResetPassword"
+            style="@style/Widget.Button.Ghost"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Go to reset"
             android:layout_marginTop="16dp" />
 
         <com.google.android.material.button.MaterialButton

@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <application
+        android:name=".TaxiApp"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -11,6 +12,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Taxi_Project">
+        <activity
+            android:name=".ui.auth.AuthActivity"
+            android:exported="false" />
         <activity
             android:name=".ui.menu.BaseNavDrawerActivity"
             android:exported="false" />

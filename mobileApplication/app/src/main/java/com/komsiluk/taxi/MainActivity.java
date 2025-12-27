@@ -14,13 +14,24 @@ import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
 
+import com.komsiluk.taxi.auth.AuthManager;
+import com.komsiluk.taxi.auth.UserRole;
 import com.komsiluk.taxi.databinding.ActivityMainBinding;
+import com.komsiluk.taxi.ui.auth.AuthActivity;
+import com.komsiluk.taxi.ui.auth.login.ResetPasswordFragment;
 import com.komsiluk.taxi.ui.profile.ProfileActivity;
 import com.komsiluk.taxi.driver.history.DriverHistoryActivity;
 
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.AndroidEntryPoint;
+
+@AndroidEntryPoint
 public class MainActivity extends AppCompatActivity {
 
+
+    @Inject AuthManager authManager;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,17 +56,29 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
-        binding.btnUserProfile.setOnClickListener(v -> openProfile("user"));
-        binding.btnDriverProfile.setOnClickListener(v -> openProfile("driver"));
+        binding.btnProfile.setOnClickListener(v -> openProfile());
+        binding.btnLogin.setOnClickListener(v -> {
+            Intent i = new Intent(this, AuthActivity.class);
+            i.putExtra("AUTH_DESTINATION","LOGIN");
+            startActivity(i);
+        });
+
+
+
+        binding.btnGoResetPassword.setOnClickListener(v -> {
+            Intent i = new Intent(this, AuthActivity.class);
+            i.putExtra("AUTH_DESTINATION","RESET");
+            startActivity(i);
+        });
         binding.btnDriverHistory.setOnClickListener(v -> {
             startActivity(new Intent(this, DriverHistoryActivity.class));
         });
 
     }
 
-    private void openProfile(String role) {
+    private void openProfile() {
+        if(this.authManager.getRole() == UserRole.GUEST) return;
         Intent i = new Intent(this, ProfileActivity.class);
-        i.putExtra("role", role);
         startActivity(i);
     }
 }
