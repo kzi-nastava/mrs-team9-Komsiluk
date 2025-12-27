@@ -20,6 +20,8 @@ import com.komsiluk.taxi.databinding.ActivityMainBinding;
 import com.komsiluk.taxi.ui.auth.AuthActivity;
 import com.komsiluk.taxi.ui.auth.login.ResetPasswordFragment;
 import com.komsiluk.taxi.ui.profile.ProfileActivity;
+import com.komsiluk.taxi.driver.history.DriverHistoryActivity;
+
 
 import javax.inject.Inject;
 
@@ -68,6 +70,10 @@ public class MainActivity extends AppCompatActivity {
             i.putExtra("AUTH_DESTINATION","RESET");
             startActivity(i);
         });
+        binding.btnDriverHistory.setOnClickListener(v -> {
+            startActivity(new Intent(this, DriverHistoryActivity.class));
+        });
+
     }
 
     private void openProfile() {

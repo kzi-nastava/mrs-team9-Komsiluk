@@ -44,6 +44,16 @@
             android:layout_height="wrap_content"
             android:text="Go to Resend"
             android:layout_marginTop="16dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnDriverHistory"
+            style="@style/Widget.Button.Ghost"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Driver History"
+            android:layout_marginTop="16dp" />
+
+
     </LinearLayout>
 
 

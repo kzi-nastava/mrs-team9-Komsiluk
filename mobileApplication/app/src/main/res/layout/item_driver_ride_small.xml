@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_ride_card_small"
+    android:padding="12dp"
+    android:layout_marginBottom="12dp">
+
+    <ImageView
+        android:id="@+id/imgThumb"
+        android:layout_width="72dp"
+        android:layout_height="72dp"
+        android:background="#FEFEFE"
+        android:scaleType="centerCrop"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <TextView
+        android:id="@+id/tvDate"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="13.12.2025"
+        android:textStyle="bold"
+        android:textColor="@color/black"
+        android:fontFamily="@font/roboto_serif_semibold"
+        app:layout_constraintStart_toEndOf="@id/imgThumb"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/imgThumb"
+        android:layout_marginStart="12dp"/>
+
+    <TextView
+        android:id="@+id/tvTimes"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Start: 12:00   End: 14:14"
+        android:textColor="@android:color/white"
+        android:fontFamily="@font/roboto_serif_medium"
+        app:layout_constraintStart_toStartOf="@id/tvDate"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvDate"
+        android:layout_marginTop="6dp"/>
+
+    <TextView
+        android:id="@+id/tvPickup"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Pickup: ..."
+        android:textColor="@android:color/white"
+        android:fontFamily="@font/roboto_serif_medium"
+        app:layout_constraintStart_toStartOf="@id/tvDate"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvTimes"
+        android:layout_marginTop="10dp"/>
+
+    <TextView
+        android:id="@+id/tvDestination"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Destination: ..."
+        android:textColor="@android:color/white"
+        android:fontFamily="@font/roboto_serif_medium"
+        app:layout_constraintStart_toStartOf="@id/tvPickup"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvPickup"
+        android:layout_marginTop="4dp"/>
+
+    <TextView
+        android:id="@+id/tvStatus"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Status: completed"
+        android:textColor="@color/black"
+        android:fontFamily="@font/roboto_serif_medium"
+        app:layout_constraintStart_toStartOf="@id/tvPickup"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvDestination"
+        android:layout_marginTop="10dp"/>
+
+    <TextView
+        android:id="@+id/tvPassengers"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Passengers: 3"
+        android:textColor="@color/black"
+        android:fontFamily="@font/roboto_serif_medium"
+        app:layout_constraintStart_toStartOf="@id/tvPickup"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvStatus"
+        android:layout_marginTop="4dp"/>
+
+    <TextView
+        android:id="@+id/tvKm"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Kilometers: 100"
+        android:textColor="@color/black"
+        android:fontFamily="@font/roboto_serif_medium"
+        app:layout_constraintStart_toStartOf="@id/tvPickup"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvPassengers"
+        android:layout_marginTop="10dp"/>
+
+    <TextView
+        android:id="@+id/tvDuration"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Time: 2h 14min"
+        android:textColor="@color/black"
+        android:fontFamily="@font/roboto_serif_medium"
+        app:layout_constraintStart_toStartOf="@id/tvPickup"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvKm"
+        android:layout_marginTop="4dp"/>
+
+    <TextView
+        android:id="@+id/tvPrice"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Price: 200$"
+        android:textColor="@color/black"
+        android:fontFamily="@font/roboto_serif_medium"
+        app:layout_constraintStart_toStartOf="@id/tvPickup"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvDuration"
+        android:layout_marginTop="4dp"/>
+
+    <Button
+        android:id="@+id/btnDetails"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:minHeight="40dp"
+        android:gravity="center"
+        android:includeFontPadding="false"
+        android:paddingTop="6dp"
+        android:paddingBottom="6dp"
+        android:text="Details"
+        android:textAllCaps="false"
+        android:fontFamily="@font/roboto_serif_medium"
+
+        android:backgroundTint="@color/black"
+        android:textColor="@color/secondary"
+        app:layout_constraintStart_toStartOf="@id/tvPickup"
+        app:layout_constraintTop_toBottomOf="@id/tvPrice"
+        android:layout_marginTop="10dp"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
