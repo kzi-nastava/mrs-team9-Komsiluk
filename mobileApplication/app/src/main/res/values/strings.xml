@@ -102,14 +102,27 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
 
-    <string name="login_title">Log in</string>
-    <string name="login_email_label">Email address</string>
-    <string name="login_password_label">Password</string>
-    <string name="login_confirm">Log in</string>
-    <string name="login_forgot_password">Forgot password?</string>
-    <string name="login_create_account">Don\'t have an account? Sign up</string>
-    <string name="login_success">You\'ve successfully logged in!</string>
+    <string name="auth_login_title">Log in</string>
+    <string name="auth_login_confirm">Log in</string>
+    <string name="auth_email">Email address</string>
+    <string name="auth_password">Password</string>
+    <string name="auth_forgot_password">Forgot password?</string>
+    <string name="auth_create_account">Don\'t have an account? Sign up</string>
+    <string name="auth_login_success">You\'ve successfully logged in!</string>
     <string name="error_email_required">Email is required</string>
     <string name="error_email_invalid">Invalid email</string>
-    <string name="login_fail">Invalid credentials!</string>
+    <string name="auth_invalid_credentials">Invalid credentials!</string>
+    <string name="auth_enter_email">Enter your email address</string>
+    <string name="auth_send_email">Send email</string>
+    <string name="auth_cancel">Cancel</string>
+    <string name="auth_verification_title">Verification message</string>
+    <string name="auth_verification_message">We’ve sent you a verification email. Please check your inbox and click the link.</string>
+    <string name="auth_resend">Resend</string>
+    <string name="auth_resend_message">Verification email has been sent to your address!</string>
+    <string name="auth_reset_password">Reset password</string>
+    <string name="auth_new_password">New password</string>
+    <string name="auth_repeat_password">Repeat password</string>
+    <string name="auth_confirm">Confirm</string>
+    <string name="auth_reset_success">You\'ve successfully changed password!</string>
+    <string name="auth_close">Close</string>
 </resources>

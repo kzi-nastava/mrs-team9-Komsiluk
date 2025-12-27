@@ -31,6 +31,19 @@
             android:layout_height="wrap_content"
             android:text="Login"
             android:layout_marginTop="16dp" />
+
+
+
+
+
+        <!--        OVO DUGME TREBA DA SE OBRISE KADA SE OMOGUCI SlANJE MEJLA-->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnGoResetPassword"
+            style="@style/Widget.Button.Ghost"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Go to Resend"
+            android:layout_marginTop="16dp" />
     </LinearLayout>
 
 

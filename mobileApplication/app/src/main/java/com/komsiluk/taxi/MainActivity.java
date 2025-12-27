@@ -18,6 +18,7 @@ import com.komsiluk.taxi.auth.AuthManager;
 import com.komsiluk.taxi.auth.UserRole;
 import com.komsiluk.taxi.databinding.ActivityMainBinding;
 import com.komsiluk.taxi.ui.auth.AuthActivity;
+import com.komsiluk.taxi.ui.auth.login.ResetPasswordFragment;
 import com.komsiluk.taxi.ui.profile.ProfileActivity;
 
 import javax.inject.Inject;
@@ -57,6 +58,14 @@ public class MainActivity extends AppCompatActivity {
         binding.btnLogin.setOnClickListener(v -> {
             Intent i = new Intent(this, AuthActivity.class);
             i.putExtra("AUTH_DESTINATION","LOGIN");
+            startActivity(i);
+        });
+
+
+
+        binding.btnGoResetPassword.setOnClickListener(v -> {
+            Intent i = new Intent(this, AuthActivity.class);
+            i.putExtra("AUTH_DESTINATION","RESET");
             startActivity(i);
         });
     }

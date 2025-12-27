@@ -14,21 +14,14 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.google.android.material.button.MaterialButton;
 import com.komsiluk.taxi.R;
-import com.komsiluk.taxi.auth.AuthManager;
-import com.komsiluk.taxi.databinding.FragmentLoginBinding;
+import com.komsiluk.taxi.databinding.FragmentForgotPasswordBinding;
+import com.komsiluk.taxi.ui.auth.AuthActivity;
 
-import javax.inject.Inject;
 
-import dagger.hilt.android.AndroidEntryPoint;
+public class ForgotPasswordFragment extends Fragment {
 
-@AndroidEntryPoint
-public class LoginFragment extends Fragment {
-    @Inject
-    AuthManager authManager;
-
-    private FragmentLoginBinding binding;
+    private FragmentForgotPasswordBinding binding;
 
     private Drawable normalBg;
     private Drawable errorBg;
@@ -39,7 +32,7 @@ public class LoginFragment extends Fragment {
             @Nullable ViewGroup container,
             @Nullable Bundle savedInstanceState
     ) {
-        binding = FragmentLoginBinding.inflate(inflater, container, false);
+        binding = FragmentForgotPasswordBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
 
@@ -60,47 +53,25 @@ public class LoginFragment extends Fragment {
             @Override
             public void afterTextChanged(Editable s) {
                 validateEmail();
-                validatePassword();
             }
         };
 
         binding.etEmail.addTextChangedListener(watcher);
-        binding.etPassword.addTextChangedListener(watcher);
 
-        binding.btnLogin.setOnClickListener(v -> {
-            boolean ok1 = validateEmail();
-            boolean ok2 = validatePassword();
-            if (!ok1 || !ok2) return;
-
-            boolean success = this.authManager.login(
-                    binding.etEmail.getText().toString().trim(),
-                    binding.etPassword.getText().toString().trim()
-            );
-            if (success) {
-                Toast.makeText(
-                        requireContext(),
-                        getString(R.string.auth_login_success),
-                        Toast.LENGTH_SHORT
-                ).show();
-            } else {
-                Toast.makeText(
-                        requireContext(),
-                        getString(R.string.auth_invalid_credentials),
-                        Toast.LENGTH_SHORT
-                ).show();
-                return;
-            }
-            requireActivity().finish();
+        binding.btnCancel.setOnClickListener(v -> {
+            ((AuthActivity) requireActivity())
+                    .showLogin();
         });
 
-        binding.tvForgotPassword.setOnClickListener(v -> {
+        binding.btnSendEmail.setOnClickListener(v -> {
+            boolean ok = validateEmail();
+            if (!ok) return;
+
             getParentFragmentManager()
                     .beginTransaction()
-                    .replace(R.id.authFragmentContainer, new ForgotPasswordFragment())
+                    .replace(R.id.authFragmentContainer, new VerificationMessageFragment())
                     .commit();
         });
-        binding.tvCreateAccount.setOnClickListener(v -> {requireActivity().finish();
-        }); // ovde ce ici replace
     }
 
     private boolean validateEmail() {
@@ -122,29 +93,6 @@ public class LoginFragment extends Fragment {
             binding.etEmail.setBackground(normalBg);
             binding.tvEmailError.setText("");
             binding.tvEmailError.setVisibility(View.GONE);
-            return true;
-        }
-    }
-
-    private boolean validatePassword() {
-        String pwd = binding.etPassword.getText().toString();
-        String error = null;
-
-        if (pwd.isEmpty()) {
-            error = getString(R.string.error_password_required);
-        } else if (pwd.length() < 8) {
-            error = getString(R.string.error_password_too_short);
-        }
-
-        if (error != null) {
-            binding.etPassword.setBackground(errorBg);
-            binding.tvPasswordError.setText(error);
-            binding.tvPasswordError.setVisibility(View.VISIBLE);
-            return false;
-        } else {
-            binding.etPassword.setBackground(normalBg);
-            binding.tvPasswordError.setText("");
-            binding.tvPasswordError.setVisibility(View.GONE);
             return true;
         }
     }

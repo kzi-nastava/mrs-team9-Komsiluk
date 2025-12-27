@@ -4,14 +4,12 @@ import android.os.Bundle;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 
 import com.komsiluk.taxi.R;
 import com.komsiluk.taxi.databinding.ActivityAuthBinding;
 import com.komsiluk.taxi.ui.auth.login.LoginFragment;
+import com.komsiluk.taxi.ui.auth.login.ResetPasswordFragment;
 
 import dagger.hilt.android.AndroidEntryPoint;
 
@@ -20,10 +18,12 @@ public class AuthActivity extends AppCompatActivity {
 
     private ActivityAuthBinding binding;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        EdgeToEdge.enable(this);
         binding = ActivityAuthBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
@@ -49,14 +49,21 @@ public class AuthActivity extends AppCompatActivity {
         switch (dest) {
 //            case "REGISTER":
 //                return new RegisterFragment();
-//            case "RESET":
-//                return new ResetPasswordFragment();
+            case "RESET":
+                return new ResetPasswordFragment();
 //            case "REGISTER_SUCCESS":
 //                return new RegisterSuccessFragment();
             case "LOGIN":
             default:
                 return new LoginFragment();
         }
+    }
+
+    public void showLogin() {
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.authFragmentContainer, new LoginFragment())
+                .commit();
     }
 
 }
