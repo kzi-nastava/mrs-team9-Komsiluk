@@ -15,6 +15,7 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
 
 import com.komsiluk.taxi.databinding.ActivityMainBinding;
+import com.komsiluk.taxi.ui.auth.AuthActivity;
 import com.komsiluk.taxi.ui.profile.ProfileActivity;
 
 public class MainActivity extends AppCompatActivity {
@@ -45,6 +46,11 @@ public class MainActivity extends AppCompatActivity {
 
         binding.btnUserProfile.setOnClickListener(v -> openProfile("user"));
         binding.btnDriverProfile.setOnClickListener(v -> openProfile("driver"));
+        binding.btnLogin.setOnClickListener(v -> {
+            Intent i = new Intent(this, AuthActivity.class);
+            i.putExtra("AUTH_DESTINATION","LOGIN");
+            startActivity(i);
+        });
     }
 
     private void openProfile(String role) {
