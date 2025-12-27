@@ -63,6 +63,12 @@ public class MainActivity extends AppCompatActivity {
             startActivity(i);
         });
 
+        binding.btnRegister.setOnClickListener(v -> {
+            Intent i = new Intent(this, AuthActivity.class);
+            i.putExtra("AUTH_DESTINATION","REGISTER");
+            startActivity(i);
+        });
+
 
 
         binding.btnGoResetPassword.setOnClickListener(v -> {

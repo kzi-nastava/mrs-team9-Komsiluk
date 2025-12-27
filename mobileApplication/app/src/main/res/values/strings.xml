@@ -125,4 +125,10 @@
     <string name="auth_confirm">Confirm</string>
     <string name="auth_reset_success">You\'ve successfully changed password!</string>
     <string name="auth_close">Close</string>
+    <string name="auth_first_name">First name</string>
+    <string name="auth_profile_photo">Profile photo</string>
+    <string name="profile_photo">Profile photo</string>
+    <string name="auth_choose_photo">Choose photo</string>
+    <string name="auth_submit">Submit</string>
+    <string name="auth_registration_title">Registration</string>
 </resources>
