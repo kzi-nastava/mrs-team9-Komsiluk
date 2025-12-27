@@ -72,10 +72,10 @@ public class RiderRegistrationFragment extends Fragment {
 
         binding.btnSubmit.setOnClickListener(v -> {
             if (!validateAll()) return;
-
+            //trebalo bi da se ode na VerificationMessage, ali radi demonstracije idem odmah na ovaj prozor
             getParentFragmentManager()
                     .beginTransaction()
-                    .replace(R.id.authFragmentContainer, new VerificationMessageFragment())
+                    .replace(R.id.authFragmentContainer, new SuccessfulRegistrationFragment())
                     .commit();
         });
     }

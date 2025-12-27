@@ -131,4 +131,7 @@
     <string name="auth_choose_photo">Choose photo</string>
     <string name="auth_submit">Submit</string>
     <string name="auth_registration_title">Registration</string>
+    <string name="auth_regist_success">Successful registration</string>
+    <string name="auth_success_regist_message">Your account has been successfully activated!</string>
+    <string name="auth_go_login">Go to login</string>
 </resources>

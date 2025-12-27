@@ -48,7 +48,7 @@
             style="@style/Widget.Button.Ghost"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Go to reset"
+            android:text="Go to verification"
             android:layout_marginTop="16dp" />
 
         <com.google.android.material.button.MaterialButton

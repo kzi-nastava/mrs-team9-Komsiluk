@@ -73,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
 
         binding.btnGoResetPassword.setOnClickListener(v -> {
             Intent i = new Intent(this, AuthActivity.class);
-            i.putExtra("AUTH_DESTINATION","RESET");
+            i.putExtra("AUTH_DESTINATION","VERIFY");
             startActivity(i);
         });
         binding.btnDriverHistory.setOnClickListener(v -> {

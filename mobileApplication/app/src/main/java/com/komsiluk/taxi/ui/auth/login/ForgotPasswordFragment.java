@@ -67,9 +67,10 @@ public class ForgotPasswordFragment extends Fragment {
             boolean ok = validateEmail();
             if (!ok) return;
 
+            //trebalo bi na verificationMEssage
             getParentFragmentManager()
                     .beginTransaction()
-                    .replace(R.id.authFragmentContainer, new VerificationMessageFragment())
+                    .replace(R.id.authFragmentContainer, new ResetPasswordFragment())
                     .commit();
         });
     }
