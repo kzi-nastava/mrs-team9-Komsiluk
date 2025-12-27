@@ -16,6 +16,8 @@ import androidx.core.view.WindowInsetsControllerCompat;
 
 import com.komsiluk.taxi.databinding.ActivityMainBinding;
 import com.komsiluk.taxi.ui.profile.ProfileActivity;
+import com.komsiluk.taxi.driver.history.DriverHistoryActivity;
+
 
 public class MainActivity extends AppCompatActivity {
 
@@ -45,6 +47,10 @@ public class MainActivity extends AppCompatActivity {
 
         binding.btnUserProfile.setOnClickListener(v -> openProfile("user"));
         binding.btnDriverProfile.setOnClickListener(v -> openProfile("driver"));
+        binding.btnDriverHistory.setOnClickListener(v -> {
+            startActivity(new Intent(this, DriverHistoryActivity.class));
+        });
+
     }
 
     private void openProfile(String role) {
