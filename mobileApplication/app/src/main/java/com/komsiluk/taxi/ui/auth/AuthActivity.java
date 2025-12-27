@@ -13,6 +13,9 @@ import com.komsiluk.taxi.R;
 import com.komsiluk.taxi.databinding.ActivityAuthBinding;
 import com.komsiluk.taxi.ui.auth.login.LoginFragment;
 
+import dagger.hilt.android.AndroidEntryPoint;
+
+@AndroidEntryPoint
 public class AuthActivity extends AppCompatActivity {
 
     private ActivityAuthBinding binding;

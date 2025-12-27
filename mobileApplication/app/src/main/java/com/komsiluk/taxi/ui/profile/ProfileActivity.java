@@ -6,17 +6,25 @@ import android.os.Bundle;
 import androidx.annotation.Nullable;
 
 import com.komsiluk.taxi.R;
+import com.komsiluk.taxi.auth.AuthManager;
+import com.komsiluk.taxi.auth.UserRole;
 import com.komsiluk.taxi.ui.menu.BaseNavDrawerActivity;
 import com.komsiluk.taxi.ui.profile.fragments.CarProfileFragment;
 import com.komsiluk.taxi.ui.profile.fragments.ProfileDetailsFragment;
 import com.komsiluk.taxi.ui.profile.fragments.ProfileSidebarBottomFragment;
 import com.komsiluk.taxi.ui.profile.fragments.ProfileSidebarTopFragment;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.AndroidEntryPoint;
+
+@AndroidEntryPoint
 public class ProfileActivity extends BaseNavDrawerActivity
         implements ProfileDetailsFragment.Host, CarProfileFragment.Host {
 
     private boolean isDriver = false;
-
+    @Inject
+    AuthManager authManager;
     @Override
     protected int getContentLayoutId() {
         // inserting activity layout
@@ -27,8 +35,7 @@ public class ProfileActivity extends BaseNavDrawerActivity
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        String role = getIntent().getStringExtra("role");
-        isDriver = "driver".equals(role);
+        isDriver = authManager.getRole().equals(UserRole.DRIVER);
 
         getSupportFragmentManager()
                 .beginTransaction()

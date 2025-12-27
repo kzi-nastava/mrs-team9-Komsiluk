@@ -111,4 +111,5 @@
     <string name="login_success">You\'ve successfully logged in!</string>
     <string name="error_email_required">Email is required</string>
     <string name="error_email_invalid">Invalid email</string>
+    <string name="login_fail">Invalid credentials!</string>
 </resources>

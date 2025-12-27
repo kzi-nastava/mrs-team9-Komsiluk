@@ -17,18 +17,11 @@
         android:background="@color/primary">
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnUserProfile"
-            style="@style/Widget.Button.Primary"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="User" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnDriverProfile"
+            android:id="@+id/btnProfile"
             style="@style/Widget.Button.Ghost"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Driver"
+            android:text="Profile"
             android:layout_marginTop="16dp" />
 
         <com.google.android.material.button.MaterialButton

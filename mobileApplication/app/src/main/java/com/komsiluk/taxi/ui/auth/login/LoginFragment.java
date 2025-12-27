@@ -16,9 +16,17 @@ import androidx.fragment.app.Fragment;
 
 import com.google.android.material.button.MaterialButton;
 import com.komsiluk.taxi.R;
+import com.komsiluk.taxi.auth.AuthManager;
 import com.komsiluk.taxi.databinding.FragmentLoginBinding;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.AndroidEntryPoint;
+
+@AndroidEntryPoint
 public class LoginFragment extends Fragment {
+    @Inject
+    AuthManager authManager;
 
     private FragmentLoginBinding binding;
 
@@ -64,11 +72,24 @@ public class LoginFragment extends Fragment {
             boolean ok2 = validatePassword();
             if (!ok1 || !ok2) return;
 
-            Toast.makeText(
-                    requireContext(),
-                    getString(R.string.login_success),
-                    Toast.LENGTH_SHORT
-            ).show();
+            boolean success = this.authManager.login(
+                    binding.etEmail.getText().toString().trim(),
+                    binding.etPassword.getText().toString().trim()
+            );
+            if (success) {
+                Toast.makeText(
+                        requireContext(),
+                        getString(R.string.login_success),
+                        Toast.LENGTH_SHORT
+                ).show();
+            } else {
+                Toast.makeText(
+                        requireContext(),
+                        getString(R.string.login_fail),
+                        Toast.LENGTH_SHORT
+                ).show();
+                return;
+            }
             requireActivity().finish();
         });
 
