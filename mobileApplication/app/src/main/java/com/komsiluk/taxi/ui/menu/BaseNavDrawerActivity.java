@@ -18,7 +18,6 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.komsiluk.taxi.R;
 import com.komsiluk.taxi.databinding.ActivityBaseNavDrawerBinding;
@@ -39,7 +38,8 @@ public abstract class BaseNavDrawerActivity extends AppCompatActivity {
 
         EdgeToEdge.enable(this);
 
-        ActivityBaseNavDrawerBinding binding = ActivityBaseNavDrawerBinding.inflate(getLayoutInflater());
+        ActivityBaseNavDrawerBinding binding =
+                ActivityBaseNavDrawerBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
         View rootContent = binding.rootContent;
@@ -48,7 +48,8 @@ public abstract class BaseNavDrawerActivity extends AppCompatActivity {
 
         root.setBackgroundColor(ContextCompat.getColor(this, R.color.black));
 
-        WindowInsetsControllerCompat controller = WindowCompat.getInsetsController(window, rootContent);
+        WindowInsetsControllerCompat controller =
+                WindowCompat.getInsetsController(window, rootContent);
         controller.setAppearanceLightStatusBars(false);
         controller.setAppearanceLightNavigationBars(false);
 
@@ -70,17 +71,22 @@ public abstract class BaseNavDrawerActivity extends AppCompatActivity {
             return insets;
         });
 
+        // --- bind drawer stuff ---
         drawerLayout = binding.drawerLayout;
         navigationView = binding.navigationView;
-        View topBar = findViewById(R.id.topAppBar); // include / container navbara
-        btnNavMenu = topBar.findViewById(R.id.btnNavLeft); // burger dugme
         bottomNav = binding.bottomNav;
 
+        // --- inflate child content into container ---
         FrameLayout contentContainer = binding.contentContainer;
         getLayoutInflater().inflate(getContentLayoutId(), contentContainer, true);
-        btnNavMenu.setOnClickListener(v -> drawerLayout.openDrawer(GravityCompat.END));
 
-        View header = navigationView.getHeaderView(0);
+        // --- NEW NAVBAR ONLY: btnNavMenu ---
+        View topBar = findViewById(R.id.topAppBar); // include/container for navbar
+        btnNavMenu = (topBar != null) ? topBar.findViewById(R.id.btnNavMenu) : null;
+
+        if (btnNavMenu != null) {
+            btnNavMenu.setOnClickListener(v -> drawerLayout.openDrawer(GravityCompat.END));
+        }
 
         navigationView.setNavigationItemSelectedListener(item -> {
             handleDrawerItemClick(item.getItemId());

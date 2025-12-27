@@ -53,7 +53,6 @@ public class RideDetailsDialogFragment extends DialogFragment {
         }
     }
 
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -77,7 +76,7 @@ public class RideDetailsDialogFragment extends DialogFragment {
                 labelWhite, valueYellow
         ));
 
-        // Za sad su ovo “dummy” (dok ne uvedeš stanice u model)
+        // Za sad “dummy” (dok ne uvedeš stanice u model)
         b.tvStation1.setText(labelValue("Station 1: ", "Medical Faculty", labelWhite, valueYellow));
         b.tvStation2.setText(labelValue("Station 2: ", "Suboticka 12", labelWhite, valueYellow));
 
@@ -87,7 +86,7 @@ public class RideDetailsDialogFragment extends DialogFragment {
                 labelWhite, valueYellow
         ));
 
-        // START/END zalepi na postojeće tvStart i tvEnd
+        // START/END
         b.tvStart.setText(labelValue(
                 "Start time: ",
                 args.getString("start", ""),
@@ -116,10 +115,11 @@ public class RideDetailsDialogFragment extends DialogFragment {
                 labelWhite, valueYellow
         ));
 
-        // PASSENGERS + RATINGS (za sad placeholder kao na slici)
+        // PASSENGERS placeholder
         b.tvPassengers.setText("user1@gmail.com\nuser2@gmail.com\nuser3@gmail.com");
 
-        b.tvRatings.setText(
+        // RATINGS placeholder (ali obojeno: do ':' belo, posle ':' žuto)
+        String ratingsText =
                 "user1@gmail.com\n" +
                         "Driver rating: 5 stars\n" +
                         "Vehicle rating: 5 stars\n" +
@@ -131,14 +131,16 @@ public class RideDetailsDialogFragment extends DialogFragment {
                         "user3@gmail.com\n" +
                         "Driver rating: N/A\n" +
                         "Vehicle rating: N/A\n" +
-                        "Comment: N/A"
-        );
+                        "Comment: N/A";
 
+        b.tvRatings.setText(colorizeLabelsUntilColon(ratingsText, labelWhite, valueYellow));
 
+        b.tvPanicFlag.setText(labelValue("Panic button pressed: ", "False", labelWhite, valueYellow));
+        b.tvInconsistencyFlag.setText(labelValue("Inconsistency report: ", "N/A", labelWhite, valueYellow));
 
         b.btnClose.setOnClickListener(v -> dismiss());
     }
-
+    
     private CharSequence labelValue(String label, String value, int labelColorRes, int valueColorRes) {
         String full = label + value;
         SpannableString ss = new SpannableString(full);
@@ -148,6 +150,41 @@ public class RideDetailsDialogFragment extends DialogFragment {
 
         ss.setSpan(new ForegroundColorSpan(labelColor), 0, label.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         ss.setSpan(new ForegroundColorSpan(valueColor), label.length(), full.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        return ss;
+    }
+
+    // Za format gde želiš "Label: value" u više linija:
+    // sve do ':' je label boja, posle ':' je value boja (liniju po liniju).
+    private CharSequence colorizeLabelsUntilColon(String text, int labelColorRes, int valueColorRes) {
+        SpannableString ss = new SpannableString(text);
+
+        int labelColor = ContextCompat.getColor(requireContext(), labelColorRes);
+        int valueColor = ContextCompat.getColor(requireContext(), valueColorRes);
+
+        int start = 0;
+        while (start < text.length()) {
+            int endLine = text.indexOf('\n', start);
+            if (endLine == -1) endLine = text.length();
+
+            int colon = text.indexOf(':', start);
+
+            if (colon != -1 && colon < endLine) {
+                // label: start..colon+1
+                ss.setSpan(new ForegroundColorSpan(labelColor),
+                        start, colon + 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+                // value: colon+1..endLine
+                ss.setSpan(new ForegroundColorSpan(valueColor),
+                        colon + 1, endLine, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            } else {
+                // linije bez ':' (npr. email) -> sve belo
+                ss.setSpan(new ForegroundColorSpan(labelColor),
+                        start, endLine, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            }
+
+            start = endLine + 1;
+        }
+
         return ss;
     }
 
@@ -181,3 +218,4 @@ public class RideDetailsDialogFragment extends DialogFragment {
         b = null;
     }
 }
+

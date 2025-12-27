@@ -1,8 +1,6 @@
 package com.komsiluk.taxi.driver.history;
 
 import android.os.Bundle;
-import android.widget.ImageButton;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -25,13 +23,8 @@ public class DriverHistoryActivity extends BaseNavDrawerActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        TextView navTitle = findViewById(R.id.navTitle);
-        ImageButton btnRight = findViewById(R.id.btnNavRight);
-
-        navTitle.setText("TAXIAPP");
-        btnRight.setOnClickListener(v ->
-                Toast.makeText(this, "Profile", Toast.LENGTH_SHORT).show()
-        );
+        // ✅ NE diramo navbar ovde (nema navTitle/btnNavRight u novom navbaru)
+        // Drawer/hamburger radi iz BaseNavDrawerActivity preko btnNavMenu.
 
         RecyclerView rv = findViewById(R.id.rvHistory);
         rv.setLayoutManager(new LinearLayoutManager(this));

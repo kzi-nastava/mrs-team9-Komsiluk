@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         binding.btnUserProfile.setOnClickListener(v -> openProfile("user"));
-        binding.btnDriverProfile.setOnClickListener(v -> openProfile("com/komsiluk/taxi/driver"));
+        binding.btnDriverProfile.setOnClickListener(v -> openProfile("driver"));
         binding.btnDriverHistory.setOnClickListener(v -> {
             startActivity(new Intent(this, DriverHistoryActivity.class));
         });

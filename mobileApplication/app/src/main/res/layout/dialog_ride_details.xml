@@ -48,14 +48,17 @@
                 android:layout_height="wrap_content"
                 android:text="Route"
                 android:textStyle="bold"
-                android:textColor="@color/secondary" />
+                android:fontFamily="@font/roboto_serif_semibold"
+                android:textColor="@color/white" />
 
             <TextView
                 android:id="@+id/tvPickup"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Pickup location: ..."
-                android:textColor="@android:color/white"
+                android:textColor="@color/secondary"
+                android:fontFamily="@font/roboto_serif_medium"
+
                 android:layout_marginTop="6dp" />
 
             <TextView
@@ -63,7 +66,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Station 1: ..."
-                android:textColor="@android:color/white"
+                android:fontFamily="@font/roboto_serif_medium"
+
+                android:textColor="@color/secondary"
                 android:layout_marginTop="4dp" />
 
             <TextView
@@ -71,7 +76,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Station 2: ..."
-                android:textColor="@android:color/white"
+                android:textColor="@color/secondary"
+                android:fontFamily="@font/roboto_serif_medium"
+
                 android:layout_marginTop="4dp" />
 
             <TextView
@@ -79,7 +86,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Destination: ..."
-                android:textColor="@android:color/white"
+                android:textColor="@color/secondary"
+                android:fontFamily="@font/roboto_serif_medium"
+
                 android:layout_marginTop="4dp" />
 
             <TextView
@@ -87,7 +96,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Start time: ..."
-                android:textColor="@android:color/white"
+                android:fontFamily="@font/roboto_serif_medium"
+                android:textColor="@color/secondary"
                 android:layout_marginTop="10dp" />
 
             <TextView
@@ -95,7 +105,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="End time: ..."
-                android:textColor="@android:color/white"
+                android:fontFamily="@font/roboto_serif_medium"
+
+                android:textColor="@color/secondary"
                 android:layout_marginTop="4dp" />
 
             <TextView
@@ -103,7 +115,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Kilometers: ..."
-                android:textColor="@android:color/white"
+                android:fontFamily="@font/roboto_serif_medium"
+
+                android:textColor="@color/secondary"
                 android:layout_marginTop="10dp" />
 
             <TextView
@@ -111,7 +125,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Time: ..."
-                android:textColor="@android:color/white"
+                android:fontFamily="@font/roboto_serif_medium"
+
+                android:textColor="@color/secondary"
                 android:layout_marginTop="4dp" />
 
             <TextView
@@ -119,8 +135,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Price: ..."
-                android:textColor="@color/secondary"
-                android:textStyle="bold"
+                android:textColor="@color/white"
+                android:fontFamily="@font/roboto_serif_medium"
+
                 android:layout_marginTop="4dp" />
 
             <TextView
@@ -129,7 +146,8 @@
                 android:layout_height="wrap_content"
                 android:text="Passengers:"
                 android:textStyle="bold"
-                android:textColor="@color/secondary"
+                android:fontFamily="@font/roboto_serif_semibold"
+                android:textColor="@color/white"
                 android:layout_marginTop="14dp" />
 
             <TextView
@@ -137,7 +155,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="user1@gmail.com&#10;user2@gmail.com&#10;user3@gmail.com"
-                android:textColor="@android:color/white"
+                android:textColor="@color/secondary"
+                android:fontFamily="@font/roboto_serif_medium"
+
                 android:layout_marginTop="6dp" />
 
             <TextView
@@ -146,7 +166,8 @@
                 android:layout_height="wrap_content"
                 android:text="Ratings:"
                 android:textStyle="bold"
-                android:textColor="@color/secondary"
+                android:textColor="@color/white"
+                android:fontFamily="@font/roboto_serif_semibold"
                 android:layout_marginTop="14dp" />
 
             <TextView
@@ -154,8 +175,32 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="(ratings placeholder)"
-                android:textColor="@android:color/white"
+                android:textColor="@color/white"
+                android:fontFamily="@font/roboto_serif_medium"
+
                 android:layout_marginTop="6dp" />
+
+            <TextView
+                android:id="@+id/tvPanicFlag"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Panic button pressed: False"
+                android:textColor="@color/secondary"
+                android:fontFamily="@font/roboto_serif_medium"
+                android:textSize="14sp" />
+
+            <Space
+                android:layout_width="18dp"
+                android:layout_height="0dp" />
+
+            <TextView
+                android:id="@+id/tvInconsistencyFlag"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Inconsistency report: N/A"
+                android:textColor="@color/secondary"
+                android:fontFamily="@font/roboto_serif_medium"
+                android:textSize="14sp" />
 
         </LinearLayout>
     </ScrollView>
