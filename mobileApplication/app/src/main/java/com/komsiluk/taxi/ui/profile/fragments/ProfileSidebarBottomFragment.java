@@ -16,6 +16,8 @@ import android.widget.Toast;
 import com.komsiluk.taxi.MainActivity;
 import com.komsiluk.taxi.R;
 import com.komsiluk.taxi.auth.AuthManager;
+import com.komsiluk.taxi.driver.history.DriverHistoryActivity;
+import com.komsiluk.taxi.ui.shared.InfoMessageActivity;
 
 import javax.inject.Inject;
 
@@ -52,8 +54,7 @@ public class ProfileSidebarBottomFragment extends Fragment {
     }
 
     @Override
-    public void onViewCreated(@NonNull View view,
-                              @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
         TextView tvActiveToday = view.findViewById(R.id.tvActiveToday);
@@ -63,18 +64,20 @@ public class ProfileSidebarBottomFragment extends Fragment {
             tvActiveToday.setVisibility(View.INVISIBLE);
         }
 
-        // TODO: add real functionality
-        view.findViewById(R.id.btnFavoriteRides)
-                .setOnClickListener(v ->
-                        Toast.makeText(getContext(), "Favorite rides", Toast.LENGTH_SHORT).show());
+        view.findViewById(R.id.btnRideHistory)
+                .setOnClickListener(v ->{
+                        Intent i = new Intent(getContext(), DriverHistoryActivity.class);
+                        startActivity(i);
+                });
 
-        // ... same for other buttons
         btnLogout.setOnClickListener(v ->{
-                Intent intent = new Intent(requireActivity(), MainActivity.class);
-                authManager.logout();
-                requireActivity().finish();
-                startActivity(intent);
-                Toast.makeText(getContext(), "Successful logout!", Toast.LENGTH_SHORT).show();
+            Intent i = InfoMessageActivity.createLogoutIntent(
+                    this.getContext(),
+                    getString(R.string.logout_title),
+                    getString(R.string.logout_message),
+                    getString(R.string.logout_button)
+            );
+            startActivity(i);
         });
     }
 }

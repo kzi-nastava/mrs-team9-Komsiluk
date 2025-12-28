@@ -7,11 +7,20 @@
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
-        android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
+        android:icon="@mipmap/ic_launcher_taxi"
+        android:label="@string/company_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Taxi_Project">
+        <activity
+            android:name=".AdminActivity"
+            android:exported="false" />
+        <activity
+            android:name=".DriverActivity"
+            android:exported="false" />
+        <activity
+            android:name=".UserActivity"
+            android:exported="false" />
         <activity
             android:name=".ui.auth.AuthActivity"
             android:exported="false" />
@@ -32,7 +41,8 @@
             android:exported="false" />
         <activity
             android:name=".MainActivity"
-            android:exported="true">
+            android:exported="true"
+            android:theme="@style/Theme.KomsilukTaxi.Splash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -40,7 +50,6 @@
             </intent-filter>
         </activity>
         <activity android:name=".driver.history.DriverHistoryActivity" />
-
     </application>
 
 </manifest>

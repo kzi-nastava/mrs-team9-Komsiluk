@@ -47,7 +47,7 @@
             app:layout_constraintEnd_toEndOf="parent">
 
             <ImageButton
-                android:id="@+id/navHome"
+                android:id="@+id/navRides"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
@@ -58,7 +58,7 @@
                 android:contentDescription="@string/menu_favorite_rides" />
 
             <ImageButton
-                android:id="@+id/navRides"
+                android:id="@+id/navHome"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
