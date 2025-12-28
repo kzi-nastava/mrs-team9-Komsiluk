@@ -10,12 +10,13 @@
 
     <ImageView
         android:id="@+id/imgThumb"
-        android:layout_width="72dp"
-        android:layout_height="72dp"
+        android:layout_width="175dp"
+        android:layout_height="175dp"
         android:background="#FEFEFE"
+        android:src="@drawable/temp_map"
         android:scaleType="centerCrop"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/tvDate"
@@ -25,10 +26,10 @@
         android:textStyle="bold"
         android:textColor="@color/black"
         android:fontFamily="@font/roboto_serif_semibold"
+        android:layout_marginStart="12dp"
         app:layout_constraintStart_toEndOf="@id/imgThumb"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/imgThumb"
-        android:layout_marginStart="12dp"/>
+        app:layout_constraintTop_toTopOf="@id/imgThumb" />
 
     <TextView
         android:id="@+id/tvTimes"
@@ -37,34 +38,20 @@
         android:text="Start: 12:00   End: 14:14"
         android:textColor="@android:color/white"
         android:fontFamily="@font/roboto_serif_medium"
+        android:layout_marginTop="6dp"
         app:layout_constraintStart_toStartOf="@id/tvDate"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvDate"
-        android:layout_marginTop="6dp"/>
+        app:layout_constraintTop_toBottomOf="@id/tvDate" />
 
-    <TextView
-        android:id="@+id/tvPickup"
+    <View
+        android:id="@+id/dividerInfo"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="Pickup: ..."
-        android:textColor="@android:color/white"
-        android:fontFamily="@font/roboto_serif_medium"
+        android:layout_height="1.5dp"
+        android:layout_marginTop="8dp"
+        android:background="@color/black"
         app:layout_constraintStart_toStartOf="@id/tvDate"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvTimes"
-        android:layout_marginTop="10dp"/>
-
-    <TextView
-        android:id="@+id/tvDestination"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="Destination: ..."
-        android:textColor="@android:color/white"
-        android:fontFamily="@font/roboto_serif_medium"
-        app:layout_constraintStart_toStartOf="@id/tvPickup"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvPickup"
-        android:layout_marginTop="4dp"/>
+        app:layout_constraintTop_toBottomOf="@id/tvTimes" />
 
     <TextView
         android:id="@+id/tvStatus"
@@ -73,10 +60,10 @@
         android:text="Status: completed"
         android:textColor="@color/black"
         android:fontFamily="@font/roboto_serif_medium"
-        app:layout_constraintStart_toStartOf="@id/tvPickup"
+        android:layout_marginTop="8dp"
+        app:layout_constraintStart_toStartOf="@id/tvDate"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvDestination"
-        android:layout_marginTop="10dp"/>
+        app:layout_constraintTop_toBottomOf="@id/dividerInfo" />
 
     <TextView
         android:id="@+id/tvPassengers"
@@ -85,10 +72,10 @@
         android:text="Passengers: 3"
         android:textColor="@color/black"
         android:fontFamily="@font/roboto_serif_medium"
-        app:layout_constraintStart_toStartOf="@id/tvPickup"
+        android:layout_marginTop="4dp"
+        app:layout_constraintStart_toStartOf="@id/tvStatus"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvStatus"
-        android:layout_marginTop="4dp"/>
+        app:layout_constraintTop_toBottomOf="@id/tvStatus" />
 
     <TextView
         android:id="@+id/tvKm"
@@ -97,10 +84,10 @@
         android:text="Kilometers: 100"
         android:textColor="@color/black"
         android:fontFamily="@font/roboto_serif_medium"
-        app:layout_constraintStart_toStartOf="@id/tvPickup"
+        android:layout_marginTop="8dp"
+        app:layout_constraintStart_toStartOf="@id/tvStatus"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvPassengers"
-        android:layout_marginTop="10dp"/>
+        app:layout_constraintTop_toBottomOf="@id/tvPassengers" />
 
     <TextView
         android:id="@+id/tvDuration"
@@ -109,10 +96,10 @@
         android:text="Time: 2h 14min"
         android:textColor="@color/black"
         android:fontFamily="@font/roboto_serif_medium"
-        app:layout_constraintStart_toStartOf="@id/tvPickup"
+        android:layout_marginTop="4dp"
+        app:layout_constraintStart_toStartOf="@id/tvKm"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvKm"
-        android:layout_marginTop="4dp"/>
+        app:layout_constraintTop_toBottomOf="@id/tvKm" />
 
     <TextView
         android:id="@+id/tvPrice"
@@ -121,10 +108,34 @@
         android:text="Price: 200$"
         android:textColor="@color/black"
         android:fontFamily="@font/roboto_serif_medium"
-        app:layout_constraintStart_toStartOf="@id/tvPickup"
+        android:layout_marginTop="4dp"
+        app:layout_constraintStart_toStartOf="@id/tvDuration"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvDuration"
-        android:layout_marginTop="4dp"/>
+        app:layout_constraintTop_toBottomOf="@id/tvDuration" />
+
+    <TextView
+        android:id="@+id/tvPickup"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Pickup: ..."
+        android:textColor="@android:color/white"
+        android:fontFamily="@font/roboto_serif_medium"
+        android:layout_marginTop="8dp"
+        app:layout_constraintStart_toStartOf="@id/imgThumb"
+        app:layout_constraintEnd_toEndOf="@id/imgThumb"
+        app:layout_constraintTop_toBottomOf="@id/imgThumb" />
+
+    <TextView
+        android:id="@+id/tvDestination"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Destination: ..."
+        android:textColor="@android:color/white"
+        android:fontFamily="@font/roboto_serif_medium"
+        android:layout_marginTop="4dp"
+        app:layout_constraintStart_toStartOf="@id/tvPickup"
+        app:layout_constraintEnd_toEndOf="@id/tvPickup"
+        app:layout_constraintTop_toBottomOf="@id/tvPickup" />
 
     <Button
         android:id="@+id/btnDetails"
@@ -138,11 +149,10 @@
         android:text="Details"
         android:textAllCaps="false"
         android:fontFamily="@font/roboto_serif_medium"
-
         android:backgroundTint="@color/black"
         android:textColor="@color/secondary"
-        app:layout_constraintStart_toStartOf="@id/tvPickup"
+        android:layout_marginTop="8dp"
         app:layout_constraintTop_toBottomOf="@id/tvPrice"
-        android:layout_marginTop="10dp"/>
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -13,6 +13,7 @@
     <string name="btn_confirm">Confirm</string>
     <string name="btn_done">Done</string>
     <string name="btn_close">Close</string>
+    <string name="btn_details">Details</string>
 
     <string name="menu_profile">Profile</string>
     <string name="menu_favorite_rides">Favorite Rides</string>

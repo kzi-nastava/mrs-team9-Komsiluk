@@ -8,21 +8,21 @@
     android:padding="16dp"
     android:background="@drawable/bg_ride_card">
 
-    <!-- MAPA -->
+    <!-- MAP -->
     <ImageView
         android:id="@+id/imgMap"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:scaleType="centerCrop"
         android:contentDescription="Map"
-        android:src="@drawable/bg_texture"
+        android:src="@drawable/temp_map"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintWidth_percent="0.66"
         app:layout_constraintDimensionRatio="1:1" />
 
-    <!-- SKROL TEKST -->
+    <!-- Scroll -->
     <ScrollView
         android:id="@+id/scrollContent"
         android:layout_width="0dp"
@@ -46,10 +46,17 @@
                 android:id="@+id/tvRouteTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Route"
+                android:text="Route:"
                 android:textStyle="bold"
                 android:fontFamily="@font/roboto_serif_semibold"
                 android:textColor="@color/white" />
+
+            <com.google.android.material.divider.MaterialDivider
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="8dp"
+                app:dividerColor="@color/white"
+                app:dividerThickness="1dp" />
 
             <TextView
                 android:id="@+id/tvPickup"
@@ -91,6 +98,14 @@
 
                 android:layout_marginTop="4dp" />
 
+            <com.google.android.material.divider.MaterialDivider
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="8dp"
+                app:dividerColor="@color/white"
+                app:dividerThickness="1dp" />
+
+
             <TextView
                 android:id="@+id/tvStart"
                 android:layout_width="match_parent"
@@ -109,6 +124,14 @@
 
                 android:textColor="@color/secondary"
                 android:layout_marginTop="4dp" />
+
+            <com.google.android.material.divider.MaterialDivider
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="8dp"
+                app:dividerColor="@color/white"
+                app:dividerThickness="1dp" />
+
 
             <TextView
                 android:id="@+id/tvKm"
@@ -150,6 +173,13 @@
                 android:textColor="@color/white"
                 android:layout_marginTop="14dp" />
 
+            <com.google.android.material.divider.MaterialDivider
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="8dp"
+                app:dividerColor="@color/white"
+                app:dividerThickness="1dp" />
+
             <TextView
                 android:id="@+id/tvPassengers"
                 android:layout_width="match_parent"
@@ -170,6 +200,13 @@
                 android:fontFamily="@font/roboto_serif_semibold"
                 android:layout_marginTop="14dp" />
 
+            <com.google.android.material.divider.MaterialDivider
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="8dp"
+                app:dividerColor="@color/white"
+                app:dividerThickness="1dp" />
+
             <TextView
                 android:id="@+id/tvRatings"
                 android:layout_width="match_parent"
@@ -179,6 +216,13 @@
                 android:fontFamily="@font/roboto_serif_medium"
 
                 android:layout_marginTop="6dp" />
+
+            <com.google.android.material.divider.MaterialDivider
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="8dp"
+                app:dividerColor="@color/white"
+                app:dividerThickness="1dp" />
 
             <TextView
                 android:id="@+id/tvPanicFlag"
@@ -214,6 +258,7 @@
         android:textAllCaps="false"
         android:backgroundTint="@color/secondary"
         android:textColor="@color/black"
+        android:fontFamily="@font/roboto_serif_semibold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
