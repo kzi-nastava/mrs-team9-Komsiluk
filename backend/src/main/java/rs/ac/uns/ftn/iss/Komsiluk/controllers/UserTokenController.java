@@ -13,7 +13,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import rs.ac.uns.ftn.iss.Komsiluk.dtos.userToken.ResetPasswordRequestDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.userToken.UserTokenActivationDTO;
+import rs.ac.uns.ftn.iss.Komsiluk.dtos.userToken.UserTokenPassengerActivationDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.userToken.UserTokenResponseDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.IUserTokenService;
 
@@ -48,4 +50,31 @@ public class UserTokenController {
         userTokenService.activateWithPassword(dto.getToken(), dto.getPassword());
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    @PostMapping(value = "/activation/passenger",
+            consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> activatePassenger(
+            @RequestBody UserTokenPassengerActivationDTO dto) {
+
+        userTokenService.activate(dto.getToken());
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping(
+            value = "/reset-password",
+            consumes = MediaType.APPLICATION_JSON_VALUE
+    )
+    public ResponseEntity<Void> resetPassword(
+            @RequestBody ResetPasswordRequestDTO dto) {
+
+        if (!dto.getNewPassword().equals(dto.getConfirmPassword())) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        userTokenService.resetPassword(dto.getToken(), dto.getNewPassword());
+
+        return ResponseEntity.ok().build();
+    }
+
+
 }

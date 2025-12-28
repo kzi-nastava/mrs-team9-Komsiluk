@@ -12,5 +12,12 @@ public interface IUserTokenService {
 
     public UserTokenResponseDTO createActivationToken(Long id);
 
+    UserTokenResponseDTO createPasswordResetToken(Long userId);
+
+
     public UserTokenResponseDTO activateWithPassword(String tokenValue, String rawPassword);
+
+    public void resetPassword(String tokenValue, String newPassword);
+
+    public void activate(String tokenValue);
 }
