@@ -5,8 +5,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/main"
-    tools:context=".MainActivity">
+    android:id="@+id/admin_root"
+    tools:context=".AdminActivity">
 
     <!-- Fullscreen placeholder image for map -->
     <ImageView

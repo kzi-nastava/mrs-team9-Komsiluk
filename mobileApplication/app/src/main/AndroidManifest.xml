@@ -13,6 +13,15 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Taxi_Project">
         <activity
+            android:name=".AdminActivity"
+            android:exported="false" />
+        <activity
+            android:name=".DriverActivity"
+            android:exported="false" />
+        <activity
+            android:name=".UserActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.auth.AuthActivity"
             android:exported="false" />
         <activity

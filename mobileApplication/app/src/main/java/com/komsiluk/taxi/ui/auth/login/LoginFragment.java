@@ -1,6 +1,8 @@
 package com.komsiluk.taxi.ui.auth.login;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.Editable;
@@ -15,8 +17,13 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.material.button.MaterialButton;
+import com.komsiluk.taxi.AdminActivity;
+import com.komsiluk.taxi.DriverActivity;
+import com.komsiluk.taxi.MainActivity;
 import com.komsiluk.taxi.R;
+import com.komsiluk.taxi.UserActivity;
 import com.komsiluk.taxi.auth.AuthManager;
+import com.komsiluk.taxi.auth.UserRole;
 import com.komsiluk.taxi.databinding.FragmentLoginBinding;
 import com.komsiluk.taxi.ui.auth.rider_registration.RiderRegistrationFragment;
 
@@ -77,13 +84,8 @@ public class LoginFragment extends Fragment {
                     binding.etEmail.getText().toString().trim(),
                     binding.etPassword.getText().toString().trim()
             );
-            if (success) {
-                Toast.makeText(
-                        requireContext(),
-                        getString(R.string.auth_login_success),
-                        Toast.LENGTH_SHORT
-                ).show();
-            } else {
+
+            if (!success) {
                 Toast.makeText(
                         requireContext(),
                         getString(R.string.auth_invalid_credentials),
@@ -91,6 +93,34 @@ public class LoginFragment extends Fragment {
                 ).show();
                 return;
             }
+
+            Toast.makeText(
+                    requireContext(),
+                    getString(R.string.auth_login_success),
+                    Toast.LENGTH_SHORT
+            ).show();
+
+            UserRole role = authManager.getRole();
+            Context ctx = requireContext();
+            Intent intent;
+
+            switch (role) {
+                case PASSENGER:
+                    intent = new Intent(ctx, UserActivity.class);
+                    break;
+                case DRIVER:
+                    intent = new Intent(ctx, DriverActivity.class);
+                    break;
+                case ADMIN:
+                    intent = new Intent(ctx, AdminActivity.class);
+                    break;
+                default:
+                    intent = new Intent(ctx, MainActivity.class);
+                    break;
+            }
+
+            intent.addFlags(android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP | android.content.Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
             requireActivity().finish();
         });
 
