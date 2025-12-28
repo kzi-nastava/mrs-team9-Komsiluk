@@ -10,7 +10,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import rs.ac.uns.ftn.iss.Komsiluk.beans.Route;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.ride.RideCreateDTO;
+import rs.ac.uns.ftn.iss.Komsiluk.dtos.ride.RideEstimateRequestDTO;
+import rs.ac.uns.ftn.iss.Komsiluk.dtos.ride.RideEstimateResponseDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.ride.RideResponseDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.IRideService;
 
@@ -32,4 +35,14 @@ public class RideController {
         RideResponseDTO dto = rideService.startRide(id);
         return new ResponseEntity<>(dto, HttpStatus.OK);
     }
+
+    @PostMapping("/estimate")
+    public ResponseEntity<RideEstimateResponseDTO> estimateRide(
+            @RequestBody RideEstimateRequestDTO dto) {
+
+        RideEstimateResponseDTO response = rideService.estimate(dto);
+
+        return ResponseEntity.ok(response);
+    }
+
 }

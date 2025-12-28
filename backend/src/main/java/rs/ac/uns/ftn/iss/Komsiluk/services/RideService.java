@@ -20,6 +20,8 @@ import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.VehicleType;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.driver.DriverResponseDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.notification.NotificationCreateDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.ride.RideCreateDTO;
+import rs.ac.uns.ftn.iss.Komsiluk.dtos.ride.RideEstimateRequestDTO;
+import rs.ac.uns.ftn.iss.Komsiluk.dtos.ride.RideEstimateResponseDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.ride.RideResponseDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.route.RouteCreateDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.route.RouteResponseDTO;
@@ -210,5 +212,17 @@ public class RideService implements IRideService {
                 .filter(d -> !babyFriendly || d.getVehicle().isBabyFriendly())
                 .filter(d -> !petFriendly || d.getVehicle().isPetFriendly())
                 .findFirst();
+    }
+
+    public RideEstimateResponseDTO estimate(RideEstimateRequestDTO dto) {
+        RideEstimateResponseDTO response = new RideEstimateResponseDTO();
+
+        // ovde neka logika za estimaciju
+        response.setDistanceKm(5);
+        response.setEstimatedDurationMin(10);
+        response.setStartAddress(dto.getStartAddress());
+        response.setDestinationAddress(dto.getDestinationAddress());
+
+        return response;
     }
 }
