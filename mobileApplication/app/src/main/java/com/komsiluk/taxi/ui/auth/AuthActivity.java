@@ -10,6 +10,8 @@ import com.komsiluk.taxi.R;
 import com.komsiluk.taxi.databinding.ActivityAuthBinding;
 import com.komsiluk.taxi.ui.auth.login.LoginFragment;
 import com.komsiluk.taxi.ui.auth.login.ResetPasswordFragment;
+import com.komsiluk.taxi.ui.auth.login.VerificationMessageFragment;
+import com.komsiluk.taxi.ui.auth.rider_registration.RiderRegistrationFragment;
 
 import dagger.hilt.android.AndroidEntryPoint;
 
@@ -47,12 +49,14 @@ public class AuthActivity extends AppCompatActivity {
         }
 
         switch (dest) {
-//            case "REGISTER":
-//                return new RegisterFragment();
-            case "RESET":
-                return new ResetPasswordFragment();
+            case "REGISTER":
+                return new RiderRegistrationFragment();
+//            case "RESET":
+//                return new ResetPasswordFragment();
 //            case "REGISTER_SUCCESS":
 //                return new RegisterSuccessFragment();
+            case "VERIFY":
+                return new VerificationMessageFragment();
             case "LOGIN":
             default:
                 return new LoginFragment();

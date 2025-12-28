@@ -18,6 +18,7 @@ import com.google.android.material.button.MaterialButton;
 import com.komsiluk.taxi.R;
 import com.komsiluk.taxi.auth.AuthManager;
 import com.komsiluk.taxi.databinding.FragmentLoginBinding;
+import com.komsiluk.taxi.ui.auth.rider_registration.RiderRegistrationFragment;
 
 import javax.inject.Inject;
 
@@ -99,8 +100,12 @@ public class LoginFragment extends Fragment {
                     .replace(R.id.authFragmentContainer, new ForgotPasswordFragment())
                     .commit();
         });
-        binding.tvCreateAccount.setOnClickListener(v -> {requireActivity().finish();
-        }); // ovde ce ici replace
+        binding.tvCreateAccount.setOnClickListener(v -> {
+            getParentFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.authFragmentContainer, new RiderRegistrationFragment())
+                    .commit();
+        });
     }
 
     private boolean validateEmail() {
