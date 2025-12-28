@@ -96,12 +96,7 @@
     <string name="profile_update_submitted_title">Profile update submitted</string>
     <string name="profile_update_submitted_body">
     Your profile changes have been submitted and are waiting for administrator approval.
-    They will become visible once approved.
-</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-
-
+    They will become visible once approved.</string>
     <string name="auth_login_title">Log in</string>
     <string name="auth_login_confirm">Log in</string>
     <string name="auth_email">Email address</string>
