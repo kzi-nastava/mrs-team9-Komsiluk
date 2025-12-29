@@ -13,10 +13,7 @@ import org.springframework.stereotype.Service;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.Ride;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.Route;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.User;
-import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.DriverStatus;
-import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.NotificationType;
-import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.RideStatus;
-import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.VehicleType;
+import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.*;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.driver.DriverResponseDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.notification.NotificationCreateDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.ride.RideCreateDTO;
@@ -225,4 +222,53 @@ public class RideService implements IRideService {
 
         return response;
     }
+
+    public void cancelByDriver(Long rideId, String reason) {
+
+        Ride ride = rideRepository.findById(rideId)
+                .orElseThrow(NotFoundException::new);
+
+        if (ride.getStatus() != RideStatus.ASSIGNED) {
+            throw new BadRequestException();
+        }
+
+        if (reason == null || reason.isBlank()) {
+            throw new BadRequestException();
+        }
+
+
+        ride.setStatus(RideStatus.CANCELLED);
+        ride.setCancellationReason(reason);
+        ride.setCancellationSource(CancellationSource.DRIVER);
+
+        rideRepository.save(ride);
+    }
+
+    public void cancelByPassenger(Long rideId, String reason) {
+
+        Ride ride = rideRepository.findById(rideId)
+                .orElseThrow(NotFoundException::new);
+
+        if (LocalDateTime.now().isAfter(
+                ride.getStartTime().minusMinutes(10))) {
+            throw new BadRequestException();
+        }
+
+
+        if (ride.getStatus() != RideStatus.ASSIGNED) {
+            throw new BadRequestException();
+        }
+
+        if (reason == null || reason.isBlank()) {
+            throw new BadRequestException();
+        }
+
+
+        ride.setStatus(RideStatus.CANCELLED);
+        ride.setCancellationReason(reason);
+        ride.setCancellationSource(CancellationSource.PASSENGER);
+
+        rideRepository.save(ride);
+    }
+
 }

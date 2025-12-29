@@ -15,4 +15,8 @@ public interface IRideService {
     public boolean userHasActiveRide(Long userId);
 
     public RideEstimateResponseDTO estimate(RideEstimateRequestDTO dto);
+
+    public void cancelByDriver(Long rideId, String reason);
+
+    public void cancelByPassenger(Long rideId, String reason);
 }

@@ -11,10 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import rs.ac.uns.ftn.iss.Komsiluk.beans.Route;
-import rs.ac.uns.ftn.iss.Komsiluk.dtos.ride.RideCreateDTO;
-import rs.ac.uns.ftn.iss.Komsiluk.dtos.ride.RideEstimateRequestDTO;
-import rs.ac.uns.ftn.iss.Komsiluk.dtos.ride.RideEstimateResponseDTO;
-import rs.ac.uns.ftn.iss.Komsiluk.dtos.ride.RideResponseDTO;
+import rs.ac.uns.ftn.iss.Komsiluk.dtos.ride.*;
 import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.IRideService;
 
 @RestController
@@ -44,5 +41,25 @@ public class RideController {
 
         return ResponseEntity.ok(response);
     }
+
+    @PostMapping("/rides/{id}/cancel/driver")
+    public ResponseEntity<Void> cancelByDriver(
+            @PathVariable Long id,
+            @RequestBody DriverCancelRideDTO dto) {
+
+        rideService.cancelByDriver(id, dto.getReason());
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/rides/{id}/cancel/passenger")
+    public ResponseEntity<Void> cancelByPassenger(
+            @PathVariable Long id,
+            @RequestBody DriverCancelRideDTO dto) {
+
+        rideService.cancelByPassenger(id, dto.getReason());
+        return ResponseEntity.ok().build();
+    }
+
+
 
 }
