@@ -47,19 +47,26 @@ public class RideController {
             @PathVariable Long id,
             @RequestBody DriverCancelRideDTO dto) {
 
-        rideService.cancelByDriver(id, dto.getReason());
+        rideService.cancelByDriver(id, dto);
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/rides/{id}/cancel/passenger")
     public ResponseEntity<Void> cancelByPassenger(
             @PathVariable Long id,
-            @RequestBody DriverCancelRideDTO dto) {
+            @RequestBody PassengerCancelRideDTO dto) {
 
-        rideService.cancelByPassenger(id, dto.getReason());
+        rideService.cancelByPassenger(id, dto);
         return ResponseEntity.ok().build();
     }
 
+    @PostMapping("/rides/{id}/stop")
+    public ResponseEntity<Void> stopRide(
+            @PathVariable Long id,
+            @RequestBody StopRideRequestDTO dto) {
 
+        rideService.stopRide(id, dto);
+        return ResponseEntity.ok().build();
+    }
 
 }

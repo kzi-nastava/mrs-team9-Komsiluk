@@ -16,10 +16,7 @@ import rs.ac.uns.ftn.iss.Komsiluk.beans.User;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.*;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.driver.DriverResponseDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.notification.NotificationCreateDTO;
-import rs.ac.uns.ftn.iss.Komsiluk.dtos.ride.RideCreateDTO;
-import rs.ac.uns.ftn.iss.Komsiluk.dtos.ride.RideEstimateRequestDTO;
-import rs.ac.uns.ftn.iss.Komsiluk.dtos.ride.RideEstimateResponseDTO;
-import rs.ac.uns.ftn.iss.Komsiluk.dtos.ride.RideResponseDTO;
+import rs.ac.uns.ftn.iss.Komsiluk.dtos.ride.*;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.route.RouteCreateDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.route.RouteResponseDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.mappers.RideDTOMapper;
@@ -223,7 +220,7 @@ public class RideService implements IRideService {
         return response;
     }
 
-    public void cancelByDriver(Long rideId, String reason) {
+    public void cancelByDriver(Long rideId, DriverCancelRideDTO dto) {
 
         Ride ride = rideRepository.findById(rideId)
                 .orElseThrow(NotFoundException::new);
@@ -232,19 +229,19 @@ public class RideService implements IRideService {
             throw new BadRequestException();
         }
 
-        if (reason == null || reason.isBlank()) {
+        if (dto.getReason() == null || dto.getReason().isBlank()) {
             throw new BadRequestException();
         }
 
 
         ride.setStatus(RideStatus.CANCELLED);
-        ride.setCancellationReason(reason);
+        ride.setCancellationReason(dto.getReason());
         ride.setCancellationSource(CancellationSource.DRIVER);
 
         rideRepository.save(ride);
     }
 
-    public void cancelByPassenger(Long rideId, String reason) {
+    public void cancelByPassenger(Long rideId, PassengerCancelRideDTO dto) {
 
         Ride ride = rideRepository.findById(rideId)
                 .orElseThrow(NotFoundException::new);
@@ -259,16 +256,59 @@ public class RideService implements IRideService {
             throw new BadRequestException();
         }
 
-        if (reason == null || reason.isBlank()) {
+        if (dto.getReason() == null || dto.getReason().isBlank()) {
             throw new BadRequestException();
         }
 
 
         ride.setStatus(RideStatus.CANCELLED);
-        ride.setCancellationReason(reason);
+        ride.setCancellationReason(dto.getReason());
         ride.setCancellationSource(CancellationSource.PASSENGER);
 
         rideRepository.save(ride);
     }
+
+
+    public StopRideResponseDTO stopRide(Long rideId, StopRideRequestDTO dto) {
+
+        Ride ride = rideRepository.findById(rideId)
+                .orElseThrow(NotFoundException::new);
+
+        if (ride.getStatus() != RideStatus.ACTIVE) {
+            throw new BadRequestException();
+        }
+
+        if (dto.getStopAddress() == null || dto.getStopAddress().isBlank()) {
+            throw new BadRequestException();
+        }
+
+        LocalDateTime endTime = LocalDateTime.now();
+        ride.setEndTime(endTime);
+
+        // TODO update everything about the route
+        Route route = ride.getRoute();
+        route.setEndAddress(dto.getStopAddress());
+        ride.setRoute(route);
+
+        ride.setStatus(RideStatus.FINISHED);
+
+        BigDecimal price = calculatePrice(ride.getDriver().getVehicle().getType(), ride.getRoute().getDistanceKm());
+
+        ride.setPrice(price);
+
+        rideRepository.save(ride);
+
+        StopRideResponseDTO response = new StopRideResponseDTO();
+        response.setFinalAddress(dto.getStopAddress());
+        response.setDurationMinutes(ride.getRoute().getEstimatedDurationMin());
+        response.setPrice(price.doubleValue());
+
+
+        // TODO: notify passengers and driver that ride has ended
+        // TODO : mozda promena statusa vozaca
+        return response;
+    }
+
+
 
 }

@@ -1,10 +1,7 @@
 package rs.ac.uns.ftn.iss.Komsiluk.services.interfaces;
 
 import rs.ac.uns.ftn.iss.Komsiluk.beans.Route;
-import rs.ac.uns.ftn.iss.Komsiluk.dtos.ride.RideCreateDTO;
-import rs.ac.uns.ftn.iss.Komsiluk.dtos.ride.RideEstimateRequestDTO;
-import rs.ac.uns.ftn.iss.Komsiluk.dtos.ride.RideEstimateResponseDTO;
-import rs.ac.uns.ftn.iss.Komsiluk.dtos.ride.RideResponseDTO;
+import rs.ac.uns.ftn.iss.Komsiluk.dtos.ride.*;
 
 public interface IRideService {
 
@@ -16,7 +13,10 @@ public interface IRideService {
 
     public RideEstimateResponseDTO estimate(RideEstimateRequestDTO dto);
 
-    public void cancelByDriver(Long rideId, String reason);
+    public void cancelByDriver(Long rideId, DriverCancelRideDTO dto);
 
-    public void cancelByPassenger(Long rideId, String reason);
+    public void cancelByPassenger(Long rideId, PassengerCancelRideDTO dto);
+
+    public StopRideResponseDTO stopRide(Long id,StopRideRequestDTO dto);
+
 }
