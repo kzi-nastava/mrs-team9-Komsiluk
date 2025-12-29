@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.User;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.TokenType;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.UserToken;
+import rs.ac.uns.ftn.iss.Komsiluk.dtos.user.UserChangePasswordDTO;
+import rs.ac.uns.ftn.iss.Komsiluk.dtos.user.UserResetPasswordDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.userToken.UserTokenResponseDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.mappers.UserTokenDTOMapper;
 import rs.ac.uns.ftn.iss.Komsiluk.repositories.UserTokenRepository;
@@ -56,6 +58,33 @@ public class UserTokenService implements IUserTokenService {
         return mapper.toResponseDTO(saved);
     }
 
+    public UserTokenResponseDTO createPasswordResetToken(Long userId) {
+
+        User user = userService.findById(userId);
+
+        // poništi sve prethodne PASSWORD_RESET tokene
+        userTokenRepository.findAll().stream()
+                .filter(t -> t.getUser().getId().equals(userId))
+                .filter(t -> t.getType() == TokenType.PASSWORD_RESET)
+                .filter(t -> !t.isUsed())
+                .forEach(t -> {
+                    t.setUsed(true);
+                    userTokenRepository.save(t);
+                });
+
+        UserToken token = new UserToken();
+        token.setType(TokenType.PASSWORD_RESET);
+        token.setToken(UUID.randomUUID().toString());
+        token.setUser(user);
+        token.setExpiresAt(LocalDateTime.now().plusHours(24));
+        token.setUsed(false);
+
+        UserToken saved = userTokenRepository.save(token);
+
+        return mapper.toResponseDTO(saved);
+    }
+
+
     @Override
     public UserTokenResponseDTO activateWithPassword(String tokenValue, String rawPassword) {
         UserToken token = userTokenRepository.findByToken(tokenValue).orElseThrow(NotFoundException::new);
@@ -78,4 +107,48 @@ public class UserTokenService implements IUserTokenService {
 
         return mapper.toResponseDTO(saved);
     }
+
+    public void activate(String tokenValue) {
+
+        UserToken token = userTokenRepository.findByToken(tokenValue)
+                .orElseThrow(NotFoundException::new);
+
+        if (token.isUsed()
+                || token.getType() != TokenType.ACTIVATION
+                || token.getExpiresAt().isBefore(LocalDateTime.now())) {
+            throw new NotFoundException();
+        }
+
+        User user = token.getUser();
+        user.setActive(true);
+
+        userService.save(user);
+
+        token.setUsed(true);
+        userTokenRepository.save(token);
+    }
+
+    public void resetPassword(String tokenValue, String newPassword) {
+
+        UserToken token = userTokenRepository.findByToken(tokenValue)
+                .orElseThrow(NotFoundException::new);
+
+        if (token.isUsed()
+                || token.getType() != TokenType.PASSWORD_RESET
+                || token.getExpiresAt().isBefore(LocalDateTime.now())) {
+            throw new NotFoundException();
+        }
+
+        User user = token.getUser();
+
+        // delegacija UserService-u
+        userService.resetPassword(user.getId(), newPassword);
+
+        // invalidate token
+        token.setUsed(true);
+        userTokenRepository.save(token);
+    }
+
+
+
 }

@@ -101,8 +101,20 @@ public class UserService implements IUserService {
 		
 		userRepository.save(user);
 	}
-	
-	@Override
+
+    public void resetPassword(Long userId, String newPassword) {
+
+        User user = userRepository.findById(userId);
+        if (user == null) {
+            throw new NotFoundException();
+        }
+
+        user.setPasswordHash(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+    }
+
+
+    @Override
 	public User findByEmail(String email) {
 		return userRepository.findByEmail(email);
 	}
