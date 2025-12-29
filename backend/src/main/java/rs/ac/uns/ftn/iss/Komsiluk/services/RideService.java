@@ -23,18 +23,13 @@ import rs.ac.uns.ftn.iss.Komsiluk.dtos.notification.NotificationCreateDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.ride.*;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.route.RouteCreateDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.route.RouteResponseDTO;
+import rs.ac.uns.ftn.iss.Komsiluk.mappers.DriverDTOMapper;
 import rs.ac.uns.ftn.iss.Komsiluk.mappers.RideDTOMapper;
 import rs.ac.uns.ftn.iss.Komsiluk.mappers.RouteDTOMapper;
 import rs.ac.uns.ftn.iss.Komsiluk.repositories.RideRepository;
 import rs.ac.uns.ftn.iss.Komsiluk.services.exceptions.BadRequestException;
 import rs.ac.uns.ftn.iss.Komsiluk.services.exceptions.NotFoundException;
-import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.IDriverActivityService;
-import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.IDriverService;
-import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.INotificationService;
-import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.IRideService;
-import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.IRouteService;
-import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.IUserService;
-import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.IDriverLocationService;
+import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.*;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.DriverLocation;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.ride.RideLiveInfoDTO;
 
@@ -60,6 +55,14 @@ public class RideService implements IRideService {
 	private IDriverActivityService driverActivityService;
     @Autowired
     private IDriverLocationService driverLocationService;
+    @Autowired
+    private IRatingService ratingService;
+    @Autowired
+    private IInconsistencyReportService inconsistencyReportService;
+    @Autowired
+    private DriverDTOMapper driverMapper;
+
+
 
 
     @Override
@@ -316,7 +319,12 @@ public class RideService implements IRideService {
         Ride ride = rideRepository.findById(rideId)
                 .orElseThrow(NotFoundException::new);
 
-        if (ride.getStatus() != RideStatus.ASSIGNED) {
+        if (ride.getStatus() != RideStatus.ASSIGNED &&
+                ride.getStatus() != RideStatus.SCHEDULED) {
+            throw new BadRequestException();
+        }
+
+        if (ride.getScheduledAt() == null) {
             throw new BadRequestException();
         }
 
@@ -337,20 +345,27 @@ public class RideService implements IRideService {
         Ride ride = rideRepository.findById(rideId)
                 .orElseThrow(NotFoundException::new);
 
+        // status mora biti ASSIGNED ili SCHEDULED
+        if (ride.getStatus() != RideStatus.ASSIGNED &&
+                ride.getStatus() != RideStatus.SCHEDULED) {
+            throw new BadRequestException();
+        }
+
+        // mora postojati zakazano vreme
+        if (ride.getScheduledAt() == null) {
+            throw new BadRequestException();
+        }
+
+        // mora biti bar 10 minuta pre početka
         if (LocalDateTime.now().isAfter(
-                ride.getStartTime().minusMinutes(10))) {
+                ride.getScheduledAt().minusMinutes(10))) {
             throw new BadRequestException();
         }
 
-
-        if (ride.getStatus() != RideStatus.ASSIGNED) {
-            throw new BadRequestException();
-        }
-
+        // razlog obavezan
         if (dto.getReason() == null || dto.getReason().isBlank()) {
             throw new BadRequestException();
         }
-
 
         ride.setStatus(RideStatus.CANCELLED);
         ride.setCancellationReason(dto.getReason());
@@ -358,6 +373,7 @@ public class RideService implements IRideService {
 
         rideRepository.save(ride);
     }
+
 
 
     public StopRideResponseDTO stopRide(Long rideId, StopRideRequestDTO dto) {
@@ -400,6 +416,156 @@ public class RideService implements IRideService {
         return response;
     }
 
+    public Collection<AdminRideHistoryDTO> getAdminRideHistory(
+            LocalDate from,
+            LocalDate to,
+            String sortBy
+    ) {
+
+        return rideRepository.findAll().stream()
+                .filter(r ->
+                        r.getStatus() == RideStatus.FINISHED ||
+                                r.getStatus() == RideStatus.CANCELLED
+                )
+                .filter(r -> {
+                    if (from != null && r.getCreatedAt().toLocalDate().isBefore(from)) {
+                        return false;
+                    }
+                    if (to != null && r.getCreatedAt().toLocalDate().isAfter(to)) {
+                        return false;
+                    }
+                    return true;
+                })
+                .sorted(getAdminSortComparator(sortBy))
+                .map(this::mapToAdminHistoryDTO)
+                .toList();
+    }
+
+    private AdminRideHistoryDTO mapToAdminHistoryDTO(Ride ride) {
+        AdminRideHistoryDTO dto = new AdminRideHistoryDTO();
+        dto.setRideId(ride.getId());
+        dto.setStartAddress(
+                ride.getRoute() != null ? ride.getRoute().getStartAddress() : null
+        );
+        dto.setEndAddress(
+                ride.getRoute() != null ? ride.getRoute().getEndAddress() : null
+        );
+
+        dto.setStartTime(ride.getStartTime());
+        dto.setEndTime(ride.getEndTime());
+        dto.setCanceled(ride.getStatus() == RideStatus.CANCELLED);
+        dto.setCancellationSource(ride.getCancellationSource());
+        dto.setPrice(ride.getPrice());
+        dto.setPanicTriggered(ride.isPanicTriggered());
+        return dto;
+    }
+
+    public AdminRideDetailsDTO getAdminRideDetails(Long rideId) {
+
+        Ride ride = rideRepository.findById(rideId)
+                .orElseThrow(NotFoundException::new);
+
+        AdminRideDetailsDTO dto = new AdminRideDetailsDTO();
+
+        dto.setRideId(ride.getId());
+        dto.setRoute(routeMapper.toResponseDTO(ride.getRoute()));
+        dto.setStartTime(ride.getStartTime());
+        dto.setEndTime(ride.getEndTime());
+        dto.setCanceled(ride.getStatus() == RideStatus.CANCELLED);
+        dto.setCancellationSource(ride.getCancellationSource());
+        dto.setCancellationReason(ride.getCancellationReason());
+        dto.setPrice(ride.getPrice());
+        dto.setPanicTriggered(ride.isPanicTriggered());
+
+        // DRIVER (ako postoji)
+        if (ride.getDriver() != null) {
+            dto.setDriver(driverMapper.toResponseDTO(ride.getDriver()));
+        }
+
+        // PASSENGERS — bez UserResponseDTO
+        dto.setPassengerIds(
+                ride.getPassengers()
+                        .stream()
+                        .map(User::getId)
+                        .toList()
+        );
+
+        // RATINGS
+        dto.setRatings(
+                ratingService.getRatingsForRide(rideId)
+        );
+
+        // INCONSISTENCY REPORTS
+        dto.setInconsistencyReports(
+                inconsistencyReportService.getByRideId(rideId)
+        );
+
+        return dto;
+    }
+
+    public Collection<AdminRideHistoryDTO> getAdminRideHistoryForUser(
+            Long userId,
+            LocalDate from,
+            LocalDate to,
+            String sortBy
+    ) {
+        return rideRepository.findAll().stream()
+                .filter(ride -> isUserOnRide(ride, userId))
+                .filter(r ->
+                        r.getStatus() == RideStatus.FINISHED ||
+                                r.getStatus() == RideStatus.CANCELLED
+                )
+                // 2️⃣ filter po datumu (createdAt)
+                .filter(ride -> {
+                    if (from != null && ride.getCreatedAt().toLocalDate().isBefore(from)) {
+                        return false;
+                    }
+                    if (to != null && ride.getCreatedAt().toLocalDate().isAfter(to)) {
+                        return false;
+                    }
+                    return true;
+                })
+
+                // 3️⃣ sortiranje
+                .sorted(getAdminSortComparator(sortBy))
+
+                // 4️⃣ mapiranje u DTO
+                .map(this::mapToAdminHistoryDTO)
+
+                .toList();
+    }
+
+    private boolean isUserOnRide(Ride ride, Long userId) {
+        // ako je vozač
+        if (ride.getDriver() != null &&
+                ride.getDriver().getId().equals(userId)) {
+            return true;
+        }
+
+        // ako je putnik
+        if (ride.getPassengers() != null) {
+            return ride.getPassengers().stream()
+                    .anyMatch(p -> p != null && p.getId().equals(userId));
+        }
+
+        return false;
+    }
+
+
+
+
+    private Comparator<Ride> getAdminSortComparator(String sortBy) {
+        if (sortBy == null) {
+            return Comparator.comparing(Ride::getCreatedAt).reversed();
+        }
+
+        return switch (sortBy) {
+            case "price" -> Comparator.comparing(Ride::getPrice, Comparator.nullsLast(BigDecimal::compareTo));
+            case "startTime" -> Comparator.comparing(Ride::getStartTime, Comparator.nullsLast(LocalDateTime::compareTo));
+            case "endTime" -> Comparator.comparing(Ride::getEndTime, Comparator.nullsLast(LocalDateTime::compareTo));
+            default -> Comparator.comparing(Ride::getCreatedAt).reversed();
+        };
+    }
 
 
 }

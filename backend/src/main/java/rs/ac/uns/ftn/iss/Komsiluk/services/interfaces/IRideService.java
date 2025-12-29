@@ -32,4 +32,10 @@ public interface IRideService {
     public RideLiveInfoDTO getLiveInfo(Long rideId);
 
     public Collection<RideResponseDTO> getDriverRideHistory(Long driverId, LocalDate from, LocalDate to);
+
+    public Collection<AdminRideHistoryDTO> getAdminRideHistory(LocalDate from,LocalDate to,String sortBy);
+
+    public AdminRideDetailsDTO getAdminRideDetails(Long rideId);
+
+    public Collection<AdminRideHistoryDTO> getAdminRideHistoryForUser(Long userId,LocalDate from,LocalDate to,String sortBy);
 }
