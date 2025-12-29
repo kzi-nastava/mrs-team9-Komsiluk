@@ -19,6 +19,7 @@ import rs.ac.uns.ftn.iss.Komsiluk.dtos.vehicle.VehicleCreateDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.vehicle.VehicleResponseDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.vehicle.VehicleUpdateDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.IVehicleService;
+import rs.ac.uns.ftn.iss.Komsiluk.dtos.map.ActiveVehicleOnMapDTO;
 
 @RestController
 @RequestMapping("/api/vehicles")
@@ -61,4 +62,10 @@ public class VehicleController {
 		vehicleService.delete(id);
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
+
+    @GetMapping(value = "/active-map", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Collection<ActiveVehicleOnMapDTO>> getActiveVehiclesOnMap() {
+        Collection<ActiveVehicleOnMapDTO> vehicles = vehicleService.getActiveVehiclesOnMap();
+        return new ResponseEntity<Collection<ActiveVehicleOnMapDTO>>(vehicles, HttpStatus.OK);
+    }
 }

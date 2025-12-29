@@ -9,7 +9,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.GetMapping;
 
+import rs.ac.uns.ftn.iss.Komsiluk.dtos.ride.RideLiveInfoDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.ride.RideCreateDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.ride.RideResponseDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.IRideService;
@@ -26,10 +28,25 @@ public class RideController {
         RideResponseDTO created = rideService.orderRide(dto);
         return new ResponseEntity<>(created, HttpStatus.CREATED);
     }
-    
+
     @PostMapping("/{id}/start")
     public ResponseEntity<RideResponseDTO> startRide(@PathVariable Long id) {
         RideResponseDTO dto = rideService.startRide(id);
         return new ResponseEntity<>(dto, HttpStatus.OK);
     }
+
+    @PostMapping("/{id}/finish")
+    public ResponseEntity<RideResponseDTO> finishRide(@PathVariable Long id) {
+        RideResponseDTO dto = rideService.finishRide(id);
+        return new ResponseEntity<>(dto, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/{id}/live", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<RideLiveInfoDTO> getLiveInfo(@PathVariable Long id) {
+        RideLiveInfoDTO dto = rideService.getLiveInfo(id);
+        return new ResponseEntity<>(dto, HttpStatus.OK);
+    }
+
+
 }
+

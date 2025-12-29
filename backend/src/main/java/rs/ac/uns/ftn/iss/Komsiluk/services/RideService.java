@@ -6,6 +6,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.time.Duration;
+import java.time.LocalDate;
+import java.util.Comparator;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -34,6 +38,10 @@ import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.INotificationService;
 import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.IRideService;
 import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.IRouteService;
 import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.IUserService;
+import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.IDriverLocationService;
+import rs.ac.uns.ftn.iss.Komsiluk.beans.DriverLocation;
+import rs.ac.uns.ftn.iss.Komsiluk.dtos.ride.RideLiveInfoDTO;
+
 
 @Service
 public class RideService implements IRideService {
@@ -54,6 +62,9 @@ public class RideService implements IRideService {
 	private RouteDTOMapper routeMapper;
 	@Autowired
 	private IDriverActivityService driverActivityService;
+    @Autowired
+    private IDriverLocationService driverLocationService;
+
 
     @Override
     public RideResponseDTO orderRide(RideCreateDTO dto) {
@@ -172,6 +183,86 @@ public class RideService implements IRideService {
 
         return rideMapper.toResponseDTO(ride);
     }
+
+    @Override
+    public RideResponseDTO finishRide(Long rideId) {
+        Ride ride = rideRepository.findById(rideId).orElseThrow(NotFoundException::new);
+        if (ride == null) {
+            throw new NotFoundException();
+        }
+
+        if (ride.getStatus() != RideStatus.ACTIVE) {
+            throw new BadRequestException();
+        }
+
+        ride.setStatus(RideStatus.FINISHED);
+        ride.setEndTime(LocalDateTime.now());
+
+        rideRepository.save(ride);
+
+        return rideMapper.toResponseDTO(ride);
+    }
+
+    @Override
+    public RideLiveInfoDTO getLiveInfo(Long rideId) {
+        Ride ride = rideRepository.findById(rideId).orElseThrow(NotFoundException::new);
+
+        if (ride.getStatus() != RideStatus.ACTIVE) {
+            throw new BadRequestException();
+        }
+        if (ride.getDriver() == null) {
+            throw new BadRequestException();
+        }
+
+        RideLiveInfoDTO dto = new RideLiveInfoDTO();
+        dto.setRideId(ride.getId());
+        dto.setStatus(ride.getStatus());
+        dto.setDriverId(ride.getDriver().getId());
+
+        DriverLocation loc = driverLocationService.getLiveLocation(dto.getDriverId());
+        if (loc != null) {
+            dto.setLat(loc.getLat());
+            dto.setLng(loc.getLng());
+            dto.setLocationUpdatedAt(loc.getUpdatedAt());
+        }
+
+        Integer est = (ride.getRoute() != null) ? ride.getRoute().getEstimatedDurationMin() : null;
+        LocalDateTime start = ride.getStartTime();
+
+        if (est != null) {
+            if (start == null) {
+                dto.setRemainingMinutes(est);
+            } else {
+                long elapsed = Duration.between(start, LocalDateTime.now()).toMinutes();
+                int remaining = Math.max(0, est - (int) elapsed);
+                dto.setRemainingMinutes(remaining);
+            }
+        }
+
+        return dto;
+    }
+
+    @Override
+    public Collection<RideResponseDTO> getDriverRideHistory(Long driverId, LocalDate from, LocalDate to) {
+
+        return rideRepository.findAll().stream()
+                .filter(r -> r.getDriver() != null && r.getDriver().getId() != null
+                        && r.getDriver().getId().equals(driverId))
+                .filter(r -> {
+                    if (from == null && to == null) return true;
+                    if (r.getCreatedAt() == null) return false;
+
+                    LocalDate created = r.getCreatedAt().toLocalDate();
+                    if (from != null && created.isBefore(from)) return false;
+                    if (to != null && created.isAfter(to)) return false;
+                    return true;
+                })
+                .sorted(Comparator.comparing(Ride::getCreatedAt, Comparator.nullsLast(Comparator.naturalOrder())).reversed())
+                .map(rideMapper::toResponseDTO)
+                .collect(Collectors.toList());
+    }
+
+
 
     @Override
     public boolean userHasActiveRide(Long userId) {
