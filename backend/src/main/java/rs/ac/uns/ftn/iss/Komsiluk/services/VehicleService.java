@@ -1,20 +1,29 @@
 package rs.ac.uns.ftn.iss.Komsiluk.services;
 
 import java.util.Collection;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import rs.ac.uns.ftn.iss.Komsiluk.beans.DriverLocation;
+import rs.ac.uns.ftn.iss.Komsiluk.beans.User;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.Vehicle;
+import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.DriverStatus;
+import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.UserRole;
+import rs.ac.uns.ftn.iss.Komsiluk.dtos.map.ActiveVehicleOnMapDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.vehicle.VehicleCreateDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.vehicle.VehicleResponseDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.vehicle.VehicleUpdateDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.mappers.VehicleDTOMapper;
+import rs.ac.uns.ftn.iss.Komsiluk.repositories.UserRepository;
 import rs.ac.uns.ftn.iss.Komsiluk.repositories.VehicleRepository;
 import rs.ac.uns.ftn.iss.Komsiluk.services.exceptions.AlreadyExistsException;
 import rs.ac.uns.ftn.iss.Komsiluk.services.exceptions.NotFoundException;
+import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.IDriverLocationService;
 import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.IVehicleService;
+
 
 @Service
 public class VehicleService implements IVehicleService {
@@ -23,6 +32,12 @@ public class VehicleService implements IVehicleService {
 	private VehicleRepository vehicleRepository;
 	@Autowired
     private VehicleDTOMapper vehicleMapper;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private IDriverLocationService driverLocationService;
 
 
 	@Override
@@ -71,4 +86,33 @@ public class VehicleService implements IVehicleService {
 		
 		return vehicle;
 	}
+    @Override
+    public Collection<ActiveVehicleOnMapDTO> getActiveVehiclesOnMap() {
+        return userRepository.findAll().stream()
+                .filter(u -> u.getRole() == UserRole.DRIVER)
+                .filter(u -> u.getDriverStatus() != DriverStatus.INACTIVE)
+                .map(this::toActiveVehicleOnMapDTO)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+    }
+
+    private ActiveVehicleOnMapDTO toActiveVehicleOnMapDTO(User driver) {
+        if (driver.getVehicle() == null) {
+            return null;
+        }
+
+        DriverLocation loc = driverLocationService.getLiveLocation(driver.getId());
+        if (loc == null) {
+            return null;
+        }
+
+        ActiveVehicleOnMapDTO dto = new ActiveVehicleOnMapDTO();
+        dto.setDriverId(driver.getId());
+        dto.setBusy(driver.getDriverStatus() == DriverStatus.IN_RIDE);
+        dto.setLatitude(loc.getLat());
+        dto.setLongitude(loc.getLng());
+        dto.setVehicle(vehicleMapper.toResponseDTO(driver.getVehicle()));
+
+        return dto;
+    }
 }

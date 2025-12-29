@@ -6,6 +6,8 @@ import rs.ac.uns.ftn.iss.Komsiluk.beans.Vehicle;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.vehicle.VehicleCreateDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.vehicle.VehicleResponseDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.vehicle.VehicleUpdateDTO;
+import rs.ac.uns.ftn.iss.Komsiluk.dtos.map.ActiveVehicleOnMapDTO;
+
 
 public interface IVehicleService {
 	
@@ -20,4 +22,8 @@ public interface IVehicleService {
 	public void delete(Long vehicleId);
 	
 	public Vehicle save(Vehicle vehicle);
+
+    public Collection<ActiveVehicleOnMapDTO> getActiveVehiclesOnMap();
+
+
 }
