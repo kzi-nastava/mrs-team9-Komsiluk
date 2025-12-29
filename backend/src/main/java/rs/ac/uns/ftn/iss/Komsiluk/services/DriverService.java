@@ -19,6 +19,7 @@ import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.IDriverActivityService;
 import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.IDriverService;
 import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.IUserTokenService;
 import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.IVehicleService;
+import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.IDriverLocationService;
 
 @Service
 public class DriverService implements IDriverService {
@@ -33,6 +34,9 @@ public class DriverService implements IDriverService {
 	private IVehicleService vehicleService;
 	@Autowired
 	private IDriverActivityService driverActivityService;
+    @Autowired
+    private IDriverLocationService driverLocationService;
+
 
     @Override
     public Collection<DriverResponseDTO> getAllDrivers() {
@@ -82,10 +86,12 @@ public class DriverService implements IDriverService {
         
         if (oldStatus == DriverStatus.INACTIVE && newStatus != DriverStatus.INACTIVE) {
             driverActivityService.startActivity(driver);
+            driverLocationService.onDriverBecameActive(driverId);
         }
 
         if (oldStatus != DriverStatus.INACTIVE && newStatus == DriverStatus.INACTIVE) {
             driverActivityService.endActivity(driver);
+            driverLocationService.onDriverBecameInactive(driverId);
         }
             
         driver.setDriverStatus(newStatus);

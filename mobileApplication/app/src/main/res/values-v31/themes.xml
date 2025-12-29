@@ -1,0 +1,11 @@
+<resources>
+
+    <style name="Theme.KomsilukTaxi.Splash" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="android:windowSplashScreenBackground">@color/primary_dark</item>
+
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/app_icon</item>
+
+        <item name="postSplashScreenTheme">@style/Theme.Taxi_Project</item>
+    </style>
+
+</resources>

@@ -1,6 +1,8 @@
 package rs.ac.uns.ftn.iss.Komsiluk.controllers;
 
 import java.util.Collection;
+import java.time.LocalDate;
+
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,11 +15,16 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.format.annotation.DateTimeFormat.ISO;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.driver.DriverCreateDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.driver.DriverResponseDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.driver.DriverStatusUpdateDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.IDriverService;
+import rs.ac.uns.ftn.iss.Komsiluk.dtos.ride.RideResponseDTO;
+import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.IRideService;
 
 @RestController
 @RequestMapping(value = "/api/drivers")
@@ -25,6 +32,10 @@ public class DriverController {
 
 	@Autowired
     private IDriverService driverService;
+
+    @Autowired
+    private IRideService rideService;
+
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Collection<DriverResponseDTO>> getAllDrivers() {
@@ -43,10 +54,21 @@ public class DriverController {
         DriverResponseDTO created = driverService.registerDriver(dto);
         return new ResponseEntity<>(created, HttpStatus.CREATED);
     }
-    
+
     @PutMapping("/{id}/status")
     public ResponseEntity<DriverResponseDTO> updateStatus(@PathVariable Long id, @RequestBody DriverStatusUpdateDTO dto) {
         DriverResponseDTO updated = driverService.updateDriverStatus(id, dto.getStatus());
         return new ResponseEntity<>(updated, HttpStatus.OK);
     }
+
+    @GetMapping(value = "/{id}/rides/history", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Collection<RideResponseDTO>> getDriverRideHistory(
+            @PathVariable("id") Long driverId,
+            @RequestParam(required = false) @DateTimeFormat(iso = ISO.DATE) LocalDate from,
+            @RequestParam(required = false) @DateTimeFormat(iso = ISO.DATE) LocalDate to
+    ) {
+        Collection<RideResponseDTO> history = rideService.getDriverRideHistory(driverId, from, to);
+        return new ResponseEntity<>(history, HttpStatus.OK);
+    }
+
 }

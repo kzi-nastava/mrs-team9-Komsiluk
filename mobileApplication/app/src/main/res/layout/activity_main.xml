@@ -1,66 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/main"
     tools:context=".MainActivity">
 
-    <LinearLayout
-        android:id="@+id/main_root"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center"
-        android:orientation="vertical"
-        android:padding="24dp"
-        android:background="@color/primary">
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnProfile"
-            style="@style/Widget.Button.Ghost"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Profile"
-            android:layout_marginTop="16dp" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnLogin"
-            style="@style/Widget.Button.Ghost"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Login"
-            android:layout_marginTop="16dp" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnRegister"
-            style="@style/Widget.Button.Ghost"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Register"
-            android:layout_marginTop="16dp" />
-
-
-
-        <!--        OVO DUGME TREBA DA SE OBRISE KADA SE OMOGUCI SlANJE MEJLA-->
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnGoResetPassword"
-            style="@style/Widget.Button.Ghost"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Go to verification"
-            android:layout_marginTop="16dp" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnDriverHistory"
-            style="@style/Widget.Button.Ghost"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Driver History"
-            android:layout_marginTop="16dp" />
-
-
-    </LinearLayout>
-
+    <!-- Fullscreen placeholder image for map -->
+    <ImageView
+        android:id="@+id/imgMapPlaceholder"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/temp_map"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
