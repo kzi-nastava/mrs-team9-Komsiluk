@@ -7,24 +7,30 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import rs.ac.uns.ftn.iss.Komsiluk.beans.User;
-import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.DriverStatus;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.UserRole;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.auth.*;
 import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.IUserService;
 import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.IUserTokenService;
+import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.IAuthService;
+
+
 
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
+
+    private final IAuthService authService;
 
     private final IUserService userService;
     private final IUserTokenService userTokenService;
     private final PasswordEncoder passwordEncoder;
 
     public AuthController(
+            IAuthService authService,
             IUserService userService,
             IUserTokenService userTokenService,
             PasswordEncoder passwordEncoder) {
+        this.authService = authService;
         this.userService = userService;
         this.userTokenService = userTokenService;
         this.passwordEncoder = passwordEncoder;
@@ -32,37 +38,8 @@ public class AuthController {
 
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponseDTO> login(
-            @RequestBody LoginRequestDTO dto) {
-
-        User user;
-        try {
-            user = userService.findByEmail(dto.getEmail());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-
-        if (!passwordEncoder.matches(dto.getPassword(), user.getPasswordHash())) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-
-        if (!user.isActive()) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
-
-        // Driver se automatski aktivira prijavom
-        if (user.getRole() == UserRole.DRIVER) {
-            user.setDriverStatus(DriverStatus.ACTIVE);
-            userService.save(user);
-        }
-
-        LoginResponseDTO response = new LoginResponseDTO(
-                user.getId(),
-                user.getEmail(),
-                user.getRole(),
-                user.getDriverStatus()
-        );
-
+    public ResponseEntity<LoginResponseDTO> login(@RequestBody LoginRequestDTO dto) {
+        LoginResponseDTO response = authService.login(dto);
         return ResponseEntity.ok(response);
     }
 
