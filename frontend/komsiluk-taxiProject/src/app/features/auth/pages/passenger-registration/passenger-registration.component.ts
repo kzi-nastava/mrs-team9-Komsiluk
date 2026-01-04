@@ -6,12 +6,12 @@ import { personName, phoneNumber, strongPassword, trimRequired } from '../../../
 import { matchFields } from '../../../../shared/util/validators/form-validators.service';
 
 @Component({
-  selector: 'app-rider-registration.component',
+  selector: 'app-passenger-registration.component',
   imports: [AuthCardComponent, ReactiveFormsModule, RouterModule],
-  templateUrl: './rider-registration.component.html',
-  styleUrl: './rider-registration.component.css',
+  templateUrl: './passenger-registration.component.html',
+  styleUrl: './passenger-registration.component.css',
 })
-export class RiderRegistrationComponent {
+export class PassengerRegistrationComponent {
   submitted = false;
   selectedFileName = '';
   form: ReturnType<FormBuilder['group']>;
