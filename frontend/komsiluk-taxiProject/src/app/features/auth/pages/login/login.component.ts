@@ -42,19 +42,20 @@ export class LoginComponent {
   save() {
     this.submitted = true;
     this.form.markAllAsTouched();
+
     if (this.form.invalid) return;
 
+    const { email, password } = this.form.value;
 
-    const success = this.authService.login(
-      this.form.value.email,
-      this.form.value.password
-    );
-
-    if (!success) {
-      this.toast.show('Invalid credentials');
-      return;
-    }
-    this.toast.show('Successful Log in!');
-    this.router.navigateByUrl('/');
+    this.authService.login(email, password).subscribe({
+      next: () => {
+        this.toast.show('Successful Log in!');
+        this.router.navigateByUrl('/');
+      },
+      error: () => {
+        this.toast.show('Invalid credentials');
+      }
+    });
   }
+
 }
