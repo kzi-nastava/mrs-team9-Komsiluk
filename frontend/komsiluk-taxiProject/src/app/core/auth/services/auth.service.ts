@@ -1,5 +1,3 @@
-// feature/auth/services/auth.service.ts
-
 import { Injectable, signal, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { tap } from 'rxjs';

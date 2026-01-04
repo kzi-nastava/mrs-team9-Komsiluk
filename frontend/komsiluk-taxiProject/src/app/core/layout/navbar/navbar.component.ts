@@ -4,7 +4,7 @@ import { Component, EventEmitter, Output } from '@angular/core';
 import { Router, NavigationEnd, RouterLink } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { CommonModule } from '@angular/common';
-import { AuthService, UserRole } from '../../../features/auth/services/auth';
+import { AuthService, UserRole } from '../../../core/auth/services/auth.service';
 import { Signal } from '@angular/core';
 
 @Component({
@@ -36,7 +36,7 @@ export class NavbarComponent {
         const url = this.router.url;
         this.isHome = url === '/' || url === '';
       });
-    this.userRole = this.authService.role.asReadonly();
+    this.userRole = this.authService.userRole;
   }
 
   goHome() {
