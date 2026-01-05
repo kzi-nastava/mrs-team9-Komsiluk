@@ -20,7 +20,7 @@ interface LoginResponse {
 @Injectable({ providedIn: 'root' })
 export class AuthService {
 
-  private readonly API = '/api/auth';
+  private readonly API = 'http://localhost:8081/api/auth';
 
 
   private token = signal<string | null>(null);
