@@ -16,6 +16,18 @@ export const jwtInterceptor: HttpInterceptorFn = (
   next: HttpHandlerFn
 ) => {
 
+  const AUTH_IGNORED_ROUTES = [
+    '/api/auth/login',
+    '/api/auth/registration',
+    '/api/auth/forgot-password',
+    '/api/auth/reset-password'
+  ];
+
+  if (AUTH_IGNORED_ROUTES.some(path => req.url.includes(path))) {
+    return next(req);
+  }
+
+
   const auth = inject(AuthService);
   const router = inject(Router);
 
@@ -23,10 +35,10 @@ export const jwtInterceptor: HttpInterceptorFn = (
 
   const authReq = token
     ? req.clone({
-        setHeaders: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
+      setHeaders: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
     : req;
 
   return next(authReq).pipe(
