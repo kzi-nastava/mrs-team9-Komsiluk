@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
 
 import rs.ac.uns.ftn.iss.Komsiluk.beans.User;
@@ -18,30 +19,67 @@ public class UserRepository {
     private final Map<Long, User> storage = new HashMap<>();
     private final AtomicLong idGenerator = new AtomicLong(0);
 
-    public UserRepository() {
-        // HARDKODOVANI DRIVER ZA TESTIRANJE AUTH-A
-        User driver = new User();
-        driver.setId(idGenerator.incrementAndGet());
-        driver.setEmail("driver@test.com");
-
-        driver.setPasswordHash("driver123");
-
-
-        driver.setFirstName("Petar");
-        driver.setLastName("Petrović");
-        driver.setCity("Novi Sad");
-        driver.setAddress("Bulevar Oslobođenja 1");
-        driver.setPhoneNumber("+381641234567");
-        driver.setProfileImageUrl("/images/default-driver.png");
-
-        driver.setRole(UserRole.DRIVER);
-        driver.setDriverStatus(DriverStatus.ACTIVE);
-        driver.setActive(true);
-        driver.setBlocked(false);
-        driver.setCreatedAt(LocalDateTime.now());
-
-        storage.put(driver.getId(), driver);
+    public UserRepository(PasswordEncoder passwordEncoder) {
+        initMockUsers(passwordEncoder);
     }
+
+    private void initMockUsers(PasswordEncoder passwordEncoder) {
+
+        // DRIVER
+        User driver = createUser(
+                "driver@test.com",
+                "driver12345",
+                UserRole.DRIVER,
+                passwordEncoder
+        );
+        driver.setDriverStatus(DriverStatus.ACTIVE);
+        storage.put(driver.getId(), driver);
+
+        // PASSENGER
+        User passenger = createUser(
+                "passenger@test.com",
+                "pass12345",
+                UserRole.PASSENGER,
+                passwordEncoder
+        );
+        storage.put(passenger.getId(), passenger);
+
+        // ADMIN
+        User admin = createUser(
+                "admin@test.com",
+                "admin12345",
+                UserRole.ADMIN,
+                passwordEncoder
+        );
+        storage.put(admin.getId(), admin);
+    }
+
+    private User createUser(
+            String email,
+            String rawPassword,
+            UserRole role,
+            PasswordEncoder passwordEncoder
+    ) {
+        User user = new User();
+        user.setId(idGenerator.incrementAndGet());
+        user.setEmail(email);
+        user.setPasswordHash(passwordEncoder.encode(rawPassword));
+
+        user.setFirstName("Test");
+        user.setLastName(role.name());
+        user.setCity("Novi Sad");
+        user.setAddress("Test Address");
+        user.setPhoneNumber("+381600000000");
+        user.setProfileImageUrl("/images/default.png");
+
+        user.setRole(role);
+        user.setActive(true);
+        user.setBlocked(false);
+        user.setCreatedAt(LocalDateTime.now());
+
+        return user;
+    }
+
 
     public User save(User user) {
         if (user.getId() == null) {
