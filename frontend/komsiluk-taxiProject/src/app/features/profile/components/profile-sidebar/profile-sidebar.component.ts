@@ -1,6 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { RouterLink, Router } from '@angular/router';
 import { AuthService } from '../../../../core/auth/services/auth.service';
+import { UserProfileResponseDTO } from '../../../../shared/models/profile.models';
 
 @Component({
   selector: 'app-profile-sidebar',
@@ -10,7 +11,9 @@ import { AuthService } from '../../../../core/auth/services/auth.service';
 })
 export class ProfileSidebarComponent {
   @Input() isDriver = false;
-  @Input() activeToday: string = '5h 23m';
+  @Input() activeToday: string = '-';
+  @Input() profile: UserProfileResponseDTO | null = null;
+  
   authService: AuthService;
   router: Router;
 

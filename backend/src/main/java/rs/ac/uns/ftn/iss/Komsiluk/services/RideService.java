@@ -115,6 +115,7 @@ public class RideService implements IRideService {
         ride.setRoute(route);
         ride.setPassengers(passengers);
         ride.setPrice(price);
+        ride.setCreatedBy(creator);
 
         if (maybeDriver.isEmpty()) { 
             ride.setStatus(RideStatus.REJECTED);

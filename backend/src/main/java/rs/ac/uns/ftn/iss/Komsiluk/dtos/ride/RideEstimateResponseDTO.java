@@ -1,7 +1,5 @@
 package rs.ac.uns.ftn.iss.Komsiluk.dtos.ride;
 
-import rs.ac.uns.ftn.iss.Komsiluk.beans.Route;
-
 public class RideEstimateResponseDTO {
     private String startAddress;
     private String destinationAddress;

@@ -4,29 +4,29 @@
       <!-- Row 1 -->
       <div class="pd-field">
         <div class="pd-label text-semibold">Firstname</div>
-        <div class="pd-box text-medium">Name</div>
+        <div class="pd-box text-medium">{{ profile?.firstName || '—' }}</div>
       </div>
 
       <div class="pd-field">
         <div class="pd-label text-semibold">Lastname</div>
-        <div class="pd-box text-medium">Surname</div>
+        <div class="pd-box text-medium">{{ profile?.lastName || '—' }}</div>
       </div>
 
       <!-- Row 2 -->
       <div class="pd-field">
         <div class="pd-label text-semibold">Address</div>
-        <div class="pd-box text-medium">Address 100</div>
+        <div class="pd-box text-medium">{{ profile?.address || '—' }}</div>
       </div>
 
       <div class="pd-field">
         <div class="pd-label text-semibold">City</div>
-        <div class="pd-box text-medium">City</div>
+        <div class="pd-box text-medium">{{ profile?.city || '—' }}</div>
       </div>
 
       <!-- Row 3 (center) -->
       <div class="pd-field pd-field--center">
         <div class="pd-label text-semibold">Phone number</div>
-        <div class="pd-box text-medium">11111111</div>
+        <div class="pd-box text-medium">{{ profile?.phoneNumber || '—' }}</div>
       </div>
     </div>
   </div>
