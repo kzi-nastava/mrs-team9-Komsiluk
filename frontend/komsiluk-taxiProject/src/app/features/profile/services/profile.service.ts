@@ -15,4 +15,11 @@ export class ProfileService {
 
     return this.http.get<UserProfileResponseDTO>(`${this.API}/${id}/profile`);
   }
+
+  changeMyPassword(oldPassword: string, newPassword: string) {
+    const id = this.auth.userId();
+
+    const body = { oldPassword, newPassword };
+    return this.http.put<void>(`${this.API}/${id}/password`, body);
+  }
 }
