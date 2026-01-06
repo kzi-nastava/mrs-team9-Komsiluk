@@ -9,21 +9,69 @@ import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.DriverStatus;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.UserRole;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.auth.LoginRequestDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.auth.LoginResponseDTO;
+import rs.ac.uns.ftn.iss.Komsiluk.dtos.auth.RegisterPassengerRequestDTO;
+import rs.ac.uns.ftn.iss.Komsiluk.dtos.userToken.UserTokenResponseDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.security.jwt.JwtService;
 import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.IAuthService;
 import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.IUserService;
+import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.IUserTokenService;
 
 @Service
 public class AuthService implements IAuthService {
 
     private final IUserService userService;
+    private final IUserTokenService userTokenService;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final MailService mailService;
 
-    public AuthService(IUserService userService, PasswordEncoder passwordEncoder, JwtService jwtService) {
+    public AuthService(
+            IUserService userService,
+            IUserTokenService userTokenService,
+            PasswordEncoder passwordEncoder,
+            JwtService jwtService,
+            MailService mailService) {
         this.userService = userService;
+        this.userTokenService = userTokenService;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
+        this.mailService = mailService;
+    }
+
+    @Override
+    public void registerPassenger(RegisterPassengerRequestDTO dto) {
+
+        if (userService.findByEmail(dto.getEmail()) != null) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already exists");
+        }
+
+
+        User user = new User();
+        user.setEmail(dto.getEmail());
+        user.setPasswordHash(passwordEncoder.encode(dto.getPassword()));
+        user.setFirstName(dto.getFirstName());
+        user.setLastName(dto.getLastName());
+        user.setAddress(dto.getAddress());
+        user.setCity(dto.getCity());
+        user.setPhoneNumber(dto.getPhoneNumber());
+        user.setProfileImageUrl(
+                dto.getProfileImageUrl() != null
+                        ? dto.getProfileImageUrl()
+                        : "/images/default.png"
+        );
+        user.setRole(UserRole.PASSENGER);
+        user.setActive(false);
+        user.setBlocked(false);
+
+        userService.save(user);
+
+        UserTokenResponseDTO token =
+                userTokenService.createActivationToken(user.getId());
+
+        mailService.sendActivationMail(
+                user.getEmail(),
+                token.getToken()
+        );
     }
 
     @Override
