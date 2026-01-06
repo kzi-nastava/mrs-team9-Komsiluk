@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { ProfileSidebarComponent } from '../../components/profile-sidebar/profile-sidebar.component';
 import { ProfileDetailsComponent } from '../../components/profile-details/profile-details.component';
 import { UserModeService } from '../../../../shared/util/user_mode/user-mode.service';
-import { AuthService, UserRole } from '../../../../features/auth/services/auth';
+import { AuthService, UserRole } from '../../../../core/auth/services/auth.service';
 
 @Component({
   selector: 'app-profile-view',
@@ -16,6 +16,6 @@ export class ProfileViewComponent {
 
   constructor(private mode: UserModeService, private auth: AuthService) {
     this.mode.getMode$().subscribe(m => this.isDriver = (m === 'driver'));
-    this.isDriver = this.auth.getRole() === UserRole.DRIVER;
+    this.isDriver = this.auth.userRole() === UserRole.DRIVER;
   }
 }

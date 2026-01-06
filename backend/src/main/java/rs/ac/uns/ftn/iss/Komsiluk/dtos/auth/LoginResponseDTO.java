@@ -4,6 +4,7 @@ import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.DriverStatus;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.UserRole;
 
 public class LoginResponseDTO {
+    private String token;
     private Long id;
     private String email;
     private UserRole role;
@@ -11,11 +12,19 @@ public class LoginResponseDTO {
 
     public LoginResponseDTO() { }
 
-    public LoginResponseDTO(Long id, String email, UserRole role, DriverStatus driverStatus) {
+    public LoginResponseDTO(String token, Long id, String email, UserRole role, DriverStatus driverStatus) {
+        this.token = token;
         this.id = id;
         this.email = email;
         this.role = role;
         this.driverStatus = driverStatus;
+    }
+
+    public String getToken() {
+        return token;
+    }
+    public void setToken(String token) {
+        this.token = token;
     }
 
     public Long getId() {

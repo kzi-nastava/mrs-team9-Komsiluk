@@ -14,7 +14,7 @@ import {
   PassengerRating
 } from '../../components/ride-history-details-modal/ride-history-details-modal.component';
 
-import { AuthService, UserRole } from '../../../auth/services/auth';
+import { AuthService, UserRole } from '../../../../core/auth/services/auth.service';
 import { Router } from '@angular/router';
 
 @Component({
@@ -49,7 +49,7 @@ export class DriverRideHistoryPageComponent {
       const { from, to } = this.filterSvc.range();
       this.filteredRides = this.applyDateFilter(this.rides, from, to);
     });
-    this.userRole = this.auth.role();
+    this.userRole = this.auth.userRole();
     if (this.userRole !== UserRole.DRIVER) { // ovo treba izbaciti kada se implementiraju i istorije za ostale korisnike
       this.router.navigate(['/']);
     }

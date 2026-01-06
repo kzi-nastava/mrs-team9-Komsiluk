@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 
 import { AuthCardComponent } from '../../../features/auth/components/auth-card/auth-card.component';
 import { ToastService } from '../toast/toast.service';
-import { AuthService } from '../../../features/auth/services/auth';
+import { AuthService } from '../../../core/auth/services/auth.service';
 
 import { MESSAGE_REGISTRY, MessageAction, MessageId } from './message-registry';
 

@@ -1,7 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {  RouterLink } from '@angular/router';
-import { AuthService, UserRole } from '../../../features/auth/services/auth';
+import { AuthService, UserRole } from '../../../core/auth/services/auth.service';
 import { Signal } from '@angular/core';
 
 @Component({
@@ -18,6 +18,6 @@ export class RightsidebarComponent {
 
 
   constructor(private auth: AuthService) {
-    this.userRole = this.auth.role.asReadonly();
+    this.userRole = this.auth.userRole;
   }
 }
