@@ -2,13 +2,17 @@ package rs.ac.uns.ftn.iss.Komsiluk.services;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.Comparator;
+import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import org.springframework.web.server.ResponseStatusException;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.User;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.TokenType;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.UserToken;
@@ -127,6 +131,32 @@ public class UserTokenService implements IUserTokenService {
         token.setUsed(true);
         userTokenRepository.save(token);
     }
+
+    public UserTokenResponseDTO resendActivationToken(Long userId) {
+
+        List<UserToken> tokens =
+                userTokenRepository.findAllByUserIdAndType(
+                        userId,
+                        TokenType.ACTIVATION
+                );
+
+        boolean hasValidToken = tokens.stream()
+                .anyMatch(t ->
+                        !t.isUsed() &&
+                                t.getExpiresAt().isAfter(LocalDateTime.now())
+                );
+
+        if (hasValidToken) {
+            throw new ResponseStatusException(
+                    HttpStatus.TOO_MANY_REQUESTS,
+                    "Activation email already sent. Please check your inbox."
+            );
+        }
+
+        return createActivationToken(userId);
+    }
+
+
 
     public void resetPassword(String tokenValue, String newPassword) {
 

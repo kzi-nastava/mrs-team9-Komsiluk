@@ -12,6 +12,8 @@ public interface IUserTokenService {
 
     public UserTokenResponseDTO createActivationToken(Long id);
 
+    public UserTokenResponseDTO resendActivationToken(Long userId);
+
     UserTokenResponseDTO createPasswordResetToken(Long userId);
 
 

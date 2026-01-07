@@ -53,6 +53,14 @@ public class AuthController {
                 ));
     }
 
+    @PostMapping("/registration/resend")
+    public ResponseEntity<Void> resendActivation(
+            @RequestBody ResendActivationDTO dto) {
+
+        authService.resendActivation(dto.getEmail());
+        return ResponseEntity.ok().build();
+    }
+
 
 
     @PostMapping("/forgot-password")

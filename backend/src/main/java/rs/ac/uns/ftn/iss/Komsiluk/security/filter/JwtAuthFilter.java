@@ -31,7 +31,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         String authHeader = request.getHeader("Authorization");
 
-        // Ako nema Authorization headera → pusti dalje (Spring će odlučiti)
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
@@ -47,13 +46,12 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         Long userId = jwtService.extractUserId(token);
         UserRole role = jwtService.extractRole(token);
 
-        // Spring Security očekuje ROLE_ prefiks
         SimpleGrantedAuthority authority =
                 new SimpleGrantedAuthority("ROLE_" + role.name());
 
         UsernamePasswordAuthenticationToken authentication =
                 new UsernamePasswordAuthenticationToken(
-                        userId, // principal (ID korisnika)
+                        userId,
                         null,
                         List.of(authority)
                 );

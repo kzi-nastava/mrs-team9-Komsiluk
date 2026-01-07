@@ -74,6 +74,31 @@ public class AuthService implements IAuthService {
         );
     }
 
+    public void resendActivation(String email) {
+
+        try {
+            User user = userService.findByEmail(email);
+
+            if (user == null || user.isActive()) {
+                return;
+            }
+
+            UserTokenResponseDTO token =
+                    userTokenService.resendActivationToken(user.getId());
+
+            mailService.sendActivationMail(
+                    user.getEmail(),
+                    token.getToken()
+            );
+
+        } catch (ResponseStatusException e) {
+            throw e;
+        } catch (Exception ignored) {
+            // security
+        }
+    }
+
+
     @Override
     public LoginResponseDTO login(LoginRequestDTO dto) {
 
