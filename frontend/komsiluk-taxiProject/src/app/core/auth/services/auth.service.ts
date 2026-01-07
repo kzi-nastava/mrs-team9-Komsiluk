@@ -33,7 +33,7 @@ export interface RegisterPassengerRequest {
 @Injectable({ providedIn: 'root' })
 export class AuthService {
 
-  private readonly API = 'http://localhost:8081/api/auth';
+  private readonly API = 'http://localhost:8081/api';
 
 
   private tokenSig = signal<string | null>(null);
@@ -50,7 +50,7 @@ export class AuthService {
   }
 
   login(email: string, password: string) {
-    return this.http.post<LoginResponse>(`${this.API}/login`, { email, password }).pipe(
+    return this.http.post<LoginResponse>(`${this.API}/auth/login`, { email, password }).pipe(
       tap(response => {
         this.setAuthState(response.token, response.role, response.id);
       })
@@ -100,17 +100,23 @@ export class AuthService {
 
   registerPassenger(payload: RegisterPassengerRequest) {
     return this.http.post<void>(
-      `${this.API}/registration/passenger`,
+      `${this.API}/auth/registration/passenger`,
       payload
     );
   }
 
   resendActivation(email: string) {
     return this.http.post<void>(
-      `${this.API}/registration/resend`,
+      `${this.API}/auth/registration/resend`,
       { email }
     );
   }
 
+  activatePassenger(token: string) {
+  return this.http.post<void>(
+    `${this.API}/tokens/activation/passenger`,
+    { token }
+  );
+}
 
 }
