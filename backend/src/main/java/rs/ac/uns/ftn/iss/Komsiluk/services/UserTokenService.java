@@ -19,6 +19,7 @@ import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.UserToken;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.userToken.UserTokenResponseDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.mappers.UserTokenDTOMapper;
 import rs.ac.uns.ftn.iss.Komsiluk.repositories.UserTokenRepository;
+import rs.ac.uns.ftn.iss.Komsiluk.services.exceptions.ActivationAlreadySentException;
 import rs.ac.uns.ftn.iss.Komsiluk.services.exceptions.NotFoundException;
 import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.IUserService;
 import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.IUserTokenService;
@@ -64,7 +65,7 @@ public class UserTokenService implements IUserTokenService {
 
         User user = userService.findById(userId);
 
-        // poništi sve prethodne PASSWORD_RESET tokene
+
         userTokenRepository.findAll().stream()
                 .filter(t -> t.getUser().getId().equals(userId))
                 .filter(t -> t.getType() == TokenType.PASSWORD_RESET)
@@ -144,11 +145,9 @@ public class UserTokenService implements IUserTokenService {
                                 t.getExpiresAt().isAfter(LocalDateTime.now())
                 );
 
+
         if (hasValidToken) {
-            throw new ResponseStatusException(
-                    HttpStatus.TOO_MANY_REQUESTS,
-                    "Activation email already sent. Please check your inbox."
-            );
+            throw new ActivationAlreadySentException();
         }
 
         return createActivationToken(userId);

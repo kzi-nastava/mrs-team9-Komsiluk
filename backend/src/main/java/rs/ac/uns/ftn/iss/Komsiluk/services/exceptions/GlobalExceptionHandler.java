@@ -14,4 +14,13 @@ public class GlobalExceptionHandler {
     public ResponseEntity<?> handleInvalidPassword(InvalidPasswordException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "Password is incorrect"));
     }
+
+    @ExceptionHandler(ActivationAlreadySentException.class)
+    public ResponseEntity<?> handleActivationAlreadySent(
+            ActivationAlreadySentException ex) {
+
+        return ResponseEntity
+                .status(HttpStatus.TOO_MANY_REQUESTS)
+                .body(Map.of("message", ex.getMessage()));
+    }
 }
