@@ -1,8 +1,10 @@
 import { Component } from '@angular/core';
-import { Router } from '@angular/router';
 import { ProfileSidebarComponent } from '../../components/profile-sidebar/profile-sidebar.component';
 import { DriverCarDetailsComponent } from '../../components/driver-car-details/driver-car-details.component';
-import { UserModeService } from '../../../../shared/util/user_mode/user-mode.service';
+import { ProfileService } from '../../services/profile.service';
+import { UserProfileResponseDTO } from '../../../../shared/models/profile.models';
+import { AuthService, UserRole } from '../../../../core/auth/services/auth.service';
+import { ChangeDetectorRef } from '@angular/core';
 
 @Component({
   selector: 'app-driver-car-view',
@@ -11,14 +13,30 @@ import { UserModeService } from '../../../../shared/util/user_mode/user-mode.ser
   styleUrl: './driver-car-view.component.css',
 })
 export class DriverCarViewComponent {
-  isDriver = false;
-  activeToday = '5h 23m';
+  profile: UserProfileResponseDTO | null = null;
+  loading = false;
 
-  constructor(private mode: UserModeService, private router: Router) {
-    this.isDriver = this.mode.getModeSnapshot() === 'driver';
+  constructor(private profileService: ProfileService, private auth: AuthService, private cdr: ChangeDetectorRef) {}
 
-    if (!this.isDriver) {
-      this.router.navigate(['/profile']);
+  get isDriver(): boolean {
+    return this.auth.userRole() === UserRole.DRIVER;
+  }
+
+  get activeToday(): string {
+    if (!this.profile) {
+      return '-';
     }
+    const minutes = this.profile.activeMinutesLast24h;
+    const hours = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+    return `${hours}h ${mins}m`;
+  }
+
+  ngOnInit(): void {
+    this.loading = true;
+    this.profileService.getMyProfile().subscribe({
+      next: (p) => { this.profile = p; this.loading = false; this.cdr.detectChanges(); },
+      error: () => { this.loading = false; this.cdr.detectChanges(); },
+    });
   }
 }

@@ -16,8 +16,6 @@ import org.springframework.web.server.ResponseStatusException;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.User;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.TokenType;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.UserToken;
-import rs.ac.uns.ftn.iss.Komsiluk.dtos.user.UserChangePasswordDTO;
-import rs.ac.uns.ftn.iss.Komsiluk.dtos.user.UserResetPasswordDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.userToken.UserTokenResponseDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.mappers.UserTokenDTOMapper;
 import rs.ac.uns.ftn.iss.Komsiluk.repositories.UserTokenRepository;

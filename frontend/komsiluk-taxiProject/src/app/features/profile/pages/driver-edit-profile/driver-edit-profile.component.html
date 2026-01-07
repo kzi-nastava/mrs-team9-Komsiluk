@@ -59,9 +59,9 @@
         <label class="pe-field">
           <span class="pe-label text-semibold">Type</span>
           <select class="pe-input text-medium" formControlName="type">
-            <option>Standard</option>
-            <option>Van</option>
-            <option>Luxury</option>
+            <option value="STANDARD">Standard</option>
+            <option value="VAN">Van</option>
+            <option value="LUXURY">Luxury</option>
           </select>
           @if (isInvalid('type')) {
             <div class="form-error">Type is required.</div>

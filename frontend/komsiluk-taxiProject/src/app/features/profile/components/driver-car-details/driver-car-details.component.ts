@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { UserProfileResponseDTO } from '../../../../shared/models/profile.models';
 
 @Component({
   selector: 'app-driver-car-details',
@@ -8,5 +9,5 @@ import { RouterLink } from '@angular/router';
   styleUrl: './driver-car-details.component.css',
 })
 export class DriverCarDetailsComponent {
-
+  @Input() profile: UserProfileResponseDTO | null = null;
 }

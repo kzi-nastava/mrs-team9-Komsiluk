@@ -23,22 +23,23 @@ export class AuthService {
   private readonly API = 'http://localhost:8081/api/auth';
 
 
-  private token = signal<string | null>(null);
-  private role = signal<UserRole>(UserRole.GUEST);
+  private tokenSig = signal<string | null>(null);
+  private roleSig = signal<UserRole>(UserRole.GUEST);
+  private userIdSig = signal<number | null>(null);
 
 
-  isLoggedIn = computed(() => this.token() !== null);
-  userRole = computed(() => this.role());
+  isLoggedIn = computed(() => this.tokenSig() !== null);
+  userRole = computed(() => this.roleSig());
+  userId = computed(() => this.userIdSig());
 
   constructor(private http: HttpClient) {
     this.restoreAuthState();
   }
 
-
   login(email: string, password: string) {
     return this.http.post<LoginResponse>(`${this.API}/login`, { email, password }).pipe(
       tap(response => {
-        this.setAuthState(response.token, response.role);
+        this.setAuthState(response.token, response.role, response.id);
       })
     );
   }
@@ -49,33 +50,38 @@ export class AuthService {
   }
 
   getToken(): string | null {
-    return this.token();
+    return this.tokenSig();
   }
 
-
-  private setAuthState(token: string, role: UserRole) {
-    this.token.set(token);
-    this.role.set(role);
+  private setAuthState(token: string, role: UserRole, userId: number) {
+    this.tokenSig.set(token);
+    this.roleSig.set(role);
+    this.userIdSig.set(userId);
 
     localStorage.setItem('auth_token', token);
     localStorage.setItem('auth_role', role);
+    localStorage.setItem('auth_user_id', userId.toString());
   }
 
   private clearAuthState() {
-    this.token.set(null);
-    this.role.set(UserRole.GUEST);
+    this.tokenSig.set(null);
+    this.roleSig.set(UserRole.GUEST);
+    this.userIdSig.set(null);
 
     localStorage.removeItem('auth_token');
     localStorage.removeItem('auth_role');
+    localStorage.removeItem('auth_user_id');
   }
 
   private restoreAuthState() {
     const token = localStorage.getItem('auth_token');
     const role = localStorage.getItem('auth_role') as UserRole | null;
+    const userId = localStorage.getItem('auth_user_id');
 
     if (token && role) {
-      this.token.set(token);
-      this.role.set(role);
+      this.tokenSig.set(token);
+      this.roleSig.set(role);
+      this.userIdSig.set(userId ? +userId : null);
     }
   }
 }

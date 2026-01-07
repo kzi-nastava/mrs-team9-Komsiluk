@@ -6,8 +6,6 @@ import java.util.Collection;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.ride.RideResponseDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.ride.RideCreateDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.ride.RideLiveInfoDTO;
-import rs.ac.uns.ftn.iss.Komsiluk.dtos.ride.RideResponseDTO;
-import rs.ac.uns.ftn.iss.Komsiluk.beans.Route;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.ride.*;
 
 public interface IRideService {

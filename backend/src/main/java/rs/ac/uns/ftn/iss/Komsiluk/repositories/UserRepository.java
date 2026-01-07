@@ -10,8 +10,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
 
 import rs.ac.uns.ftn.iss.Komsiluk.beans.User;
+import rs.ac.uns.ftn.iss.Komsiluk.beans.Vehicle;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.DriverStatus;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.UserRole;
+import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.VehicleType;
+import rs.ac.uns.ftn.iss.Komsiluk.dtos.vehicle.VehicleResponseDTO;
 
 @Repository
 public class UserRepository {
@@ -76,6 +79,19 @@ public class UserRepository {
         user.setActive(true);
         user.setBlocked(false);
         user.setCreatedAt(LocalDateTime.now());
+        
+        if (role == UserRole.DRIVER) {
+			Vehicle vehicle = new Vehicle();
+			vehicle.setId(1L);
+			vehicle.setModel("Test Model");
+			vehicle.setType(VehicleType.STANDARD);
+			vehicle.setLicencePlate("NS-123-AB");
+			vehicle.setSeatCount(4);
+			vehicle.setPetFriendly(false);
+			vehicle.setBabyFriendly(true);
+			
+			user.setVehicle(vehicle);
+		}
 
         return user;
     }

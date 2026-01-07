@@ -13,10 +13,14 @@
 
     <!-- Name + email -->
     <div class="profile-sidebar__identity">
-        <div class="profile-sidebar__name text-semibold">Name Surname</div>
-        <div class="profile-sidebar__email text-semibold">email@gmail.com</div>
+        <div class="profile-sidebar__name text-semibold">
+            {{ profile ? (profile.firstName + ' ' + profile.lastName) : '—' }}
+        </div>
+        <div class="profile-sidebar__email text-semibold">
+            {{ profile?.email || '—' }}
+        </div>
     </div>
-
+    
     <!-- Actions -->
     <button type="button" class="profile-sidebar__link profile-sidebar__link--image">
         Change image
