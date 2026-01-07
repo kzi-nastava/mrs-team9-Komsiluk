@@ -17,6 +17,19 @@ interface LoginResponse {
   driverStatus: string | null;
 }
 
+export interface RegisterPassengerRequest {
+  firstName: string;
+  lastName: string;
+  address: string;
+  city: string;
+  phoneNumber: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+  profileImageUrl: string | null;
+}
+
+
 @Injectable({ providedIn: 'root' })
 export class AuthService {
 
@@ -84,4 +97,20 @@ export class AuthService {
       this.userIdSig.set(userId ? +userId : null);
     }
   }
+
+  registerPassenger(payload: RegisterPassengerRequest) {
+    return this.http.post<void>(
+      `${this.API}/registration/passenger`,
+      payload
+    );
+  }
+
+  resendActivation(email: string) {
+    return this.http.post<void>(
+      `${this.API}/registration/resend`,
+      { email }
+    );
+  }
+
+
 }
