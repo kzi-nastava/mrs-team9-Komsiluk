@@ -47,6 +47,13 @@ export class AuthService {
 
   constructor(private http: HttpClient) {
     this.restoreAuthState();
+
+    window.addEventListener('storage', (event) => {
+      if (event.key === 'auth_token' && event.newValue === null) {
+        this.clearAuthState();
+        location.href = '/login';
+      }
+    });
   }
 
   login(email: string, password: string) {
