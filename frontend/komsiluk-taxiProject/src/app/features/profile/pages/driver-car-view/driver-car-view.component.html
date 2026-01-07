@@ -1,4 +1,10 @@
 <div class="app-bg-textured profile-page">
-  <app-profile-sidebar [isDriver]="true" [activeToday]="activeToday"></app-profile-sidebar>
-  <app-driver-car-details></app-driver-car-details>
+  <app-profile-sidebar
+  [profile]="profile"
+  [isDriver]="true"
+  [activeToday]="activeToday">
+  </app-profile-sidebar>
+  <app-driver-car-details
+  [profile]="profile">
+  </app-driver-car-details>
 </div>

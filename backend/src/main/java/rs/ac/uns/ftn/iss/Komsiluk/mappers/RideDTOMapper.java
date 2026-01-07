@@ -35,7 +35,7 @@ public class RideDTOMapper {
             }
         }
         dto.setPassengerIds(pIds);
-
+        dto.setCreatorId(ride.getCreatedBy().getId());
         dto.setStartAddress(ride.getRoute().getStartAddress());
         dto.setEndAddress(ride.getRoute().getEndAddress());
         dto.setStops(ride.getRoute().getStops() == null || ride.getRoute().getStops().isBlank() ? List.of() : Arrays.asList(ride.getRoute().getStops().split("\\|"))
