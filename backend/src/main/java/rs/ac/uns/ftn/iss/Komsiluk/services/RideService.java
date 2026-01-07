@@ -13,7 +13,6 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import rs.ac.uns.ftn.iss.Komsiluk.beans.Ride;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.Route;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.User;
@@ -96,8 +95,8 @@ public class RideService implements IRideService {
             for (String email : dto.getPassengerEmails()) {
                 User passenger= userService.findByEmail(email);
                 if (passenger == null) {
-					throw new NotFoundException();
-				}
+            	  throw new NotFoundException();
+            	}
                 passengers.add(passenger);
             }
         }
@@ -159,7 +158,7 @@ public class RideService implements IRideService {
             notificationDTOPassenger.setType(NotificationType.INFO);
             notificationDTOPassenger.setTitle("Added to Ride");
             notificationDTOPassenger.setMessage("You have been added as a passenger to a ride from " + dto.getStartAddress() + " to " + dto.getEndAddress());
-            notificationService.createNotification(notificationDTOCreator);
+            notificationService.createNotification(notificationDTOPassenger);
         }
 
         return rideMapper.toResponseDTO(ride);

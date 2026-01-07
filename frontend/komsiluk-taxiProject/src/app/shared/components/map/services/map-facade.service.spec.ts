@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { UserModeService } from './user-mode.service';
+import { MapFacadeService } from './map-facade.service';
 
-describe('UserModeService', () => {
-  let service: UserModeService;
+describe('MapFacadeService', () => {
+  let service: MapFacadeService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(UserModeService);
+    service = TestBed.inject(MapFacadeService);
   });
 
   it('should be created', () => {

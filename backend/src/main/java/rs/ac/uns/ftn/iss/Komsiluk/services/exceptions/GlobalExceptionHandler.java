@@ -14,4 +14,21 @@ public class GlobalExceptionHandler {
     public ResponseEntity<?> handleInvalidPassword(InvalidPasswordException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "Password is incorrect"));
     }
+    
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<?> handleNotFoundException(NotFoundException ex) {
+        String msg = (ex.getMessage() != null && !ex.getMessage().isBlank()) ? ex.getMessage() : "Resource not found";
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", msg));
+    }
+
+    
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<?> handleBadRequestException(BadRequestException ex) {
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", ex.getMessage()));
+    }
+    
+    @ExceptionHandler(AlreadyExistsException.class)
+    public ResponseEntity<?> handleAlreadyExistsException(AlreadyExistsException ex) {
+		return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("message", ex.getMessage()));
+    }
 }
