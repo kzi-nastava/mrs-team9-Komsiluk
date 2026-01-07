@@ -53,6 +53,16 @@ export class AuthService {
         this.clearAuthState();
         location.href = '/login';
       }
+
+    
+      if (event.key === 'auth_token' && event.newValue) {
+        const role = localStorage.getItem('auth_role');
+        const userId = localStorage.getItem('auth_user_id');
+
+        this.setAuthState(event.newValue, role as any, userId ? +userId : null);
+
+        location.reload();
+      }
     });
   }
 
@@ -73,14 +83,18 @@ export class AuthService {
     return this.tokenSig();
   }
 
-  private setAuthState(token: string, role: UserRole, userId: number) {
+  private setAuthState(token: string, role: UserRole, userId: number | null) {
     this.tokenSig.set(token);
     this.roleSig.set(role);
     this.userIdSig.set(userId);
 
     localStorage.setItem('auth_token', token);
     localStorage.setItem('auth_role', role);
-    localStorage.setItem('auth_user_id', userId.toString());
+    if (userId !== null) {
+      localStorage.setItem('auth_user_id', userId.toString());
+    } else {
+      localStorage.removeItem('auth_user_id');
+    }
   }
 
   private clearAuthState() {
