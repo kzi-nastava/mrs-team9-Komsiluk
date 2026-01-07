@@ -1,9 +1,10 @@
 import { Component } from '@angular/core';
 import { AuthCardComponent } from '../../components/auth-card/auth-card.component';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { ToastService } from '../../../../shared/components/toast/toast.service';
-import { RouterLink } from '@angular/router';
+import { AuthService } from '../../../../core/auth/services/auth.service';
 
-@Component({ // mogao bi da se posalje mail preko inputa u buducnosti
+@Component({
   selector: 'app-activation-message',
   imports: [AuthCardComponent, RouterLink],
   templateUrl: './activation-message.component.html',
@@ -11,13 +12,37 @@ import { RouterLink } from '@angular/router';
 })
 export class ActivationMessageComponent {
 
+  email: string | null = null;
+  loading = false;
+
   constructor(
+    private route: ActivatedRoute,
+    private auth: AuthService,
     private toast: ToastService
   ) {
-    
+    this.email = this.route.snapshot.queryParamMap.get('email');
   }
 
   resendActivationEmail() {
-     this.toast.show('Activation link has been sent to your email.');
+    if (!this.email || this.loading) {
+      return;
+    }
+
+    this.loading = true;
+
+    this.auth.resendActivation(this.email).subscribe({
+      next: () => {
+        this.toast.show('If the email exists, the activation link was sent.');
+        this.loading = false;
+      },
+      error: (err: { status: number; }) => {
+        if (err?.status === 429) {
+          this.toast.show('Activation email already sent. Please check your inbox.');
+        } else {
+          this.toast.show('Something went wrong. Please try again later.');
+        }
+        this.loading = false;
+      }
+    });
   }
 }
