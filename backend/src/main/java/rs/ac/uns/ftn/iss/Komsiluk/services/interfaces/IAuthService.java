@@ -8,4 +8,5 @@ public interface IAuthService {
     LoginResponseDTO login(LoginRequestDTO dto);
     public void registerPassenger(RegisterPassengerRequestDTO dto);
     public void resendActivation(String email);
+    void forgotPassword(String email);
 }
