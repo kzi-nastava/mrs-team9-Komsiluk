@@ -6,14 +6,16 @@ import { ActivationMessageComponent } from './pages/activation-message/activatio
 import { PassengerRegistrationComponent } from './pages/passenger-registration/passenger-registration.component';
 import { SuccessfulRegistrationComponent } from './pages/successful-registration/successful-registration.component';
 import { ActivationComponent } from './components/activation/activation.component';
+import { ForgotPasswordMessageComponent } from './pages/forgot-password-message/forgot-password-message.component';
 import { GuestGuard } from '../../core/auth/guards/guest.guard';
 
 export const AUTH_ROUTES: Routes = [
   { path: 'login', component: LoginComponent, canActivate: [GuestGuard] },
   { path: 'forgot-password', component: ForgotPasswordComponent , canActivate: [GuestGuard] },
-  { path: 'reset-password', component: ResetPasswordComponent, canActivate: [GuestGuard] },
+  { path: 'reset-password', component: ResetPasswordComponent},
   { path: 'activation-message', component: ActivationMessageComponent },
   { path: 'register-passenger', component: PassengerRegistrationComponent, canActivate: [GuestGuard] },
   { path: 'successful-registration', component: SuccessfulRegistrationComponent },
+  { path: 'forgot-password-message', component: ForgotPasswordMessageComponent},
   { path: 'activation', component: ActivationComponent }
 ];
