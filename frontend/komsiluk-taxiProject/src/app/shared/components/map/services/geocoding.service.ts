@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { map, of } from 'rxjs';
+import { map, of, tap, catchError } from 'rxjs';
 
 export interface AddressSuggestion {
   label: string;
@@ -90,5 +90,34 @@ export class GeocodingService {
     }
 
     return Array.from(new Set(parts)).join(', ');
+  }
+
+  private cacheOne = new Map<string, AddressSuggestion | null>();
+
+  lookupOne(query: string) {
+    const q = (query ?? '').trim();
+    if (!q) return of(null);
+
+    const key = q.toLowerCase();
+    if (this.cacheOne.has(key)) return of(this.cacheOne.get(key)!);
+
+    const params = new HttpParams()
+      .set('format', 'jsonv2')
+      .set('q', `${q}, Novi Sad`)
+      .set('limit', '1')
+      .set('addressdetails', '1')
+      .set('countrycodes', 'rs')
+      .set('bounded', '1')
+      .set('viewbox', '19.764,45.309,19.929,45.214');
+
+    return this.http.get<any[]>('https://nominatim.openstreetmap.org/search', { params }).pipe(
+      map(list => {
+        const x = list?.[0];
+        if (!x) return null;
+        return { label: this.formatLabel(x), lat: +x.lat, lon: +x.lon } as AddressSuggestion;
+      }),
+      tap(res => this.cacheOne.set(key, res)),
+      catchError(() => of(null))
+    );
   }
 }

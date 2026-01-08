@@ -1,0 +1,87 @@
+<app-modal-shell [open]="open" (closed)="cancel.emit()">
+  @if (favorite) {
+    <div class="fd-head">
+      <div class="fd-title text-regular">{{ favorite.title }}</div>
+      <button type="button" class="fd-rename text-regular" (click)="onRename()">Change name</button>
+    </div>
+
+    <div class="fd-line"></div>
+
+    <div class="fd-row text-regular">
+      Pickup location: <span class="text-regular fd-accent">{{ favorite.startAddress }}</span>
+    </div>
+
+    <div class="fd-row fd-two text-regular">
+      <div>Stations: <span class="text-regular">{{ stationsCount }}</span></div>
+      <div>Users: <span class="text-regular">{{ usersCount }}</span></div>
+    </div>
+
+    <div class="fd-two">
+        <div class="fd-col">
+            @if (stationsCount > 0) {
+            <div class="fd-list">
+                @for (st of stopsList; track st) {
+                <div class="fd-item text-regular fd-accent">{{ st }}</div>
+                }
+            </div>
+            }
+        </div>
+
+        <div class="fd-col">
+            @if (passengerEmails.length) {
+            <div class="fd-list">
+                @for (em of passengerEmails; track em + '|' + $index; let i = $index) {
+                <div class="fd-item text-regular fd-accent">{{ em }}</div>
+                }
+            </div>
+            }
+        </div>
+    </div>
+
+    <div class="fd-row text-regular">
+      Destination: <span class="text-regular fd-accent">{{ favorite.endAddress }}</span>
+    </div>
+
+    <div class="fd-row text-regular">
+      Car type: <span class="text-regular fd-accent">{{ favorite.vehicleType }}</span>
+    </div>
+
+    <div class="fd-row fd-two text-regular">
+      <div>Pet friendly: <span class="text-regular fd-accent">{{ favorite.petFriendly ? 'Yes' : 'No' }}</span></div>
+      <div>Child seat available: <span class="text-regular fd-accent">{{ favorite.babyFriendly ? 'Yes' : 'No' }}</span></div>
+    </div>
+
+    <div class="fd-block text-regular">Estimated values:</div>
+
+    <div class="fd-stats">
+      <div class="fd-stat text-medium">
+        <span class="material-symbols-outlined fd-ico">route</span>
+        <span>Kilometers: <span class="text-semibold">{{ favorite.distanceKm.toFixed(1) }}</span></span>
+      </div>
+
+      <div class="fd-stat text-medium">
+        <span class="material-symbols-outlined fd-ico">schedule</span>
+        <span>Time: <span class="text-semibold">{{ favorite.estimatedDurationMin }} min</span></span>
+      </div>
+
+      <div class="fd-stat text-medium">
+        <span class="material-symbols-outlined fd-ico">payments</span>
+        <span>Price: <span class="text-semibold">--</span></span>
+      </div>
+    </div>
+
+    <div class="fd-actions">
+      <button type="button" class="btn btn--ghost text-semibold btn-scale" (click)="cancel.emit()">
+        Cancel
+      </button>
+
+      <button type="button" class="btn btn--ghost text-semibold btn-scale" (click)="onDelete()">
+        Delete
+      </button>
+
+      <button type="button" class="btn btn--primary text-semibold btn-scale" (click)="onBook()">
+        Book
+      </button>
+    </div>
+  }
+</app-modal-shell>

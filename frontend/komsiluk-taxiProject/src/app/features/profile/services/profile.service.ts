@@ -17,6 +17,10 @@ export class ProfileService {
     return this.http.get<UserProfileResponseDTO>(`${this.API}/${id}/profile`);
   }
 
+  getProfileById(id: number): Observable<UserProfileResponseDTO> {
+    return this.http.get<UserProfileResponseDTO>(`${this.API}/${id}/profile`);
+  }
+
   changeMyPassword(oldPassword: string, newPassword: string) {
     const id = this.auth.userId();
 

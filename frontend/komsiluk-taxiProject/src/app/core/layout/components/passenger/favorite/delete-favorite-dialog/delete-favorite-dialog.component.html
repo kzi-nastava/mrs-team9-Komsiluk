@@ -1,0 +1,16 @@
+<app-modal-shell [open]="open" (closed)="cancel.emit()">
+
+  <div class="df-title text-regular">Delete {{ title }}</div>
+  <div class="df-sub text-regular">Are you sure you want to remove this ride from favorites?</div>
+
+  <div class="df-actions">
+    <button type="button" class="btn btn--ghost text-semibold btn-scale" (click)="cancel.emit()">
+      Cancel
+    </button>
+
+    <button type="button" class="btn btn--primary text-semibold btn-scale" (click)="confirm.emit()">
+      Delete
+    </button>
+  </div>
+
+</app-modal-shell>

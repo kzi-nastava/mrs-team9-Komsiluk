@@ -1,10 +1,12 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, ViewChild, inject, effect} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PassengerBookRidePanelComponent } from '../book_ride/passenger-book-ride-panel/passenger-book-ride-panel.component';
+import { FavoriteRidesPanelComponent } from '../favorite/favorite-rides-panel/favorite-rides-panel.component';
+import { BookRidePrefillService } from '../../../../../shared/components/map/services/book-ride-prefill.service';
 
 @Component({
   selector: 'app-passenger-left-menu',
-  imports: [CommonModule, PassengerBookRidePanelComponent],
+  imports: [CommonModule, PassengerBookRidePanelComponent, FavoriteRidesPanelComponent],
   templateUrl: './passenger-left-menu.component.html',
   styleUrl: './passenger-left-menu.component.css',
 })
@@ -13,9 +15,35 @@ export class PassengerLeftMenuComponent {
   favOpen = signal(false);
   schedOpen = signal(false);
 
+  @ViewChild('favPanel') favPanel?: FavoriteRidesPanelComponent;
+  @ViewChild(PassengerBookRidePanelComponent) bookPanel?: PassengerBookRidePanelComponent;
+
+  private prefill = inject(BookRidePrefillService);
+
+  constructor() {
+    effect(() => {
+      const data = this.prefill.pending();
+      if (!data) return;
+
+      this.bookOpen.set(true);
+
+      setTimeout(() => {
+        this.bookPanel?.applyPrefillFromFavorite(data.favorite, data.passengerEmails);
+        this.bookPanel?.scrollIntoView();
+        this.prefill.clear();
+      }, 0);
+    });
+  }
+
   toggle(which: 'book' | 'fav' | 'sched') {
     if (which === 'book') this.bookOpen.set(!this.bookOpen());
-    if (which === 'fav') this.favOpen.set(!this.favOpen());
+
+    if (which === 'fav') {
+      const next = !this.favOpen();
+      this.favOpen.set(next);
+      if (next) setTimeout(() => this.favPanel?.load(), 0);
+    }
+
     if (which === 'sched') this.schedOpen.set(!this.schedOpen());
   }
 }

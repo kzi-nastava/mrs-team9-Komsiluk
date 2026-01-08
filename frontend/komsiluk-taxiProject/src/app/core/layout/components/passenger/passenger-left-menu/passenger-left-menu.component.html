@@ -10,7 +10,7 @@
   </button>
 
   @if (bookOpen()) {
-    <div class="p-panel">
+    <div class="p-panel" #bookPanel>
         <app-passenger-book-ride-panel />
     </div>
   }
@@ -27,7 +27,7 @@
 
   @if (favOpen()) {
     <div class="p-panel">
-      <span class="p-panel__label">Favorite rides</span>
+      <app-favorite-rides-panel #favPanel />
     </div>
   }
 

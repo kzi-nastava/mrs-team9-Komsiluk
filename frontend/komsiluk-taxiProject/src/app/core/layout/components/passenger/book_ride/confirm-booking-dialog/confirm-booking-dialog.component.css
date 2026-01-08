@@ -36,7 +36,7 @@
 
 .cb-actions{
   display: flex;
-  justify-content: space-between;
-  gap: 14px;
+  justify-content: center;
+  gap: 100px;
   margin-top: 10px;
 }

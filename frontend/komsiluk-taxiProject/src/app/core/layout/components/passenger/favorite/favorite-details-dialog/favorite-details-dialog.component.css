@@ -1,0 +1,94 @@
+.fd-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+}
+
+.fd-title{
+  font-size: var(--fs-h1);
+  color: var(--color-white);
+}
+
+.fd-rename{
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--color-secondary);
+  text-decoration: underline;
+  font-size: 12px;
+  opacity: 0.95;
+}
+
+.fd-line{
+  height:1px;
+  background: var(--color-secondary);
+  margin: 10px 0 20px;
+}
+
+.fd-row{
+  color: var(--color-white);
+  margin: 6px 0;
+  font-size: var(--fs-md);
+}
+
+.fd-two{
+  display:flex;
+  justify-content:space-between;
+  gap: 14px;
+}
+
+.fd-col {
+  min-width: 0;
+}
+
+
+.fd-accent{
+  color: var(--color-secondary);
+}
+
+.fd-list{
+  margin: 6px 0 10px;
+  display:flex;
+  flex-direction:column;
+  gap: 4px;
+}
+
+.fd-item{
+  color: var(--color-secondary);
+  font-size: 12px;
+}
+
+.fd-block{
+  margin-top: 20px;
+  color: var(--color-white);
+  font-size: var(--fs-md);
+}
+
+.fd-stats{
+  margin-top: 5px;
+  display:flex;
+  flex-direction:column;
+  gap: 3px;
+}
+
+.fd-stat{
+  display:flex;
+  align-items:center;
+  gap: 8px;
+  color: var(--color-white);
+  font-size: var(--fs-md);
+}
+
+.fd-ico{
+  color: var(--color-secondary);
+  line-height: 1;
+  font-size: var(--fs-h1);
+}
+
+.fd-actions{
+  margin-top: 25px;
+  display:flex;
+  justify-content:space-between;
+  gap: 10px;
+}

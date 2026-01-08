@@ -28,3 +28,33 @@
   (cancel)="confirmModal.close()"
   (confirm)="confirmModal.confirm()">
 </app-confirm-booking-dialog>
+
+<app-add-favorite-dialog
+  [open]="addFavModal.open()"
+  [defaultName]="addFavModal.data()?.defaultName ?? ''"
+  (cancel)="addFavModal.close()"
+  (confirm)="addFavModal.confirm($event)">
+</app-add-favorite-dialog>
+
+<app-favorite-details-dialog
+  [open]="favDetailsModal.open()"
+  [favorite]="favDetailsModal.data()?.favorite ?? null"
+  [passengerEmails]="favDetailsModal.data()?.passengerEmails ?? []"
+  (cancel)="favDetailsModal.close()"
+  (delete)="onFavoriteDelete($event)"
+  (rename)="onFavoriteRename($event)">
+</app-favorite-details-dialog>
+
+<app-rename-favorite-dialog
+  [open]="renameFavModal.open()"
+  [currentTitle]="renameFavModal.data()?.currentTitle ?? ''"
+  (cancel)="renameFavModal.close()"
+  (confirm)="renameFavModal.confirm($event)">
+</app-rename-favorite-dialog>
+
+<app-delete-favorite-dialog
+  [open]="deleteFavModal.open()"
+  [title]="deleteFavModal.data()?.title ?? ''"
+  (cancel)="deleteFavModal.close()"
+  (confirm)="deleteFavModal.confirm()">
+</app-delete-favorite-dialog>

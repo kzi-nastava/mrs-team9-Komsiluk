@@ -1,4 +1,4 @@
-<form class="br" [formGroup]="form" (ngSubmit)="submit()" autocomplete="off">
+<form class="br" [formGroup]="form" (ngSubmit)="submit()" autocomplete="off" #root>
 
   <!-- Pickup -->
   <div class="br-field">
@@ -173,7 +173,7 @@
 
   <!-- Actions -->
   <div class="br-actions">
-    <button class="br-fav btn--primary btn-scale" type="button" title="Save as favorite">
+    <button class="br-fav btn--primary btn-scale" type="button" title="Save as favorite" (click)="openAddToFavourites()">
         <span class="material-symbols-outlined btn-fav">star</span>
     </button>
 

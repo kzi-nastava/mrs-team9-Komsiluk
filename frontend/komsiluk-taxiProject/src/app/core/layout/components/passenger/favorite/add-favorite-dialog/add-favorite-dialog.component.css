@@ -1,0 +1,27 @@
+.af-title {
+  font-size: var(--fs-h1);
+  margin-bottom: 25px;
+}
+
+.af-sub {
+  opacity: 0.85;
+  margin-bottom: 25px;
+  font-size: var(--fs-md);
+}
+
+.af-input {
+  width: 100%;
+  height: 28px;
+  border-radius: 2px;
+  border: 1px solid rgba(255,255,255,0.25);
+  background: #fff;
+  color: #000;
+  margin-bottom: 18px;
+}
+
+.af-actions {
+  display: flex;
+  justify-content: center;
+  gap: 100px;
+  margin-top: 10px;
+}

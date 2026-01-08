@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { RideCreateDTO, RideResponseDTO } from '../../../../../../shared/models/ride.models';
 @Injectable({ providedIn: 'root' })
-export class RideApiService {
+export class RideService {
   private readonly API = 'http://localhost:8081/api/rides';
 
   constructor(private http: HttpClient) {}

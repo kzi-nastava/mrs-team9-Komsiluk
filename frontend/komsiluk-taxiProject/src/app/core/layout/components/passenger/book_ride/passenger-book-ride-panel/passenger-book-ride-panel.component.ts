@@ -1,5 +1,5 @@
-import { Component, signal, OnDestroy, OnInit, ChangeDetectorRef } from '@angular/core';
-import { Subscription, switchMap, catchError, of, tap, map } from 'rxjs';
+import { Component, signal, OnDestroy, OnInit, ChangeDetectorRef, ElementRef, ViewChild } from '@angular/core';
+import { Subscription, switchMap, catchError, of, tap, map, finalize, forkJoin} from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { FormArray, FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { VehicleType } from '../../../../../../shared/models/profile.models';
@@ -8,10 +8,16 @@ import { RidePlannerService } from '../../../../../../shared/components/map/serv
 import { ToastService } from '../../../../../../shared/components/toast/toast.service';
 import { ConfirmBookingModalService } from '../../../../../../shared/components/modal-shell/services/confirm-booking-modal.service';
 import { HttpErrorResponse } from '@angular/common/http';
-import { RideApiService } from '../services/ride.service';
+import { RideService } from '../services/ride.service';
 import { RideCreateDTO } from '../../../../../../shared/models/ride.models';
 import { AuthService } from '../../../../../auth/services/auth.service';
 import { NotificationService } from '../../../../../../features/menu/services/notification.service';
+import { AddFavoriteModalService } from '../../../../../../shared/components/modal-shell/services/add-favorite-modal.service';
+import { RouteService } from '../../favorite/services/route.service';
+import { FavoriteRouteService } from '../../favorite/services/favorite-route.service';
+import { RouteCreateDTO } from '../../../../../../shared/models/route.models';
+import { FavoriteRouteCreateDTO, FavoriteRouteResponseDTO } from '../../../../../../shared/models/favorite-route.models';
+import { BookRidePrefillService, BookRidePrefillPayload } from '../../../../../../shared/components/map/services/book-ride-prefill.service';
 
 type TimeMode = 'NOW' | 'SCHEDULED';
 
@@ -25,6 +31,8 @@ export class PassengerBookRidePanelComponent implements OnInit, OnDestroy {
   submitted = signal(false);
   form;
 
+  @ViewChild('root', { static: true }) root!: ElementRef<HTMLElement>;
+
   pickupSuggestions: AddressSuggestion[] = [];
   destinationSuggestions: AddressSuggestion[] = [];
   stationSuggestions: AddressSuggestion[][] = [];
@@ -36,7 +44,12 @@ export class PassengerBookRidePanelComponent implements OnInit, OnDestroy {
   private destinationPoint: { lat: number; lon: number; label: string } | null = null;
   private stationPoints: Array<{ lat: number; lon: number; label: string } | null> = [];
 
-  constructor(private fb: FormBuilder, private geocoding: GeocodingService, public ridePlanner: RidePlannerService, private cdr: ChangeDetectorRef, private toast: ToastService, public confirmModal: ConfirmBookingModalService, private rideApi: RideApiService, private auth: AuthService, private notification: NotificationService) {
+  constructor(private fb: FormBuilder, private geocoding: GeocodingService, public ridePlanner: RidePlannerService,
+    private cdr: ChangeDetectorRef, private toast: ToastService, public confirmModal: ConfirmBookingModalService,
+    private rideApi: RideService, private auth: AuthService, private notification: NotificationService,
+    private addFavModal: AddFavoriteModalService, private routeApi: RouteService, private favoriteRouteApi: FavoriteRouteService,
+    private prefill: BookRidePrefillService) {
+
     this.form = this.fb.group({
       pickup: ['', [Validators.required]],
       destination: ['', [Validators.required]],
@@ -353,5 +366,138 @@ export class PassengerBookRidePanelComponent implements OnInit, OnDestroy {
         return of(null);
       })
     ).subscribe();
+  }
+
+  openAddToFavourites() {
+    const hasRoute = !!this.ridePlanner.route();
+    if (!hasRoute) {
+      this.toast.show('Please select valid pickup and destination locations.');
+      return;
+    }
+
+    const pickupLabel = (this.form.get('pickup')!.value ?? '').toString().trim();
+    const destLabel = (this.form.get('destination')!.value ?? '').toString().trim();
+
+    this.addFavModal.openModal(
+      { defaultName: `${pickupLabel} → ${destLabel}` },
+      (title: string) => this.confirmAddFavorite(title)
+    );
+  }
+
+  favSaving = signal(false);
+
+  confirmAddFavorite(title: string) {
+    const userId = this.auth.userId();
+    if (!userId) {
+      this.toast.show('Not logged in.');
+      return;
+    }
+
+    const pickupLabel = (this.form.get('pickup')!.value ?? '').toString().trim();
+    const destLabel = (this.form.get('destination')!.value ?? '').toString().trim();
+
+    const stopsArr = (this.form.value.stations ?? []).filter(Boolean).map(x => String(x).trim());
+    const stopsStr = stopsArr.join('|');
+
+    const routeDto: RouteCreateDTO = {
+      startAddress: pickupLabel,
+      endAddress: destLabel,
+      stops: stopsStr,
+      distanceKm: this.ridePlanner.km(),
+      estimatedDurationMin: this.ridePlanner.minutes(),
+    };
+
+    const favDtoBase = {
+      title,
+      passengersEmails: (this.form.value.users ?? []).filter(Boolean).map(x => String(x).trim()),
+      vehicleType: this.form.value.vehicleType!,
+      petFriendly: !!this.form.value.petFriendly,
+      babyFriendly: !!this.form.value.childSeatAvailable,
+    };
+
+    this.favSaving.set(true);
+
+    this.routeApi.findOrCreate(routeDto).pipe(
+      switchMap(route => {
+        const favDto: FavoriteRouteCreateDTO = { ...favDtoBase, routeId: route.id };
+        return this.favoriteRouteApi.addFavorite(+userId, favDto);
+      }),
+      finalize(() => this.favSaving.set(false))
+    ).subscribe({
+      next: () => {
+        this.toast.show('Added to favourites.');
+        this.addFavModal.close();
+      },
+      error: (err: HttpErrorResponse) => {
+        const msg =
+          err?.error?.message ||
+          err?.error ||
+          err?.message ||
+          'Failed to add favourite.';
+        this.toast.show(String(msg));
+      }
+    });
+  }
+
+  applyPrefillFromFavorite(f: FavoriteRouteResponseDTO, passengerEmails: string[]) {
+    this.form.patchValue({
+      pickup: f.startAddress ?? '',
+      destination: f.endAddress ?? '',
+      vehicleType: f.vehicleType ?? 'STANDARD',
+      petFriendly: !!f.petFriendly,
+      childSeatAvailable: !!f.babyFriendly,
+      timeMode: 'NOW',
+      scheduledAt: '',
+    }, { emitEvent: false });
+
+    this.setStations(Array.isArray(f.stops) ? f.stops : []);
+    this.setUsers(passengerEmails ?? []);
+
+    const stops = Array.isArray(f.stops) ? f.stops : [];
+
+    forkJoin({
+      pickup: this.geocoding.lookupOne(f.startAddress ?? ''),
+      dest: this.geocoding.lookupOne(f.endAddress ?? ''),
+      stops: stops.length ? forkJoin(stops.map(s => this.geocoding.lookupOne(s))) : of([])
+    }).subscribe(({ pickup, dest, stops: stopPoints }) => {
+      if (!pickup || !dest) {
+        this.toast.show('Could not resolve pickup/destination.');
+        return;
+      }
+
+      this.pickupPoint = { lat: pickup.lat, lon: pickup.lon, label: pickup.label };
+      this.destinationPoint = { lat: dest.lat, lon: dest.lon, label: dest.label };
+
+      this.ridePlanner.setPickup(this.pickupPoint);
+      this.ridePlanner.setDestination(this.destinationPoint);
+
+      this.stationPoints = stops.map((_, i) => {
+        const p = (stopPoints as any[])[i];
+        return p ? { lat: p.lat, lon: p.lon, label: p.label } : null;
+      });
+      this.pushStopsToPlanner();
+
+      this.cdr.detectChanges();
+    });
+  }
+
+  scrollIntoView() {
+    this.root?.nativeElement?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  private setStations(values: string[]) {
+    const arr = this.stations;
+    while (arr.length > values.length) arr.removeAt(arr.length - 1);
+    while (arr.length < values.length) arr.push(this.fb.control('', Validators.required));
+    values.forEach((v, i) => arr.at(i).setValue(v, { emitEvent: false }));
+
+    this.rebindStationsAutocomplete();
+  }
+
+  private setUsers(values: string[]) {
+    const arr = this.users;
+    while (arr.length > values.length) arr.removeAt(arr.length - 1);
+    while (arr.length < values.length) arr.push(this.fb.control('', Validators.required));
+    values.forEach((v, i) => arr.at(i).setValue(v, { emitEvent: false }));
   }
 }
