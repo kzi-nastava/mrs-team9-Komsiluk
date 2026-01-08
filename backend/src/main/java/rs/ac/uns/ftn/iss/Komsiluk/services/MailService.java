@@ -30,5 +30,24 @@ public class MailService {
 
         mailSender.send(message);
     }
+
+    public void sendPasswordResetMail(String to, String token) {
+
+        String resetLink =
+                "http://localhost:4200/reset-password?token=" + token;
+
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(to);
+        message.setSubject("Reset your Komsiluk password");
+        message.setText(
+                "You requested a password reset.\n\n" +
+                        "Click the link below to set a new password:\n\n" +
+                        resetLink + "\n\n" +
+                        "This link expires in 24 hours."
+        );
+
+        mailSender.send(message);
+    }
+
 }
 

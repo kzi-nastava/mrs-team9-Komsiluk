@@ -1,8 +1,10 @@
 import { Component } from '@angular/core';
 import { AuthCardComponent } from '../../components/auth-card/auth-card.component';
-import {FormBuilder, Validators, ReactiveFormsModule} from "@angular/forms";
+import { FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { trimRequired } from '../../../../shared/util/validators/field-validators.service';
+import { ToastService } from '../../../../shared/components/toast/toast.service';
+import { AuthService } from '../../../../core/auth/services/auth.service';
 
 @Component({
   selector: 'app-forgot-password',
@@ -12,18 +14,19 @@ import { trimRequired } from '../../../../shared/util/validators/field-validator
 })
 export class ForgotPasswordComponent {
   submitted = false;
+  loading = false;
 
   form: ReturnType<FormBuilder['group']>;
 
   constructor(
     private fb: FormBuilder,
-    private router: Router
+    private router: Router,
+    private auth: AuthService,
+    private toast: ToastService
   ) {
-    this.form = this.fb.group(
-      {
-        email: ['', [trimRequired, Validators.email]],
-      }
-    );
+    this.form = this.fb.group({
+      email: ['', [trimRequired, Validators.email]],
+    });
   }
 
   c(name: string) {
@@ -38,8 +41,23 @@ export class ForgotPasswordComponent {
   save() {
     this.submitted = true;
     this.form.markAllAsTouched();
-    if (this.form.invalid) return;
+    if (this.form.invalid || this.loading) return;
 
-    this.router.navigate(['/activation-message']);
+    this.loading = true;
+
+    const email = this.c('email').value;
+
+    this.auth.forgotPassword(email).subscribe({
+      next: () => {
+        this.loading = false;
+        this.router.navigate(['/forgot-password-message'], {
+          queryParams: { email },
+        });
+      },
+      error: () => {
+        this.loading = false;
+        this.toast.show('Something went wrong. Please try again later.');
+      },
+    });
   }
 }

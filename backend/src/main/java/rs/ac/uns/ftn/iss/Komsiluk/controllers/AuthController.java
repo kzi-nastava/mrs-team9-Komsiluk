@@ -67,17 +67,7 @@ public class AuthController {
     public ResponseEntity<Void> forgotPassword(
             @RequestBody ForgotPasswordRequestDTO dto) {
 
-        try {
-            User user = userService.findByEmail(dto.getEmail());
-
-            userTokenService.createPasswordResetToken(user.getId());
-
-            // ovde ce ici slanje maila
-
-        } catch (Exception ignored) {
-            // prazno da ne bismo otkrili da li email postoji
-        }
-
+        authService.forgotPassword(dto.getEmail());
         return ResponseEntity.ok().build();
     }
 }

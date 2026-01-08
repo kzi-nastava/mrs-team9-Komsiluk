@@ -129,4 +129,23 @@ public class AuthService implements IAuthService {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
         }
     }
+
+    @Override
+    public void forgotPassword(String email) {
+
+        User user = userService.findByEmail(email);
+
+        if (user == null) {
+            return;
+        }
+
+        UserTokenResponseDTO token =
+                userTokenService.createPasswordResetToken(user.getId());
+
+        mailService.sendPasswordResetMail(
+                user.getEmail(),
+                token.getToken()
+        );
+    }
+
 }

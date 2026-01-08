@@ -29,6 +29,16 @@ export interface RegisterPassengerRequest {
   profileImageUrl: string | null;
 }
 
+export interface ForgotPasswordRequest {
+  email: string;
+}
+
+export interface ResetPasswordRequest {
+  token: string;
+  newPassword: string;
+  confirmPassword: string;
+}
+
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -134,10 +144,18 @@ export class AuthService {
   }
 
   activatePassenger(token: string) {
-  return this.http.post<void>(
-    `${this.API}/tokens/activation/passenger`,
-    { token }
-  );
-}
+    return this.http.post<void>(
+      `${this.API}/tokens/activation/passenger`,
+      { token }
+    );
+  }
+
+  forgotPassword(email: string) {
+    return this.http.post<void>(`${this.API}/auth/forgot-password`, { email });
+  }
+
+  resetPassword(payload: ResetPasswordRequest) {
+    return this.http.post<void>(`${this.API}/tokens/reset-password`, payload);
+  }
 
 }
