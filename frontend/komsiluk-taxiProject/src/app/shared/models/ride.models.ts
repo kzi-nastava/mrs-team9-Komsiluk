@@ -34,4 +34,9 @@ export interface RideResponseDTO {
   cancellationSource: string | null;
   cancellationReason: string | null;
   creatorId: number;
+  distanceKm: number;
+  estimatedDurationMin: number;
+  vehicleType: VehicleType;
+  babyFriendly: boolean;
+  petFriendly: boolean;
 }

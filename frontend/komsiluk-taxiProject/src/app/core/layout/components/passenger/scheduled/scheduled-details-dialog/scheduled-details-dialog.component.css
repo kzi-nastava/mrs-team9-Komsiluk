@@ -1,77 +1,56 @@
-.fd-head{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:12px;
-}
-
-.fd-title{
+.sd-title{
   font-size: var(--fs-h1);
   color: var(--color-white);
 }
 
-.fd-rename{
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  color: var(--color-secondary);
-  text-decoration: underline;
-  font-size: 12px;
-  opacity: 0.95;
-}
-
-.fd-line{
+.sd-line{
   height:1px;
   background: var(--color-secondary);
   margin: 10px 0 20px;
 }
 
-.fd-row{
+.sd-row{
   color: var(--color-white);
   margin: 6px 0;
   font-size: var(--fs-md);
 }
 
-.fd-two{
+.sd-two{
   display:flex;
   justify-content:space-between;
   gap: 14px;
 }
 
-.fd-col {
-  min-width: 0;
-}
+.sd-col { min-width: 0; }
 
-.fd-accent{
-  color: var(--color-secondary);
-}
+.sd-accent{ color: var(--color-secondary); }
 
-.fd-list{
+.sd-list{
   margin: 6px 0 10px;
   display:flex;
   flex-direction:column;
   gap: 4px;
 }
 
-.fd-item{
+.sd-item{
   color: var(--color-secondary);
   font-size: 12px;
 }
 
-.fd-block{
+.sd-block{
   margin-top: 20px;
   color: var(--color-white);
   font-size: var(--fs-md);
 }
 
-.fd-stats{
+.sd-stats{
   margin-top: 5px;
   display:flex;
   flex-direction:column;
   gap: 3px;
 }
 
-.fd-stat{
+.sd-stat{
   display:flex;
   align-items:center;
   gap: 8px;
@@ -79,13 +58,19 @@
   font-size: var(--fs-md);
 }
 
-.fd-ico{
+.sd-stat--right{
+  margin-top: 6px;
+  justify-content: flex-end;
+  opacity: 0.95;
+}
+
+.sd-ico{
   color: var(--color-secondary);
   line-height: 1;
   font-size: var(--fs-h1);
 }
 
-.fd-actions{
+.sd-actions{
   margin-top: 25px;
   display:flex;
   justify-content:space-between;

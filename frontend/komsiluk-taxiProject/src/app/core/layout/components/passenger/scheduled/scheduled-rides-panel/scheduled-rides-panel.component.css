@@ -1,15 +1,15 @@
-.fav-empty{
+.sch-empty{
   color: rgba(255,255,255,0.8);
   padding: 8px 2px;
 }
 
-.fav-list{
+.sch-list{
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
-.fav-card{
+.sch-card{
   background: var(--color-white);
   border-radius: 8px;
   padding: 10px 10px 12px;
@@ -18,37 +18,35 @@
   cursor: pointer;
 }
 
-.fav-card:hover { outline: 1px solid rgba(255, 238, 2, 0.25); }
+.sch-card:hover { outline: 1px solid rgba(255, 238, 2, 0.25); }
 
-.fav-title{
- margin-bottom: 6px; 
- font-size: var(--fs-h2);
+.sch-title{
+  margin-bottom: 6px;
+  font-size: var(--fs-h2);
 }
 
-.fav-line{
+.sch-line{
   height: 1.5px;
   background: var(--color-primary);
   margin-bottom: 8px;
   box-shadow: #111111bc 0px 2px 4px;
 }
 
-.fav-row{
+.sch-row{
   font-size: var(--fs-sm);
   line-height: 1.25;
   margin: 2px 0;
 }
 
-.fav-sep{
-  color: var(--color-white);
-}
+.sch-sep{ color: var(--color-white); }
 
-.fav-row--ico{
+.sch-row--ico{
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
-.fav-ico{
+.sch-ico{
   color: var(--color-secondary);
   font-size: 18px;
   line-height: 1;

@@ -1,0 +1,54 @@
+@if (loading()) {
+  <div class="sch-empty text-regular">Loading...</div>
+} @else {
+  @if (rides().length === 0) {
+    <div class="sch-empty text-regular">
+      You currently don't have any scheduled rides.
+    </div>
+  } @else {
+    <div class="sch-list">
+      @for (r of rides(); track r.id) {
+        <div class="sch-card" role="button" tabindex="0" (click)="openCard(r)">
+          <div class="sch-title text-semibold">Scheduled ride</div>
+          <div class="sch-line"></div>
+
+          <div class="sch-row text-regular">Pickup location: <span class="text-semibold">{{ r.startAddress }}</span></div>
+
+          <div class="sch-row text-regular">
+            Stations: <span class="text-semibold">{{ r.stops.length }}</span>
+            <span class="sch-sep">---</span>
+            Users: <span class="text-semibold">{{ r.passengerIds.length }}</span>
+          </div>
+
+          <div class="sch-row text-regular">Destination: <span class="text-semibold">{{ r.endAddress }}</span></div>
+
+          <div class="sch-row text-regular">Car type: <span class="text-semibold">{{ r.vehicleType}}</span></div>
+
+          <div class="sch-row text-regular">Pet friendly: <span class="text-semibold">{{ r.petFriendly ? 'Yes' : 'No' }}</span></div>
+
+          <div class="sch-row text-regular">Child seat available: <span class="text-semibold">{{ r.babyFriendly ? 'Yes' : 'No' }}</span></div>
+
+          <div class="sch-row sch-row--ico text-regular">
+            <span class="material-symbols-outlined sch-ico">route</span>
+            Kilometers: <span class="text-semibold">{{ (r.distanceKm).toFixed(1) }}</span>
+          </div>
+
+          <div class="sch-row sch-row--ico text-regular">
+            <span class="material-symbols-outlined sch-ico">schedule</span>
+            Time: <span class="text-semibold">{{ (r).estimatedDurationMin }} min</span>
+          </div>
+
+          <div class="sch-row sch-row--ico text-regular">
+            <span class="material-symbols-outlined sch-ico">payments</span>
+            Price: <span class="text-semibold">{{ r.price }}</span>
+          </div>
+
+          <div class="sch-row sch-row--ico text-regular">
+            <span class="material-symbols-outlined sch-ico">calendar_month</span>
+            Scheduled time: <span class="text-semibold">{{ formatTime(r.scheduledAt) }}</span>
+          </div>
+        </div>
+      }
+    </div>
+  }
+}

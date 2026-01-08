@@ -6,6 +6,7 @@ import java.util.List;
 
 import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.CancellationSource;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.RideStatus;
+import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.VehicleType;
 
 public class Ride {
 	
@@ -23,6 +24,11 @@ public class Ride {
     private User driver;
     private List<User> passengers;
     private User createdBy;
+    private VehicleType vehicleType;
+    private boolean babyFriendly;
+    private boolean petFriendly;
+    private double distanceKm;
+    private int estimatedDurationMin;
     
 	public Ride() {
 		super();
@@ -30,7 +36,8 @@ public class Ride {
 
 	public Ride(Long id, RideStatus status, LocalDateTime createdAt, LocalDateTime scheduledAt, LocalDateTime startTime,
 			LocalDateTime endTime, BigDecimal price, boolean panicTriggered, CancellationSource cancellationSource,
-			String cancellationReason, Route route, User driver, List<User> passengers, User createdBy) {
+			String cancellationReason, Route route, User driver, List<User> passengers, User createdBy, VehicleType vehicleType,
+			boolean babyFriendly, boolean petFriendly, double distanceKm, int estimatedDurationMin) {
 		super();
 		this.id = id;
 		this.status = status;
@@ -46,6 +53,11 @@ public class Ride {
 		this.driver = driver;
 		this.passengers = passengers;
 		this.createdBy = createdBy;
+		this.vehicleType = vehicleType;
+		this.babyFriendly = babyFriendly;
+		this.petFriendly = petFriendly;
+		this.distanceKm = distanceKm;
+		this.estimatedDurationMin = estimatedDurationMin;
 	}
 
 	public Long getId() {
@@ -158,5 +170,45 @@ public class Ride {
 
 	public void setCreatedBy(User createdBy) {
 		this.createdBy = createdBy;
+	}
+	
+	public VehicleType getVehicleType() {
+		return vehicleType;
+	}
+	
+	public void setVehicleType(VehicleType vehicleType) {
+		this.vehicleType = vehicleType;
+	}
+	
+	public boolean isBabyFriendly() {
+		return babyFriendly;
+	}
+	
+	public void setBabyFriendly(boolean babyFriendly) {
+		this.babyFriendly = babyFriendly;
+	}
+	
+	public boolean isPetFriendly() {
+		return petFriendly;
+	}
+	
+	public void setPetFriendly(boolean petFriendly) {
+		this.petFriendly = petFriendly;
+	}
+	
+	public double getDistanceKm() {
+		return distanceKm;
+	}
+	
+	public void setDistanceKm(double distanceKm) {
+		this.distanceKm = distanceKm;
+	}
+	
+	public int getEstimatedDurationMin() {
+		return estimatedDurationMin;
+	}
+	
+	public void setEstimatedDurationMin(int estimatedDurationMin) {
+		this.estimatedDurationMin = estimatedDurationMin;
 	}
 }

@@ -1,5 +1,7 @@
 package rs.ac.uns.ftn.iss.Komsiluk.controllers;
 
+import java.util.Collection;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -25,6 +27,12 @@ public class RideController {
         return new ResponseEntity<>(created, HttpStatus.CREATED);
     }
 
+    @GetMapping("/user/{userId}/scheduled")
+    public ResponseEntity<Collection<RideResponseDTO>> getScheduledRidesForUser(@PathVariable Long userId) {
+        Collection<RideResponseDTO> rides = rideService.getScheduledRidesForUser(userId);
+        return new ResponseEntity<>(rides, HttpStatus.OK);
+    }
+    
     @PostMapping("/{id}/start")
     public ResponseEntity<RideResponseDTO> startRide(@PathVariable Long id) {
         RideResponseDTO dto = rideService.startRide(id);

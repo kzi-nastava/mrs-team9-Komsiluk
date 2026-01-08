@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.CancellationSource;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.RideStatus;
+import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.VehicleType;
 
 public class RideResponseDTO {
 
@@ -25,6 +26,11 @@ public class RideResponseDTO {
     private CancellationSource cancellationSource;
     private String cancellationReason;
     private Long creatorId;
+    private VehicleType vehicleType;
+    private boolean babyFriendly;
+    private boolean petFriendly;
+    private double distanceKm;
+    private int estimatedDurationMin;
     
     public RideResponseDTO() {
 		super();
@@ -164,5 +170,45 @@ public class RideResponseDTO {
 
 	public void setCreatorId(Long creatorId) {
 		this.creatorId = creatorId;
+	}
+	
+	public VehicleType getVehicleType() {
+		return vehicleType;
+	}
+	
+	public void setVehicleType(VehicleType vehicleType) {
+		this.vehicleType = vehicleType;
+	}
+	
+	public boolean isBabyFriendly() {
+		return babyFriendly;
+	}
+	
+	public void setBabyFriendly(boolean babyFriendly) {
+		this.babyFriendly = babyFriendly;
+	}
+	
+	public boolean isPetFriendly() {
+		return petFriendly;
+	}
+	
+	public void setPetFriendly(boolean petFriendly) {
+		this.petFriendly = petFriendly;
+	}
+	
+	public double getDistanceKm() {
+		return distanceKm;
+	}
+	
+	public void setDistanceKm(double distanceKm) {
+		this.distanceKm = distanceKm;
+	}
+	
+	public int getEstimatedDurationMin() {
+		return estimatedDurationMin;
+	}
+	
+	public void setEstimatedDurationMin(int estimatedDurationMin) {
+		this.estimatedDurationMin = estimatedDurationMin;
 	}
 }

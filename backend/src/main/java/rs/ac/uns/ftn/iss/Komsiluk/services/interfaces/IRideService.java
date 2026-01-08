@@ -9,6 +9,8 @@ import rs.ac.uns.ftn.iss.Komsiluk.dtos.ride.RideLiveInfoDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.ride.*;
 
 public interface IRideService {
+	
+	public Collection<RideResponseDTO> getScheduledRidesForUser(Long userId);
 
     public RideResponseDTO orderRide(RideCreateDTO dto);
     
@@ -25,7 +27,6 @@ public interface IRideService {
     public void cancelByPassenger(Long rideId, PassengerCancelRideDTO dto);
 
     public StopRideResponseDTO stopRide(Long id,StopRideRequestDTO dto);
-
 
     public RideLiveInfoDTO getLiveInfo(Long rideId);
 

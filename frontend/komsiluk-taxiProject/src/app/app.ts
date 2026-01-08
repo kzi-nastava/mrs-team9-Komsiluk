@@ -25,6 +25,8 @@ import { RenameFavoriteModalService } from './shared/components/modal-shell/serv
 import { DeleteFavoriteModalService } from './shared/components/modal-shell/services/delete-favorite-modal.service';
 import { FavoriteRouteService } from './core/layout/components/passenger/favorite/services/favorite-route.service';
 import { FavoritesBusService } from './core/layout/components/passenger/favorite/services/favorites-bus.service';
+import { ScheduledDetailsDialogComponent } from './core/layout/components/passenger/scheduled/scheduled-details-dialog/scheduled-details-dialog.component';
+import { ScheduledDetailsModalService } from './shared/components/modal-shell/services/scheduled-details-modal.service';
 
 @Component({
   selector: 'app-root',
@@ -41,7 +43,8 @@ import { FavoritesBusService } from './core/layout/components/passenger/favorite
     AddFavoriteDialogComponent,
     FavoriteDetailsDialogComponent,
     RenameFavoriteDialogComponent,
-    DeleteFavoriteDialogComponent
+    DeleteFavoriteDialogComponent,
+    ScheduledDetailsDialogComponent
   ],
   templateUrl: './app.html',
   styleUrl: './app.css'
@@ -54,7 +57,7 @@ export class App implements OnInit {
 
   constructor(public filterSvc: RideHistoryFilterService, private router: Router, public confirmModal: ConfirmBookingModalService,
     public addFavModal: AddFavoriteModalService, public favDetailsModal: FavoriteDetailsModalService, public renameFavModal: RenameFavoriteModalService,
-    public deleteFavModal: DeleteFavoriteModalService, public toastService: ToastService, private favoriteApi: FavoriteRouteService, private favBus: FavoritesBusService) {}
+    public deleteFavModal: DeleteFavoriteModalService, public toastService: ToastService, private favoriteApi: FavoriteRouteService, private favBus: FavoritesBusService, public schedDetailsModal: ScheduledDetailsModalService) {}
 
   ngOnInit(): void {
   this.router.events
@@ -128,4 +131,8 @@ export class App implements OnInit {
     });
   }
 
+  onScheduledCancelRide(r: any) {
+    console.log('CANCEL SCHEDULED (GUI ONLY):', r);
+    this.schedDetailsModal.close();
+  }
 }

@@ -58,3 +58,11 @@
   (cancel)="deleteFavModal.close()"
   (confirm)="deleteFavModal.confirm()">
 </app-delete-favorite-dialog>
+
+<app-scheduled-details-dialog
+  [open]="schedDetailsModal.open()"
+  [ride]="schedDetailsModal.data()?.ride ?? null"
+  [passengerEmails]="schedDetailsModal.data()?.passengerEmails ?? []"
+  (close)="schedDetailsModal.close()"
+  (cancelRide)="onScheduledCancelRide($event)">
+</app-scheduled-details-dialog>
