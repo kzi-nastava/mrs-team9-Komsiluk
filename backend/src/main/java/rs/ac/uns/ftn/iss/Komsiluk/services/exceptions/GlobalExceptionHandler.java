@@ -20,7 +20,6 @@ public class GlobalExceptionHandler {
         String msg = (ex.getMessage() != null && !ex.getMessage().isBlank()) ? ex.getMessage() : "Resource not found";
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", msg));
     }
-
     
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<?> handleBadRequestException(BadRequestException ex) {
@@ -30,5 +29,14 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(AlreadyExistsException.class)
     public ResponseEntity<?> handleAlreadyExistsException(AlreadyExistsException ex) {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("message", ex.getMessage()));
+	}
+
+    @ExceptionHandler(ActivationAlreadySentException.class)
+    public ResponseEntity<?> handleActivationAlreadySent(
+            ActivationAlreadySentException ex) {
+
+        return ResponseEntity
+                .status(HttpStatus.TOO_MANY_REQUESTS)
+                .body(Map.of("message", ex.getMessage()));
     }
 }

@@ -39,6 +39,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // PUBLIC
                         .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/tokens/activation/**").permitAll()
+                        .requestMatchers("/api/tokens/reset-password").permitAll()
                         .requestMatchers("/h2-console/**").permitAll()
 
                         // ROLE BASED

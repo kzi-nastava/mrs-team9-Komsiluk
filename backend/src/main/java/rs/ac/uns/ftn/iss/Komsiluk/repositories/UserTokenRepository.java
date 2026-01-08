@@ -9,6 +9,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import org.springframework.stereotype.Repository;
 
+import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.TokenType;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.UserToken;
 
 @Repository
@@ -32,6 +33,15 @@ public class UserTokenRepository {
     public Optional<UserToken> findByToken(String tokenValue) {
         return storage.values().stream().filter(t -> t.getToken().equals(tokenValue)).findFirst();
     }
+
+    public List<UserToken> findAllByUserIdAndType(Long userId, TokenType type) {
+        return storage.values().stream()
+                .filter(token -> token.getUser() != null)
+                .filter(token -> token.getUser().getId().equals(userId))
+                .filter(token -> token.getType() == type)
+                .toList();
+    }
+
 
     public List<UserToken> findAll() {
         return new ArrayList<>(storage.values());

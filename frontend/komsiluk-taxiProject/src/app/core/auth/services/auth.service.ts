@@ -17,10 +17,23 @@ interface LoginResponse {
   driverStatus: string | null;
 }
 
+export interface RegisterPassengerRequest {
+  firstName: string;
+  lastName: string;
+  address: string;
+  city: string;
+  phoneNumber: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+  profileImageUrl: string | null;
+}
+
+
 @Injectable({ providedIn: 'root' })
 export class AuthService {
 
-  private readonly API = 'http://localhost:8081/api/auth';
+  private readonly API = 'http://localhost:8081/api';
 
 
   private tokenSig = signal<string | null>(null);
@@ -34,10 +47,27 @@ export class AuthService {
 
   constructor(private http: HttpClient) {
     this.restoreAuthState();
+
+    window.addEventListener('storage', (event) => {
+      if (event.key === 'auth_token' && event.newValue === null) {
+        this.clearAuthState();
+        location.href = '/login';
+      }
+
+    
+      if (event.key === 'auth_token' && event.newValue) {
+        const role = localStorage.getItem('auth_role');
+        const userId = localStorage.getItem('auth_user_id');
+
+        this.setAuthState(event.newValue, role as any, userId ? +userId : null);
+
+        location.reload();
+      }
+    });
   }
 
   login(email: string, password: string) {
-    return this.http.post<LoginResponse>(`${this.API}/login`, { email, password }).pipe(
+    return this.http.post<LoginResponse>(`${this.API}/auth/login`, { email, password }).pipe(
       tap(response => {
         this.setAuthState(response.token, response.role, response.id);
       })
@@ -53,14 +83,18 @@ export class AuthService {
     return this.tokenSig();
   }
 
-  private setAuthState(token: string, role: UserRole, userId: number) {
+  private setAuthState(token: string, role: UserRole, userId: number | null) {
     this.tokenSig.set(token);
     this.roleSig.set(role);
     this.userIdSig.set(userId);
 
     localStorage.setItem('auth_token', token);
     localStorage.setItem('auth_role', role);
-    localStorage.setItem('auth_user_id', userId.toString());
+    if (userId !== null) {
+      localStorage.setItem('auth_user_id', userId.toString());
+    } else {
+      localStorage.removeItem('auth_user_id');
+    }
   }
 
   private clearAuthState() {
@@ -84,4 +118,26 @@ export class AuthService {
       this.userIdSig.set(userId ? +userId : null);
     }
   }
+
+  registerPassenger(payload: RegisterPassengerRequest) {
+    return this.http.post<void>(
+      `${this.API}/auth/registration/passenger`,
+      payload
+    );
+  }
+
+  resendActivation(email: string) {
+    return this.http.post<void>(
+      `${this.API}/auth/registration/resend`,
+      { email }
+    );
+  }
+
+  activatePassenger(token: string) {
+  return this.http.post<void>(
+    `${this.API}/tokens/activation/passenger`,
+    { token }
+  );
+}
+
 }
