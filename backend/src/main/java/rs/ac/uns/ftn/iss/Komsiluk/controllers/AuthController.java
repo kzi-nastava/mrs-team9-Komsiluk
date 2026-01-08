@@ -20,20 +20,16 @@ import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.IAuthService;
 public class AuthController {
 
     private final IAuthService authService;
-
-    private final IUserService userService;
     private final IUserTokenService userTokenService;
-    private final PasswordEncoder passwordEncoder;
+    private final IUserService userService;
 
     public AuthController(
             IAuthService authService,
             IUserService userService,
-            IUserTokenService userTokenService,
-            PasswordEncoder passwordEncoder) {
+            IUserTokenService userTokenService) {
         this.authService = authService;
-        this.userService = userService;
         this.userTokenService = userTokenService;
-        this.passwordEncoder = passwordEncoder;
+        this.userService = userService;
     }
 
 
@@ -44,39 +40,25 @@ public class AuthController {
     }
 
 
-
     @PostMapping("/registration/passenger")
-    public ResponseEntity<RegisterResponseDTO> register(
+    public ResponseEntity<RegisterResponseDTO> registerPassenger(
             @RequestBody RegisterPassengerRequestDTO dto) {
 
-        User existing = userService.findByEmail(dto.getEmail());
-        if (existing != null) {
-            return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body(new RegisterResponseDTO("Email already exists"));
-        }
+        authService.registerPassenger(dto);
 
-        User user = new User();
-        user.setEmail(dto.getEmail());
-        user.setPasswordHash(passwordEncoder.encode(dto.getPassword()));
-        user.setFirstName(dto.getFirstName());
-        user.setLastName(dto.getLastName());
-        user.setAddress(dto.getAddress());
-        user.setCity(dto.getCity());
-        user.setPhoneNumber(dto.getPhoneNumber());
-        user.setProfileImageUrl(
-                dto.getProfileImageUrl() != null ? dto.getProfileImageUrl() : "/images/default.png"
-        );
-        user.setRole(UserRole.PASSENGER);
-        user.setActive(false);
-        user.setBlocked(false);
-
-        userService.save(user);
-        userTokenService.createActivationToken(user.getId());
-
-        return ResponseEntity.status(HttpStatus.CREATED)
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
                 .body(new RegisterResponseDTO(
                         "Activation link has been sent to your email."
                 ));
+    }
+
+    @PostMapping("/registration/resend")
+    public ResponseEntity<Void> resendActivation(
+            @RequestBody ResendActivationDTO dto) {
+
+        authService.resendActivation(dto.getEmail());
+        return ResponseEntity.ok().build();
     }
 
 
