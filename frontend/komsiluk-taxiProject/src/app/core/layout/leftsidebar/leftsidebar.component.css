@@ -7,9 +7,6 @@
   width: 320px;
   max-width: 85vw;
 
-  /* bottom:0 + top:64px je dovoljno, height ti ne treba */
-  /* height: calc(100vh - 64px); */
-
   background: rgba(17, 17, 17, 0.95);
   backdrop-filter: blur(6px);
 
@@ -18,7 +15,7 @@
   z-index: 30;
 
   border-right: 2px solid rgba(255, 238, 2, 0.6);
-  overflow-y: auto; /* ako sadržaj pređe visinu */
+  overflow: hidden;
 }
 
 .leftsidebar.open {
@@ -27,38 +24,36 @@
 
 .leftsidebar__content {
   padding: 18px 16px;
-
-  /* BONUS: neka content popuni visinu sidebara,
-     pa dugme može da “legne” na dno */
   height: 100%;
-
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   gap: 14px;
 }
 
-.taxi-hero {
-  display: flex;
-  justify-content: center;
-  padding-top: 6px;
+.leftsidebar__header{
+  flex: 0 0 auto;
 }
 
-.taxi-hero__placeholder {
-  width: 180px;
-  height: 110px;
-  border: 2px dashed rgba(255, 238, 2, 0.6);
-  color: var(--color-secondary);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 600;
-  letter-spacing: 0.08em;
+.leftsidebar__scroll{
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+.taxicar {
+  width: 100%;
+  height: auto;
+  margin-top: -90px;
+  margin-bottom: -90px;
 }
 
 .divider {
   height: 2px;
   background: var(--color-secondary);
   opacity: 0.9;
+  margin: 15px 0;
 }
 
 .field {
@@ -69,7 +64,8 @@
 
 .field__label {
   color: var(--color-white);
-  font-size: 12px;
+  font-size: var(--fs-sm);
+  margin-top: 10px;
 }
 
 .field__input {
@@ -78,7 +74,6 @@
   border: 1px solid var(--color-sidepanel);
   background: var(--color-white);
 
-  /* ISPRAVKA: tekst u inputu treba da bude crn */
   color: #111;
 
   padding: 0 10px;
@@ -94,7 +89,9 @@
   flex-direction: column;
   gap: 8px;
   color: rgba(255, 255, 255, 0.85);
-  font-size: 13px;
+  font-size: var(--fs-md);
+  margin-top: 25px;
+  margin-bottom: 30px;
 }
 
 .stat {
@@ -114,10 +111,17 @@
   height: 26px;
 }
 
-.cta {
-  /* BONUS: gura dugme na dno sidebara kad ima prostora */
-  margin-top: auto;
+.guest-panel{
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-height: 100%;
+}
 
+.cta {
+  margin-top: auto;
+  width: 100%;
+  display: block;
   height: 44px;
   border: none;
   border-radius: 999px;
@@ -129,20 +133,4 @@
 
 .cta:hover {
   filter: brightness(1.05);
-}
-
-/* RESPONSIVE: mobile drawer širina */
-@media (max-width: 768px) {
-  .leftsidebar {
-    width: min(92vw, 420px);
-    max-width: 92vw;
-  }
-}
-
-/* RESPONSIVE: baš mali ekrani - full width */
-@media (max-width: 420px) {
-  .leftsidebar {
-    width: 100vw;
-    max-width: 100vw;
-  }
 }

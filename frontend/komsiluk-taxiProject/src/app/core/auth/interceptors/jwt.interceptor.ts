@@ -27,6 +27,16 @@ export const jwtInterceptor: HttpInterceptorFn = (
     return next(req);
   }
 
+  const BACKEND_BASES = [
+    'http://localhost:8081',
+    'https://localhost:8081'
+  ];
+
+  const isBackendRequest = BACKEND_BASES.some(base => req.url.startsWith(base));
+
+  if (!isBackendRequest) {
+    return next(req);
+  }
 
   const auth = inject(AuthService);
   const router = inject(Router);

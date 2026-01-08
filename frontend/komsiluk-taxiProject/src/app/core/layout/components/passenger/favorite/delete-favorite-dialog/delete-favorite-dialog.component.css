@@ -1,0 +1,9 @@
+.df-title { font-size: var(--fs-h1); margin-bottom: 25px; }
+.df-sub { opacity: 0.85; margin-bottom: 25px; font-size: var(--fs-md); }
+
+.df-actions{
+  display: flex;
+  justify-content: center;
+  gap: 100px;
+  margin-top: 10px;
+}

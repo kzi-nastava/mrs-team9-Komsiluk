@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { UserModeService } from './user-mode.service';
+import { FavoritesBusService } from './favorites-bus.service';
 
-describe('UserModeService', () => {
-  let service: UserModeService;
+describe('FavoritesBusService', () => {
+  let service: FavoritesBusService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(UserModeService);
+    service = TestBed.inject(FavoritesBusService);
   });
 
   it('should be created', () => {

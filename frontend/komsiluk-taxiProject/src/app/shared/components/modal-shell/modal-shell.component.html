@@ -1,0 +1,7 @@
+@if (open) {
+  <div class="ms-backdrop" (mousedown)="onBackdropMouseDown($event)">
+    <div class="ms-panel" role="dialog" aria-modal="true" (mousedown)="$event.stopPropagation()">
+      <ng-content></ng-content>
+    </div>
+  </div>
+}

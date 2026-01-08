@@ -13,7 +13,6 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import rs.ac.uns.ftn.iss.Komsiluk.beans.Ride;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.Route;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.User;
@@ -62,9 +61,6 @@ public class RideService implements IRideService {
     @Autowired
     private DriverDTOMapper driverMapper;
 
-
-
-
     @Override
     public RideResponseDTO orderRide(RideCreateDTO dto) {
 
@@ -90,14 +86,13 @@ public class RideService implements IRideService {
         BigDecimal price = calculatePrice(dto.getVehicleType(), dto.getDistanceKm());
 		
         List<User> passengers = new ArrayList<>();
-        passengers.add(creator);
 
         if (dto.getPassengerEmails() != null) {
             for (String email : dto.getPassengerEmails()) {
                 User passenger= userService.findByEmail(email);
                 if (passenger == null) {
-					throw new NotFoundException();
-				}
+            	  throw new NotFoundException();
+            	}
                 passengers.add(passenger);
             }
         }
@@ -116,6 +111,11 @@ public class RideService implements IRideService {
         ride.setPassengers(passengers);
         ride.setPrice(price);
         ride.setCreatedBy(creator);
+        ride.setVehicleType(dto.getVehicleType());
+        ride.setBabyFriendly(dto.isBabyFriendly());
+        ride.setPetFriendly(dto.isPetFriendly());
+        ride.setDistanceKm(dto.getDistanceKm());
+        ride.setEstimatedDurationMin(dto.getEstimatedDurationMin());
 
         if (maybeDriver.isEmpty()) { 
             ride.setStatus(RideStatus.REJECTED);
@@ -159,10 +159,21 @@ public class RideService implements IRideService {
             notificationDTOPassenger.setType(NotificationType.INFO);
             notificationDTOPassenger.setTitle("Added to Ride");
             notificationDTOPassenger.setMessage("You have been added as a passenger to a ride from " + dto.getStartAddress() + " to " + dto.getEndAddress());
-            notificationService.createNotification(notificationDTOCreator);
+            notificationService.createNotification(notificationDTOPassenger);
         }
 
         return rideMapper.toResponseDTO(ride);
+    }
+    
+    @Override
+    public Collection<RideResponseDTO> getScheduledRidesForUser(Long userId) {
+        if (userService.findById(userId) == null) {
+            throw new NotFoundException();
+        }
+
+        Collection<Ride> rides = rideRepository.findScheduledByUserId(userId);
+
+        return rides.stream().map(rideMapper::toResponseDTO).collect(Collectors.toList());
     }
     
     @Override

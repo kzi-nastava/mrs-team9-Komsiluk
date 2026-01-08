@@ -1,0 +1,49 @@
+<nav class="p-menu">
+  <!-- Book a ride -->
+  <button class="p-item" type="button" (click)="toggle('book')">
+    <span class="p-left">
+      <span class="material-symbols-outlined">local_taxi</span>
+      <span class="p-text">Book a ride</span>
+    </span>
+
+    <span class="p-chev" [class.p-chev--open]="bookOpen()">▾</span>
+  </button>
+
+  @if (bookOpen()) {
+    <div class="p-panel" #bookPanel>
+        <app-passenger-book-ride-panel />
+    </div>
+  }
+
+  <!-- Favorite rides -->
+  <button class="p-item" type="button" (click)="toggle('fav')">
+    <span class="p-left">
+      <span class="material-symbols-outlined">star</span>
+      <span class="p-text">Favorite rides</span>
+    </span>
+
+    <span class="p-chev" [class.p-chev--open]="favOpen()">▾</span>
+  </button>
+
+  @if (favOpen()) {
+    <div class="p-panel">
+      <app-favorite-rides-panel #favPanel />
+    </div>
+  }
+
+  <!-- Scheduled rides -->
+  <button class="p-item" type="button" (click)="toggle('sched')">
+    <span class="p-left">
+      <span class="material-symbols-outlined">calendar_month</span>
+      <span class="p-text">Scheduled rides</span>
+    </span>
+
+    <span class="p-chev" [class.p-chev--open]="schedOpen()">▾</span>
+  </button>
+
+  @if (schedOpen()) {
+    <div class="p-panel">
+      <app-scheduled-rides-panel #schedPanel />
+    </div>
+  }
+</nav>

@@ -1,0 +1,45 @@
+@if (loading()) {
+  <div class="fav-empty text-regular">Loading...</div>
+} @else {
+  @if (favorites().length === 0) {
+    <div class="fav-empty text-regular">
+      You currently don't have any favorite rides.
+    </div>
+  } @else {
+    <div class="fav-list">
+      @for (f of favorites(); track f.id) {
+        <div class="fav-card" role="button" tabindex="0" (click)="openCard(f)">
+          <div class="fav-title text-semibold">{{ f.title }}</div>
+          <div class="fav-line"></div>
+
+          <div class="fav-row text-regular">Pickup location: <span class="text-semibold">{{ f.startAddress }}</span></div>
+          <div class="fav-row text-regular">
+            Stations: <span class="text-semibold">{{ f.stops.length }}</span>
+            <span class="fav-sep">---</span>
+            Users: <span class="text-semibold">{{ f.passengerIds.length }}</span>
+          </div>
+          <div class="fav-row text-regular">Destination: <span class="text-semibold">{{ f.endAddress }}</span></div>
+
+          <div class="fav-row text-regular">Car type: <span class="text-semibold">{{ f.vehicleType }}</span></div>
+          <div class="fav-row text-regular">Pet friendly: <span class="text-semibold">{{ f.petFriendly ? 'Yes' : 'No' }}</span></div>
+          <div class="fav-row text-regular">Child seat available: <span class="text-semibold">{{ f.babyFriendly ? 'Yes' : 'No' }}</span></div>
+
+          <div class="fav-row fav-row--ico text-regular">
+            <span class="material-symbols-outlined fav-ico">route</span>
+            Kilometers: <span class="text-semibold">{{ f.distanceKm.toFixed(1) }}</span>
+          </div>
+
+          <div class="fav-row fav-row--ico text-regular">
+            <span class="material-symbols-outlined fav-ico">schedule</span>
+            Time: <span class="text-semibold">{{ f.estimatedDurationMin }} min</span>
+          </div>
+
+          <div class="fav-row fav-row--ico text-regular">
+            <span class="material-symbols-outlined fav-ico">payments</span>
+            Price: <span class="text-semibold">{{ calcPrice(f.vehicleType, f.distanceKm) }}$</span>
+          </div>
+        </div>
+      }
+    </div>
+  }
+}

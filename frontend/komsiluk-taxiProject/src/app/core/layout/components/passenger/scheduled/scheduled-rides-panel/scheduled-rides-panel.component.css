@@ -1,0 +1,53 @@
+.sch-empty{
+  color: rgba(255,255,255,0.8);
+  padding: 8px 2px;
+}
+
+.sch-list{
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sch-card{
+  background: var(--color-white);
+  border-radius: 8px;
+  padding: 10px 10px 12px;
+  border: 3px solid var(--color-secondary);
+  color: #111;
+  cursor: pointer;
+}
+
+.sch-card:hover { outline: 1px solid rgba(255, 238, 2, 0.25); }
+
+.sch-title{
+  margin-bottom: 6px;
+  font-size: var(--fs-h2);
+}
+
+.sch-line{
+  height: 1.5px;
+  background: var(--color-primary);
+  margin-bottom: 8px;
+  box-shadow: #111111bc 0px 2px 4px;
+}
+
+.sch-row{
+  font-size: var(--fs-sm);
+  line-height: 1.25;
+  margin: 2px 0;
+}
+
+.sch-sep{ color: var(--color-white); }
+
+.sch-row--ico{
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sch-ico{
+  color: var(--color-secondary);
+  font-size: 18px;
+  line-height: 1;
+}

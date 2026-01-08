@@ -1,0 +1,184 @@
+<form class="br" [formGroup]="form" (ngSubmit)="submit()" autocomplete="off" #root>
+
+  <!-- Pickup -->
+  <div class="br-field">
+    <div class="br-label text-regular">Pickup location</div>
+    <div class="br-input-wrap">
+        <input class="br-input text-medium" type="text" formControlName="pickup" placeholder="Start" />
+        <button type="button" class="br-search-btn" (click)="searchPickup()">
+            <span class="btn-search-icon material-symbols-outlined">search</span>
+        </button>
+    </div>
+    @if (pickupSuggestions.length > 0) {
+    <div class="br-suggest">
+        @for (s of pickupSuggestions; track (s.lat + ',' + s.lon)) {
+        <button type="button" class="br-suggest__item" (click)="selectPickup(s)">
+            {{ s.label }}
+        </button>
+        }
+    </div>
+    }
+  </div>
+
+  <!-- Stations -->
+  @if (stations.length > 0) {
+    <div class="br-section">
+      <div class="br-label text-regular">Stations</div>
+
+      <div class="br-list" formArrayName="stations">
+        @for (ctrl of stations.controls; track $index; let i = $index) {
+            <div class="br-chip">
+                <div class="br-chip__row">
+                    <div class="br-input-wrap br-input-wrap--chip">
+                        <input class="br-input br-input--chip text-medium" type="text" [formControlName]="$index" placeholder="Enter location..." />
+                        <button type="button" class="br-search-btn br-search-btn--chip" (click)="searchStation($index)">
+                            <span class="btn-search-icon material-symbols-outlined">search</span>
+                        </button>
+                    </div>
+                    <button class="br-x" type="button" (click)="removeStation(i)">×</button>
+                </div>
+                @if (stationSuggestions[i]?.length) {
+                <div class="br-suggest br-suggest--chip">
+                    @for (s of stationSuggestions[i]; track (s.label + '|' + s.lat + ',' + s.lon)) {
+                    <button type="button" class="br-suggest__item" (click)="selectStation(i, s)">
+                        {{ s.label }}
+                    </button>
+                    }
+                </div>
+                }
+            </div>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- Destination -->
+  <div class="br-field">
+    <div class="br-label text-regular">Destination</div>
+    <div class="br-input-wrap">
+        <input class="br-input text-medium" type="text" formControlName="destination" placeholder="Finish" />
+        <button type="button" class="br-search-btn" (click)="searchDestination()">
+            <span class="btn-search-icon material-symbols-outlined">search</span>
+        </button>
+    </div>
+    @if (destinationSuggestions.length > 0) {
+    <div class="br-suggest">
+        @for (s of destinationSuggestions; track (s.lat + ',' + s.lon)) {
+        <button type="button" class="br-suggest__item" (click)="selectDestination(s)">
+            {{ s.label }}
+        </button>
+        }
+    </div>
+    }
+  </div>
+
+  <!-- Add buttons -->
+  <div class="br-row br-row--actions">
+    <button class="br-mini-btn text-semibold" type="button" (click)="addStation()">
+        +Add station
+    </button>
+
+    <button class="br-mini-btn text-semibold" type="button" (click)="addUser()">
+        +Add user
+    </button>
+  </div>
+
+  <!-- Users -->
+  @if (users.length > 0) {
+    <div class="br-section">
+      <div class="br-label text-regular">Users</div>
+
+      <div class="br-list" formArrayName="users">
+        @for (ctrl of users.controls; track $index) {
+          <div class="br-chip">
+            <div class="br-chip__row">
+                <input class="br-input br-input--chip text-medium" type="text" [formControlName]="$index" placeholder="Enter email of passenger..." />
+                <button class="br-x" type="button" (click)="removeUser($index)">×</button>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- Car type -->
+  <div class="br-field">
+    <div class="br-label text-regular">Car type</div>
+
+    <div class="br-select-wrap">
+      <select class="br-input text-medium" formControlName="vehicleType">
+        <option value="STANDARD">Standard</option>
+        <option value="VAN">Van</option>
+        <option value="LUXURY">Luxury</option>
+      </select>
+
+      <span class="br-select-arrow">▾</span>
+    </div>
+  </div>
+
+  <!-- Checkboxes -->
+  <div class="br-checks">
+    <label class="br-check text-semibold">
+      <input type="checkbox" formControlName="petFriendly" />
+      <span>Pet friendly</span>
+    </label>
+
+    <label class="br-check text-semibold">
+      <input type="checkbox" formControlName="childSeatAvailable" />
+      <span>Child seat available</span>
+    </label>
+  </div>
+
+  <!-- Time -->
+  <div class="br-field">
+    <div class="br-label text-regular">Time</div>
+
+    <div class="br-select-wrap">
+      <select class="br-input text-medium" formControlName="timeMode">
+        <option value="NOW">Now</option>
+        <option value="SCHEDULED">Scheduled</option>
+      </select>
+      <span class="br-select-arrow">▾</span>
+    </div>
+
+    @if (isScheduled()) {
+        <div class="br-select-wrap br-input--mt">
+            <select class="br-input text-medium" formControlName="scheduledAt">
+            @for (s of timeSlots; track s.value) {
+                <option [value]="s.value">{{ s.label }}</option>
+            }
+            </select>
+            <span class="br-select-arrow">▾</span>
+        </div>
+    }
+  </div>
+
+  <!-- Stats -->
+  <div class="br-stats">
+    <div class="br-stat">
+      <span class="material-symbols-outlined">route</span>
+      <span class="text-medium">Kilometers: {{ridePlanner.km() ? ridePlanner.km().toFixed(1) : '-'}}</span>
+    </div>
+
+    <div class="br-stat">
+      <span class="material-symbols-outlined">schedule</span>
+      <span class="text-medium">Drive time: {{ridePlanner.minutes() ? (ridePlanner.minutes() + ' min') : '-'}}</span>
+    </div>
+
+    <div class="br-stat">
+      <span class="material-symbols-outlined">payments</span>
+      <span class="text-medium">Price: {{ridePlanner.price() ? (ridePlanner.price() + '$') : '-'}}</span>
+    </div>
+  </div>
+
+  <!-- Actions -->
+  <div class="br-actions">
+    <button class="br-fav btn--primary btn-scale" type="button" title="Save as favorite" (click)="openAddToFavourites()">
+        <span class="material-symbols-outlined btn-fav">star</span>
+    </button>
+
+    <button class="btn-book btn btn--primary text-semibold btn-scale" type="button" (click)="openConfirm()">
+      Book a ride
+    </button>
+  </div>
+</form>

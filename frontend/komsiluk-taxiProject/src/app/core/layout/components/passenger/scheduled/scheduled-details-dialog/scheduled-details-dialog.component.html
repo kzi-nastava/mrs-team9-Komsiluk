@@ -1,0 +1,84 @@
+<app-modal-shell [open]="open" (closed)="close.emit()">
+  @if (ride) {
+    <div class="sd-title text-regular">Scheduled ride</div>
+
+    <div class="sd-line"></div>
+
+    <div class="sd-row text-regular">
+      Pickup location: <span class="text-regular sd-accent">{{ ride.startAddress }}</span>
+    </div>
+
+    <div class="sd-row sd-two text-regular">
+      <div>Stations: <span class="text-regular">{{ stationsCount }}</span></div>
+      <div>Users: <span class="text-regular">{{ usersCount }}</span></div>
+    </div>
+
+    <div class="sd-two">
+      <div class="sd-col">
+        @if (stationsCount > 0) {
+          <div class="sd-list">
+            @for (st of stopsList; track st) {
+              <div class="sd-item text-regular sd-accent">{{ st }}</div>
+            }
+          </div>
+        }
+      </div>
+
+      <div class="sd-col">
+        @if (passengerEmails.length) {
+          <div class="sd-list">
+            @for (em of passengerEmails; track em + '|' + $index; let i = $index) {
+              <div class="sd-item text-regular sd-accent">{{ em }}</div>
+            }
+          </div>
+        }
+      </div>
+    </div>
+
+    <div class="sd-row text-regular">
+      Destination: <span class="text-regular sd-accent">{{ ride.endAddress }}</span>
+    </div>
+
+    <div class="sd-row text-regular">
+      Car type: <span class="text-regular sd-accent">{{ ride.vehicleType }}</span>
+    </div>
+
+    <div class="sd-row sd-two text-regular">
+      <div>Pet friendly: <span class="text-regular sd-accent">{{ ride.petFriendly ? 'Yes' : 'No' }}</span></div>
+      <div>Child seat available: <span class="text-regular sd-accent">{{ ride.babyFriendly ? 'Yes' : 'No' }}</span></div>
+    </div>
+
+    <div class="sd-block text-regular">Estimated values:</div>
+
+    <div class="sd-stats">
+      <div class="sd-stat text-medium">
+        <span class="material-symbols-outlined sd-ico">route</span>
+        <span>Kilometers: <span class="text-semibold">{{ (ride.distanceKm).toFixed(1) }}</span></span>
+      </div>
+
+      <div class="sd-stat text-medium">
+        <span class="material-symbols-outlined sd-ico">schedule</span>
+        <span>Time: <span class="text-semibold">{{ ride.estimatedDurationMin }} min</span></span>
+      </div>
+
+      <div class="sd-stat text-medium">
+        <span class="material-symbols-outlined sd-ico">payments</span>
+        <span>Price: <span class="text-semibold">{{ ride.price }}</span></span>
+      </div>
+
+      <div class="sd-stat text-medium sd-stat--right">
+        <span>Scheduled time: <span class="text-semibold">{{ formatTime(ride.scheduledAt) }}</span></span>
+      </div>
+    </div>
+
+    <div class="sd-actions">
+      <button type="button" class="btn btn--ghost text-semibold btn-scale" (click)="close.emit()">
+        Close
+      </button>
+
+      <button type="button" class="btn btn--primary text-semibold btn-scale" (click)="onCancelRide()">
+        Cancel ride
+      </button>
+    </div>
+  }
+</app-modal-shell>

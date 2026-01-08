@@ -1,0 +1,35 @@
+<app-modal-shell [open]="open" (closed)="cancel.emit()">
+
+  <div class="cb-title text-regular">Confirm booking</div>
+  <div class="cb-sub text-regular">Are you sure you want to book this ride?</div>
+
+  <div class="cb-block text-regular">Estimated values:</div>
+
+  <div class="cb-stats">
+    <div class="cb-stat">
+      <span class="material-symbols-outlined cb-ico">route</span>
+      <span>Kilometers: {{ km ? km.toFixed(1) : '-' }}</span>
+    </div>
+
+    <div class="cb-stat">
+      <span class="material-symbols-outlined cb-ico">schedule</span>
+      <span>Time: {{ minutes ? (minutes + ' min') : '-' }}</span>
+    </div>
+
+    <div class="cb-stat">
+      <span class="material-symbols-outlined cb-ico">payments</span>
+      <span>Price: {{ price ? (price + '$') : '-' }}</span>
+    </div>
+  </div>
+
+  <div class="cb-actions">
+    <button type="button" class="btn btn--ghost text-semibold btn-scale" (click)="cancel.emit()">
+      Cancel
+    </button>
+
+    <button type="button" class="btn btn--primary text-semibold btn-scale" (click)="confirm.emit()">
+      Confirm
+    </button>
+  </div>
+
+</app-modal-shell>

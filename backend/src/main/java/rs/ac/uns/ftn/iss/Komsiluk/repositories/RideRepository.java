@@ -4,10 +4,12 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Repository;
 
 import rs.ac.uns.ftn.iss.Komsiluk.beans.Ride;
+import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.RideStatus;
 
 @Repository
 public class RideRepository {
@@ -29,5 +31,11 @@ public class RideRepository {
 
     public Collection<Ride> findAll() {
         return storage.values();
+    }
+    
+    public Collection<Ride> findScheduledByUserId(Long userId) {
+        return storage.values().stream().filter(r -> r.getStatus() == RideStatus.SCHEDULED)
+                .filter(r -> r.getCreatedBy().getId() == userId)
+                .collect(Collectors.toList());
     }
 }

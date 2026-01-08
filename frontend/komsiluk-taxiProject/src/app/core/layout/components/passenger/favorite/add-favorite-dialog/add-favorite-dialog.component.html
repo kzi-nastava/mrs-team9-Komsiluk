@@ -1,0 +1,29 @@
+<app-modal-shell [open]="open" (closed)="cancel.emit()">
+
+  <div class="af-title text-regular">Add a ride to favourites</div>
+
+  <div class="af-sub text-regular">Please insert a name for the ride</div>
+
+  <input
+    class="af-input text-medium"
+    type="text"
+    [formControl]="nameCtrl"
+    placeholder=""
+  />
+
+  <div class="af-actions">
+    <button type="button" class="btn btn--ghost text-semibold btn-scale" (click)="cancel.emit()">
+      Cancel
+    </button>
+
+    <button
+      type="button"
+      class="btn btn--primary text-semibold btn-scale"
+      [disabled]="nameCtrl.invalid"
+      (click)="onConfirmClick()"
+    >
+      Confirm
+    </button>
+  </div>
+
+</app-modal-shell>
