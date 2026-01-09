@@ -33,8 +33,8 @@ export class NavbarComponent {
     this.router.events
       .pipe(filter(e => e instanceof NavigationEnd))
       .subscribe(() => {
-        const url = this.router.url;
-        this.isHome = url === '/' || url === '';
+        const path = this.router.url.split('?')[0].split('#')[0]; // skini query + hash
+        this.isHome = path === '/' || path === '';
       });
     this.userRole = this.authService.userRole;
   }

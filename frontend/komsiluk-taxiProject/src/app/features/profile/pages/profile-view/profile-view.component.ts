@@ -31,6 +31,10 @@ export class ProfileViewComponent {
     return this.auth.userRole() === UserRole.DRIVER;
   }
 
+  get isPassenger(): boolean {
+    return this.auth.userRole() === UserRole.PASSENGER;
+  }
+
   get activeToday(): string {
     if (!this.profile) {
       return '-';

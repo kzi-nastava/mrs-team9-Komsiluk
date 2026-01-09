@@ -11,6 +11,7 @@ import { UserProfileResponseDTO } from '../../../../shared/models/profile.models
 })
 export class ProfileSidebarComponent {
   @Input() isDriver = false;
+  @Input() isPassenger = false;
   @Input() activeToday: string = '-';
   @Input() profile: UserProfileResponseDTO | null = null;
   
@@ -24,7 +25,28 @@ export class ProfileSidebarComponent {
     this.authService = auth;
     this.router = rout;
   }
+
   logout() {
     this.router.navigate(['/message', 'confirm-logout']);
+  }
+
+  goToFavorites() {
+    this.router.navigate(['/'], {
+      queryParams: {
+        lp: '1',
+        section: 'fav',
+        scroll: 'fav'
+      }
+    });
+  }
+
+  goToScheduled() {
+    this.router.navigate(['/'], {
+      queryParams: {
+        lp: '1',
+        section: 'sched',
+        scroll: 'sched'
+      }
+    });
   }
 }

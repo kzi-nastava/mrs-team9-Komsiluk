@@ -1,9 +1,10 @@
-import { Component, signal, ViewChild, inject, effect} from '@angular/core';
+import { Component, AfterViewInit, signal, ViewChild, inject, effect} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PassengerBookRidePanelComponent } from '../book_ride/passenger-book-ride-panel/passenger-book-ride-panel.component';
 import { FavoriteRidesPanelComponent } from '../favorite/favorite-rides-panel/favorite-rides-panel.component';
 import { BookRidePrefillService } from '../../../../../shared/components/map/services/book-ride-prefill.service';
 import { ScheduledRidesPanelComponent } from '../scheduled/scheduled-rides-panel/scheduled-rides-panel.component';
+import { LeftSidebarCommandService } from '../services/left-sidebar-command-service.service';
 
 @Component({
   selector: 'app-passenger-left-menu',
@@ -11,7 +12,7 @@ import { ScheduledRidesPanelComponent } from '../scheduled/scheduled-rides-panel
   templateUrl: './passenger-left-menu.component.html',
   styleUrl: './passenger-left-menu.component.css',
 })
-export class PassengerLeftMenuComponent {
+export class PassengerLeftMenuComponent implements AfterViewInit {
   bookOpen = signal(false);
   favOpen = signal(false);
   schedOpen = signal(false);
@@ -22,7 +23,7 @@ export class PassengerLeftMenuComponent {
 
   private prefill = inject(BookRidePrefillService);
 
-  constructor() {
+  constructor(private leftCmd: LeftSidebarCommandService) {
     effect(() => {
       const data = this.prefill.pending();
       if (!data) return;
@@ -51,5 +52,24 @@ export class PassengerLeftMenuComponent {
       this.schedOpen.set(next);
       if (next) setTimeout(() => this.schedPanel?.load(), 0);
     }
+  }
+
+  ngAfterViewInit(): void {
+    this.leftCmd.cmd$.subscribe(cmd => {
+      this.openSection(cmd.section);
+
+      setTimeout(() => {
+        if (cmd.scrollId) {
+          document.getElementById(cmd.scrollId)
+            ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 0);
+    });
+  }
+
+  private openSection(section: 'book' | 'fav' | 'sched') {
+    this.bookOpen.set(section === 'book');
+    this.favOpen.set(section === 'fav');
+    this.schedOpen.set(section === 'sched');
   }
 }

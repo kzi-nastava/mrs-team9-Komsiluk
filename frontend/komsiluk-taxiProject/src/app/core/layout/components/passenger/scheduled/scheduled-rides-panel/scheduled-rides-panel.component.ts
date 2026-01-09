@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { Component, Input, signal, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../../../../auth/services/auth.service';
 import { ToastService } from '../../../../../../shared/components/toast/toast.service';
@@ -26,6 +26,14 @@ export class ScheduledRidesPanelComponent {
     public detailsModal: ScheduledDetailsModalService,
     private profileService: ProfileService,
   ) {}
+
+  @Input() open = false;
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['open']?.currentValue === true) {
+      this.load();
+    }
+  }
 
   load() {
     const userId = this.auth.userId();

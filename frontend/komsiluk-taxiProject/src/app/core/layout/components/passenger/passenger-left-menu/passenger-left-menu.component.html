@@ -15,6 +15,8 @@
     </div>
   }
 
+  <div id="favorites-anchor"></div>
+
   <!-- Favorite rides -->
   <button class="p-item" type="button" (click)="toggle('fav')">
     <span class="p-left">
@@ -27,7 +29,7 @@
 
   @if (favOpen()) {
     <div class="p-panel">
-      <app-favorite-rides-panel #favPanel />
+      <app-favorite-rides-panel #favPanel [open]="true"/>
     </div>
   }
 
@@ -43,7 +45,7 @@
 
   @if (schedOpen()) {
     <div class="p-panel">
-      <app-scheduled-rides-panel #schedPanel />
+      <app-scheduled-rides-panel #schedPanel [open]="true"/>
     </div>
   }
 </nav>
