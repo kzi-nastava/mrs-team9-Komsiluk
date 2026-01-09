@@ -235,3 +235,20 @@
 .profile-sidebar__divider::after {
   right: 2.5px;
 }
+
+.profile-sidebar__blocked{
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+
+  font-size: var(--fs-h1);
+  text-decoration: underline;
+  letter-spacing: 0.5px;
+
+  color: var(--color-text)
+}
+
+.profile-sidebar__blocked:hover{
+  opacity: 1;
+}

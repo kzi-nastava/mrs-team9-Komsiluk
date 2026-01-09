@@ -1,6 +1,7 @@
 package rs.ac.uns.ftn.iss.Komsiluk.services.interfaces;
 
 import java.util.Collection;
+import java.util.List;
 
 import rs.ac.uns.ftn.iss.Komsiluk.beans.User;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.user.UserChangePasswordDTO;
@@ -26,4 +27,8 @@ public interface IUserService {
     public void resetPassword(Long userId, String newPassword);
 
     public User findByEmail(String email);
+    
+    public List<String> autocompleteEmails(String query, int limit);
+    
+    public boolean isBlocked(Long userId);
 }

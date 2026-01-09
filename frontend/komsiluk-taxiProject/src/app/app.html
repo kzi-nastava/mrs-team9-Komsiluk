@@ -66,3 +66,16 @@
   (close)="schedDetailsModal.close()"
   (cancelRide)="onScheduledCancelRide($event)">
 </app-scheduled-details-dialog>
+
+<app-block-user-confirm-dialog
+  [open]="blockUserModal.open()"
+  [email]="blockUserModal.data()?.email ?? ''"
+  (cancel)="blockUserModal.close()"
+  (confirm)="blockUserModal.confirm($event)">
+</app-block-user-confirm-dialog>
+
+<app-account-blocked-dialog
+  [open]="blockedModal.open()"
+  [data]="blockedModal.data()"
+  (closed)="blockedModal.close()">
+</app-account-blocked-dialog>

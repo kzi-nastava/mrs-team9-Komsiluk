@@ -1,0 +1,38 @@
+<div class="au">
+
+  <div class="au-label text-regular">User</div>
+
+  <div class="au-input-wrap">
+    <input
+      class="au-input text-medium"
+      type="text"
+      placeholder="Please enter an email..."
+      [formControl]="emailCtrl"
+      autocomplete="off"
+    />
+  </div>
+
+  @if (loading()) {
+    <div class="au-hint text-regular">Loading...</div>
+  }
+
+  @if (suggestions().length) {
+    <div class="au-suggest">
+      @for (s of suggestions(); track s.email) {
+        <button type="button" class="au-suggest__item" (click)="pickEmail(s.email)">
+            {{ s.email }}
+        </button>
+        }
+    </div>
+  }
+
+  <button
+    class="au-btn btn btn--primary text-semibold btn-scale"
+    [class.au-btn--disabled]="!canBlock() || blocking()"
+    [disabled]="!canBlock() || blocking()"
+    type="button"
+    (click)="onBlockClick()">
+    Block
+  </button>
+
+</div>

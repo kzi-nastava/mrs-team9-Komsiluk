@@ -1,0 +1,46 @@
+.bu-title{
+  font-size: var(--fs-h1);
+  margin-bottom: 20px;
+  color: var(--color-white);
+}
+
+.bu-sub{
+  margin-bottom: 16px;
+  font-size: var(--fs-md);
+  color: var(--color-white);
+  line-height: 1.35;
+}
+
+.bu-accent{
+  color: var(--color-secondary);
+}
+
+.bu-block{
+  margin-bottom: 8px;
+  font-size: var(--fs-md);
+  color: var(--color-white);
+}
+
+.bu-textarea{
+  width: 95%;
+  min-height: 90px;
+
+  border-radius: 2px;
+  border: 1px solid rgba(255,255,255,0.25);
+
+  background: var(--color-white);
+  color: #000;
+
+  resize: none;
+  padding: 8px 10px;
+  outline: none;
+
+  margin-bottom: 18px;
+}
+
+.bu-actions{
+  display: flex;
+  justify-content: center;
+  gap: 100px;
+  margin-top: 10px;
+}

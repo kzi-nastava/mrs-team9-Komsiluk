@@ -27,6 +27,10 @@ import { FavoriteRouteService } from './core/layout/components/passenger/favorit
 import { FavoritesBusService } from './core/layout/components/passenger/favorite/services/favorites-bus.service';
 import { ScheduledDetailsDialogComponent } from './core/layout/components/passenger/scheduled/scheduled-details-dialog/scheduled-details-dialog.component';
 import { ScheduledDetailsModalService } from './shared/components/modal-shell/services/scheduled-details-modal.service';
+import { BlockUserConfirmDialogComponent } from './core/layout/components/admin/block/block-user-confirm-dialog/block-user-confirm-dialog.component';
+import { BlockUserConfirmModalService } from './shared/components/modal-shell/services/block-user-confirm-modal.service';
+import { AccountBlockedDialogComponent } from './core/layout/components/passenger/book_ride/account-blocked-dialog/account-blocked-dialog.component';
+import { AccountBlockedModalService } from './shared/components/modal-shell/services/account-blocked-modal.service';
 
 @Component({
   selector: 'app-root',
@@ -44,7 +48,9 @@ import { ScheduledDetailsModalService } from './shared/components/modal-shell/se
     FavoriteDetailsDialogComponent,
     RenameFavoriteDialogComponent,
     DeleteFavoriteDialogComponent,
-    ScheduledDetailsDialogComponent
+    ScheduledDetailsDialogComponent,
+    BlockUserConfirmDialogComponent,
+    AccountBlockedDialogComponent
   ],
   templateUrl: './app.html',
   styleUrl: './app.css'
@@ -57,14 +63,17 @@ export class App implements OnInit {
 
   constructor(public filterSvc: RideHistoryFilterService, private router: Router, public confirmModal: ConfirmBookingModalService,
     public addFavModal: AddFavoriteModalService, public favDetailsModal: FavoriteDetailsModalService, public renameFavModal: RenameFavoriteModalService,
-    public deleteFavModal: DeleteFavoriteModalService, public toastService: ToastService, private favoriteApi: FavoriteRouteService, private favBus: FavoritesBusService, public schedDetailsModal: ScheduledDetailsModalService) {}
+    public deleteFavModal: DeleteFavoriteModalService, public toastService: ToastService, private favoriteApi: FavoriteRouteService, private favBus: FavoritesBusService,
+    public schedDetailsModal: ScheduledDetailsModalService, public blockUserModal: BlockUserConfirmModalService, public blockedModal: AccountBlockedModalService) {}
 
   ngOnInit(): void {
-  this.router.events
+    this.router.events
     .pipe(filter(e => e instanceof NavigationStart))
     .subscribe(() => {
-      this.isLeftSidebarOpen = false;
-      this.rightOpen = false;
+      queueMicrotask(() => {
+        this.isLeftSidebarOpen = false;
+        this.rightOpen = false;
+      });
     });
   }
 

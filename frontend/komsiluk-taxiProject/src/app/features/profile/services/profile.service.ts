@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { AuthService } from '../../../core/auth/services/auth.service';
 import { UserProfileResponseDTO, UserProfileUpdateDTO, DriverEditRequestCreateDTO, DriverEditRequestResponseDTO } from '../../../shared/models/profile.models';
+import { UserBlockedDTO } from '../../../shared/models/block-note.model';
 
 @Injectable({ providedIn: 'root' })
 export class ProfileService {
@@ -38,5 +39,9 @@ export class ProfileService {
     const driverId = this.auth.userId();
 
     return this.http.post<DriverEditRequestResponseDTO>(`${this.DRIVER_EDIT_API}/${driverId}`, dto);
+  }
+
+  isUserBlocked(userId: number): Observable<UserBlockedDTO> {
+    return this.http.get<UserBlockedDTO>(`${this.API}/${userId}/blocked`);
   }
 }

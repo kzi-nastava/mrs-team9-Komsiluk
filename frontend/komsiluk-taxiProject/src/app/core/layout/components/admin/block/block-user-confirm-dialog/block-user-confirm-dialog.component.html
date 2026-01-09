@@ -1,0 +1,32 @@
+<app-modal-shell [open]="open" (closed)="cancel.emit()">
+
+  <div class="bu-title text-regular">Block a user</div>
+
+  <div class="bu-sub text-regular">
+    Are you sure you want to block the user:
+    <span class="bu-accent">{{ email }}</span>
+  </div>
+
+  <div class="bu-block text-regular">Please give a reason:</div>
+
+  <textarea
+    class="bu-textarea text-medium"
+    [formControl]="reasonCtrl"
+    rows="4"
+  ></textarea>
+
+  <div class="bu-actions">
+    <button type="button" class="btn btn--ghost text-semibold btn-scale" (click)="cancel.emit()">
+      Cancel
+    </button>
+
+    <button
+      type="button"
+      class="btn btn--primary text-semibold btn-scale"
+      [disabled]="reasonCtrl.invalid"
+      (click)="onConfirmClick()">
+      Confirm
+    </button>
+  </div>
+
+</app-modal-shell>
