@@ -1,0 +1,166 @@
+<div class="app-bg-textured usage-page">
+  <div class="ur-wrap">
+
+    <!-- LEFT -->
+    <section class="ur-left">
+      <div class="ur-title text-regular">Usage reports</div>
+      <div class="ur-line"></div>
+
+      <div class="ur-form">
+
+        <div class="ur-row">
+          <div class="ur-label text-semibold">From:</div>
+          <input class="ur-input ur-input--fixed" type="date" [formControl]="form.controls.from" />
+        </div>
+
+        <div class="ur-row">
+            <div class="ur-label text-semibold">To:</div>
+
+            <div class="ur-inline">
+                <input class="ur-input ur-input--fixed" type="date" [formControl]="form.controls.to" />
+
+                <button
+                type="button"
+                class="btn btn--primary text-semibold btn-scale ur-btn"
+                [class.ur-btn--disabled]="!canGenerate()"
+                (click)="onGenerate()"
+                >
+                Insert
+                </button>
+            </div>
+        </div>
+
+        @if (isAdmin()) {
+          <div class="ur-row">
+            <div class="ur-label text-semibold">Target:</div>
+
+            <select class="ur-input ur-select ur-input--fixed" [formControl]="form.controls.target">
+              <option value="ALL_DRIVERS">All drivers</option>
+              <option value="ALL_PASSENGERS">All passengers</option>
+              <option value="SINGLE_USER">Single user</option>
+            </select>
+          </div>
+
+          @if (showUserEmail()) {
+            <div class="ur-row ur-row--email">
+              <div class="ur-label text-semibold usr-label">User:</div>
+
+              <div class="ur-email">
+                <input
+                  class="ur-input ur-input--fixed"
+                  type="text"
+                  placeholder="Type email..."
+                  [formControl]="emailCtrl"
+                  autocomplete="off"
+                />
+
+                @if (emailLoading()) {
+                  <div class="ur-hint text-regular">Loading...</div>
+                }
+
+                @if (suggestions().length) {
+                  <div class="ur-suggest">
+                    @for (s of suggestions(); track s.email) {
+                      <button
+                        type="button"
+                        class="ur-suggest__item"
+                        (click)="pickEmail(s.email)"
+                      >
+                        {{ s.display }}
+                      </button>
+                    }
+                  </div>
+                }
+              </div>
+            </div>
+          }
+        }
+      </div>
+    </section>
+
+    <!-- TOP RIGHT (Money) -->
+    <section class="ur-card ur-money">
+      <div class="ur-card__title text-semibold">Amount of money per day</div>
+
+      <div class="ur-card__body">
+        <div class="ur-card__y">Amount</div>
+
+        <div class="ur-card__plot">
+          @if (report()) {
+              <canvas baseChart
+                [type]="'line'"
+                [data]="moneyChartData"
+                [options]="chartOptions">
+              </canvas>
+            } @else {
+              <div class="ur-plot-placeholder"></div>
+            }
+        </div>
+
+        <div class="ur-card__stats text-regular">
+          <div class="ur-stat"><span class="ur-stat__k">Sum: </span> <span class="ur-stat__v">{{ moneySum() }}</span></div>
+          <div class="ur-stat"><span class="ur-stat__k">Average: </span> <span class="ur-stat__v">{{ moneyAvg() }}</span></div>
+        </div>
+
+        <div class="ur-card__x">Date</div>
+      </div>
+    </section>
+
+    <!-- BOTTOM LEFT (Rides) -->
+    <section class="ur-card ur-rides">
+      <div class="ur-card__title text-semibold">Number of rides per day</div>
+
+      <div class="ur-card__body">
+        <div class="ur-card__y">Number</div>
+
+        <div class="ur-card__plot">
+          @if (report()) {
+              <canvas baseChart
+                [type]="'line'"
+                [data]="ridesChartData"
+                [options]="chartOptions">
+              </canvas>
+            } @else {
+              <div class="ur-plot-placeholder"></div>
+            }
+        </div>
+
+        <div class="ur-card__stats text-regular">
+          <div class="ur-stat"><span class="ur-stat__k">Sum: </span> <span class="ur-stat__v">{{ ridesSum() }}</span></div>
+          <div class="ur-stat"><span class="ur-stat__k">Average: </span> <span class="ur-stat__v">{{ ridesAvg() }}</span></div>
+        </div>
+
+        <div class="ur-card__x">Date</div>
+      </div>
+    </section>
+
+    <!-- BOTTOM RIGHT (KM) -->
+    <section class="ur-card ur-km">
+      <div class="ur-card__title text-semibold">Number of kilometers traveled per day</div>
+
+      <div class="ur-card__body">
+        <div class="ur-card__y">Number</div>
+
+        <div class="ur-card__plot">
+          @if (report()) {
+              <canvas baseChart
+                [type]="'line'"
+                [data]="kmChartData"
+                [options]="chartOptions">
+              </canvas>
+            } @else {
+              <div class="ur-plot-placeholder"></div>
+            }
+        </div>
+
+        <div class="ur-card__stats text-regular">
+          <div class="ur-stat"><span class="ur-stat__k">Sum: </span> <span class="ur-stat__v">{{ kmSum() }}</span></div>
+          <div class="ur-stat"><span class="ur-stat__k">Average: </span> <span class="ur-stat__v">{{ kmAvg() }}</span></div>
+        </div>
+
+        <div class="ur-card__x">Date</div>
+      </div>
+    </section>
+
+  </div>
+</div>

@@ -7,6 +7,7 @@ import { ProfileEditComponent } from './features/profile/pages/profile-edit/prof
 import { ProfileChangePasswordComponent } from './features/profile/pages/profile-change-password/profile-change-password.component';
 import { DriverCarViewComponent } from './features/profile/pages/driver-car-view/driver-car-view.component';
 import { DriverEditProfileComponent } from './features/profile/pages/driver-edit-profile/driver-edit-profile.component';
+import { UsageReportsPageComponent } from './features/usage-report/pages/usage-reports-page/usage-reports-page.component';
 
 import { MessagePageComponent } from './shared/components/message-page/message-page.component';
 import { DriverRideHistoryPageComponent } from './features/driver-history/pages/driver-ride-history-page/driver-ride-history-page.component';
@@ -53,6 +54,13 @@ export const routes: Routes = [
         data: { roles: [UserRole.DRIVER] }
       }
     ],
+  },
+
+  // ===== USAGE REPORT =====
+  {
+    path: 'usage-report',
+    component: UsageReportsPageComponent,
+    canActivate: [authGuard],
   },
 
   // ===== AUTH (PUBLIC, lazy) =====
