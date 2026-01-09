@@ -17,7 +17,10 @@ import { RouteService } from '../../favorite/services/route.service';
 import { FavoriteRouteService } from '../../favorite/services/favorite-route.service';
 import { RouteCreateDTO } from '../../../../../../shared/models/route.models';
 import { FavoriteRouteCreateDTO, FavoriteRouteResponseDTO } from '../../../../../../shared/models/favorite-route.models';
-import { BookRidePrefillService, BookRidePrefillPayload } from '../../../../../../shared/components/map/services/book-ride-prefill.service';
+import { BookRidePrefillService } from '../../../../../../shared/components/map/services/book-ride-prefill.service';
+import { ProfileService } from '../../../../../../features/profile/services/profile.service';
+import { BlockNoteService } from '../../../admin/block/services/block-note.service';
+import { AccountBlockedModalService } from '../../../../../../shared/components/modal-shell/services/account-blocked-modal.service';
 
 type TimeMode = 'NOW' | 'SCHEDULED';
 
@@ -48,7 +51,7 @@ export class PassengerBookRidePanelComponent implements OnInit, OnDestroy {
     private cdr: ChangeDetectorRef, private toast: ToastService, public confirmModal: ConfirmBookingModalService,
     private rideApi: RideService, private auth: AuthService, private notification: NotificationService,
     private addFavModal: AddFavoriteModalService, private routeApi: RouteService, private favoriteRouteApi: FavoriteRouteService,
-    private prefill: BookRidePrefillService) {
+    private prefill: BookRidePrefillService, private profileService: ProfileService, private blockNoteService: BlockNoteService, private blockedModal: AccountBlockedModalService) {
 
     this.form = this.fb.group({
       pickup: ['', [Validators.required]],
@@ -208,8 +211,6 @@ export class PassengerBookRidePanelComponent implements OnInit, OnDestroy {
     this.submitted.set(true);
     this.form.markAllAsTouched();
     if (this.form.invalid) return;
-
-    console.log('BOOK RIDE (GUI ONLY):', this.form.value);
   }
 
   timeSlots = this.buildTimeSlots();
@@ -293,21 +294,45 @@ export class PassengerBookRidePanelComponent implements OnInit, OnDestroy {
   }
 
   openConfirm() {
-    if (!this.hasValidRoute()) {
-      this.toast.show('Please select valid pickup/destination and valid stations.');
+    const userId = this.auth.userId();
+    if (!userId) {
+      this.toast.show('Not logged in.');
       return;
     }
 
-    this.confirmModal.open(
-      {
-        km: this.ridePlanner.km(),
-        minutes: this.ridePlanner.minutes(),
-        price: this.ridePlanner.price(),
-      },
-      () => {
-        this.confirmBooking();
+    this.profileService.isUserBlocked(+userId).pipe(
+      switchMap(res => {
+        if (!res?.blocked) return of({ blocked: false, note: null as any });
+
+        return this.blockNoteService.getLastForUser(+userId).pipe(
+          map(note => ({ blocked: true, note })),
+          catchError(() => of({ blocked: true, note: null }))
+        );
+      })
+    ).subscribe(({ blocked, note }) => {
+      if (blocked) {
+        this.blockedModal.openModal({
+          reason: note?.reason ?? 'Your account is blocked.',
+          adminEmail: note?.adminEmail ?? undefined,
+          createdAt: note?.createdAt ?? undefined,
+        });
+        return;
       }
-    );
+
+      if (!this.hasValidRoute()) {
+        this.toast.show('Please select valid pickup/destination and valid stations.');
+        return;
+      }
+
+      this.confirmModal.open(
+        {
+          km: this.ridePlanner.km(),
+          minutes: this.ridePlanner.minutes(),
+          price: this.ridePlanner.price(),
+        },
+        () => this.confirmBooking()
+      );
+    });
   }
 
   private confirmBooking() {

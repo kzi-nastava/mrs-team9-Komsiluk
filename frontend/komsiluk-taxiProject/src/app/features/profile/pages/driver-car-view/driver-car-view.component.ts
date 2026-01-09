@@ -5,10 +5,16 @@ import { ProfileService } from '../../services/profile.service';
 import { UserProfileResponseDTO } from '../../../../shared/models/profile.models';
 import { AuthService, UserRole } from '../../../../core/auth/services/auth.service';
 import { ChangeDetectorRef } from '@angular/core';
+import { BlockNoteService } from '../../../../core/layout/components/admin/block/services/block-note.service';
+import { BlockNoteResponseDTO, UserBlockedDTO } from '../../../../shared/models/block-note.model';
+import { forkJoin, of } from 'rxjs';
+import { catchError, finalize, switchMap, tap } from 'rxjs/operators';
+import { DriverBlockedDialogComponent } from '../../components/driver-blocked-dialog/driver-blocked-dialog.component';
+import { signal } from '@angular/core';
 
 @Component({
   selector: 'app-driver-car-view',
-  imports: [ProfileSidebarComponent, DriverCarDetailsComponent],
+  imports: [ProfileSidebarComponent, DriverCarDetailsComponent, DriverBlockedDialogComponent],
   templateUrl: './driver-car-view.component.html',
   styleUrl: './driver-car-view.component.css',
 })
@@ -16,7 +22,11 @@ export class DriverCarViewComponent {
   profile: UserProfileResponseDTO | null = null;
   loading = false;
 
-  constructor(private profileService: ProfileService, private auth: AuthService, private cdr: ChangeDetectorRef) {}
+  isBlocked = signal(false);
+  blockNote: BlockNoteResponseDTO | null = null;
+  blockedDialogOpen = signal(false);
+
+  constructor(private profileService: ProfileService, private auth: AuthService, private cdr: ChangeDetectorRef, private blockNoteService: BlockNoteService) {}
 
   get isDriver(): boolean {
     return this.auth.userRole() === UserRole.DRIVER;
@@ -33,10 +43,38 @@ export class DriverCarViewComponent {
   }
 
   ngOnInit(): void {
+    const id = Number(this.auth.userId());
+    if (!id) return;
+
     this.loading = true;
-    this.profileService.getMyProfile().subscribe({
-      next: (p) => { this.profile = p; this.loading = false; this.cdr.detectChanges(); },
-      error: () => { this.loading = false; this.cdr.detectChanges(); },
+
+    forkJoin({
+      profile: this.profileService.getMyProfile(),
+      blocked: this.profileService.isUserBlocked(id).pipe(
+        catchError(() => of({ blocked: false } as UserBlockedDTO))
+      )
+    }).pipe(
+      tap(({ profile, blocked }) => {
+        this.profile = profile;
+        this.isBlocked.set(!!blocked.blocked);
+      }),
+      switchMap(({ blocked }) => {
+        if (!blocked.blocked) return of(null);
+        return this.blockNoteService.getLastForUser(id).pipe(
+          catchError(() => of(null))
+        );
+      }),
+      finalize(() => {
+        this.loading = false;
+        this.cdr.detectChanges();
+      })
+    ).subscribe(note => {
+      this.blockNote = note;
+      this.cdr.detectChanges();
     });
+  }
+
+  openBlockedInfo() {
+    this.blockedDialogOpen.set(true);
   }
 }

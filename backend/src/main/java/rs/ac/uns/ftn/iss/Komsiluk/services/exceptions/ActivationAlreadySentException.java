@@ -5,8 +5,9 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(HttpStatus.TOO_MANY_REQUESTS)
 public class ActivationAlreadySentException extends RuntimeException {
+	private static final long serialVersionUID = 1L;
 
-    public ActivationAlreadySentException() {
+	public ActivationAlreadySentException() {
         super("Activation email already sent. Please check your inbox.");
     }
 }

@@ -1,0 +1,36 @@
+<app-modal-shell [open]="open" (closed)="close.emit()">
+
+  <div class="ab-title text-regular">Account blocked</div>
+
+  <div class="ab-sub text-regular">
+    You can’t go active or receive new ride requests because your account has been blocked by an administrator.
+  </div>
+
+  <div class="ab-label text-regular">Reason from administrator:</div>
+
+  <div class="ab-reason text-regular">
+    @if (reason) {
+      <span class="ab-reason__text">{{ reason }}</span>
+    } @else {
+      <span class="ab-reason__muted">No reason provided.</span>
+    }
+
+    @if (adminEmail) {
+      <div class="ab-meta text-regular">
+        <span class="ab-meta__k">Admin:</span>
+        <span class="ab-meta__v">{{ adminEmail }}</span>
+      </div>
+    }
+  </div>
+
+  <div class="ab-foot text-regular">
+    If you believe this is a mistake, please contact support.
+  </div>
+
+  <div class="ab-actions">
+    <button type="button" class="btn btn--primary text-semibold btn-scale" (click)="close.emit()">
+      Confirm
+    </button>
+  </div>
+
+</app-modal-shell>

@@ -1,12 +1,16 @@
 package rs.ac.uns.ftn.iss.Komsiluk.services;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import rs.ac.uns.ftn.iss.Komsiluk.beans.User;
+import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.UserRole;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.user.UserChangePasswordDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.user.UserProfileResponseDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.user.UserProfileUpdateDTO;
@@ -113,9 +117,34 @@ public class UserService implements IUserService {
         userRepository.save(user);
     }
 
-
     @Override
 	public User findByEmail(String email) {
 		return userRepository.findByEmail(email);
 	}
+    
+    @Override
+    public List<String> autocompleteEmails(String query, int limit) {
+        String prefix = (query == null) ? "" : query.trim().toLowerCase();
+        if (limit <= 0) {
+            limit = 10;
+        }
+
+        Set<UserRole> allowedRoles = Set.of(UserRole.DRIVER, UserRole.PASSENGER);
+
+        return userRepository.findAll().stream()
+                .filter(u -> u.getEmail() != null).filter(u -> allowedRoles.contains(u.getRole()))
+                .map(User::getEmail).map(String::trim)
+                .filter(e -> e.toLowerCase().startsWith(prefix))
+                .distinct().sorted().limit(limit)
+                .collect(Collectors.toList());
+    }
+    
+    @Override
+    public boolean isBlocked(Long userId) {
+        User user = userRepository.findById(userId);
+        if (user == null) {
+            throw new NotFoundException();
+        }
+        return user.isBlocked();
+    }
 }

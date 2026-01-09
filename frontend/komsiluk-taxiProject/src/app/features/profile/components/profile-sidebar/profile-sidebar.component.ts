@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { RouterLink, Router } from '@angular/router';
 import { AuthService } from '../../../../core/auth/services/auth.service';
 import { UserProfileResponseDTO } from '../../../../shared/models/profile.models';
@@ -14,6 +14,9 @@ export class ProfileSidebarComponent {
   @Input() activeToday: string = '-';
   @Input() profile: UserProfileResponseDTO | null = null;
   
+  @Input() isBlocked = false;
+  @Output() blockedClick = new EventEmitter<void>();
+
   authService: AuthService;
   router: Router;
 

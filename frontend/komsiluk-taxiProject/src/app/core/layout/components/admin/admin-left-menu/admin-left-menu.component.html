@@ -1,0 +1,33 @@
+<nav class="p-menu">
+
+  <!-- Check a ride -->
+  <button class="p-item" type="button" (click)="toggle('check')">
+    <span class="p-left">
+      <span class="material-symbols-outlined">fact_check</span>
+      <span class="p-text">Check a ride</span>
+    </span>
+    <span class="p-chev" [class.p-chev--open]="checkOpen()">▾</span>
+  </button>
+
+  @if (checkOpen()) {
+    <div class="p-panel">
+      <span class="p-panel__label">TODO: check ride panel</span>
+    </div>
+  }
+
+  <!-- Block a user -->
+  <button class="p-item" type="button" (click)="toggle('block')">
+    <span class="p-left">
+      <span class="material-symbols-outlined">person_off</span>
+      <span class="p-text">Block a user</span>
+    </span>
+    <span class="p-chev" [class.p-chev--open]="blockOpen()">▾</span>
+  </button>
+
+  @if (blockOpen()) {
+    <div class="p-panel">
+      <app-admin-block-user-panel />
+    </div>
+  }
+
+</nav>

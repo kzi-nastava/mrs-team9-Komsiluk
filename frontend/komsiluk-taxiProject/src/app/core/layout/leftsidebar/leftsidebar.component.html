@@ -38,6 +38,10 @@
       {
         <app-passenger-left-menu></app-passenger-left-menu>
       }
+      @else if (userRole() === UserRole.ADMIN)
+      {
+        <app-admin-left-menu></app-admin-left-menu>
+      }
       @else
       {
         <div>

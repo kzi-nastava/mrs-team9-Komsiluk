@@ -1,14 +1,19 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { ProfileSidebarComponent } from '../../components/profile-sidebar/profile-sidebar.component';
 import { ProfileDetailsComponent } from '../../components/profile-details/profile-details.component';
 import { ProfileService } from '../../services/profile.service';
 import { UserProfileResponseDTO } from '../../../../shared/models/profile.models';
 import { AuthService, UserRole } from '../../../../core/auth/services/auth.service';
 import { ChangeDetectorRef } from '@angular/core';
+import { forkJoin, of } from 'rxjs';
+import { catchError, finalize, switchMap, tap } from 'rxjs/operators';
+import { BlockNoteService } from '../../../../core/layout/components/admin/block/services/block-note.service';
+import { BlockNoteResponseDTO, UserBlockedDTO } from '../../../../shared/models/block-note.model';
+import { DriverBlockedDialogComponent } from '../../components/driver-blocked-dialog/driver-blocked-dialog.component';
 
 @Component({
   selector: 'app-profile-view',
-  imports: [ProfileSidebarComponent, ProfileDetailsComponent],
+  imports: [ProfileSidebarComponent, ProfileDetailsComponent, DriverBlockedDialogComponent],
   templateUrl: './profile-view.component.html',
   styleUrl: './profile-view.component.css',
 })
@@ -16,7 +21,11 @@ export class ProfileViewComponent {
   profile: UserProfileResponseDTO | null = null;
   loading = false;
 
-  constructor(private profileService: ProfileService, private auth: AuthService, private cdr: ChangeDetectorRef) {}
+  isBlocked = signal(false);
+  blockNote: BlockNoteResponseDTO | null = null;
+  blockedDialogOpen = signal(false);
+
+  constructor(private profileService: ProfileService, private auth: AuthService, private cdr: ChangeDetectorRef, private blockNoteService: BlockNoteService) {}
 
   get isDriver(): boolean {
     return this.auth.userRole() === UserRole.DRIVER;
@@ -34,9 +43,51 @@ export class ProfileViewComponent {
 
   ngOnInit(): void {
     this.loading = true;
-    this.profileService.getMyProfile().subscribe({
-      next: (p) => { this.profile = p; this.loading = false; this.cdr.detectChanges(); },
-      error: () => { this.loading = false; this.cdr.detectChanges(); },
+
+    const id = Number(this.auth.userId());
+
+    if (!id) {
+      this.profileService.getMyProfile().pipe(
+        finalize(() => {
+          this.loading = false;
+          this.cdr.detectChanges();
+        })
+      ).subscribe({
+        next: p => { this.profile = p; },
+        error: () => {}
+      });
+      return;
+    }
+
+    forkJoin({
+      profile: this.profileService.getMyProfile().pipe(
+        catchError(() => of(null as any))
+      ),
+      blocked: this.profileService.isUserBlocked(id).pipe(
+        catchError(() => of({ blocked: false } as UserBlockedDTO))
+      )
+    }).pipe(
+      tap(({ profile, blocked }) => {
+        this.profile = profile;
+        this.isBlocked.set(!!blocked?.blocked);
+      }),
+      switchMap(({ blocked }) => {
+        if (!blocked?.blocked) return of(null);
+        return this.blockNoteService.getLastForUser(id).pipe(
+          catchError(() => of(null))
+        );
+      }),
+      finalize(() => {
+        this.loading = false;
+        this.cdr.detectChanges();
+      })
+    ).subscribe(note => {
+      this.blockNote = note;
+      this.cdr.detectChanges();
     });
+  }
+
+  openBlockedInfo() {
+    this.blockedDialogOpen.set(true);
   }
 }

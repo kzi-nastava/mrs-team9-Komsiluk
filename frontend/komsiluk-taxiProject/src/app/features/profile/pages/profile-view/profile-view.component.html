@@ -1,11 +1,22 @@
 <div class="app-bg-textured profile-page">
-    <app-profile-sidebar
-        [profile]="profile"
-        [isDriver]="isDriver"
-        [activeToday]="activeToday">
-    </app-profile-sidebar>
-    <app-profile-details
-        [profile]="profile"
-        [isDriver]="isDriver">
-    </app-profile-details>
+  <app-profile-sidebar
+    [profile]="profile"
+    [isDriver]="isDriver"
+    [activeToday]="activeToday"
+    [isBlocked]="isBlocked()"
+    (blockedClick)="openBlockedInfo()"
+  >
+  </app-profile-sidebar>
+
+  <app-profile-details
+    [profile]="profile"
+    [isDriver]="isDriver">
+  </app-profile-details>
+
+  <app-driver-blocked-dialog
+    [open]="blockedDialogOpen()"
+    [reason]="blockNote?.reason || ''"
+    [adminEmail]="blockNote?.adminEmail || ''"
+    (close)="blockedDialogOpen.set(false)"
+  />
 </div>
