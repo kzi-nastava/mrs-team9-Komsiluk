@@ -1,0 +1,261 @@
+.usage-page{
+  min-height: calc(100vh - 64px); /* minus navbar height */;
+}
+
+.ur-wrap{
+  display: grid;
+  grid-template-columns: 4fr 1fr;
+  grid-template-areas:
+    "left money"
+    "rides km";
+  gap: 26px 34px;
+  padding: 15px 25px;
+  align-items: start;
+  box-sizing: border-box;
+}
+
+.ur-left{ grid-area: left; }
+.ur-money{ grid-area: money; justify-self: end; }
+.ur-rides{ grid-area: rides; }
+.ur-km{ grid-area: km; justify-self: end; }
+
+/* LEFT */
+.ur-title{
+  font-size: 30px;
+  color: var(--color-white);
+  letter-spacing: 0.5px;
+}
+
+.ur-line{
+  height: 2px;
+  width: 375px;
+  background: var(--color-secondary);
+  margin-top: 12px;
+  margin-bottom: 22px;
+}
+
+.ur-form{
+  display: grid;
+  gap: 5px;
+  max-width: 380px;
+}
+
+.ur-row{
+  display: grid;
+  grid-template-columns: 90px 1fr;
+  gap: 0px;
+  align-items: center;
+}
+
+.ur-row--email{
+  margin-top: 3.75px;
+  align-items: start;
+}
+
+.usr-label{
+  margin-top: 5px;
+}
+
+.ur-label{
+  color: var(--color-white);
+  font-size: var(--fs-lg);
+}
+
+/* Inputs */
+.ur-input{
+  height: 34px;
+  border-radius: 6px;
+  border: 1px solid rgba(255,255,255,0.15);
+  background: var(--color-white);
+  padding: 0 10px;
+  outline: none;
+  box-sizing: border-box;
+  margin-left: -10px;
+}
+
+.ur-select{
+  height: 34px;
+}
+
+.ur-btn{
+  width: 120px;
+  justify-self: start;
+}
+
+.ur-btn--disabled{
+  opacity: 0.8;
+  pointer-events: none;
+}
+
+/* Autocomplete */
+.ur-email{
+  position: relative;
+}
+
+.ur-hint{
+  margin-top: 6px;
+  font-size: var(--fs-sm);
+  color: rgba(255,255,255,0.75);
+}
+
+.ur-suggest{
+  position: absolute;
+  top: 38px;
+  left: 0;
+  width: 290px;
+  z-index: 50;
+  font-size: var(--fs-sm);
+  border: 2px solid var(--color-secondary);
+  background: rgba(255,255,255,0.96);
+  border-radius: 6px;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.ur-suggest__item{
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: none;
+  padding: 8px 10px;
+  cursor: pointer;
+  color: rgba(0,0,0,0.85);
+}
+
+.ur-suggest__item:hover{
+  background: rgba(255, 238, 2, 0.25);
+}
+
+/* === CHART CARDS === */
+.ur-card{
+  width: 650px;
+  max-width: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 10px;
+  padding: 14px 14px 10px;
+  box-sizing: border-box;
+  margin-right: 100px;
+}
+
+.ur-card__title{
+  text-align: center;
+  color: rgba(255,255,255,0.9);
+  margin-bottom: 8px;
+}
+
+.ur-card__body{
+  display: grid;
+  grid-template-columns: 24px 1fr 140px;
+  grid-template-rows: 1fr auto;
+  gap: 10px;
+  align-items: center;
+}
+
+.ur-card__y{
+  grid-column: 1;
+  grid-row: 1;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  color: rgba(255,255,255,0.85);
+  font-size: 12px;
+  justify-self: center;
+}
+
+.ur-card__plot{
+  grid-column: 2;
+  grid-row: 1;
+  border: 5px solid var(--color-secondary);
+  border-radius: 10px;
+  background: rgba(255,255,255,0.92);
+  padding: 10px;
+  height: 210px;
+  box-sizing: border-box;
+}
+
+.ur-card__stats{
+  grid-column: 3;
+  grid-row: 1;
+  display: grid;
+  gap: 20px;
+  color: rgba(255,255,255,0.85);
+  font-size: var(--fs-md);
+  align-self: center;
+  margin-left: 15px;
+}
+
+.ur-stat{
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+}
+
+.ur-stat__k{
+  color: rgba(255,255,255,0.75);
+}
+
+.ur-stat__v{
+  color: rgba(255,255,255,0.92);
+}
+
+.ur-card__x{
+  grid-column: 2;
+  grid-row: 2;
+  text-align: center;
+  color: rgba(255,255,255,0.85);
+  font-size: 12px;
+}
+
+/* placeholder */
+.ur-plot-placeholder{
+  width: 100%;
+  height: 100%;
+  border: 1px dashed rgba(0,0,0,0.25);
+  border-radius: 6px;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      rgba(0,0,0,0.08) 0,
+      rgba(0,0,0,0.08) 1px,
+      transparent 1px,
+      transparent 70px
+    );
+}
+
+@media (max-width: 1475px){
+  .ur-wrap{
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "left"
+      "money"
+      "rides"
+      "km";
+  }
+  .ur-money, .ur-km{ justify-self: start; }
+}
+
+.ur-to-wrap{
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px;
+  align-items: center;
+}
+
+.ur-btn--inline{
+  margin-top: 0;
+  justify-self: end;
+}
+
+.ur-form{
+  max-width: none;
+}
+
+.ur-input--fixed{
+  width: 290px;
+}
+
+.ur-inline{
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
