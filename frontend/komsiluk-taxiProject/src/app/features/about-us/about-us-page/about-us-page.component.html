@@ -1,0 +1,100 @@
+<div class="app-bg-textured about-page">
+  <div class="about-wrap">
+
+    <!-- TOP (black) -->
+    <section class="about-top">
+      <div class="about-top__inner">
+        <h1 class="about-title text-regular">About us</h1>
+        <div class="about-line"></div>
+
+        <div class="about-motto text-regular">
+          A modern neighborhood ride-hailing platform connecting passengers and drivers in a safe and reliable way.
+        </div>
+
+        <p class="about-text text-regular">
+          <span class="about-accent">Neighbourhood Taxi</span> is a ride-hailing service that helps passengers book rides quickly
+          and allows drivers to manage their daily work in a clear and transparent way. The system supports instant bookings,
+          scheduled rides, detailed ride history, and usage reports for all users.
+        </p>
+      </div>
+    </section>
+
+    <!-- BOTTOM (yellow) -->
+    <section class="about-bottom">
+      <div class="about-bottom__inner">
+
+        <!-- LEFT: contact title + line + grid -->
+        <div class="about-contact">
+          <div class="about-subtitle text-regular">Contact us</div>
+          <div class="about-subline"></div>
+
+          <div class="about-grid">
+            <!-- Facebook -->
+            <a class="about-item btn-scale" href="https://www.facebook.com" target="_blank" rel="noopener">
+              <span class="about-ico fb-ico" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                  <path d="M14 9h3V6h-3c-2.2 0-4 1.8-4 4v3H7v3h3v8h3v-8h3l1-3h-4v-3c0-.6.4-1 1-1z"/>
+                </svg>
+              </span>
+              <span class="about-item__text text-semibold">www.facebook.com</span>
+            </a>
+
+            <!-- Phone -->
+            <a class="about-item btn-scale" href="tel:+38111111111">
+              <span class="about-ico" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                  <path d="M6.6 10.8c1.4 2.7 3.9 5.2 6.6 6.6l2.2-2.2c.3-.3.8-.4 1.2-.2 1 .4 2.2.7 3.4.7.7 0 1.2.5 1.2 1.2V21c0 .7-.5 1.2-1.2 1.2C11.2 22.2 1.8 12.8 1.8 1.2 1.8.5 2.3 0 3 0h3.2c.7 0 1.2.5 1.2 1.2 0 1.2.2 2.4.7 3.4.1.4.1.9-.2 1.2L6.6 10.8z"/>
+                </svg>
+              </span>
+              <span class="about-item__text text-semibold">+381 11 111 1111</span>
+            </a>
+
+            <!-- Instagram -->
+            <a class="about-item btn-scale" href="https://www.instagram.com" target="_blank" rel="noopener">
+              <span class="about-ico ig-ico" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                  <path d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5zm10 2H7a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3zm-5 4a4 4 0 1 1 0 8 4 4 0 0 1 0-8zm0 2a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm5.2-.9a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+                </svg>
+              </span>
+              <span class="about-item__text text-semibold">www.instagram.com</span>
+            </a>
+
+            <!-- Email -->
+            <a class="about-item btn-scale" href="mailto:email@gmail.com">
+              <span class="about-ico" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                  <path d="M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zm0 3.2V18h16V7.2l-8 5.3-8-5.3zm.9-1.2L12 10.7 19.1 6H4.9z"/>
+                </svg>
+              </span>
+              <span class="about-item__text text-semibold">email@gmail.com</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- RIGHT: legal (terms/privacy top, version bottom) -->
+        <div class="about-legal">
+          <div class="about-legal__top">
+            <button class="about-legal__link text-regular btn-scale" type="button" (click)="prevent($event)">
+              Terms of use
+            </button>
+            <button class="about-legal__link text-regular btn-scale" type="button" (click)="prevent($event)">
+              Privacy policy
+            </button>
+          </div>
+
+          <div class="about-meta text-regular">
+            <div>Version {{ version }}</div>
+            <div>Last updated: {{ lastUpdated }}</div>
+          </div>
+        </div>
+
+        <!-- CAR OVERLAY -->
+        <div class="about-carWrap" aria-hidden="true">
+          <img class="about-car" [src]="carSrc" alt="" />
+        </div>
+
+      </div>
+    </section>
+
+  </div>
+</div>

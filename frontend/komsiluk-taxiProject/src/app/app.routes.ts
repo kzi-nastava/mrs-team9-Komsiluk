@@ -8,6 +8,7 @@ import { ProfileChangePasswordComponent } from './features/profile/pages/profile
 import { DriverCarViewComponent } from './features/profile/pages/driver-car-view/driver-car-view.component';
 import { DriverEditProfileComponent } from './features/profile/pages/driver-edit-profile/driver-edit-profile.component';
 import { UsageReportsPageComponent } from './features/usage-report/pages/usage-reports-page/usage-reports-page.component';
+import { AboutUsPageComponent } from './features/about-us/about-us-page/about-us-page.component';
 
 import { MessagePageComponent } from './shared/components/message-page/message-page.component';
 import { DriverRideHistoryPageComponent } from './features/driver-history/pages/driver-ride-history-page/driver-ride-history-page.component';
@@ -70,6 +71,8 @@ export const routes: Routes = [
       import('./features/auth/auth.routes')
         .then(m => m.AUTH_ROUTES),
   },
+
+  { path: 'about', component: AboutUsPageComponent },
 
   // ===== FALLBACK =====
   { path: '**', redirectTo: '' }
