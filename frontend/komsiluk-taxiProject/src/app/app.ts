@@ -1,6 +1,6 @@
 import { Component, signal, OnInit } from '@angular/core';
 import { RouterOutlet, Router, NavigationStart } from '@angular/router';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 
 import { NavbarComponent } from './core/layout/navbar/navbar.component';
 import { ToastComponent } from './shared/components/toast/toast/toast.component';
@@ -31,6 +31,8 @@ import { BlockUserConfirmDialogComponent } from './core/layout/components/admin/
 import { BlockUserConfirmModalService } from './shared/components/modal-shell/services/block-user-confirm-modal.service';
 import { AccountBlockedDialogComponent } from './core/layout/components/passenger/book_ride/account-blocked-dialog/account-blocked-dialog.component';
 import { AccountBlockedModalService } from './shared/components/modal-shell/services/account-blocked-modal.service';
+import { ActivatedRoute, NavigationEnd } from '@angular/router';
+import { LeftSidebarCommandService } from './core/layout/components/passenger/services/left-sidebar-command-service.service';
 
 @Component({
   selector: 'app-root',
@@ -64,17 +66,44 @@ export class App implements OnInit {
   constructor(public filterSvc: RideHistoryFilterService, private router: Router, public confirmModal: ConfirmBookingModalService,
     public addFavModal: AddFavoriteModalService, public favDetailsModal: FavoriteDetailsModalService, public renameFavModal: RenameFavoriteModalService,
     public deleteFavModal: DeleteFavoriteModalService, public toastService: ToastService, private favoriteApi: FavoriteRouteService, private favBus: FavoritesBusService,
-    public schedDetailsModal: ScheduledDetailsModalService, public blockUserModal: BlockUserConfirmModalService, public blockedModal: AccountBlockedModalService) {}
+    public schedDetailsModal: ScheduledDetailsModalService, public blockUserModal: BlockUserConfirmModalService, public blockedModal: AccountBlockedModalService,
+    private leftCmd: LeftSidebarCommandService, private route: ActivatedRoute, private location: Location) {}
 
-  ngOnInit(): void {
+    ngOnInit(): void {
     this.router.events
-    .pipe(filter(e => e instanceof NavigationStart))
-    .subscribe(() => {
-      queueMicrotask(() => {
-        this.isLeftSidebarOpen = false;
-        this.rightOpen = false;
+      .pipe(filter(e => e instanceof NavigationStart))
+      .subscribe((e: any) => {
+        const url = String(e.url || '');
+        const hasLeftCommand = url.includes('lp=1') && url.includes('section=');
+
+        queueMicrotask(() => {
+          this.rightOpen = false;
+
+          if (!hasLeftCommand) {
+            this.isLeftSidebarOpen = false;
+          }
+        });
       });
-    });
+
+    this.router.events
+      .pipe(filter(e => e instanceof NavigationEnd))
+      .subscribe(() => {
+        const qp = this.route.snapshot.queryParamMap;
+
+        const lp = qp.get('lp');
+        const section = qp.get('section');
+        const scroll = qp.get('scroll');
+
+        if (lp === '1' && (section === 'book' || section === 'fav' || section === 'sched')) {
+          this.isLeftSidebarOpen = true;
+          this.rightOpen = false;
+
+          this.leftCmd.emit({ section, scrollId: scroll ?? undefined });
+
+          const cleanPath = this.router.url.split('?')[0];
+            this.location.replaceState(cleanPath);
+          }
+      });
   }
 
   toggleLeftSidebar() { this.isLeftSidebarOpen = !this.isLeftSidebarOpen; }

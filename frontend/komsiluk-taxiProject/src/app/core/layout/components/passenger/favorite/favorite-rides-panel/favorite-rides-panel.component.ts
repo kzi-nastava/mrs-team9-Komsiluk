@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FavoriteRouteService } from '../services/favorite-route.service';
 import { FavoriteRouteResponseDTO } from '../../../../../../shared/models/favorite-route.models';
@@ -19,6 +19,7 @@ import { FavoritesBusService } from '../services/favorites-bus.service';
 export class FavoriteRidesPanelComponent {
   loading = signal(false);
   favorites = signal<FavoriteRouteResponseDTO[]>([]);
+  @Input() open = false;
 
   constructor(
     private api: FavoriteRouteService,
@@ -29,6 +30,12 @@ export class FavoriteRidesPanelComponent {
     private favBus: FavoritesBusService
   ) {
     this.favBus.refresh$.subscribe(() => this.load());
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['open']?.currentValue === true) {
+      this.load();
+    }
   }
 
   load() {
