@@ -73,7 +73,7 @@ public class ProfileChangeRequestService implements IProfileChangeRequestService
     }
 
     @Override
-    public ProfileChangeRequestResponseDTO reject(Long requestId, Long adminId, String reason) {
+    public ProfileChangeRequestResponseDTO reject(Long requestId, Long adminId) {
         ProfileChangeRequest req = repo.findById(requestId);
         if (req == null) throw new NotFoundException();
 

@@ -1,0 +1,45 @@
+@if (open) {
+  <div class="acr-backdrop" (click)="close.emit()"></div>
+
+  <div class="acr-modal" role="dialog" aria-modal="true">
+    <div class="acr-modal__head">
+      <div class="acr-modal__title text-regular">Review change request</div>
+      <button class="acr-x btn-scale" type="button" (click)="close.emit()">✕</button>
+    </div>
+
+    <div class="acr-modal__meta text-regular">
+      <div><span class="k">Driver: </span> <span class="v">{{ driverEmail }}</span></div>
+      <div><span class="k">Requested at: </span> <span class="v">{{ requestedAt | date:'medium' }}</span></div>
+    </div>
+
+    <div class="acr-table">
+      <div class="acr-row acr-row--head text-semibold">
+        <div>Field</div>
+        <div>Current</div>
+        <div>Requested</div>
+      </div>
+
+      @if (rows.length === 0) {
+        <div class="acr-none text-regular">No actual changes found in this request.</div>
+      } @else {
+        @for (r of rows; track r.key) {
+          <div class="acr-row text-regular">
+            <div class="acr-field text-semibold">{{ r.label }}</div>
+            <div class="acr-val">{{ r.current }}</div>
+            <div class="acr-val acr-val--new">{{ r.requested }}</div>
+          </div>
+        }
+      }
+    </div>
+
+    <div class="acr-actions">
+      <button type="button" class="btn btn--danger text-semibold btn-scale" (click)="reject.emit()">
+        Reject
+      </button>
+
+      <button type="button" class="btn btn--primary text-semibold btn-scale" (click)="approve.emit()">
+        Approve
+      </button>
+    </div>
+  </div>
+}

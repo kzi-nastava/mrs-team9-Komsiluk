@@ -46,8 +46,8 @@ public class ProfileChangeRequestController {
     }
 
     @PutMapping("/{requestId}/reject/{adminId}")
-    public ResponseEntity<ProfileChangeRequestResponseDTO> reject(@PathVariable Long requestId, @PathVariable Long adminId, @RequestBody String reason) {
-        var updated = service.reject(requestId, adminId, reason);
+    public ResponseEntity<ProfileChangeRequestResponseDTO> reject(@PathVariable Long requestId, @PathVariable Long adminId) {
+        var updated = service.reject(requestId, adminId);
         return ResponseEntity.ok(updated);
     }
 }

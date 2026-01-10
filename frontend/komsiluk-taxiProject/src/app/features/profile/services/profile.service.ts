@@ -44,4 +44,17 @@ export class ProfileService {
   isUserBlocked(userId: number): Observable<UserBlockedDTO> {
     return this.http.get<UserBlockedDTO>(`${this.API}/${userId}/blocked`);
   }
+
+  getPendingDriverEditRequests(): Observable<DriverEditRequestResponseDTO[]> {
+    return this.http.get<DriverEditRequestResponseDTO[]>(`${this.DRIVER_EDIT_API}/pending`);
+  }
+  approveDriverEditRequest(requestId: number): Observable<DriverEditRequestResponseDTO> {
+    const adminId = Number(this.auth.userId());
+    return this.http.put<DriverEditRequestResponseDTO>(`${this.DRIVER_EDIT_API}/${requestId}/approve/${adminId}`, null);
+  }
+
+  rejectDriverEditRequest(requestId: number): Observable<DriverEditRequestResponseDTO> {
+    const adminId = Number(this.auth.userId());
+    return this.http.put<DriverEditRequestResponseDTO>(`${this.DRIVER_EDIT_API}/${requestId}/reject/${adminId}`, null);
+  }
 }
