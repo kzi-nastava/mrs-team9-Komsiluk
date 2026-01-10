@@ -13,5 +13,5 @@ public interface IProfileChangeRequestService {
     
     public ProfileChangeRequestResponseDTO approve(Long requestId, Long adminId);
     
-    public ProfileChangeRequestResponseDTO reject(Long requestId, Long adminId, String reason);
+    public ProfileChangeRequestResponseDTO reject(Long requestId, Long adminId);
 }

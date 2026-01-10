@@ -1,0 +1,59 @@
+<div class="app-bg-textured acr-page">
+  <div class="acr-wrap">
+
+    <header class="acr-head">
+      <div class="acr-title text-regular">Driver change requests</div>
+      <div class="acr-sub text-regular">Review and approve/reject pending profile & vehicle updates.</div>
+      <div class="acr-line"></div>
+    </header>
+
+    <section class="acr-list">
+
+      @if (requests().length === 0) {
+        <div class="acr-empty text-regular">
+          <div class="acr-empty__title text-semibold">No pending requests</div>
+          <div class="acr-empty__sub">All driver profiles are up to date.</div>
+        </div>
+      } @else {
+        @for (r of requests(); track r.id) {
+          <button type="button" class="acr-card btn-scale" (click)="openReview(r)">
+            <div class="acr-card__top">
+              <div class="acr-card__who">
+                <div class="acr-card__email text-semibold">
+                  {{ getCurrentFor(r).email }}
+                </div>
+                <div class="acr-card__meta text-regular">
+                  Request #{{ r.id }} • {{ r.requestedAt | date:'medium' }}
+                </div>
+              </div>
+
+              <div class="acr-card__badge text-semibold">PENDING</div>
+            </div>
+
+            <div class="acr-card__chips">
+              @for (c of requestChips(r); track c) {
+                <span class="acr-chip text-semibold">{{ c }}</span>
+              }
+            </div>
+
+            <div class="acr-card__hint text-regular">
+              Click to review details
+            </div>
+          </button>
+        }
+      }
+
+    </section>
+
+    <!-- Review dialog -->
+    <app-driver-change-request-review-dialog
+      [open]="dialogOpen()"
+      [driverEmail]="selectedCurrent()?.email || ''"
+      [requestedAt]="selectedReq()?.requestedAt || ''"
+      [rows]="diffRows()"
+      (close)="closeDialog()"
+      (approve)="approveSelected()"
+      (reject)="rejectSelected()"
+    />
+  </div>
+</div>
