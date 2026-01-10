@@ -1,12 +1,8 @@
 package rs.ac.uns.ftn.iss.Komsiluk.services;
 
 import java.time.LocalDateTime;
-import java.util.Comparator;
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import rs.ac.uns.ftn.iss.Komsiluk.beans.BlockNote;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.User;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.block.BlockNoteCreateDTO;
@@ -31,7 +27,10 @@ public class BlockNoteService implements IBlockNoteService {
     public BlockNoteResponseDTO createBlock(BlockNoteCreateDTO dto) {
     	
         User blocked = userRepository.findByEmailIgnoreCase(dto.getBlockedUserEmail());
-
+        if (blocked == null) {
+			throw new NotFoundException();
+		}
+        
         User admin = userRepository.findById(dto.getAdminId()).orElseThrow(NotFoundException::new);
 
         blocked.setBlocked(true);
@@ -50,8 +49,6 @@ public class BlockNoteService implements IBlockNoteService {
 
     @Override
     public BlockNoteResponseDTO getLastBlockForUser(Long userId) {
-        List<BlockNote> list = blockNoteRepository.findByBlockedUserId(userId);
-
-        return list.stream().max(Comparator.comparing(BlockNote::getCreatedAt)).map(mapper::toResponseDTO).orElse(null);
+        return blockNoteRepository.findByBlockedUserId(userId).stream().sorted((a, b) -> b.getCreatedAt().compareTo(a.getCreatedAt())).findFirst().map(mapper::toResponseDTO).orElse(null);
     }
 }

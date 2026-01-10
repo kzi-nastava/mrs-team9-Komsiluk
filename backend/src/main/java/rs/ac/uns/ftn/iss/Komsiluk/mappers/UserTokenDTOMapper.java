@@ -4,7 +4,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.UserToken;
+import rs.ac.uns.ftn.iss.Komsiluk.beans.UserToken;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.userToken.UserTokenResponseDTO;
 
 @Component

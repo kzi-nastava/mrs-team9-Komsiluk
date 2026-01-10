@@ -2,20 +2,17 @@ package rs.ac.uns.ftn.iss.Komsiluk.services;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import org.springframework.web.server.ResponseStatusException;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.User;
+import rs.ac.uns.ftn.iss.Komsiluk.beans.UserToken;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.TokenType;
-import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.UserToken;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.userToken.UserTokenResponseDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.mappers.UserTokenDTOMapper;
 import rs.ac.uns.ftn.iss.Komsiluk.repositories.UserTokenRepository;
@@ -62,19 +59,12 @@ public class UserTokenService implements IUserTokenService {
     }
 
     public UserTokenResponseDTO createPasswordResetToken(Long userId) {
-
         User user = userService.findById(userId);
 
-
-        userTokenRepository.findAll().stream()
-                .filter(t -> t.getUser().getId().equals(userId))
-                .filter(t -> t.getType() == TokenType.PASSWORD_RESET)
-                .filter(t -> !t.isUsed())
-                .forEach(t -> {
-                    t.setUsed(true);
-                    userTokenRepository.save(t);
-                });
-
+        List<UserToken> open = userTokenRepository.findAllByUserIdAndTypeAndUsedFalse(userId, TokenType.PASSWORD_RESET);
+        open.forEach(t -> t.setUsed(true));
+        userTokenRepository.saveAll(open);
+        
         UserToken token = new UserToken();
         token.setType(TokenType.PASSWORD_RESET);
         token.setToken(UUID.randomUUID().toString());
@@ -96,8 +86,7 @@ public class UserTokenService implements IUserTokenService {
             throw new NotFoundException();
         }
         
-        Long userId = token.getUser().getId();
-        User user = userService.findById(userId);
+        User user = userService.findById( token.getUser().getId());
 
         String hashed = passwordEncoder.encode(rawPassword);
         user.setPasswordHash(hashed);
@@ -113,12 +102,9 @@ public class UserTokenService implements IUserTokenService {
 
     public void activate(String tokenValue) {
 
-        UserToken token = userTokenRepository.findByToken(tokenValue)
-                .orElseThrow(NotFoundException::new);
+        UserToken token = userTokenRepository.findByToken(tokenValue).orElseThrow(NotFoundException::new);
 
-        if (token.isUsed()
-                || token.getType() != TokenType.ACTIVATION
-                || token.getExpiresAt().isBefore(LocalDateTime.now())) {
+        if (token.isUsed() || token.getType() != TokenType.ACTIVATION || token.getExpiresAt().isBefore(LocalDateTime.now())) {
             throw new NotFoundException();
         }
 
@@ -133,18 +119,9 @@ public class UserTokenService implements IUserTokenService {
 
     public UserTokenResponseDTO resendActivationToken(Long userId) {
 
-        List<UserToken> tokens =
-                userTokenRepository.findAllByUserIdAndType(
-                        userId,
-                        TokenType.ACTIVATION
-                );
+        List<UserToken> tokens = userTokenRepository.findAllByUserIdAndType(userId, TokenType.ACTIVATION);
 
-        boolean hasValidToken = tokens.stream()
-                .anyMatch(t ->
-                        !t.isUsed() &&
-                                t.getExpiresAt().isAfter(LocalDateTime.now())
-                );
-
+        boolean hasValidToken = tokens.stream().anyMatch(t -> !t.isUsed() && t.getExpiresAt().isAfter(LocalDateTime.now()));
 
         if (hasValidToken) {
             throw new ActivationAlreadySentException();
@@ -153,25 +130,18 @@ public class UserTokenService implements IUserTokenService {
         return createActivationToken(userId);
     }
 
-
-
     public void resetPassword(String tokenValue, String newPassword) {
 
-        UserToken token = userTokenRepository.findByToken(tokenValue)
-                .orElseThrow(NotFoundException::new);
+        UserToken token = userTokenRepository.findByToken(tokenValue).orElseThrow(NotFoundException::new);
 
-        if (token.isUsed()
-                || token.getType() != TokenType.PASSWORD_RESET
-                || token.getExpiresAt().isBefore(LocalDateTime.now())) {
+        if (token.isUsed() || token.getType() != TokenType.PASSWORD_RESET || token.getExpiresAt().isBefore(LocalDateTime.now())) {
             throw new NotFoundException();
         }
 
         User user = token.getUser();
 
-        // delegacija UserService-u
         userService.resetPassword(user.getId(), newPassword);
 
-        // invalidate token
         token.setUsed(true);
         userTokenRepository.save(token);
     }
