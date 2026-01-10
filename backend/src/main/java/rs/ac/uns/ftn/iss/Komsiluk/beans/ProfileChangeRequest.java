@@ -2,14 +2,35 @@ package rs.ac.uns.ftn.iss.Komsiluk.beans;
 
 import java.time.LocalDateTime;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.ChangeRequestStatus;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.VehicleType;
 
+@Entity
+@Table(name = "profile_change_requests")
 public class ProfileChangeRequest {
 
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
+	
+	@Column(nullable = false)
 	private LocalDateTime requestedAt;
+	
+	@Enumerated(EnumType.STRING)
+	@Column(nullable = false)
 	private ChangeRequestStatus status;
+	
     private String newName;
     private String newSurname;
     private String newAddress;
@@ -17,12 +38,21 @@ public class ProfileChangeRequest {
     private String newPhoneNumber;
     private String newProfileImageUrl;
     private String newModel;
+    
+    @Enumerated(EnumType.STRING)
     private VehicleType newType;
+    
     private String newLicencePlate;
     private Integer newSeatCount;
     private Boolean newBabyFriendly;
     private Boolean newPetFriendly;
+    
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    @JoinColumn(name = "driver_id", nullable = false)
     private User driver;
+    
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "admin_id")
     private User admin;
     
     public ProfileChangeRequest() {

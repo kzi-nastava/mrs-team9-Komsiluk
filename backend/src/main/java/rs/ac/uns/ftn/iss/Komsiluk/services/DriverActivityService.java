@@ -2,7 +2,6 @@ package rs.ac.uns.ftn.iss.Komsiluk.services;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -82,11 +81,7 @@ public class DriverActivityService implements IDriverActivityService {
     }
 
     private DriverActivityPeriod findOpenPeriod(User driver) {
-        List<DriverActivityPeriod> periods = repo.findByDriver(driver);
-        return periods.stream()
-                .filter(p -> p.getEndTime() == null)
-                .max(Comparator.comparing(DriverActivityPeriod::getStartTime))
-                .orElse(null);
+        return repo.findTopByDriverAndEndTimeIsNullOrderByStartTimeDesc(driver);
     }
 
     public void cleanupOld(User driver) {
@@ -95,6 +90,7 @@ public class DriverActivityService implements IDriverActivityService {
                 .filter(p -> p.getEndTime() != null && p.getEndTime().isBefore(from))
                 .map(DriverActivityPeriod::getId)
                 .collect(Collectors.toList());
-        repo.deleteAll(oldIds);
+        
+        repo.deleteAllById(oldIds);
     }
 }
