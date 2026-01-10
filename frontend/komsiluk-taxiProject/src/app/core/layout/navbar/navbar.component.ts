@@ -42,4 +42,7 @@ export class NavbarComponent {
   goHome() {
     this.router.navigateByUrl('/');
   }
+
+  @Output() adminMenuClick = new EventEmitter<void>();
+
 }

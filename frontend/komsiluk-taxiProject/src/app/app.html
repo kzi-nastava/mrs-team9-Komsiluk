@@ -1,14 +1,17 @@
 <app-navbar
   (menuClick)="toggleLeftSidebar()"
-  (rightMenuClick)="toggleRightSidebar()"
+  (rightMenuClick)="toggleRightSidebar('profile')"
+  (adminMenuClick)="toggleRightSidebar('admin')"
   (filterClick)="toggleFilter()">
 </app-navbar>
+
 
 <app-leftsidebar [open]="isLeftSidebarOpen"></app-leftsidebar>
 @if (rightOpen) {
   <div class="sidebar-backdrop" (click)="closeRightSidebar()"></div>
 }
-<app-rightsidebar [open]="rightOpen"></app-rightsidebar>
+<app-rightsidebar [open]="rightOpen" [mode]="rightMode"></app-rightsidebar>
+
 
 @if (filterSvc.open()) {
   <app-ride-history-filter-panel
