@@ -43,13 +43,12 @@ public class FavoriteRouteService implements IFavoriteRouteService {
         Route route = routeRepository.findById(dto.getRouteId()).orElse(null);
         if (route == null) throw new NotFoundException();
 
-        User owner = userRepository.findById(dto.getUserId());
-        if (owner == null) throw new NotFoundException();
+        User owner = userRepository.findById(dto.getUserId()).orElseThrow(NotFoundException::new);
 
         List<User> passengers = new ArrayList<>();
         if (dto.getPassengersEmails() != null) {
             for (String email : dto.getPassengersEmails()) {
-                User u = userRepository.findByEmail(email);
+                User u = userRepository.findByEmailIgnoreCase(email);
                 if (u == null) {
                     throw new NotFoundException();
                 }

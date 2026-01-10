@@ -14,6 +14,7 @@ import rs.ac.uns.ftn.iss.Komsiluk.dtos.block.BlockNoteResponseDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.mappers.BlockNoteDTOMapper;
 import rs.ac.uns.ftn.iss.Komsiluk.repositories.BlockNoteRepository;
 import rs.ac.uns.ftn.iss.Komsiluk.repositories.UserRepository;
+import rs.ac.uns.ftn.iss.Komsiluk.services.exceptions.NotFoundException;
 import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.IBlockNoteService;
 
 @Service
@@ -29,9 +30,9 @@ public class BlockNoteService implements IBlockNoteService {
     @Override
     public BlockNoteResponseDTO createBlock(BlockNoteCreateDTO dto) {
     	
-        User blocked = userRepository.findByEmail(dto.getBlockedUserEmail());
+        User blocked = userRepository.findByEmailIgnoreCase(dto.getBlockedUserEmail());
 
-        User admin = userRepository.findById(dto.getAdminId());
+        User admin = userRepository.findById(dto.getAdminId()).orElseThrow(NotFoundException::new);
 
         blocked.setBlocked(true);
         userRepository.save(blocked);

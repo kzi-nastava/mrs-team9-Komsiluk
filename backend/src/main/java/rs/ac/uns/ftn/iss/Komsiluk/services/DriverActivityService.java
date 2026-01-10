@@ -76,7 +76,7 @@ public class DriverActivityService implements IDriverActivityService {
     
     @Override
     public boolean canAcceptNewRide(Long driverId) {
-    	User driver = userRepository.findById(driverId);
+    	User driver = userRepository.findById(driverId).orElse(null);
         long minutes = getWorkedMinutesLast24h(driver);
         return minutes < MAX_MINUTES_LAST_24H;
     }

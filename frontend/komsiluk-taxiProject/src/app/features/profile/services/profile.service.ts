@@ -57,4 +57,12 @@ export class ProfileService {
     const adminId = Number(this.auth.userId());
     return this.http.put<DriverEditRequestResponseDTO>(`${this.DRIVER_EDIT_API}/${requestId}/reject/${adminId}`, null);
   }
+
+  updateMyProfileImage(file: File): Observable<UserProfileResponseDTO> {
+    const id = Number(this.auth.userId());
+    const form = new FormData();
+    form.append('image', file, file.name);
+
+    return this.http.put<UserProfileResponseDTO>(`${this.API}/${id}/profile-image`, form);
+  }
 }

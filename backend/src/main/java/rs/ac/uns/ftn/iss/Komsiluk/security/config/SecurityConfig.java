@@ -42,7 +42,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/tokens/activation/**").permitAll()
                         .requestMatchers("/api/tokens/reset-password").permitAll()
                         .requestMatchers("/h2-console/**").permitAll()
-
+                        .requestMatchers("/images/**").permitAll()
                         // ROLE BASED
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/drivers/**").hasRole("DRIVER")
