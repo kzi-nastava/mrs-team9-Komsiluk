@@ -13,6 +13,7 @@ import { Signal } from '@angular/core';
 })
 export class RightsidebarComponent {
   @Input() open = false;
+  @Input() mode: 'profile' | 'admin' = 'profile';
   userRole: Signal<UserRole>;
   UserRole = UserRole;
 

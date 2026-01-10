@@ -47,5 +47,13 @@
         </svg>
       </span>
     </button>
+
+   <button
+  *ngIf="userRole() === UserRole.ADMIN"
+  class="app-navbar__kebab-btn"
+  aria-label="Admin menu"
+  (click)="adminMenuClick.emit()">
+  <span class="app-navbar__kebab" aria-hidden="true">⋮</span>
+</button>
   </div>
 </nav>

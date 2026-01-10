@@ -154,3 +154,59 @@
 .app-navbar--driver-history{
   box-shadow: none;
 }
+
+.app-navbar__slot--right {
+  position: relative; /* bitno da dropdown bude vezan za desni deo */
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.app-navbar__kebab-btn {
+  width: 42px;
+  height: 42px;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+}
+
+.app-navbar__kebab {
+  font-size: 22px;
+  line-height: 1;
+  color: var(--color-secondary); /* žuta */
+}
+
+.app-navbar__kebab-menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 8px;
+
+  min-width: 220px;
+  padding: 10px;
+  border-radius: 14px;
+
+  background: rgba(17, 17, 17, 0.95);
+  backdrop-filter: blur(6px);
+  border: 2px solid rgba(255, 238, 2, 0.6);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+  z-index: 999;
+}
+
+.app-navbar__kebab-item {
+  display: block;
+  padding: 12px 12px;
+  border-radius: 12px;
+  text-decoration: none;
+
+  color: var(--color-secondary);
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.app-navbar__kebab-item:hover {
+  background: rgba(255, 238, 2, 0.12);
+}
+

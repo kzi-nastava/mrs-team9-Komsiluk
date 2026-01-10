@@ -63,6 +63,9 @@ export class App implements OnInit {
   isLeftSidebarOpen = false;
   rightOpen = false;
 
+  rightMode: 'profile' | 'admin' = 'profile';
+
+
   constructor(public filterSvc: RideHistoryFilterService, private router: Router, public confirmModal: ConfirmBookingModalService,
     public addFavModal: AddFavoriteModalService, public favDetailsModal: FavoriteDetailsModalService, public renameFavModal: RenameFavoriteModalService,
     public deleteFavModal: DeleteFavoriteModalService, public toastService: ToastService, private favoriteApi: FavoriteRouteService, private favBus: FavoritesBusService,
@@ -107,7 +110,24 @@ export class App implements OnInit {
   }
 
   toggleLeftSidebar() { this.isLeftSidebarOpen = !this.isLeftSidebarOpen; }
-  toggleRightSidebar() { this.rightOpen = !this.rightOpen; if (this.rightOpen) this.isLeftSidebarOpen = false; }
+toggleRightSidebar(mode: 'profile' | 'admin') {
+  // ako je otvoren i klikneš isto dugme (isti mode) -> zatvori
+  if (this.rightOpen && this.rightMode === mode) {
+    this.rightOpen = false;
+    return;
+  }
+
+  // ako je otvoren ali menjaš mode -> samo promeni sadržaj (ostaje otvoren)
+  this.rightMode = mode;
+  this.rightOpen = true;
+  this.isLeftSidebarOpen = false;
+}
+  openRightSidebar(mode: 'profile' | 'admin') {
+  this.rightMode = mode;
+  this.rightOpen = true;
+  this.isLeftSidebarOpen = false;
+}
+
 
   toggleFilter() { this.filterSvc.toggle(); }
 
@@ -173,4 +193,11 @@ export class App implements OnInit {
     console.log('CANCEL SCHEDULED (GUI ONLY):', r);
     this.schedDetailsModal.close();
   }
+
+  openAdminSidebar() {
+  this.rightMode = 'admin';
+  this.rightOpen = true;
+  this.isLeftSidebarOpen = false;
+}
+
 }
