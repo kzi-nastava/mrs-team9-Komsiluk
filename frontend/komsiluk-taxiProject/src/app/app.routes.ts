@@ -16,6 +16,7 @@ import { DriverRideHistoryPageComponent } from './features/driver-history/pages/
 import { authGuard } from './core/auth/guards/auth.guard';
 import { roleGuard } from './core/auth/guards/role.guard';
 import { UserRole } from './core/auth/services/auth.service';
+import { AdminDriverChangeRequestsPageComponent } from './features/approve-edit/admin-driver-change-requests-page/admin-driver-change-requests-page.component';
 
 export const routes: Routes = [
 
@@ -62,6 +63,14 @@ export const routes: Routes = [
     path: 'usage-report',
     component: UsageReportsPageComponent,
     canActivate: [authGuard],
+  },
+
+  // ===== ADMIN =====
+  { 
+    path: 'driver-change-requests',
+    component: AdminDriverChangeRequestsPageComponent,
+    canActivate: [authGuard, roleGuard],
+    data: { roles: [UserRole.ADMIN] }
   },
 
   // ===== AUTH (PUBLIC, lazy) =====

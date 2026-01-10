@@ -47,11 +47,23 @@ export interface DriverEditRequestCreateDTO {
   newPetFriendly: boolean;
 }
 
-export interface DriverEditRequestResponseDTO {
+export type DriverEditRequestResponseDTO = {
   id: number;
   requestedAt: string;
-  status: string;
-  driverId: number;
+  status: 'PENDING' | 'APPROVED' | 'REJECTED';
 
-  // no need for other fields right now
-}
+  newName?: string | null;
+  newSurname?: string | null;
+  newAddress?: string | null;
+  newCity?: string | null;
+  newPhoneNumber?: string | null;
+
+  newModel?: string | null;
+  newType?: VehicleType | null;
+  newLicencePlate?: string | null;
+  newSeatCount?: number | null;
+  newBabyFriendly?: boolean | null;
+  newPetFriendly?: boolean | null;
+
+  driverId: number;
+};
