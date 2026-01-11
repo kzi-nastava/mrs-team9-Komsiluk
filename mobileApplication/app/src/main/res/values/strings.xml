@@ -136,4 +136,45 @@
     <string name="auth_regist_success">Successful registration</string>
     <string name="auth_success_regist_message">Your account has been successfully activated!</string>
     <string name="auth_go_login">Go to login</string>
+
+    <string name="book_ride_title">Book a ride</string>
+
+    <string name="label_pickup">Pickup location</string>
+    <string name="hint_pickup">Start</string>
+
+    <string name="label_stations">Stations</string>
+    <string name="btn_add_station">+Add station</string>
+
+    <string name="label_destination">Destination</string>
+    <string name="hint_destination">Finish</string>
+
+    <string name="label_users">Users</string>
+    <string name="btn_add_user">+Add user</string>
+
+    <string name="label_car_type">Car type</string>
+    <string name="hint_car_type">Select type</string>
+
+    <string name="label_time">Time</string>
+    <string name="time_now">Now</string>
+    <string name="time_scheduled">Scheduled</string>
+    <string name="hint_time">Select time (up to 5h)</string>
+
+    <string name="btn_book_ride">Book a ride</string>
+
+    <string name="dialog_add_station_title">Add station</string>
+    <string name="dialog_add_station_hint">Enter location…</string>
+
+    <string name="dialog_add_user_title">Add user</string>
+    <string name="dialog_add_user_hint">Enter email of passenger…</string>
+
+    <string name="placeholder_kilometers">Kilometers: 10</string>
+    <string name="placeholder_drive_time">Drive time: 24 min</string>
+    <string name="placeholder_price">Price: 2000 RSD</string>
+
+    <string name="cd_book_ride_icon">Book ride</string>
+    <string name="cd_favorite">Favorite</string>
+    <string name="cd_kilometers">Kilometers</string>
+    <string name="cd_drive_time">Drive time</string>
+    <string name="cd_price">Price</string>
+
 </resources>

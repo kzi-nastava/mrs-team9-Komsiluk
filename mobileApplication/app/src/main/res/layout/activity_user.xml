@@ -1,23 +1,435 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
     android:id="@+id/user_root"
-    tools:context=".UserActivity">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
-    <!-- Fullscreen placeholder image for map -->
+    <!-- MAP placeholder -->
     <ImageView
         android:id="@+id/imgMapPlaceholder"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:scaleType="centerCrop"
-        android:src="@drawable/temp_map"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        android:src="@drawable/temp_map" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <!-- Bottom sheet -->
+    <LinearLayout
+        android:id="@+id/bookRideSheet"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="@drawable/bg_book_sheet"
+        android:elevation="10dp"
+        android:paddingTop="10dp"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        app:layout_behavior="@string/bottom_sheet_behavior"
+        app:behavior_hideable="false"
+        app:behavior_fitToContents="true"
+        app:behavior_peekHeight="72dp">
+
+        <!-- drag handle -->
+        <View
+            android:id="@+id/sheetHandle"
+            android:layout_width="44dp"
+            android:layout_height="5dp"
+            android:layout_gravity="center_horizontal"
+            android:background="@drawable/bg_sheet_handle" />
+
+        <!-- Collapsed header -->
+        <LinearLayout
+            android:id="@+id/headerRow"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/ivBookRideIcon"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:src="@drawable/car"
+                app:tint="@color/secondary"
+                android:contentDescription="@string/cd_book_ride_icon"/>
+
+            <TextView
+                android:id="@+id/tvBookRideTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:text="@string/book_ride_title"
+                android:textColor="@color/secondary"
+                android:textSize="@dimen/fs_h2"
+                android:fontFamily="@font/roboto_serif_semibold"/>
+        </LinearLayout>
+
+        <!-- Scroll content -->
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/formScroll"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:fillViewport="true"
+            android:overScrollMode="never"
+            android:paddingTop="12dp"
+            android:paddingBottom="12dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <!-- Pickup -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/label_pickup"
+                    android:textColor="@color/white"
+                    android:textSize="16sp"
+                    android:fontFamily="@font/roboto_serif_semibold" />
+
+                <EditText
+                    android:id="@+id/etPickup"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="42dp"
+                    android:background="@drawable/bg_input_normal"
+                    android:paddingHorizontal="16dp"
+                    android:textColor="@color/text"
+                    android:textSize="16sp"
+                    android:fontFamily="@font/roboto_serif_medium"
+                    android:hint="@string/hint_pickup"
+                    android:textColorHint="@color/primary_dark"
+                    android:imeOptions="actionNext" />
+
+                <!-- Stations header + add -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/label_stations"
+                        android:textColor="@color/white"
+                        android:textSize="16sp"
+                        android:fontFamily="@font/roboto_serif_semibold" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnAddStation"
+                        style="@style/Widget.Button.Ghost"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/btn_add_station" />
+                </LinearLayout>
+
+                <!-- stations chips -->
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/chipGroupStations"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:singleLine="false"
+                    app:chipSpacingHorizontal="8dp"
+                    app:chipSpacingVertical="8dp" />
+
+                <!-- Destination -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="@string/label_destination"
+                    android:textColor="@color/white"
+                    android:textSize="16sp"
+                    android:fontFamily="@font/roboto_serif_semibold" />
+
+                <EditText
+                    android:id="@+id/etDestination"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="42dp"
+                    android:background="@drawable/bg_input_normal"
+                    android:paddingHorizontal="16dp"
+                    android:textColor="@color/text"
+                    android:textSize="16sp"
+                    android:fontFamily="@font/roboto_serif_medium"
+                    android:hint="@string/hint_destination"
+                    android:textColorHint="@color/primary_dark"
+                    android:imeOptions="actionNext" />
+
+                <!-- Users header + add -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/label_users"
+                        android:textColor="@color/white"
+                        android:textSize="16sp"
+                        android:fontFamily="@font/roboto_serif_semibold" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnAddUser"
+                        style="@style/Widget.Button.Ghost"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/btn_add_user" />
+                </LinearLayout>
+
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/chipGroupUsers"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:singleLine="false"
+                    app:chipSpacingHorizontal="8dp"
+                    app:chipSpacingVertical="8dp" />
+
+                <!-- Car type -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="@string/label_car_type"
+                    android:textColor="@color/white"
+                    android:textSize="16sp"
+                    android:fontFamily="@font/roboto_serif_semibold" />
+
+                <!-- pravi dropdown: AutoComplete + arrow icon -->
+                <AutoCompleteTextView
+                    android:id="@+id/actCarType"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="42dp"
+                    android:background="@drawable/bg_input_normal"
+                    android:paddingHorizontal="16dp"
+                    android:textColor="@color/text"
+                    android:textSize="16sp"
+                    android:fontFamily="@font/roboto_serif_medium"
+                    android:inputType="none"
+                    android:focusable="false"
+                    android:drawableEnd="@drawable/arrow_drop_down"
+                    android:drawablePadding="8dp"
+                    android:hint="@string/hint_car_type"
+                    android:textColorHint="@color/primary_dark" />
+
+                <!-- checkboxes -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="start"
+                    android:layout_marginTop="10dp">
+
+                    <CheckBox
+                        android:id="@+id/cbPetFriendly"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/label_pet_friendly"
+                        android:textColor="@color/white"
+                        android:fontFamily="@font/roboto_serif_semibold"
+                        app:buttonTint="@color/secondary" />
+
+                    <View
+                        android:layout_width="15dp"
+                        android:layout_height="0dp" />
+
+                    <CheckBox
+                        android:id="@+id/cbChildSeat"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/label_child_seat"
+                        android:textColor="@color/white"
+                        android:fontFamily="@font/roboto_serif_semibold"
+                        app:buttonTint="@color/secondary" />
+                </LinearLayout>
+
+                <!-- Time -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="@string/label_time"
+                    android:textColor="@color/white"
+                    android:textSize="16sp"
+                    android:fontFamily="@font/roboto_serif_semibold" />
+
+                <RadioGroup
+                    android:id="@+id/rgTime"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <RadioButton
+                        android:id="@+id/rbNow"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/time_now"
+                        android:textColor="@color/white"
+                        android:fontFamily="@font/roboto_serif_semibold"
+                        app:buttonTint="@color/secondary"
+                        android:checked="true"/>
+
+                    <RadioButton
+                        android:id="@+id/rbScheduled"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="18dp"
+                        android:text="@string/time_scheduled"
+                        android:textColor="@color/white"
+                        android:fontFamily="@font/roboto_serif_semibold"
+                        app:buttonTint="@color/secondary"/>
+                </RadioGroup>
+
+                <AutoCompleteTextView
+                    android:id="@+id/actTime"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="42dp"
+                    android:background="@drawable/bg_input_normal"
+                    android:paddingHorizontal="16dp"
+                    android:textColor="@color/text"
+                    android:textSize="16sp"
+                    android:fontFamily="@font/roboto_serif_medium"
+                    android:inputType="none"
+                    android:focusable="false"
+                    android:drawableEnd="@drawable/arrow_drop_down"
+                    android:drawablePadding="8dp"
+                    android:hint="@string/hint_time"
+                    android:textColorHint="@color/primary_dark"
+                    android:visibility="gone" />
+
+                <!-- Summary rows (ikonice iz drawable, bez emoji) -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:src="@drawable/route"
+                            app:tint="@color/secondary"
+                            android:contentDescription="@string/cd_kilometers"/>
+
+                        <TextView
+                            android:id="@+id/tvKm"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="10dp"
+                            android:text="@string/placeholder_kilometers"
+                            android:textColor="@color/white"
+                            android:textSize="@dimen/fs_md"
+                            android:fontFamily="@font/roboto_serif_medium"/>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:src="@drawable/clock"
+                            app:tint="@color/secondary"
+                            android:contentDescription="@string/cd_drive_time"/>
+
+                        <TextView
+                            android:id="@+id/tvDriveTime"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="10dp"
+                            android:text="@string/placeholder_drive_time"
+                            android:textColor="@color/white"
+                            android:textSize="@dimen/fs_md"
+                            android:fontFamily="@font/roboto_serif_medium"/>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:src="@drawable/money"
+                            app:tint="@color/secondary"
+                            android:contentDescription="@string/cd_price"/>
+
+                        <TextView
+                            android:id="@+id/tvPrice"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="10dp"
+                            android:text="@string/placeholder_price"
+                            android:textColor="@color/white"
+                            android:textSize="@dimen/fs_md"
+                            android:fontFamily="@font/roboto_serif_medium"/>
+                    </LinearLayout>
+                </LinearLayout>
+
+            </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
+
+        <!-- Footer -->
+        <LinearLayout
+            android:id="@+id/footerRow"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingTop="10dp"
+            android:paddingBottom="52dp">
+
+            <!-- favorite -->
+            <ImageButton
+                android:id="@+id/btnFavorite"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:background="@drawable/bg_icon_square"
+                android:padding="8dp"
+                app:tint="@color/primary"
+                android:src="@drawable/favorite"
+                android:contentDescription="@string/cd_favorite"/>
+
+            <View
+                android:layout_width="12dp"
+                android:layout_height="0dp" />
+
+            <!-- book -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnBookRide"
+                style="@style/Widget.Button.Primary"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/btn_book_ride" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

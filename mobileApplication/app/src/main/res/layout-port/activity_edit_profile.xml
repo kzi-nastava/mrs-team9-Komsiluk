@@ -39,7 +39,6 @@
                 android:layout_marginBottom="16dp"
                 android:background="@color/white" />
 
-            <!-- Ovde fragment ubacuje formu (user/driver) -->
             <FrameLayout
                 android:id="@+id/editContentContainer"
                 android:layout_width="match_parent"
