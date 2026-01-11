@@ -245,4 +245,22 @@
 
     <string name="scheduled_card_title_placeholder">Scheduled ride 1</string>
 
+    <string name="about_title">About us</string>
+    <string name="about_tagline">A modern ride-hailing platform connecting passengers and drivers in a safe and reliable way.</string>
+
+    <string name="about_body">
+        Neighbourhood taxi is a taxi and ride-hailing service that allows passengers to quickly book rides, and drivers to manage their daily work in a clear and transparent way. The system supports instant bookings, scheduled rides, detailed ride history and usage reports for all users.
+    </string>
+
+    <string name="contact_title">Contact us</string>
+    <string name="contact_facebook">www.facebook.com</string>
+    <string name="contact_instagram">www.instagram.com</string>
+    <string name="contact_phone">+381 11 111 1111</string>
+    <string name="contact_email">email@gmail.com</string>
+
+    <string name="about_terms">Terms of use</string>
+    <string name="about_privacy">Privacy policy</string>
+
+    <string name="nav_about_us">About us</string>
+
 </resources>

@@ -13,6 +13,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Taxi_Project">
         <activity
+            android:name=".ui.about.AboutUsActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.ride.ScheduledActivity"
             android:exported="false" />
         <activity

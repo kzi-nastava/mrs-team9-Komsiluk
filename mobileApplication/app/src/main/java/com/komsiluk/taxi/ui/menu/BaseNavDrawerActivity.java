@@ -29,6 +29,7 @@ import com.komsiluk.taxi.auth.AuthManager;
 import com.komsiluk.taxi.auth.UserRole;
 import com.komsiluk.taxi.databinding.ActivityBaseNavDrawerBinding;
 import com.komsiluk.taxi.driver.history.DriverHistoryActivity;
+import com.komsiluk.taxi.ui.about.AboutUsActivity;
 import com.komsiluk.taxi.ui.ride.FavoritesActivity;
 import com.komsiluk.taxi.ui.profile.ProfileActivity;
 import com.komsiluk.taxi.ui.ride.ScheduledActivity;
@@ -166,7 +167,7 @@ public abstract class BaseNavDrawerActivity extends AppCompatActivity {
         } else if (itemId == R.id.nav_chat) {
             // ...
         } else if (itemId == R.id.nav_about) {
-            // ...
+            navigateToAbout();
         }
     }
 
@@ -227,5 +228,9 @@ public abstract class BaseNavDrawerActivity extends AppCompatActivity {
 
     protected void navigateToScheduled() {
         startActivity(new Intent(this, ScheduledActivity.class));
+    }
+
+    protected void navigateToAbout() {
+        startActivity(new Intent(this, AboutUsActivity.class));
     }
 }
