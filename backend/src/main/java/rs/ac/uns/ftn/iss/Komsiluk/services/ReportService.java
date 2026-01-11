@@ -34,10 +34,7 @@ public class ReportService implements IReportService {
 
     @Override
     public RideReportDTO getUserReport(Long userId, LocalDate start, LocalDate end) {
-        User user = userRepository.findById(userId);
-        if (user == null) {
-            throw new NotFoundException();
-        }
+        User user = userRepository.findById(userId).orElseThrow(NotFoundException::new);
 
         Collection<Ride> allRides = rideRepository.findAll();
 

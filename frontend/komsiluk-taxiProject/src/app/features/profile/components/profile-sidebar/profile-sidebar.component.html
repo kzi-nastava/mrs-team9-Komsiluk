@@ -2,14 +2,24 @@
   <div class="profile-sidebar__top">
     <!-- Avatar -->
     <div class="profile-sidebar__avatar" aria-hidden="true">
-        <svg class="profile-sidebar__avatar-icon" viewBox="0 0 64 64" role="img">
-        <circle cx="32" cy="22" r="12" fill="currentColor"></circle>
-        <path
-            d="M12 58c0-11 9-20 20-20s20 9 20 20v2H12v-2z"
-            fill="currentColor"
-        ></path>
-        </svg>
+        @if (avatarSrc) {
+            <img class="profile-sidebar__avatar-img" [src]="avatarSrc" alt="Profile image" />
+        } @else {
+            <svg class="profile-sidebar__avatar-icon" viewBox="0 0 64 64" role="img">
+                <circle cx="32" cy="22" r="12" fill="currentColor"></circle>
+                <path d="M12 58c0-11 9-20 20-20s20 9 20 20v2H12v-2z" fill="currentColor"></path>
+            </svg>
+        }
     </div>
+
+    <!-- Hidden file input -->
+    <input
+        #fileInput
+        type="file"
+        accept="image/png,image/jpeg,image/webp"
+        hidden
+        (change)="onPickFile($event)"
+    />
 
     <!-- Name + email -->
     <div class="profile-sidebar__identity">
@@ -22,7 +32,7 @@
     </div>
     
     <!-- Actions -->
-    <button type="button" class="profile-sidebar__link profile-sidebar__link--image">
+    <button type="button" class="profile-sidebar__link profile-sidebar__link--image" (click)="fileInput.click()">
         Change image
     </button>
 

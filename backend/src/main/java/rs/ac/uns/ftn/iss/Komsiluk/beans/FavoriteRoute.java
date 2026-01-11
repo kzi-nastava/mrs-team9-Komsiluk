@@ -2,17 +2,52 @@ package rs.ac.uns.ftn.iss.Komsiluk.beans;
 
 import java.util.List;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.VehicleType;
 
+@Entity
+@Table(name = "favorite_routes")
 public class FavoriteRoute {
 
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
+	
+	@Column(nullable = false)
     private String title;
+	
+	@ManyToOne(fetch = FetchType.EAGER, optional = false)
+	@JoinColumn(name = "route_id", nullable = false)
     private Route route;
+	
+	@ManyToOne(fetch = FetchType.EAGER, optional = false)
+	@JoinColumn(name = "user_id", nullable = false)
     private User user;
+	
+	@ManyToMany(fetch = FetchType.EAGER)
+	@JoinTable(name = "favorite_route_passengers", joinColumns = @JoinColumn(name = "favorite_route_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
     private List<User> passengers;
+	
+	@Enumerated(EnumType.STRING)
+	@Column(nullable = false)
     private VehicleType vehicleType;
+	
+	@Column(nullable = false)
     private boolean petFriendly;
+	
+	@Column(nullable = false)
     private boolean babyFriendly;
 
     public FavoriteRoute() {

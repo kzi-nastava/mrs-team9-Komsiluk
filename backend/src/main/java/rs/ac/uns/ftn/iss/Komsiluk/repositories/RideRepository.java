@@ -1,41 +1,24 @@
 package rs.ac.uns.ftn.iss.Komsiluk.repositories;
 
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import rs.ac.uns.ftn.iss.Komsiluk.beans.Ride;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.RideStatus;
 
 @Repository
-public class RideRepository {
+public interface RideRepository extends JpaRepository<Ride, Long> {
 
-    private final Map<Long, Ride> storage = new HashMap<>();
-    private long idSequence = 1L;
-
-    public Ride save(Ride ride) {
-        if (ride.getId() == null) {
-            ride.setId(idSequence++);
-        }
-        storage.put(ride.getId(), ride);
-        return ride;
-    }
-
-    public Optional<Ride> findById(Long id) {
-        return Optional.ofNullable(storage.get(id));
-    }
-
-    public Collection<Ride> findAll() {
-        return storage.values();
-    }
-    
-    public Collection<Ride> findScheduledByUserId(Long userId) {
-        return storage.values().stream().filter(r -> r.getStatus() == RideStatus.SCHEDULED)
-                .filter(r -> r.getCreatedBy().getId() == userId)
-                .collect(Collectors.toList());
-    }
+	@Query("""
+	        SELECT r
+	        FROM Ride r
+	        WHERE r.status = :status
+	          AND r.createdBy.id = :userId
+	        """)
+	Collection<Ride> findScheduledByUserId(@Param("userId") Long userId, @Param("status") RideStatus status);
+	
 }

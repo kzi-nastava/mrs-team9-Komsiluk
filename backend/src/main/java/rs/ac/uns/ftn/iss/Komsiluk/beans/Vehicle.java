@@ -1,15 +1,40 @@
 package rs.ac.uns.ftn.iss.Komsiluk.beans;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.VehicleType;
 
+@Entity
+@Table(name = "vehicles")
 public class Vehicle {
 	
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
+	
+	@Column(nullable = false)
 	private String model;
+	
+	@Enumerated(EnumType.STRING)
+	@Column(nullable = false)
 	private VehicleType type;
+	
+	@Column(nullable = false, unique = true)
 	private String licencePlate;
+	
+	@Column(nullable = false)
 	private int seatCount;
+	
+	@Column(nullable = false)
 	private boolean babyFriendly;
+	
+	@Column(nullable = false)
 	private boolean petFriendly;
 	
 	public Vehicle() {

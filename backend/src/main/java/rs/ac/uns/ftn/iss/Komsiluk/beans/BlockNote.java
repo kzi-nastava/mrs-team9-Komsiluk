@@ -2,12 +2,36 @@ package rs.ac.uns.ftn.iss.Komsiluk.beans;
 
 import java.time.LocalDateTime;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name = "block_notes")
 public class BlockNote {
 
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+	
+	@ManyToOne(fetch = FetchType.EAGER, optional = false)
+	@JoinColumn(name = "blocked_user_id", nullable = false)
     private User blockedUser;
+	
+	@ManyToOne(fetch = FetchType.EAGER, optional = false)
+	@JoinColumn(name = "admin_id", nullable = false)
     private User admin;
+	
+	@Column(nullable = false)
     private String reason;
+	
+	@Column(nullable = false)
     private LocalDateTime createdAt;
 
     public BlockNote() {

@@ -2,25 +2,64 @@ package rs.ac.uns.ftn.iss.Komsiluk.beans;
 
 import java.time.LocalDateTime;
 
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.DriverStatus;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.UserRole;
 
+@Entity
+@Table(name = "users")
 public class User {
 	
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
+	
+	@Column(unique = true, nullable = false)
 	private String email;
+	
+	@Column(nullable = false)
 	private String passwordHash;
+	
+	@Column(nullable = false)
 	private String firstName;
+	
+	@Column(nullable = false)
 	private String lastName;
+	
 	private String address;
 	private String city;
 	private String phoneNumber;
 	private String profileImageUrl;
+	
+	@Column(nullable = false)
 	private boolean active;
+	
+	@Column(nullable = false)
 	private boolean blocked;
+	
+	@Column(nullable = false)
 	private LocalDateTime createdAt;
+	
+	@Enumerated(EnumType.STRING)
+	@Column(nullable = false)
 	private UserRole role;
+	
+	@Enumerated(EnumType.STRING)
 	private DriverStatus driverStatus;
+	
+	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+	@JoinColumn(name = "vehicle_id")
 	private Vehicle vehicle;
 	
 	public User() {

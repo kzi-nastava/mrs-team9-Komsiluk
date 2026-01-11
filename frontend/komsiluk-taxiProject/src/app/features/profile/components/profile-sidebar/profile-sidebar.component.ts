@@ -7,7 +7,7 @@ import { UserProfileResponseDTO } from '../../../../shared/models/profile.models
   selector: 'app-profile-sidebar',
   imports: [RouterLink],
   templateUrl: './profile-sidebar.component.html',
-  styleUrl: './profile-sidebar.component.css',
+  styleUrls: ['./profile-sidebar.component.css'],
 })
 export class ProfileSidebarComponent {
   @Input() isDriver = false;
@@ -18,12 +18,32 @@ export class ProfileSidebarComponent {
   @Input() isBlocked = false;
   @Output() blockedClick = new EventEmitter<void>();
 
+  @Input() avatarVersion = 0;
+  @Output() profileImagePicked = new EventEmitter<File>();
+
   authService: AuthService;
   router: Router;
 
   constructor(private auth: AuthService, private rout: Router) {
     this.authService = auth;
     this.router = rout;
+  }
+
+  private readonly IMG_BASE = 'http://localhost:8081';
+  get avatarSrc(): string | null {
+    const url = this.profile?.profileImageUrl?.trim();
+    if (!url) return null;
+    return `${this.IMG_BASE}${url}?v=${this.avatarVersion}`;
+  }
+
+  onPickFile(ev: Event) {
+    const input = ev.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+
+    input.value = '';
+
+    this.profileImagePicked.emit(file);
   }
 
   logout() {

@@ -3,6 +3,8 @@ package rs.ac.uns.ftn.iss.Komsiluk.services.interfaces;
 import java.util.Collection;
 import java.util.List;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import rs.ac.uns.ftn.iss.Komsiluk.beans.User;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.user.UserChangePasswordDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.user.UserProfileResponseDTO;
@@ -31,4 +33,6 @@ public interface IUserService {
     public List<String> autocompleteEmails(String query, int limit);
     
     public boolean isBlocked(Long userId);
+    
+    public UserProfileResponseDTO updateProfileImage(Long id, MultipartFile image);
 }

@@ -32,13 +32,10 @@ public class VehicleService implements IVehicleService {
 	private VehicleRepository vehicleRepository;
 	@Autowired
     private VehicleDTOMapper vehicleMapper;
-
     @Autowired
     private UserRepository userRepository;
-
     @Autowired
     private IDriverLocationService driverLocationService;
-
 
 	@Override
     public Collection<VehicleResponseDTO> getAll() {
@@ -53,7 +50,7 @@ public class VehicleService implements IVehicleService {
 
 	@Override
     public VehicleResponseDTO create(VehicleCreateDTO dto) {
-    	if (vehicleRepository.existsByLicencePlate(dto.getLicencePlate())) {
+    	if (vehicleRepository.existsByLicencePlateIgnoreCase(dto.getLicencePlate())) {
     		throw new AlreadyExistsException();
     	}
     	Vehicle vehicle = vehicleMapper.fromCreateDTO(dto);
@@ -65,7 +62,7 @@ public class VehicleService implements IVehicleService {
     public VehicleResponseDTO update(Long id, VehicleUpdateDTO dto) {
         Vehicle v = vehicleRepository.findById(id).orElseThrow(NotFoundException::new);
         if (dto.getLicencePlate() != null && !dto.getLicencePlate().equals(v.getLicencePlate())) {
-			if (vehicleRepository.existsByLicencePlate(dto.getLicencePlate())) {
+			if (vehicleRepository.existsByLicencePlateIgnoreCase(dto.getLicencePlate())) {
 				throw new AlreadyExistsException();
 			}
 		}
@@ -82,9 +79,7 @@ public class VehicleService implements IVehicleService {
 	
 	@Override
 	public Vehicle save(Vehicle vehicle) {
-		vehicleRepository.save(vehicle);
-		
-		return vehicle;
+		return vehicleRepository.save(vehicle);
 	}
     @Override
     public Collection<ActiveVehicleOnMapDTO> getActiveVehiclesOnMap() {

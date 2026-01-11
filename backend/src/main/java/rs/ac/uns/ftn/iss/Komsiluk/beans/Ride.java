@@ -4,30 +4,83 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.CancellationSource;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.RideStatus;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.VehicleType;
 
+@Entity
+@Table(name = "rides")
 public class Ride {
 	
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
+	
+	@Enumerated(EnumType.STRING)
+	@Column(nullable = false)
     private RideStatus status;
+	
+	@Column(nullable = false)
     private LocalDateTime createdAt;
+	
     private LocalDateTime scheduledAt;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
+    
+    @Column(precision = 12, scale = 2)
     private BigDecimal price;
+    
+    @Column(nullable = false)
     private boolean panicTriggered;
+    
+    @Enumerated(EnumType.STRING)
     private CancellationSource cancellationSource;
+    
     private String cancellationReason;
+    
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "route_id")
     private Route route;
+    
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "driver_id")
     private User driver;
+    
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "ride_passengers", joinColumns = @JoinColumn(name = "ride_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
     private List<User> passengers;
+    
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    @JoinColumn(name = "created_by", nullable = false)
     private User createdBy;
+    
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private VehicleType vehicleType;
+    
+    @Column(nullable = false)
     private boolean babyFriendly;
+    
+    @Column(nullable = false)
     private boolean petFriendly;
+    
+    @Column(nullable = false)
     private double distanceKm;
+    
+    @Column(nullable = false)
     private int estimatedDurationMin;
     
 	public Ride() {

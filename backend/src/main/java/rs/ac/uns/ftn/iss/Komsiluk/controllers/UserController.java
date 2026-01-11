@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -11,7 +12,9 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.user.UserBlockedDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.user.UserChangePasswordDTO;
@@ -56,5 +59,10 @@ public class UserController {
         UserBlockedDTO dto = new UserBlockedDTO();
         dto.setBlocked(blocked);
         return ResponseEntity.ok(dto);
+    }
+    
+    @PutMapping(value = "/{id}/profile-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public UserProfileResponseDTO updateProfileImage(@PathVariable Long id, @RequestPart("image") MultipartFile image) {
+        return userService.updateProfileImage(id, image);
     }
 }
