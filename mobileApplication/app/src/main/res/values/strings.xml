@@ -232,4 +232,17 @@
     <string name="favorites_change_name">Change name</string>
 
     <string name="placeholder_time">Time: 2h 14min</string>
+
+    <string name="nav_scheduled_rides">Scheduled rides</string>
+
+    <string name="scheduled_screen_title">Scheduled rides</string>
+    <string name="scheduled_empty">You currently don’t have any scheduled rides.</string>
+
+    <string name="scheduled_details_title">Scheduled ride</string>
+
+    <string name="scheduled_time_label">Scheduled time:</string>
+    <string name="scheduled_time_placeholder">17:30</string>
+
+    <string name="scheduled_card_title_placeholder">Scheduled ride 1</string>
+
 </resources>

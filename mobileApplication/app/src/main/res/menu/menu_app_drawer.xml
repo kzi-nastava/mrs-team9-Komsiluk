@@ -12,6 +12,11 @@
         android:title="@string/menu_favorite_rides" />
 
     <item
+        android:id="@+id/nav_scheduled_rides"
+        android:title="@string/nav_scheduled_rides"
+        android:icon="@drawable/clock" />
+
+    <item
         android:id="@+id/nav_usage"
         android:icon="@drawable/report"
         android:title="@string/menu_usage_report" />

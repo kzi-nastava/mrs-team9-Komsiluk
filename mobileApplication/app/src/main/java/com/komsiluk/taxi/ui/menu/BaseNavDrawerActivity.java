@@ -31,6 +31,7 @@ import com.komsiluk.taxi.databinding.ActivityBaseNavDrawerBinding;
 import com.komsiluk.taxi.driver.history.DriverHistoryActivity;
 import com.komsiluk.taxi.ui.ride.FavoritesActivity;
 import com.komsiluk.taxi.ui.profile.ProfileActivity;
+import com.komsiluk.taxi.ui.ride.ScheduledActivity;
 
 import javax.inject.Inject;
 
@@ -156,6 +157,8 @@ public abstract class BaseNavDrawerActivity extends AppCompatActivity {
             navigateToProfile();
         } else if (itemId == R.id.nav_favorites) {
             navigateToFavorites();
+        }else if (itemId == R.id.nav_scheduled_rides) {
+            navigateToScheduled();
         } else if (itemId == R.id.nav_usage) {
             // ...
         } else if (itemId == R.id.nav_history) {
@@ -222,4 +225,7 @@ public abstract class BaseNavDrawerActivity extends AppCompatActivity {
         startActivity(new Intent(this, FavoritesActivity.class));
     }
 
+    protected void navigateToScheduled() {
+        startActivity(new Intent(this, ScheduledActivity.class));
+    }
 }
