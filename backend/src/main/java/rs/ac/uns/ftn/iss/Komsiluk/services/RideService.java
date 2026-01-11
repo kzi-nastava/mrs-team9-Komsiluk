@@ -171,7 +171,7 @@ public class RideService implements IRideService {
             throw new NotFoundException();
         }
 
-        Collection<Ride> rides = rideRepository.findScheduledByUserId(userId);
+        Collection<Ride> rides = rideRepository.findScheduledByUserId(userId,RideStatus.SCHEDULED);
 
         return rides.stream().map(rideMapper::toResponseDTO).collect(Collectors.toList());
     }

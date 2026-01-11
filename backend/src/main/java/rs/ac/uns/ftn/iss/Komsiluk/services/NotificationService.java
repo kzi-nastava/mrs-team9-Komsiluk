@@ -44,12 +44,12 @@ public class NotificationService implements INotificationService {
 
     @Override
     public Collection<NotificationResponseDTO> getUserNotifications(Long userId) {
-        return repository.findByUserId(userId).stream().map(mapper::toResponseDTO).collect(Collectors.toList());
+        return repository.findByUserIdOrderByCreatedAtDesc(userId).stream().map(mapper::toResponseDTO).collect(Collectors.toList());
     }
 
     @Override
     public Collection<NotificationResponseDTO> getUnreadUserNotifications(Long userId) {
-        return repository.findUnreadByUserId(userId).stream().map(mapper::toResponseDTO).collect(Collectors.toList());
+        return repository.findByUserIdAndReadFalseOrderByCreatedAtDesc(userId).stream().map(mapper::toResponseDTO).collect(Collectors.toList());
     }
 
     @Override

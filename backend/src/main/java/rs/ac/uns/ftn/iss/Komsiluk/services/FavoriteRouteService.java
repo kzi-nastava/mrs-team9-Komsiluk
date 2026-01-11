@@ -64,7 +64,7 @@ public class FavoriteRouteService implements IFavoriteRouteService {
 
     @Override
     public FavoriteRouteResponseDTO updateTitle(Long favoriteId, FavoriteRouteUpdateDTO dto) {
-        FavoriteRoute fav = favoriteRouteRepository.findById(favoriteId);
+        FavoriteRoute fav = favoriteRouteRepository.findById(favoriteId).orElseThrow(NotFoundException::new);
         if (fav == null) throw new NotFoundException();
 
         fav.setTitle(dto.getTitle());
@@ -75,7 +75,7 @@ public class FavoriteRouteService implements IFavoriteRouteService {
 
     @Override
     public void delete(Long favoriteId) {
-        FavoriteRoute fav = favoriteRouteRepository.findById(favoriteId);
+        FavoriteRoute fav = favoriteRouteRepository.findById(favoriteId).orElseThrow(NotFoundException::new);
         if (fav == null) throw new NotFoundException();
         favoriteRouteRepository.deleteById(favoriteId);
     }

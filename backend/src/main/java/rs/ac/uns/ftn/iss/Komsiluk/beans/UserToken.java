@@ -26,7 +26,6 @@ public class UserToken {
 	@Column(nullable = false, unique = true)
     private String token;
 	
-	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
     private LocalDateTime expiresAt;
 	

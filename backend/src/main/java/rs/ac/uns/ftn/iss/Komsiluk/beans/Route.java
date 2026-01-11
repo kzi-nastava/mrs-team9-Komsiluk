@@ -1,12 +1,32 @@
 package rs.ac.uns.ftn.iss.Komsiluk.beans;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name = "routes")
 public class Route {
 
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
+	
+	@Column(nullable = false)
     private String startAddress;
+	
+	@Column(nullable = false)
     private String endAddress;
+	
     private String stops;
+    
+    @Column(nullable = false)
     private double distanceKm;
+    
+    @Column(nullable = false)
     private Integer estimatedDurationMin;
     
     public Route() {

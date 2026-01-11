@@ -43,7 +43,7 @@ public class RouteService implements IRouteService {
     @Override
     public void delete(Long id) {
         Route route = routeRepository.findById(id).orElseThrow(NotFoundException::new);
-        routeRepository.delete(route.getId());
+        routeRepository.deleteById(route.getId());
     }
 
     @Override
