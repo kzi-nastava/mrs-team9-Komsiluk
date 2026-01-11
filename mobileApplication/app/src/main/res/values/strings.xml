@@ -57,7 +57,7 @@
     <string name="profile_menu_support">Support</string>
     <string name="profile_active_today_placeholder">Active today: 5h</string>
     <string name="profile_logout">Log out</string>
-    
+
     <string name="logout_title">Log out</string>
     <string name="logout_message">Are you sure you want to log out?</string>
     <string name="logout_button">Log out</string>
@@ -177,4 +177,59 @@
     <string name="cd_drive_time">Drive time</string>
     <string name="cd_price">Price</string>
 
+    <string name="confirm_booking_title">Confirm booking</string>
+    <string name="confirm_booking_message">Are you sure you want to book this ride?</string>
+    <string name="estimated_values">Estimated values:</string>
+
+    <string name="booking_success_title">Ride booked</string>
+    <string name="booking_success_message">Your ride request has been created.</string>
+
+    <!-- Favorites screen -->
+    <string name="fav_screen_title">Favorite rides</string>
+    <string name="fav_empty">You currently don’t have any favorite rides.</string>
+    <string name="fav_pickup_fmt">Pickup: %1$s</string>
+    <string name="fav_destination_fmt">Destination: %1$s</string>
+
+    <!-- Add to favorites dialog -->
+    <string name="fav_add_title">Add a ride to favourites</string>
+    <string name="fav_add_message">Please insert a name for the ride</string>
+    <string name="fav_add_hint">Ride name</string>
+
+    <!-- Favorite details dialog -->
+    <string name="fav_change_name">Change name</string>
+    <string name="fav_details_pickup_fmt">Pickup location: %1$s</string>
+    <string name="fav_details_destination_fmt">Destination: %1$s</string>
+    <string name="fav_details_stations_fmt">Stations: %1$d</string>
+    <string name="fav_details_users_fmt">Users: %1$d</string>
+    <string name="fav_details_car_type_fmt">Car type: %1$s</string>
+    <string name="fav_details_pet_fmt">Pet friendly: %1$s</string>
+    <string name="fav_details_child_fmt">Child seat available: %1$s</string>
+
+    <!-- Rename / Delete -->
+    <string name="fav_rename_title_fmt">Rename %1$s</string>
+    <string name="fav_rename_message">Please insert a new name for the ride</string>
+    <string name="fav_rename_hint">New name</string>
+
+    <string name="fav_delete_title_fmt">Delete %1$s</string>
+    <string name="fav_delete_message">Are you sure you want to remove this ride from favourites?</string>
+
+    <!-- Common -->
+    <string name="btn_delete">Delete</string>
+    <string name="btn_book">Book</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+
+    <string name="fav_pickup_label">Pickup:</string>
+    <string name="fav_destination_label">Destination:</string>
+
+    <string name="fav_details_stations">Stations:</string>
+    <string name="fav_details_users">Users:</string>
+    <string name="fav_details_car_type">Car type:</string>
+    <string name="fav_details_pet">Pet friendly:</string>
+    <string name="fav_details_child">Child seat available:</string>
+
+    <string name="favorites_details_title">Favorite ride</string>
+    <string name="favorites_change_name">Change name</string>
+
+    <string name="placeholder_time">Time: 2h 14min</string>
 </resources>

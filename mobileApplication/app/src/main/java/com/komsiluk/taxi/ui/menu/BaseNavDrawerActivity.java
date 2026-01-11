@@ -29,7 +29,7 @@ import com.komsiluk.taxi.auth.AuthManager;
 import com.komsiluk.taxi.auth.UserRole;
 import com.komsiluk.taxi.databinding.ActivityBaseNavDrawerBinding;
 import com.komsiluk.taxi.driver.history.DriverHistoryActivity;
-import com.komsiluk.taxi.ui.auth.AuthActivity;
+import com.komsiluk.taxi.ui.ride.FavoritesActivity;
 import com.komsiluk.taxi.ui.profile.ProfileActivity;
 
 import javax.inject.Inject;
@@ -126,8 +126,13 @@ public abstract class BaseNavDrawerActivity extends AppCompatActivity {
         if (bottomNav != null) {
             bottomNav.setVisibility(shouldShowBottomNav() ? View.VISIBLE : View.GONE);
 
+            View btnBottomLeft = bottomNav.findViewById(R.id.navRides);
             View btnBottomCenter = bottomNav.findViewById(R.id.navHome);
             View btnBottomRight  = bottomNav.findViewById(R.id.navProfile);
+
+            if (btnBottomLeft != null) {
+                btnBottomLeft.setOnClickListener(v -> navigateToFavorites());
+            }
 
             if (btnBottomCenter != null) {
                 btnBottomCenter.setOnClickListener(v -> navigateToHome());
@@ -150,7 +155,7 @@ public abstract class BaseNavDrawerActivity extends AppCompatActivity {
         if (itemId == R.id.nav_profile) {
             navigateToProfile();
         } else if (itemId == R.id.nav_favorites) {
-            // ...
+            navigateToFavorites();
         } else if (itemId == R.id.nav_usage) {
             // ...
         } else if (itemId == R.id.nav_history) {
@@ -212,4 +217,9 @@ public abstract class BaseNavDrawerActivity extends AppCompatActivity {
                 break;
         }
     }
+
+    protected void navigateToFavorites() {
+        startActivity(new Intent(this, FavoritesActivity.class));
+    }
+
 }

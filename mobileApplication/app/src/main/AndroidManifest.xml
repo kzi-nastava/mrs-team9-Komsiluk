@@ -13,6 +13,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Taxi_Project">
         <activity
+            android:name=".ui.ride.FavoriteRide"
+            android:exported="false" />
+        <activity
+            android:name=".ui.ride.FavoritesActivity"
+            android:exported="false" />
+        <activity
             android:name=".AdminActivity"
             android:exported="false" />
         <activity

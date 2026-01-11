@@ -6,6 +6,7 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.RadioButton;
 
@@ -18,6 +19,8 @@ import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
 import com.komsiluk.taxi.ui.menu.BaseNavDrawerActivity;
+import com.komsiluk.taxi.ui.ride.FavoriteRide;
+import com.komsiluk.taxi.ui.ride.FavoritesActivity;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -41,7 +44,6 @@ public class UserActivity extends BaseNavDrawerActivity {
     private ImageButton btnFavorite;
     private View headerRow;
     private View sheetHandle;
-
 
     private boolean isFavorite = false;
 
@@ -95,8 +97,53 @@ public class UserActivity extends BaseNavDrawerActivity {
         setupTimeDropdown();
         setupTimeToggle();
         setupAddButtons();
-        setupFavorite();
+        setupFavoriteButton();
         setupBookButton();
+
+        Object extra = getIntent().getSerializableExtra(FavoritesActivity.EXTRA_BOOK_FAVORITE);
+        if (extra instanceof FavoriteRide) {
+            FavoriteRide ride = (FavoriteRide) extra;
+
+            sheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+
+            applyFavoriteToBookRide(ride);
+        }
+
+    }
+
+    private void applyFavoriteToBookRide(FavoriteRide r) {
+        EditText etPickup = findViewById(R.id.etPickup);
+        EditText etDestination = findViewById(R.id.etDestination);
+
+        if (etPickup != null) etPickup.setText(r.getPickup());
+        if (etDestination != null) etDestination.setText(r.getDestination());
+
+        clearStations();
+        for (String s : r.getStations()) {
+            addStationChip(s);
+        }
+
+        clearUsers();
+        for (String u : r.getUsers()) {
+            addUserChip(u);
+        }
+
+        android.widget.AutoCompleteTextView etCarType = findViewById(R.id.actCarType);
+        if (etCarType != null) etCarType.setText(r.getCarType(), false);
+
+        android.widget.CheckBox cbPet = findViewById(R.id.cbPetFriendly);
+        android.widget.CheckBox cbChild = findViewById(R.id.cbChildSeat);
+
+        if (cbPet != null) cbPet.setChecked(r.isPetFriendly());
+        if (cbChild != null) cbChild.setChecked(r.isChildSeat());
+    }
+
+    private void clearStations() {
+        chipStations.removeAllViews();
+    }
+
+    private void clearUsers() {
+        chipUsers.removeAllViews();
     }
 
     private void setSheetDraggable(boolean draggable) {
@@ -161,17 +208,70 @@ public class UserActivity extends BaseNavDrawerActivity {
         ));
     }
 
-    private void setupFavorite() {
-        btnFavorite.setOnClickListener(v -> {
-            isFavorite = !isFavorite;
-            btnFavorite.setImageResource(isFavorite ? R.drawable.favorite : R.drawable.favorite);
+    private void setupFavoriteButton() {
+        ImageButton btnFavorite = findViewById(R.id.btnFavorite);
+        if (btnFavorite == null) return;
+
+        btnFavorite.setOnClickListener(v -> showAddToFavoritesDialog());
+    }
+
+    private void showAddToFavoritesDialog() {
+        View view = getLayoutInflater().inflate(R.layout.dialog_add_to_favorites, null);
+
+        EditText etName = view.findViewById(R.id.etFavName);
+        MaterialButton btnCancel = view.findViewById(R.id.btnFavCancel);
+        MaterialButton btnConfirm = view.findViewById(R.id.btnFavConfirm);
+
+        androidx.appcompat.app.AlertDialog dialog =
+                new androidx.appcompat.app.AlertDialog.Builder(this)
+                        .setView(view)
+                        .setCancelable(true)
+                        .create();
+
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        }
+
+        btnCancel.setOnClickListener(v -> dialog.dismiss());
+
+        btnConfirm.setOnClickListener(v -> {
+            dialog.dismiss();
         });
+
+        dialog.show();
     }
 
     private void setupBookButton() {
-        btnBookRide.setOnClickListener(v -> {
-            sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+        btnBookRide.setOnClickListener(v -> showConfirmBookingDialog());
+    }
+
+    private void showConfirmBookingDialog() {
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_confirm_booking, null);
+
+        MaterialButton btnCancel = dialogView.findViewById(R.id.btnConfirmCancel);
+        MaterialButton btnOk     = dialogView.findViewById(R.id.btnConfirmOk);
+
+        androidx.appcompat.app.AlertDialog dialog =
+                new androidx.appcompat.app.AlertDialog.Builder(this)
+                        .setView(dialogView)
+                        .setCancelable(true)
+                        .create();
+
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+            dialog.getWindow().addFlags(android.view.WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+            android.view.WindowManager.LayoutParams lp = dialog.getWindow().getAttributes();
+            lp.dimAmount = 0.55f;
+            dialog.getWindow().setAttributes(lp);
+        }
+
+        btnCancel.setOnClickListener(v -> dialog.dismiss());
+
+        btnOk.setOnClickListener(v -> {
+            dialog.dismiss();
         });
+
+        dialog.show();
     }
 
     private void showAddDialogStyled(String title, String hint, OnValueAdded callback) {
