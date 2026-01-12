@@ -9,16 +9,36 @@ import android.view.View;
 import androidx.annotation.Nullable;
 
 import com.komsiluk.taxi.R;
+import com.komsiluk.taxi.auth.AuthManager;
+import com.komsiluk.taxi.auth.UserRole;
 import com.komsiluk.taxi.ui.menu.BaseNavDrawerActivity;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.AndroidEntryPoint;
+
+@AndroidEntryPoint
 public class AboutUsActivity extends BaseNavDrawerActivity {
 
     private static final String PHONE_NUMBER = "+381111111111";
     private static final String EMAIL = "email@gmail.com";
 
+    @Inject
+    AuthManager authManager;
+
     @Override
     protected int getContentLayoutId() {
         return R.layout.activity_about_us;
+    }
+
+    @Override
+    protected int getDrawerMenuResId() {
+        if (authManager.getRole().equals(UserRole.DRIVER)) {
+            return R.menu.menu_driver_drawer;
+        } else if(authManager.getRole().equals(UserRole.ADMIN)){
+            return R.menu.menu_admin_drawer;
+        }
+        return R.menu.menu_app_drawer;
     }
 
     @Override

@@ -10,6 +10,7 @@ import com.komsiluk.taxi.auth.AuthManager;
 import com.komsiluk.taxi.auth.UserRole;
 import com.komsiluk.taxi.databinding.ActivityMainBinding;
 import com.komsiluk.taxi.driver.history.DriverHistoryActivity;
+import com.komsiluk.taxi.ui.about.AboutUsActivity;
 import com.komsiluk.taxi.ui.auth.AuthActivity;
 import com.komsiluk.taxi.ui.menu.BaseNavDrawerActivity;
 import com.komsiluk.taxi.ui.profile.ProfileActivity;
@@ -59,7 +60,7 @@ public class MainActivity extends BaseNavDrawerActivity {
             i.putExtra("AUTH_DESTINATION", "REGISTER");
             startActivity(i);
         } else if (itemId == R.id.nav_about) {
-            // startActivity(new Intent(this, AboutActivity.class));
+            startActivity(new Intent(this, AboutUsActivity.class));
         }
     }
 }

@@ -23,6 +23,9 @@
     <string name="menu_about_us">About Us</string>
     <string name="menu_login">Login</string>
     <string name="menu_register">Register</string>
+    <string name="menu_block">Block User</string>
+    <string name="menu_add_driver">Add Driver</string>
+    <string name="menu_panic_history">Panic History</string>
 
     <string name="profile_avatar_content_description">User Avatar</string>
     <string name="profile_change_image">Change image</string>
@@ -262,5 +265,19 @@
     <string name="about_privacy">Privacy policy</string>
 
     <string name="nav_about_us">About us</string>
+
+    <string name="admin_block_user_title">Block a user</string>
+    <string name="admin_block_user_label_user">User</string>
+    <string name="admin_block_user_hint_email">Please enter an email...</string>
+
+    <string name="btn_block">Block</string>
+
+    <string name="dialog_block_title">Block a user</string>
+    <string name="dialog_block_message_fmt">Are you sure you want to block the user:\n%1$s</string>
+    <string name="dialog_block_reason_label">Please give a reason:</string>
+    <string name="dialog_block_reason_hint">Reason...</string>
+
+    <string name="nav_admin_block_user">Block a user</string>
+
 
 </resources>

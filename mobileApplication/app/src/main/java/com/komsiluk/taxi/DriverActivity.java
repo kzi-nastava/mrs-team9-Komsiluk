@@ -18,6 +18,11 @@ public class DriverActivity extends BaseNavDrawerActivity {
     }
 
     @Override
+    protected int getDrawerMenuResId() {
+        return R.menu.menu_driver_drawer;
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
     }

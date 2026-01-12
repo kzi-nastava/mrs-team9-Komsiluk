@@ -2,6 +2,7 @@ package com.komsiluk.taxi.ui.menu;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
 import android.view.View;
 import android.view.Window;
 import android.widget.FrameLayout;
@@ -30,6 +31,7 @@ import com.komsiluk.taxi.auth.UserRole;
 import com.komsiluk.taxi.databinding.ActivityBaseNavDrawerBinding;
 import com.komsiluk.taxi.driver.history.DriverHistoryActivity;
 import com.komsiluk.taxi.ui.about.AboutUsActivity;
+import com.komsiluk.taxi.ui.block.AdminBlockUserActivity;
 import com.komsiluk.taxi.ui.ride.FavoritesActivity;
 import com.komsiluk.taxi.ui.profile.ProfileActivity;
 import com.komsiluk.taxi.ui.ride.ScheduledActivity;
@@ -128,12 +130,21 @@ public abstract class BaseNavDrawerActivity extends AppCompatActivity {
         if (bottomNav != null) {
             bottomNav.setVisibility(shouldShowBottomNav() ? View.VISIBLE : View.GONE);
 
-            View btnBottomLeft = bottomNav.findViewById(R.id.navRides);
+            View btnBottomLeft = bottomNav.findViewById(R.id.navLeft);
             View btnBottomCenter = bottomNav.findViewById(R.id.navHome);
             View btnBottomRight  = bottomNav.findViewById(R.id.navProfile);
 
             if (btnBottomLeft != null) {
-                btnBottomLeft.setOnClickListener(v -> navigateToFavorites());
+                ImageButton navLeftButton = (ImageButton) btnBottomLeft;
+                if (authManager.getRole() == UserRole.PASSENGER) {
+                    btnBottomLeft.setOnClickListener(v -> navigateToFavorites());
+                }else if (authManager.getRole() == UserRole.DRIVER) {
+                    navLeftButton.setImageResource(R.drawable.clock);
+                    btnBottomLeft.setOnClickListener(v -> navigateToScheduled());
+                }else{
+                    navLeftButton.setImageResource(R.drawable.support);
+                    btnBottomLeft.setOnClickListener(v -> navigateToSupport());
+                }
             }
 
             if (btnBottomCenter != null) {
@@ -160,7 +171,9 @@ public abstract class BaseNavDrawerActivity extends AppCompatActivity {
             navigateToFavorites();
         }else if (itemId == R.id.nav_scheduled_rides) {
             navigateToScheduled();
-        } else if (itemId == R.id.nav_usage) {
+        }else if (itemId == R.id.nav_block) {
+            navigateToBlock();
+        }else if (itemId == R.id.nav_usage) {
             // ...
         } else if (itemId == R.id.nav_history) {
             navigateToRideHistory();
@@ -232,5 +245,13 @@ public abstract class BaseNavDrawerActivity extends AppCompatActivity {
 
     protected void navigateToAbout() {
         startActivity(new Intent(this, AboutUsActivity.class));
+    }
+
+    protected void navigateToBlock() {
+        startActivity(new Intent(this, AdminBlockUserActivity.class));
+    }
+
+    protected void navigateToSupport() {
+        // Placeholder for support navigation
     }
 }
