@@ -22,6 +22,11 @@
         android:title="@string/menu_usage_report" />
 
     <item
+        android:id="@+id/nav_edit_requests"
+        android:icon="@drawable/edit"
+        android:title="@string/menu_edit_requests" />
+
+    <item
         android:id="@+id/nav_history"
         android:icon="@drawable/history"
         android:title="@string/menu_ride_history" />

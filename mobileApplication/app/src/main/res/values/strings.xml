@@ -14,6 +14,10 @@
     <string name="btn_done">Done</string>
     <string name="btn_close">Close</string>
     <string name="btn_details">Details</string>
+    <string name="btn_delete">Delete</string>
+    <string name="btn_book">Book</string>
+    <string name="btn_approve">Approve</string>
+    <string name="btn_reject">Reject</string>
 
     <string name="menu_profile">Profile</string>
     <string name="menu_favorite_rides">Favorite Rides</string>
@@ -26,6 +30,7 @@
     <string name="menu_block">Block User</string>
     <string name="menu_add_driver">Add Driver</string>
     <string name="menu_panic_history">Panic History</string>
+    <string name="menu_edit_requests">Edit Requests</string>
 
     <string name="profile_avatar_content_description">User Avatar</string>
     <string name="profile_change_image">Change image</string>
@@ -49,7 +54,6 @@
     <string name="label_pet_friendly">Pet friendly</string>
     <string name="label_pet_friendly_full">Pet friendly: Yes</string>
     <string name="label_child_seat_full">Child seat available: No</string>
-
 
     <string name="nav_left">Left action</string>
     <string name="nav_right">Right action</string>
@@ -217,8 +221,6 @@
     <string name="fav_delete_message">Are you sure you want to remove this ride from favourites?</string>
 
     <!-- Common -->
-    <string name="btn_delete">Delete</string>
-    <string name="btn_book">Book</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
 
@@ -279,5 +281,23 @@
 
     <string name="nav_admin_block_user">Block a user</string>
 
+    <string name="admin_dcr_title">Driver change requests</string>
+    <string name="admin_dcr_subtitle">Review and approve/reject pending profile &amp; vehicle updates.</string>
+
+    <string name="admin_no_pending_title">No pending requests</string>
+    <string name="admin_no_pending_subtitle">All driver profiles are up to date.</string>
+
+    <string name="admin_pending">PENDING</string>
+    <string name="admin_click_to_review">Click to review details</string>
+
+    <string name="admin_req_meta_fmt">Request #%1$d • %2$s</string>
+
+    <string name="admin_dcr_dialog_title">Review change request</string>
+    <string name="admin_dcr_dialog_driver_fmt">Driver: %1$s</string>
+    <string name="admin_dcr_dialog_requested_at_fmt">Requested at: %1$s</string>
+
+    <string name="admin_dcr_field">Field</string>
+    <string name="admin_dcr_current">Current</string>
+    <string name="admin_dcr_requested">Requested</string>
 
 </resources>

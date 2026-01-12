@@ -13,6 +13,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Taxi_Project">
         <activity
+            android:name=".ui.edit.AdminDriverChangeRequestsActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.block.AdminBlockUserActivity"
             android:exported="false" />
         <activity
