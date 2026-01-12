@@ -33,6 +33,7 @@ import com.komsiluk.taxi.driver.history.DriverHistoryActivity;
 import com.komsiluk.taxi.ui.about.AboutUsActivity;
 import com.komsiluk.taxi.ui.block.AdminBlockUserActivity;
 import com.komsiluk.taxi.ui.edit.AdminDriverChangeRequestsActivity;
+import com.komsiluk.taxi.ui.report.UsageReportsActivity;
 import com.komsiluk.taxi.ui.ride.FavoritesActivity;
 import com.komsiluk.taxi.ui.profile.ProfileActivity;
 import com.komsiluk.taxi.ui.ride.ScheduledActivity;
@@ -175,7 +176,7 @@ public abstract class BaseNavDrawerActivity extends AppCompatActivity {
         }else if (itemId == R.id.nav_block) {
             navigateToBlock();
         }else if (itemId == R.id.nav_usage) {
-            // ...
+            navigateToUsageReports();
         }else if (itemId == R.id.nav_edit_requests){
             navigateToEditRequests();
         }else if (itemId == R.id.nav_history) {
@@ -260,5 +261,9 @@ public abstract class BaseNavDrawerActivity extends AppCompatActivity {
 
     protected void navigateToSupport() {
         // Placeholder for support navigation
+    }
+
+    protected void navigateToUsageReports() {
+        startActivity(new Intent(this, UsageReportsActivity.class).putExtra(UsageReportsActivity.EXTRA_IS_ADMIN, authManager.getRole().equals(UserRole.ADMIN)));
     }
 }

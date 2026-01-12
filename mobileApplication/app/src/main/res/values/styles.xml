@@ -14,5 +14,14 @@
         <item name="backgroundInsetBottom">0dp</item>
     </style>
 
+    <style name="AppDatePickerDialogTheme" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
+        <item name="android:windowBackground">@color/secondary</item>
+
+        <item name="colorAccent">@color/primary</item>
+        <item name="colorPrimary">@color/primary</item>
+
+        <item name="android:textColorPrimary">@color/text</item>
+    </style>
+
 </resources>
 

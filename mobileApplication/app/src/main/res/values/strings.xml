@@ -300,4 +300,23 @@
     <string name="admin_dcr_current">Current</string>
     <string name="admin_dcr_requested">Requested</string>
 
+    <string name="usage_reports_title">Usage reports</string>
+    <string name="from_label">From:</string>
+    <string name="to_label">To:</string>
+    <string name="target_label">Target:</string>
+    <string name="user_label">User:</string>
+    <string name="btn_insert">Insert</string>
+    <string name="admin_usage_target_hint">Select target user...</string>
+
+    <string name="chart_money_title">Amount of money per day</string>
+    <string name="chart_rides_title">Number of rides per day</string>
+    <string name="chart_km_title">Number of kilometers traveled per day</string>
+
+    <string name="sum_fmt">Sum: %1$.1f</string>
+    <string name="avg_fmt">Average: %1$.1f</string>
+
+    <string name="err_dates_required">Please select both dates.</string>
+    <string name="err_date_order">"From" must be before or equal to "To".</string>
+    <string name="err_user_required">Please select a user from suggestions.</string>
+
 </resources>
