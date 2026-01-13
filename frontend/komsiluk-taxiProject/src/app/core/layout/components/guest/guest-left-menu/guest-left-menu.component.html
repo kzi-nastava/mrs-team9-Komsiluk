@@ -1,0 +1,18 @@
+<nav class="g-menu">
+
+  <button class="g-item" type="button" (click)="toggle()">
+    <span class="g-left">
+      <span class="material-symbols-outlined">local_taxi</span>
+      <span class="g-text">Booking</span>
+    </span>
+
+    <span class="g-chev" [class.g-chev--open]="bookOpen()">▾</span>
+  </button>
+
+  @if (bookOpen()) {
+    <div class="g-panel">
+      <app-guest-book-ride-panel />
+    </div>
+  }
+
+</nav>

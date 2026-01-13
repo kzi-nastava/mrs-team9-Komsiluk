@@ -110,27 +110,3 @@
   width: 28px;
   height: 26px;
 }
-
-.guest-panel{
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  min-height: 100%;
-}
-
-.cta {
-  margin-top: auto;
-  width: 100%;
-  display: block;
-  height: 44px;
-  border: none;
-  border-radius: 999px;
-  background: var(--color-secondary);
-  color: #111;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.cta:hover {
-  filter: brightness(1.05);
-}
