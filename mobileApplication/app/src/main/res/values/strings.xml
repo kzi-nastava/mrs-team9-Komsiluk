@@ -9,6 +9,7 @@
     <string name="btn_edit">Edit</string>
     <string name="btn_car">Car</string>
     <string name="btn_back">Back</string>
+    <string name="btn_next">Next</string>
     <string name="btn_cancel">Cancel</string>
     <string name="btn_confirm">Confirm</string>
     <string name="btn_done">Done</string>
@@ -318,5 +319,10 @@
     <string name="err_dates_required">Please select both dates.</string>
     <string name="err_date_order">"From" must be before or equal to "To".</string>
     <string name="err_user_required">Please select a user from suggestions.</string>
+
+    <string name="admin_add_driver_title">Add driver</string>
+    <string name="admin_add_driver_vehicle_title">Vehicle details</string>
+    <string name="admin_driver_created_title">Driver account created</string>
+    <string name="admin_driver_created_message">An activation email has been sent to the driver</string>
 
 </resources>

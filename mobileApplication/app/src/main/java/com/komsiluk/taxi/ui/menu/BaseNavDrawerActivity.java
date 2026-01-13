@@ -31,6 +31,7 @@ import com.komsiluk.taxi.auth.UserRole;
 import com.komsiluk.taxi.databinding.ActivityBaseNavDrawerBinding;
 import com.komsiluk.taxi.driver.history.DriverHistoryActivity;
 import com.komsiluk.taxi.ui.about.AboutUsActivity;
+import com.komsiluk.taxi.ui.add_driver.AddDriverActivity;
 import com.komsiluk.taxi.ui.block.AdminBlockUserActivity;
 import com.komsiluk.taxi.ui.edit.AdminDriverChangeRequestsActivity;
 import com.komsiluk.taxi.ui.report.UsageReportsActivity;
@@ -175,6 +176,8 @@ public abstract class BaseNavDrawerActivity extends AppCompatActivity {
             navigateToScheduled();
         }else if (itemId == R.id.nav_block) {
             navigateToBlock();
+        }else if(itemId == R.id.nav_add_driver){
+            navigateToAddDriver();
         }else if (itemId == R.id.nav_usage) {
             navigateToUsageReports();
         }else if (itemId == R.id.nav_edit_requests){
@@ -265,5 +268,9 @@ public abstract class BaseNavDrawerActivity extends AppCompatActivity {
 
     protected void navigateToUsageReports() {
         startActivity(new Intent(this, UsageReportsActivity.class).putExtra(UsageReportsActivity.EXTRA_IS_ADMIN, authManager.getRole().equals(UserRole.ADMIN)));
+    }
+
+    protected void navigateToAddDriver() {
+        startActivity(new Intent(this, AddDriverActivity.class));
     }
 }

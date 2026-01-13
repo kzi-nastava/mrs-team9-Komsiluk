@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:paddingTop="24dp"
+        android:paddingBottom="24dp">
+
+        <LinearLayout
+            android:id="@+id/vehiclePanel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="24dp"
+            android:background="@drawable/bg_panel_dark"
+            android:maxWidth="480dp">
+
+            <TextView
+                android:id="@+id/tvTitleVehicle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/admin_add_driver_vehicle_title"
+                android:textColor="@color/white"
+                android:fontFamily="@font/roboto_serif_semibold"
+                android:textSize="@dimen/fs_h2" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="16dp"
+                android:background="@color/white" />
+
+            <TextView
+                android:id="@+id/tvLabelModel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/label_car_model"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:layout_marginTop="10dp"
+                android:fontFamily="@font/roboto_serif_semibold" />
+
+            <EditText
+                android:id="@+id/etModel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="42dp"
+                android:background="@drawable/bg_input_normal"
+                android:paddingHorizontal="16dp"
+                android:textColor="@color/text"
+                android:textSize="16sp"
+                android:fontFamily="@font/roboto_serif_medium"
+                android:imeOptions="actionNext" />
+
+            <TextView
+                android:id="@+id/tvErrorModel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/error"
+                android:textSize="@dimen/fs_sm"
+                android:visibility="gone"
+                android:layout_marginBottom="12dp" />
+
+            <TextView
+                android:id="@+id/tvLabelType"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/label_type"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:layout_marginTop="10dp"
+                android:fontFamily="@font/roboto_serif_semibold" />
+
+            <AutoCompleteTextView
+                android:id="@+id/actType"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="42dp"
+                android:background="@drawable/bg_input_normal"
+                android:paddingHorizontal="16dp"
+                android:textColor="@color/text"
+                android:textSize="16sp"
+                android:fontFamily="@font/roboto_serif_medium"
+                android:inputType="none"
+                android:focusable="false"
+                android:clickable="true"
+                android:imeOptions="actionNext"
+                android:dropDownWidth="match_parent"
+                android:dropDownVerticalOffset="4dp"
+                android:popupBackground="@drawable/bg_dialog_panel"
+                android:drawableEnd="@drawable/arrow_drop_down"
+                android:drawablePadding="8dp"
+                app:drawableTint="@color/white" />
+
+            <TextView
+                android:id="@+id/tvErrorType"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/error"
+                android:textSize="@dimen/fs_sm"
+                android:visibility="gone"
+                android:layout_marginBottom="12dp" />
+
+            <TextView
+                android:id="@+id/tvLabelLicence"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/label_licence_plate"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:layout_marginTop="10dp"
+                android:fontFamily="@font/roboto_serif_semibold" />
+
+            <EditText
+                android:id="@+id/etLicence"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="42dp"
+                android:background="@drawable/bg_input_normal"
+                android:paddingHorizontal="16dp"
+                android:textColor="@color/text"
+                android:textSize="16sp"
+                android:fontFamily="@font/roboto_serif_medium"
+                android:imeOptions="actionNext" />
+
+            <TextView
+                android:id="@+id/tvErrorLicence"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/error"
+                android:textSize="@dimen/fs_sm"
+                android:visibility="gone"
+                android:layout_marginBottom="12dp" />
+
+            <TextView
+                android:id="@+id/tvLabelSeats"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/label_num_seats"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:layout_marginTop="10dp"
+                android:fontFamily="@font/roboto_serif_semibold" />
+
+            <EditText
+                android:id="@+id/etSeats"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="42dp"
+                android:background="@drawable/bg_input_normal"
+                android:paddingHorizontal="16dp"
+                android:inputType="number"
+                android:textColor="@color/text"
+                android:textSize="16sp"
+                android:fontFamily="@font/roboto_serif_medium"
+                android:imeOptions="actionNext" />
+
+            <TextView
+                android:id="@+id/tvErrorSeats"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/error"
+                android:textSize="@dimen/fs_sm"
+                android:visibility="gone"
+                android:layout_marginBottom="12dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="24dp">
+
+                <com.google.android.material.checkbox.MaterialCheckBox
+                    android:id="@+id/cbPetFriendly"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/label_pet_friendly"
+                    android:textColor="@color/white"
+                    android:fontFamily="@font/roboto_serif_semibold"
+                    app:buttonTint="@color/secondary"
+                    app:checkedIconTint="@color/white" />
+
+                <com.google.android.material.checkbox.MaterialCheckBox
+                    android:id="@+id/cbChildSeat"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/label_child_seat"
+                    android:textColor="@color/white"
+                    android:fontFamily="@font/roboto_serif_semibold"
+                    app:buttonTint="@color/secondary"
+                    app:checkedIconTint="@color/white" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="end">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnBack"
+                    style="@style/Widget.Button.Ghost"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/btn_back" />
+
+                <View
+                    android:layout_width="16dp"
+                    android:layout_height="0dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnConfirm"
+                    style="@style/Widget.Button.Primary"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/btn_confirm" />
+            </LinearLayout>
+
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>
