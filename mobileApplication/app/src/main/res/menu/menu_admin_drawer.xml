@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/nav_profile"
+        android:icon="@drawable/profile"
+        android:title="@string/menu_profile" />
+
+    <item
+        android:id="@+id/nav_block"
+        android:icon="@drawable/block"
+        android:title="@string/menu_block" />
+
+    <item
+        android:id="@+id/nav_add_driver"
+        android:title="@string/menu_add_driver"
+        android:icon="@drawable/add_driver" />
+
+    <item
+        android:id="@+id/nav_usage"
+        android:icon="@drawable/report"
+        android:title="@string/menu_usage_report" />
+
+    <item
+        android:id="@+id/nav_edit_requests"
+        android:icon="@drawable/edit"
+        android:title="@string/menu_edit_requests" />
+
+    <item
+        android:id="@+id/nav_history"
+        android:icon="@drawable/history"
+        android:title="@string/menu_ride_history" />
+
+    <item
+        android:id="@+id/nav_panic"
+        android:icon="@drawable/panic"
+        android:title="@string/menu_panic_history" />
+
+    <item
+        android:id="@+id/nav_chat"
+        android:icon="@drawable/support"
+        android:title="@string/menu_chat" />
+
+    <item
+        android:id="@+id/nav_about"
+        android:icon="@drawable/about"
+        android:title="@string/menu_about_us" />
+</menu>

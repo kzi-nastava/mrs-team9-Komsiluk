@@ -7,5 +7,21 @@
         <item name="android:textColor">@color/secondary</item>
     </style>
 
+    <style name="DialogNoInset" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+        <item name="backgroundInsetStart">0dp</item>
+        <item name="backgroundInsetEnd">0dp</item>
+        <item name="backgroundInsetTop">0dp</item>
+        <item name="backgroundInsetBottom">0dp</item>
+    </style>
+
+    <style name="AppDatePickerDialogTheme" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
+        <item name="android:windowBackground">@color/secondary</item>
+
+        <item name="colorAccent">@color/primary</item>
+        <item name="colorPrimary">@color/primary</item>
+
+        <item name="android:textColorPrimary">@color/text</item>
+    </style>
+
 </resources>
 

@@ -32,6 +32,16 @@ public class ProfileActivity extends BaseNavDrawerActivity
     }
 
     @Override
+    protected int getDrawerMenuResId() {
+        if (authManager.getRole().equals(UserRole.DRIVER)) {
+            return R.menu.menu_driver_drawer;
+        } else if(authManager.getRole().equals(UserRole.ADMIN)){
+            return R.menu.menu_admin_drawer;
+        }
+        return R.menu.menu_app_drawer;
+    }
+
+    @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 

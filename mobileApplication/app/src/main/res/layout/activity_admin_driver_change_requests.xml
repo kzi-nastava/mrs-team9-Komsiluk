@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/rootAdminDcr"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/tvAdminDcrTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/admin_dcr_title"
+        android:textColor="@color/secondary"
+        android:textSize="@dimen/fs_h1"
+        android:fontFamily="@font/roboto_serif_semibold" />
+
+    <!-- Empty panel -->
+    <LinearLayout
+        android:id="@+id/panelNoRequests"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/bg_dialog_panel"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/admin_no_pending_title"
+            android:textColor="@color/secondary"
+            android:textSize="@dimen/fs_lg"
+            android:fontFamily="@font/roboto_serif_semibold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="@string/admin_no_pending_subtitle"
+            android:textColor="@color/white"
+            android:textSize="@dimen/fs_md"
+            android:fontFamily="@font/roboto_serif_medium" />
+    </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvDriverChangeRequests"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="16dp" />
+
+</LinearLayout>

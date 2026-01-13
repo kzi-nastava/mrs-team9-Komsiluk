@@ -18,6 +18,11 @@ public class AdminActivity extends BaseNavDrawerActivity {
     }
 
     @Override
+    protected int getDrawerMenuResId() {
+        return R.menu.menu_admin_drawer;
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
     }

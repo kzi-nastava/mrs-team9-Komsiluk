@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/cardReqRoot"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="12dp"
+    android:background="@drawable/bg_dialog_panel"
+    android:orientation="vertical"
+    android:padding="14dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/tvReqEmail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="driver@test.com"
+            android:textColor="@color/white"
+            android:textSize="@dimen/fs_lg"
+            android:fontFamily="@font/roboto_serif_semibold" />
+
+        <TextView
+            android:id="@+id/tvReqBadge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:background="@drawable/bg_badge_pending"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp"
+            android:text="@string/admin_pending"
+            android:textColor="@color/secondary"
+            android:textSize="@dimen/fs_sm"
+            android:fontFamily="@font/roboto_serif_semibold" />
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/tvReqMeta"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="Request #2 • Jan 12, 2026, 5:03:34 PM"
+        android:textColor="@color/white"
+        android:alpha="0.75"
+        android:textSize="@dimen/fs_sm"
+        android:fontFamily="@font/roboto_serif_medium" />
+
+    <com.google.android.material.chip.ChipGroup
+        android:id="@+id/cgReqTags"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:singleLine="false" />
+
+    <TextView
+        android:id="@+id/tvReqHint"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="@string/admin_click_to_review"
+        android:textColor="@color/white"
+        android:alpha="0.7"
+        android:textSize="@dimen/fs_sm"
+        android:fontFamily="@font/roboto_serif_medium" />
+
+</LinearLayout>

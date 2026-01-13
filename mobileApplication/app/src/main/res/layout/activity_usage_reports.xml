@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/svUsage"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginBottom="40dp"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:id="@+id/rootUsage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:id="@+id/tvUsageTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/usage_reports_title"
+            android:textColor="@color/secondary"
+            android:textSize="@dimen/fs_h1"
+            android:fontFamily="@font/roboto_serif_semibold" />
+
+        <LinearLayout
+            android:id="@+id/panelFilters"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:background="@drawable/bg_dialog_panel"
+            android:orientation="vertical"
+            android:padding="14dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="70dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/from_label"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/fs_md"
+                    android:fontFamily="@font/roboto_serif_semibold" />
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="0dp"
+                    android:layout_height="36dp"
+                    android:layout_weight="1"
+                    app:boxBackgroundMode="outline"
+                    app:boxStrokeColor="@color/secondary"
+                    app:boxStrokeWidth="1dp"
+                    app:boxStrokeWidthFocused="2dp"
+                    app:hintEnabled="false"
+                    app:boxBackgroundColor="@android:color/white"
+                    app:boxCornerRadiusTopStart="10dp"
+                    app:boxCornerRadiusTopEnd="10dp"
+                    app:boxCornerRadiusBottomStart="10dp"
+                    app:boxCornerRadiusBottomEnd="10dp">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etFrom"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:clickable="true"
+                        android:focusable="false"
+                        android:gravity="center_vertical"
+                        android:inputType="none"
+                        android:paddingStart="12dp"
+                        android:paddingEnd="12dp"
+                        android:paddingTop="0dp"
+                        android:paddingBottom="0dp"
+                        android:textColor="@color/text"
+                        android:textSize="@dimen/fs_sm" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="70dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/to_label"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/fs_md"
+                    android:fontFamily="@font/roboto_serif_semibold" />
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="0dp"
+                    android:layout_height="36dp"
+                    android:layout_weight="1"
+                    app:boxBackgroundMode="outline"
+                    app:boxStrokeColor="@color/secondary"
+                    app:boxStrokeWidth="1dp"
+                    app:boxStrokeWidthFocused="2dp"
+                    app:hintEnabled="false"
+                    app:boxBackgroundColor="@android:color/white"
+                    app:boxCornerRadiusTopStart="10dp"
+                    app:boxCornerRadiusTopEnd="10dp"
+                    app:boxCornerRadiusBottomStart="10dp"
+                    app:boxCornerRadiusBottomEnd="10dp">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etTo"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:clickable="true"
+                        android:focusable="false"
+                        android:gravity="center_vertical"
+                        android:inputType="none"
+                        android:paddingStart="12dp"
+                        android:paddingEnd="12dp"
+                        android:paddingTop="0dp"
+                        android:paddingBottom="0dp"
+                        android:textColor="@color/text"
+                        android:textSize="@dimen/fs_sm" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/rowTarget"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/tvLabelTarget"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:text="@string/target_label"
+                    android:textColor="@color/white"
+                    android:textSize="16sp"
+                    android:fontFamily="@font/roboto_serif_semibold" />
+
+                <AutoCompleteTextView
+                    android:id="@+id/actTarget"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:background="@drawable/bg_input_normal"
+                    android:clickable="true"
+                    android:focusable="false"
+                    android:inputType="none"
+                    android:minHeight="42dp"
+                    android:paddingHorizontal="16dp"
+                    android:textColor="@color/text"
+                    android:textSize="16sp"
+                    android:fontFamily="@font/roboto_serif_medium"
+                    android:hint="@string/admin_usage_target_hint"
+                    android:dropDownWidth="match_parent"
+                    android:dropDownVerticalOffset="4dp"
+                    android:popupBackground="@drawable/bg_dialog_panel"
+                    android:drawableEnd="@drawable/arrow_drop_down"
+                    android:drawablePadding="8dp"
+                    app:drawableTint="@color/white" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/rowUser"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/tvLabelUser"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:text="@string/user_label"
+                    android:textColor="@color/white"
+                    android:textSize="16sp"
+                    android:fontFamily="@font/roboto_serif_semibold" />
+
+                <AutoCompleteTextView
+                    android:id="@+id/actUserEmail"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:background="@drawable/bg_input_normal"
+                    android:completionThreshold="3"
+                    android:dropDownVerticalOffset="4dp"
+                    android:dropDownWidth="match_parent"
+                    android:hint="@string/admin_block_user_hint_email"
+                    android:imeOptions="actionDone"
+                    android:inputType="textEmailAddress"
+                    android:minHeight="42dp"
+                    android:paddingHorizontal="16dp"
+                    android:popupBackground="@drawable/bg_dialog_panel"
+                    android:textColor="@color/text"
+                    android:textSize="16sp"
+                    android:fontFamily="@font/roboto_serif_medium" />
+            </LinearLayout>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnInsert"
+                style="@style/Widget.Button.Primary"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="@string/btn_insert" />
+
+            <TextView
+                android:id="@+id/tvValidation"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:textColor="@color/secondary"
+                android:textSize="@dimen/fs_sm"
+                android:fontFamily="@font/roboto_serif_medium"
+                android:visibility="gone" />
+        </LinearLayout>
+
+        <include
+            android:id="@+id/chartMoneyInclude"
+            layout="@layout/partial_usage_chart" />
+
+        <include
+            android:id="@+id/chartRidesInclude"
+            layout="@layout/partial_usage_chart" />
+
+        <include
+            android:id="@+id/chartKmInclude"
+            layout="@layout/partial_usage_chart" />
+
+    </LinearLayout>
+</ScrollView>

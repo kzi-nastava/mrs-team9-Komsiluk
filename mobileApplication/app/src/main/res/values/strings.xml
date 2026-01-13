@@ -9,11 +9,16 @@
     <string name="btn_edit">Edit</string>
     <string name="btn_car">Car</string>
     <string name="btn_back">Back</string>
+    <string name="btn_next">Next</string>
     <string name="btn_cancel">Cancel</string>
     <string name="btn_confirm">Confirm</string>
     <string name="btn_done">Done</string>
     <string name="btn_close">Close</string>
     <string name="btn_details">Details</string>
+    <string name="btn_delete">Delete</string>
+    <string name="btn_book">Book</string>
+    <string name="btn_approve">Approve</string>
+    <string name="btn_reject">Reject</string>
 
     <string name="menu_profile">Profile</string>
     <string name="menu_favorite_rides">Favorite Rides</string>
@@ -23,6 +28,10 @@
     <string name="menu_about_us">About Us</string>
     <string name="menu_login">Login</string>
     <string name="menu_register">Register</string>
+    <string name="menu_block">Block User</string>
+    <string name="menu_add_driver">Add Driver</string>
+    <string name="menu_panic_history">Panic History</string>
+    <string name="menu_edit_requests">Edit Requests</string>
 
     <string name="profile_avatar_content_description">User Avatar</string>
     <string name="profile_change_image">Change image</string>
@@ -47,7 +56,6 @@
     <string name="label_pet_friendly_full">Pet friendly: Yes</string>
     <string name="label_child_seat_full">Child seat available: No</string>
 
-
     <string name="nav_left">Left action</string>
     <string name="nav_right">Right action</string>
 
@@ -57,7 +65,7 @@
     <string name="profile_menu_support">Support</string>
     <string name="profile_active_today_placeholder">Active today: 5h</string>
     <string name="profile_logout">Log out</string>
-    
+
     <string name="logout_title">Log out</string>
     <string name="logout_message">Are you sure you want to log out?</string>
     <string name="logout_button">Log out</string>
@@ -136,4 +144,185 @@
     <string name="auth_regist_success">Successful registration</string>
     <string name="auth_success_regist_message">Your account has been successfully activated!</string>
     <string name="auth_go_login">Go to login</string>
+
+    <string name="book_ride_title">Book a ride</string>
+
+    <string name="label_pickup">Pickup location</string>
+    <string name="hint_pickup">Start</string>
+
+    <string name="label_stations">Stations</string>
+    <string name="btn_add_station">+Add station</string>
+
+    <string name="label_destination">Destination</string>
+    <string name="hint_destination">Finish</string>
+
+    <string name="label_users">Users</string>
+    <string name="btn_add_user">+Add user</string>
+
+    <string name="label_car_type">Car type</string>
+    <string name="hint_car_type">Select type</string>
+
+    <string name="label_time">Time</string>
+    <string name="time_now">Now</string>
+    <string name="time_scheduled">Scheduled</string>
+    <string name="hint_time">Select time (up to 5h)</string>
+
+    <string name="btn_book_ride">Book a ride</string>
+
+    <string name="dialog_add_station_title">Add station</string>
+    <string name="dialog_add_station_hint">Enter location…</string>
+
+    <string name="dialog_add_user_title">Add user</string>
+    <string name="dialog_add_user_hint">Enter email of passenger…</string>
+
+    <string name="placeholder_kilometers">Kilometers: 10</string>
+    <string name="placeholder_drive_time">Drive time: 24 min</string>
+    <string name="placeholder_price">Price: 2000 RSD</string>
+
+    <string name="cd_book_ride_icon">Book ride</string>
+    <string name="cd_favorite">Favorite</string>
+    <string name="cd_kilometers">Kilometers</string>
+    <string name="cd_drive_time">Drive time</string>
+    <string name="cd_price">Price</string>
+
+    <string name="confirm_booking_title">Confirm booking</string>
+    <string name="confirm_booking_message">Are you sure you want to book this ride?</string>
+    <string name="estimated_values">Estimated values:</string>
+
+    <string name="booking_success_title">Ride booked</string>
+    <string name="booking_success_message">Your ride request has been created.</string>
+
+    <!-- Favorites screen -->
+    <string name="fav_screen_title">Favorite rides</string>
+    <string name="fav_empty">You currently don’t have any favorite rides.</string>
+    <string name="fav_pickup_fmt">Pickup: %1$s</string>
+    <string name="fav_destination_fmt">Destination: %1$s</string>
+
+    <!-- Add to favorites dialog -->
+    <string name="fav_add_title">Add a ride to favourites</string>
+    <string name="fav_add_message">Please insert a name for the ride</string>
+    <string name="fav_add_hint">Ride name</string>
+
+    <!-- Favorite details dialog -->
+    <string name="fav_change_name">Change name</string>
+    <string name="fav_details_pickup_fmt">Pickup location: %1$s</string>
+    <string name="fav_details_destination_fmt">Destination: %1$s</string>
+    <string name="fav_details_stations_fmt">Stations: %1$d</string>
+    <string name="fav_details_users_fmt">Users: %1$d</string>
+    <string name="fav_details_car_type_fmt">Car type: %1$s</string>
+    <string name="fav_details_pet_fmt">Pet friendly: %1$s</string>
+    <string name="fav_details_child_fmt">Child seat available: %1$s</string>
+
+    <!-- Rename / Delete -->
+    <string name="fav_rename_title_fmt">Rename %1$s</string>
+    <string name="fav_rename_message">Please insert a new name for the ride</string>
+    <string name="fav_rename_hint">New name</string>
+
+    <string name="fav_delete_title_fmt">Delete %1$s</string>
+    <string name="fav_delete_message">Are you sure you want to remove this ride from favourites?</string>
+
+    <!-- Common -->
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+
+    <string name="fav_pickup_label">Pickup:</string>
+    <string name="fav_destination_label">Destination:</string>
+
+    <string name="fav_details_stations">Stations:</string>
+    <string name="fav_details_users">Users:</string>
+    <string name="fav_details_car_type">Car type:</string>
+    <string name="fav_details_pet">Pet friendly:</string>
+    <string name="fav_details_child">Child seat available:</string>
+
+    <string name="favorites_details_title">Favorite ride</string>
+    <string name="favorites_change_name">Change name</string>
+
+    <string name="placeholder_time">Time: 2h 14min</string>
+
+    <string name="nav_scheduled_rides">Scheduled rides</string>
+
+    <string name="scheduled_screen_title">Scheduled rides</string>
+    <string name="scheduled_empty">You currently don’t have any scheduled rides.</string>
+
+    <string name="scheduled_details_title">Scheduled ride</string>
+
+    <string name="scheduled_time_label">Scheduled time:</string>
+    <string name="scheduled_time_placeholder">17:30</string>
+
+    <string name="scheduled_card_title_placeholder">Scheduled ride 1</string>
+
+    <string name="about_title">About us</string>
+    <string name="about_tagline">A modern ride-hailing platform connecting passengers and drivers in a safe and reliable way.</string>
+
+    <string name="about_body">
+        Neighbourhood taxi is a taxi and ride-hailing service that allows passengers to quickly book rides, and drivers to manage their daily work in a clear and transparent way. The system supports instant bookings, scheduled rides, detailed ride history and usage reports for all users.
+    </string>
+
+    <string name="contact_title">Contact us</string>
+    <string name="contact_facebook">www.facebook.com</string>
+    <string name="contact_instagram">www.instagram.com</string>
+    <string name="contact_phone">+381 11 111 1111</string>
+    <string name="contact_email">email@gmail.com</string>
+
+    <string name="about_terms">Terms of use</string>
+    <string name="about_privacy">Privacy policy</string>
+
+    <string name="nav_about_us">About us</string>
+
+    <string name="admin_block_user_title">Block a user</string>
+    <string name="admin_block_user_label_user">User</string>
+    <string name="admin_block_user_hint_email">Please enter an email...</string>
+
+    <string name="btn_block">Block</string>
+
+    <string name="dialog_block_title">Block a user</string>
+    <string name="dialog_block_message_fmt">Are you sure you want to block the user:\n%1$s</string>
+    <string name="dialog_block_reason_label">Please give a reason:</string>
+    <string name="dialog_block_reason_hint">Reason...</string>
+
+    <string name="nav_admin_block_user">Block a user</string>
+
+    <string name="admin_dcr_title">Driver change requests</string>
+    <string name="admin_dcr_subtitle">Review and approve/reject pending profile &amp; vehicle updates.</string>
+
+    <string name="admin_no_pending_title">No pending requests</string>
+    <string name="admin_no_pending_subtitle">All driver profiles are up to date.</string>
+
+    <string name="admin_pending">PENDING</string>
+    <string name="admin_click_to_review">Click to review details</string>
+
+    <string name="admin_req_meta_fmt">Request #%1$d • %2$s</string>
+
+    <string name="admin_dcr_dialog_title">Review change request</string>
+    <string name="admin_dcr_dialog_driver_fmt">Driver: %1$s</string>
+    <string name="admin_dcr_dialog_requested_at_fmt">Requested at: %1$s</string>
+
+    <string name="admin_dcr_field">Field</string>
+    <string name="admin_dcr_current">Current</string>
+    <string name="admin_dcr_requested">Requested</string>
+
+    <string name="usage_reports_title">Usage reports</string>
+    <string name="from_label">From:</string>
+    <string name="to_label">To:</string>
+    <string name="target_label">Target:</string>
+    <string name="user_label">User:</string>
+    <string name="btn_insert">Insert</string>
+    <string name="admin_usage_target_hint">Select target user...</string>
+
+    <string name="chart_money_title">Amount of money per day</string>
+    <string name="chart_rides_title">Number of rides per day</string>
+    <string name="chart_km_title">Number of kilometers traveled per day</string>
+
+    <string name="sum_fmt">Sum: %1$.1f</string>
+    <string name="avg_fmt">Average: %1$.1f</string>
+
+    <string name="err_dates_required">Please select both dates.</string>
+    <string name="err_date_order">"From" must be before or equal to "To".</string>
+    <string name="err_user_required">Please select a user from suggestions.</string>
+
+    <string name="admin_add_driver_title">Add driver</string>
+    <string name="admin_add_driver_vehicle_title">Vehicle details</string>
+    <string name="admin_driver_created_title">Driver account created</string>
+    <string name="admin_driver_created_message">An activation email has been sent to the driver</string>
+
 </resources>

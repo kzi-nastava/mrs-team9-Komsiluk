@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/dialogRoot"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/bg_dialog_panel"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/tvDialogTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/dialog_add_station_title"
+        android:textColor="@color/secondary"
+        android:textSize="@dimen/fs_h2"
+        android:fontFamily="@font/roboto_serif_semibold"/>
+
+    <TextView
+        android:id="@+id/tvDialogSubtitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:text="@string/dialog_add_station_hint"
+        android:textColor="@color/white"
+        android:textSize="@dimen/fs_md"
+        android:fontFamily="@font/roboto_serif_medium"/>
+
+    <EditText
+        android:id="@+id/etDialogValue"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:minHeight="42dp"
+        android:background="@drawable/bg_input_normal"
+        android:paddingHorizontal="16dp"
+        android:textColor="@color/text"
+        android:textSize="16sp"
+        android:fontFamily="@font/roboto_serif_medium"
+        android:hint="@string/dialog_add_station_hint"
+        android:textColorHint="@color/primary_dark"
+        android:imeOptions="actionDone"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="end"
+        android:layout_marginTop="16dp">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnDialogCancel"
+            style="@style/Widget.Button.Ghost"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/btn_cancel" />
+
+        <View
+            android:layout_width="12dp"
+            android:layout_height="0dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnDialogConfirm"
+            style="@style/Widget.Button.Primary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/btn_confirm" />
+    </LinearLayout>
+
+</LinearLayout>

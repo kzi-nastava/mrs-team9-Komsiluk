@@ -13,6 +13,30 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Taxi_Project">
         <activity
+            android:name=".ui.add_driver.AddDriverActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.report.UsageReportsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.edit.AdminDriverChangeRequestsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.block.AdminBlockUserActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.about.AboutUsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.ride.ScheduledActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.ride.FavoriteRide"
+            android:exported="false" />
+        <activity
+            android:name=".ui.ride.FavoritesActivity"
+            android:exported="false" />
+        <activity
             android:name=".AdminActivity"
             android:exported="false" />
         <activity

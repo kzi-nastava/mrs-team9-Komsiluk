@@ -2,6 +2,7 @@ package com.komsiluk.taxi.ui.menu;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
 import android.view.View;
 import android.view.Window;
 import android.widget.FrameLayout;
@@ -29,8 +30,14 @@ import com.komsiluk.taxi.auth.AuthManager;
 import com.komsiluk.taxi.auth.UserRole;
 import com.komsiluk.taxi.databinding.ActivityBaseNavDrawerBinding;
 import com.komsiluk.taxi.driver.history.DriverHistoryActivity;
-import com.komsiluk.taxi.ui.auth.AuthActivity;
+import com.komsiluk.taxi.ui.about.AboutUsActivity;
+import com.komsiluk.taxi.ui.add_driver.AddDriverActivity;
+import com.komsiluk.taxi.ui.block.AdminBlockUserActivity;
+import com.komsiluk.taxi.ui.edit.AdminDriverChangeRequestsActivity;
+import com.komsiluk.taxi.ui.report.UsageReportsActivity;
+import com.komsiluk.taxi.ui.ride.FavoritesActivity;
 import com.komsiluk.taxi.ui.profile.ProfileActivity;
+import com.komsiluk.taxi.ui.ride.ScheduledActivity;
 
 import javax.inject.Inject;
 
@@ -126,8 +133,22 @@ public abstract class BaseNavDrawerActivity extends AppCompatActivity {
         if (bottomNav != null) {
             bottomNav.setVisibility(shouldShowBottomNav() ? View.VISIBLE : View.GONE);
 
+            View btnBottomLeft = bottomNav.findViewById(R.id.navLeft);
             View btnBottomCenter = bottomNav.findViewById(R.id.navHome);
             View btnBottomRight  = bottomNav.findViewById(R.id.navProfile);
+
+            if (btnBottomLeft != null) {
+                ImageButton navLeftButton = (ImageButton) btnBottomLeft;
+                if (authManager.getRole() == UserRole.PASSENGER) {
+                    btnBottomLeft.setOnClickListener(v -> navigateToFavorites());
+                }else if (authManager.getRole() == UserRole.DRIVER) {
+                    navLeftButton.setImageResource(R.drawable.clock);
+                    btnBottomLeft.setOnClickListener(v -> navigateToScheduled());
+                }else{
+                    navLeftButton.setImageResource(R.drawable.support);
+                    btnBottomLeft.setOnClickListener(v -> navigateToSupport());
+                }
+            }
 
             if (btnBottomCenter != null) {
                 btnBottomCenter.setOnClickListener(v -> navigateToHome());
@@ -150,15 +171,23 @@ public abstract class BaseNavDrawerActivity extends AppCompatActivity {
         if (itemId == R.id.nav_profile) {
             navigateToProfile();
         } else if (itemId == R.id.nav_favorites) {
-            // ...
-        } else if (itemId == R.id.nav_usage) {
-            // ...
-        } else if (itemId == R.id.nav_history) {
+            navigateToFavorites();
+        }else if (itemId == R.id.nav_scheduled_rides) {
+            navigateToScheduled();
+        }else if (itemId == R.id.nav_block) {
+            navigateToBlock();
+        }else if(itemId == R.id.nav_add_driver){
+            navigateToAddDriver();
+        }else if (itemId == R.id.nav_usage) {
+            navigateToUsageReports();
+        }else if (itemId == R.id.nav_edit_requests){
+            navigateToEditRequests();
+        }else if (itemId == R.id.nav_history) {
             navigateToRideHistory();
         } else if (itemId == R.id.nav_chat) {
             // ...
         } else if (itemId == R.id.nav_about) {
-            // ...
+            navigateToAbout();
         }
     }
 
@@ -211,5 +240,37 @@ public abstract class BaseNavDrawerActivity extends AppCompatActivity {
             default:
                 break;
         }
+    }
+
+    protected void navigateToFavorites() {
+        startActivity(new Intent(this, FavoritesActivity.class));
+    }
+
+    protected void navigateToScheduled() {
+        startActivity(new Intent(this, ScheduledActivity.class));
+    }
+
+    protected void navigateToAbout() {
+        startActivity(new Intent(this, AboutUsActivity.class));
+    }
+
+    protected void navigateToBlock() {
+        startActivity(new Intent(this, AdminBlockUserActivity.class));
+    }
+
+    protected void navigateToEditRequests() {
+        startActivity(new Intent(this, AdminDriverChangeRequestsActivity.class));
+    }
+
+    protected void navigateToSupport() {
+        // Placeholder for support navigation
+    }
+
+    protected void navigateToUsageReports() {
+        startActivity(new Intent(this, UsageReportsActivity.class).putExtra(UsageReportsActivity.EXTRA_IS_ADMIN, authManager.getRole().equals(UserRole.ADMIN)));
+    }
+
+    protected void navigateToAddDriver() {
+        startActivity(new Intent(this, AddDriverActivity.class));
     }
 }

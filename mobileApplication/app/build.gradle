@@ -47,6 +47,7 @@ dependencies {
     androidTestImplementation libs.espresso.core
     implementation libs.hilt.android
     annotationProcessor libs.hilt.compiler
+    implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
 }
 
 hilt {
