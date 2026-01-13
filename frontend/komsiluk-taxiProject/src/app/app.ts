@@ -34,6 +34,8 @@ import { AccountBlockedModalService } from './shared/components/modal-shell/serv
 import { ActivatedRoute, NavigationEnd } from '@angular/router';
 import { LeftSidebarCommandService } from './core/layout/components/passenger/services/left-sidebar-command-service.service';
 
+import { LoginRequiredDialogComponent } from './core/layout/components/guest/login-required-dialog/login-required-dialog.component';
+
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -52,7 +54,8 @@ import { LeftSidebarCommandService } from './core/layout/components/passenger/se
     DeleteFavoriteDialogComponent,
     ScheduledDetailsDialogComponent,
     BlockUserConfirmDialogComponent,
-    AccountBlockedDialogComponent
+    AccountBlockedDialogComponent,
+    LoginRequiredDialogComponent
   ],
   templateUrl: './app.html',
   styleUrl: './app.css'

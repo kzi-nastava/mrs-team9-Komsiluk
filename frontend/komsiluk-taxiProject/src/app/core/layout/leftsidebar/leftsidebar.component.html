@@ -1,58 +1,28 @@
 <aside class="leftsidebar" [class.open]="open">
   <div class="leftsidebar__content">
+
     <div class="leftsidebar__header">
       <img class="taxicar" src="assets/taxi.png" alt="Taxi Car" />
       <div class="divider"></div>
     </div>
 
     <div class="leftsidebar__scroll">
-      @if (userRole() === UserRole.GUEST)
-      {
-        <div class="guest-panel">
-          <label class="field">
-            <span class="field__label">Pickup location</span>
-            <input class="field__input" placeholder="Start" />
-          </label>
 
-          <label class="field">
-            <span class="field__label">Destination</span>
-            <input class="field__input" placeholder="Finish" />
-          </label>
-
-          <div class="stats">
-            <div class="stat">
-              <img class="stat__icon stat__icon--big" src="assets/icons/taxi.png" alt="Taxi" />
-              <span>Kilometers: 100</span>
-            </div>
-
-            <div class="stat">
-              <img class="stat__icon stat__icon--big" src="assets/icons/clock.png" alt="Time" />
-              <span>Time: 2h 14min</span>
-            </div>
-          </div>
-
-          <button class="cta">Book a ride</button>
+      @if (userRole() === UserRole.GUEST) {
+        <app-guest-left-menu />
+      }
+      @else if (userRole() === UserRole.PASSENGER) {
+        <app-passenger-left-menu />
+      }
+      @else if (userRole() === UserRole.ADMIN) {
+        <app-admin-left-menu />
+      }
+      @else {
+        <div class="role-label">
+          {{ userRole() }}
         </div>
       }
-      @else if (userRole() === UserRole.PASSENGER)
-      {
-        <app-passenger-left-menu></app-passenger-left-menu>
-      }
-      @else if (userRole() === UserRole.ADMIN)
-      {
-        <app-admin-left-menu></app-admin-left-menu>
-      }
-      @else
-      {
-        <div>
-          <div class="role-label">
-            {{ userRole() === UserRole.PASSENGER ? 'PASSENGER' :
-              userRole() === UserRole.DRIVER ? 'DRIVER' :
-              userRole() === UserRole.ADMIN ? 'ADMIN' : 'GUEST' }}
-          </div>
-        </div>
-      }
+
     </div>
-
   </div>
 </aside>

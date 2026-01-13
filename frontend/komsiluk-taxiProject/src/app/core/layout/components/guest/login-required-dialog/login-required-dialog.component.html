@@ -1,0 +1,33 @@
+<app-modal-shell [open]="modal.isOpen()" (closed)="close()">
+
+  <div class="lr-title text-regular">
+    {{ modal.vm()?.title ?? 'Log in required' }}
+  </div>
+
+  <div class="lr-sub text-regular">
+    {{ modal.vm()?.message ?? 'You need to log in in order to book a ride.' }}
+  </div>
+
+  <div class="lr-hint text-regular">
+    Logging in will allow you to book rides, save favorites, and track your history.
+  </div>
+
+  <div class="lr-actions">
+    <button
+      type="button"
+      class="btn btn--ghost text-semibold btn-scale"
+      (click)="close()"
+    >
+      {{ modal.vm()?.cancelText ?? 'Cancel' }}
+    </button>
+
+    <button
+      type="button"
+      class="btn btn--primary text-semibold btn-scale"
+      (click)="goToLogin()"
+    >
+      {{ modal.vm()?.confirmText ?? 'Go to log in' }}
+    </button>
+  </div>
+
+</app-modal-shell>

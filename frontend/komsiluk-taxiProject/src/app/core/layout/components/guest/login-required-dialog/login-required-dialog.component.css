@@ -1,0 +1,26 @@
+.lr-title {
+  font-size: var(--fs-h1);
+  margin-bottom: 18px;
+  color: var(--color-white);
+  text-align: left;
+}
+
+.lr-sub {
+  font-size: var(--fs-md);
+  color: rgba(255, 255, 255, 0.85);
+  margin-bottom: 14px;
+  text-align: left;
+}
+
+.lr-hint {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.65);
+  margin-bottom: 22px;
+  text-align: left;
+}
+
+.lr-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
