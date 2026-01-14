@@ -39,15 +39,6 @@ public class RideController {
         return new ResponseEntity<>(dto, HttpStatus.OK);
     }
 
-    @PostMapping("/estimate")
-    public ResponseEntity<RideEstimateResponseDTO> estimateRide(
-            @RequestBody RideEstimateRequestDTO dto) {
-
-        RideEstimateResponseDTO response = rideService.estimate(dto);
-
-        return ResponseEntity.ok(response);
-    }
-
     @PostMapping("/{id}/cancel/driver")
     public ResponseEntity<Void> cancelByDriver(
             @PathVariable Long id,

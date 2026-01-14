@@ -316,18 +316,6 @@ public class RideService implements IRideService {
                 .findFirst();
     }
 
-    public RideEstimateResponseDTO estimate(RideEstimateRequestDTO dto) {
-        RideEstimateResponseDTO response = new RideEstimateResponseDTO();
-
-        // ovde neka logika za estimaciju
-        response.setDistanceKm(5);
-        response.setEstimatedDurationMin(10);
-        response.setStartAddress(dto.getStartAddress());
-        response.setDestinationAddress(dto.getDestinationAddress());
-
-        return response;
-    }
-
     public void cancelByDriver(Long rideId, DriverCancelRideDTO dto) {
 
         Ride ride = rideRepository.findById(rideId)
