@@ -13,6 +13,9 @@ import rs.ac.uns.ftn.iss.Komsiluk.dtos.auth.RegisterPassengerRequestDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.userToken.UserTokenResponseDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.mappers.RegisterPassengerMapper;
 import rs.ac.uns.ftn.iss.Komsiluk.security.jwt.JwtService;
+import rs.ac.uns.ftn.iss.Komsiluk.services.exceptions.AccountNotActivatedException;
+import rs.ac.uns.ftn.iss.Komsiluk.services.exceptions.EmailAlreadyExistsException;
+import rs.ac.uns.ftn.iss.Komsiluk.services.exceptions.InvalidCredentialsException;
 import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.IAuthService;
 import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.IUserService;
 import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.IUserTokenService;
@@ -45,13 +48,16 @@ public class AuthService implements IAuthService {
     @Override
     public void registerPassenger(RegisterPassengerRequestDTO dto) {
 
-        if (userService.findByEmail(dto.getEmail()) != null) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already exists");
+        User existing = userService.findByEmail(dto.getEmail());
+
+        if (existing != null) {
+            if (!existing.isActive()) {
+                throw new AccountNotActivatedException();
+            }
+            throw new EmailAlreadyExistsException(dto.getEmail());
         }
 
-
         User user = registerPassengerMapper.toEntity(dto);
-
         userService.save(user);
 
         UserTokenResponseDTO token =
@@ -62,6 +68,7 @@ public class AuthService implements IAuthService {
                 token.getToken()
         );
     }
+
 
     public void resendActivation(String email) {
         User user = userService.findByEmail(email);
@@ -83,14 +90,17 @@ public class AuthService implements IAuthService {
     @Override
     public LoginResponseDTO login(LoginRequestDTO dto) {
 
-        User user = findUserOrThrowUnauthorized(dto.getEmail());
+        User user = userService.findByEmail(dto.getEmail());
+        if (user == null) {
+            throw new InvalidCredentialsException();
+        }
 
         if (!passwordEncoder.matches(dto.getPassword(), user.getPasswordHash())) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+            throw new InvalidCredentialsException();
         }
 
         if (!user.isActive()) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+            throw new AccountNotActivatedException();
         }
 
         if (user.getRole() == UserRole.DRIVER) {
@@ -109,15 +119,6 @@ public class AuthService implements IAuthService {
         );
     }
 
-    private User findUserOrThrowUnauthorized(String email) {
-        try {
-            User user = userService.findByEmail(email);
-            if (user == null) throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
-            return user;
-        } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
-        }
-    }
 
     @Override
     public void forgotPassword(String email) {
