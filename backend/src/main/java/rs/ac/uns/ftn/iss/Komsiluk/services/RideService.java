@@ -22,9 +22,7 @@ import rs.ac.uns.ftn.iss.Komsiluk.dtos.notification.NotificationCreateDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.ride.*;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.route.RouteCreateDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.route.RouteResponseDTO;
-import rs.ac.uns.ftn.iss.Komsiluk.mappers.DriverDTOMapper;
-import rs.ac.uns.ftn.iss.Komsiluk.mappers.RideDTOMapper;
-import rs.ac.uns.ftn.iss.Komsiluk.mappers.RouteDTOMapper;
+import rs.ac.uns.ftn.iss.Komsiluk.mappers.*;
 import rs.ac.uns.ftn.iss.Komsiluk.repositories.RideRepository;
 import rs.ac.uns.ftn.iss.Komsiluk.services.exceptions.BadRequestException;
 import rs.ac.uns.ftn.iss.Komsiluk.services.exceptions.NotFoundException;
@@ -60,6 +58,10 @@ public class RideService implements IRideService {
     private IInconsistencyReportService inconsistencyReportService;
     @Autowired
     private DriverDTOMapper driverMapper;
+    @Autowired
+    private AdminRideDetailsMapper adminRideDetailsMapper;
+    @Autowired
+    private AdminRideHistoryMapper adminRideHistoryMapper;
 
     @Override
     public RideResponseDTO orderRide(RideCreateDTO dto) {
@@ -449,27 +451,8 @@ public class RideService implements IRideService {
                     return true;
                 })
                 .sorted(getAdminSortComparator(sortBy))
-                .map(this::mapToAdminHistoryDTO)
+                .map(adminRideHistoryMapper::toDto)
                 .toList();
-    }
-
-    private AdminRideHistoryDTO mapToAdminHistoryDTO(Ride ride) {
-        AdminRideHistoryDTO dto = new AdminRideHistoryDTO();
-        dto.setRideId(ride.getId());
-        dto.setStartAddress(
-                ride.getRoute() != null ? ride.getRoute().getStartAddress() : null
-        );
-        dto.setEndAddress(
-                ride.getRoute() != null ? ride.getRoute().getEndAddress() : null
-        );
-
-        dto.setStartTime(ride.getStartTime());
-        dto.setEndTime(ride.getEndTime());
-        dto.setCanceled(ride.getStatus() == RideStatus.CANCELLED);
-        dto.setCancellationSource(ride.getCancellationSource());
-        dto.setPrice(ride.getPrice());
-        dto.setPanicTriggered(ride.isPanicTriggered());
-        return dto;
     }
 
     public AdminRideDetailsDTO getAdminRideDetails(Long rideId) {
@@ -477,43 +460,12 @@ public class RideService implements IRideService {
         Ride ride = rideRepository.findById(rideId)
                 .orElseThrow(NotFoundException::new);
 
-        AdminRideDetailsDTO dto = new AdminRideDetailsDTO();
+        var ratings = ratingService.getRatingsForRide(rideId);
+        var reports = inconsistencyReportService.getByRideId(rideId);
 
-        dto.setRideId(ride.getId());
-        dto.setRoute(routeMapper.toResponseDTO(ride.getRoute()));
-        dto.setStartTime(ride.getStartTime());
-        dto.setEndTime(ride.getEndTime());
-        dto.setCanceled(ride.getStatus() == RideStatus.CANCELLED);
-        dto.setCancellationSource(ride.getCancellationSource());
-        dto.setCancellationReason(ride.getCancellationReason());
-        dto.setPrice(ride.getPrice());
-        dto.setPanicTriggered(ride.isPanicTriggered());
-
-        // DRIVER (ako postoji)
-        if (ride.getDriver() != null) {
-            dto.setDriver(driverMapper.toResponseDTO(ride.getDriver()));
-        }
-
-        // PASSENGERS — bez UserResponseDTO
-        dto.setPassengerIds(
-                ride.getPassengers()
-                        .stream()
-                        .map(User::getId)
-                        .toList()
-        );
-
-        // RATINGS
-        dto.setRatings(
-                ratingService.getRatingsForRide(rideId)
-        );
-
-        // INCONSISTENCY REPORTS
-        dto.setInconsistencyReports(
-                inconsistencyReportService.getByRideId(rideId)
-        );
-
-        return dto;
+        return adminRideDetailsMapper.toDto(ride, ratings, reports);
     }
+
 
     public Collection<AdminRideHistoryDTO> getAdminRideHistoryForUser(
             Long userId,
@@ -527,7 +479,6 @@ public class RideService implements IRideService {
                         r.getStatus() == RideStatus.FINISHED ||
                                 r.getStatus() == RideStatus.CANCELLED
                 )
-                // 2️⃣ filter po datumu (createdAt)
                 .filter(ride -> {
                     if (from != null && ride.getCreatedAt().toLocalDate().isBefore(from)) {
                         return false;
@@ -538,11 +489,9 @@ public class RideService implements IRideService {
                     return true;
                 })
 
-                // 3️⃣ sortiranje
                 .sorted(getAdminSortComparator(sortBy))
 
-                // 4️⃣ mapiranje u DTO
-                .map(this::mapToAdminHistoryDTO)
+                .map(adminRideHistoryMapper::toDto)
 
                 .toList();
     }
