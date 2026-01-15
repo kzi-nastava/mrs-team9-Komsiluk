@@ -11,7 +11,11 @@ import rs.ac.uns.ftn.iss.Komsiluk.dtos.auth.LoginRequestDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.auth.LoginResponseDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.auth.RegisterPassengerRequestDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.userToken.UserTokenResponseDTO;
+import rs.ac.uns.ftn.iss.Komsiluk.mappers.RegisterPassengerMapper;
 import rs.ac.uns.ftn.iss.Komsiluk.security.jwt.JwtService;
+import rs.ac.uns.ftn.iss.Komsiluk.services.exceptions.AccountNotActivatedException;
+import rs.ac.uns.ftn.iss.Komsiluk.services.exceptions.EmailAlreadyExistsException;
+import rs.ac.uns.ftn.iss.Komsiluk.services.exceptions.InvalidCredentialsException;
 import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.IAuthService;
 import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.IUserService;
 import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.IUserTokenService;
@@ -24,45 +28,36 @@ public class AuthService implements IAuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final MailService mailService;
+    private final RegisterPassengerMapper registerPassengerMapper;
 
     public AuthService(
             IUserService userService,
             IUserTokenService userTokenService,
             PasswordEncoder passwordEncoder,
             JwtService jwtService,
-            MailService mailService) {
+            MailService mailService,
+            RegisterPassengerMapper registerPassengerMapper) {
         this.userService = userService;
         this.userTokenService = userTokenService;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
         this.mailService = mailService;
+        this.registerPassengerMapper = registerPassengerMapper;
     }
 
     @Override
     public void registerPassenger(RegisterPassengerRequestDTO dto) {
 
-        if (userService.findByEmail(dto.getEmail()) != null) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already exists");
+        User existing = userService.findByEmail(dto.getEmail());
+
+        if (existing != null) {
+            if (!existing.isActive()) {
+                throw new AccountNotActivatedException();
+            }
+            throw new EmailAlreadyExistsException(dto.getEmail());
         }
 
-
-        User user = new User();
-        user.setEmail(dto.getEmail());
-        user.setPasswordHash(passwordEncoder.encode(dto.getPassword()));
-        user.setFirstName(dto.getFirstName());
-        user.setLastName(dto.getLastName());
-        user.setAddress(dto.getAddress());
-        user.setCity(dto.getCity());
-        user.setPhoneNumber(dto.getPhoneNumber());
-        user.setProfileImageUrl(
-                dto.getProfileImageUrl() != null
-                        ? dto.getProfileImageUrl()
-                        : "/images/default.png"
-        );
-        user.setRole(UserRole.PASSENGER);
-        user.setActive(false);
-        user.setBlocked(false);
-
+        User user = registerPassengerMapper.toEntity(dto);
         userService.save(user);
 
         UserTokenResponseDTO token =
@@ -73,6 +68,7 @@ public class AuthService implements IAuthService {
                 token.getToken()
         );
     }
+
 
     public void resendActivation(String email) {
         User user = userService.findByEmail(email);
@@ -94,14 +90,17 @@ public class AuthService implements IAuthService {
     @Override
     public LoginResponseDTO login(LoginRequestDTO dto) {
 
-        User user = findUserOrThrowUnauthorized(dto.getEmail());
+        User user = userService.findByEmail(dto.getEmail());
+        if (user == null) {
+            throw new InvalidCredentialsException();
+        }
 
         if (!passwordEncoder.matches(dto.getPassword(), user.getPasswordHash())) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+            throw new InvalidCredentialsException();
         }
 
         if (!user.isActive()) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+            throw new AccountNotActivatedException();
         }
 
         if (user.getRole() == UserRole.DRIVER) {
@@ -120,15 +119,6 @@ public class AuthService implements IAuthService {
         );
     }
 
-    private User findUserOrThrowUnauthorized(String email) {
-        try {
-            User user = userService.findByEmail(email);
-            if (user == null) throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
-            return user;
-        } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
-        }
-    }
 
     @Override
     public void forgotPassword(String email) {
