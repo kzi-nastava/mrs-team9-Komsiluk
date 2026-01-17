@@ -7,19 +7,26 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.UserRole;
 import rs.ac.uns.ftn.iss.Komsiluk.security.jwt.JwtService;
+import rs.ac.uns.ftn.iss.Komsiluk.security.services.CustomUserDetailsService;
 
 import java.io.IOException;
 import java.util.List;
 
+@Component
 public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
+    private final CustomUserDetailsService userDetailsService;
 
-    public JwtAuthFilter(JwtService jwtService) {
+    public JwtAuthFilter(JwtService jwtService,
+                         CustomUserDetailsService userDetailsService) {
         this.jwtService = jwtService;
+        this.userDetailsService = userDetailsService;
     }
 
     @Override
@@ -36,24 +43,22 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             return;
         }
 
-        String token = authHeader.substring(7); // skida "Bearer "
+        String token = authHeader.substring(7);
 
         if (!jwtService.isValid(token)) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return;
         }
 
-        Long userId = jwtService.extractUserId(token);
-        UserRole role = jwtService.extractRole(token);
+        String email = jwtService.extractUsername(token);
 
-        SimpleGrantedAuthority authority =
-                new SimpleGrantedAuthority("ROLE_" + role.name());
+        UserDetails userDetails = userDetailsService.loadUserByUsername(email);
 
         UsernamePasswordAuthenticationToken authentication =
                 new UsernamePasswordAuthenticationToken(
-                        userId,
+                        userDetails,
                         null,
-                        List.of(authority)
+                        userDetails.getAuthorities()
                 );
 
         SecurityContextHolder.getContext().setAuthentication(authentication);

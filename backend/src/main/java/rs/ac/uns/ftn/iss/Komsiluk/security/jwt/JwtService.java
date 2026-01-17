@@ -27,14 +27,13 @@ public class JwtService {
         Instant now = Instant.now();
         Instant exp = now.plusSeconds(props.getExpirationSeconds());
 
-        // Minimalni claims: userId + role
         Map<String, Object> claims = Map.of(
                 "role", user.getRole().name()
         );
 
         return Jwts.builder()
                 .setIssuer(props.getIssuer())
-                .setSubject(String.valueOf(user.getId())) // sub = userId
+                .setSubject(user.getEmail())
                 .setIssuedAt(Date.from(now))
                 .setExpiration(Date.from(exp))
                 .addClaims(claims)
@@ -44,25 +43,18 @@ public class JwtService {
 
     public boolean isValid(String token) {
         try {
-            parseAllClaims(token);
+            parseClaims(token);
             return true;
         } catch (JwtException | IllegalArgumentException ex) {
             return false;
         }
     }
 
-    public long extractUserId(String token) {
-        Claims claims = parseAllClaims(token);
-        return Long.parseLong(claims.getSubject());
+    public String extractUsername(String token) {
+        return parseClaims(token).getSubject();
     }
 
-    public UserRole extractRole(String token) {
-        Claims claims = parseAllClaims(token);
-        String role = claims.get("role", String.class);
-        return UserRole.valueOf(role);
-    }
-
-    private Claims parseAllClaims(String token) {
+    private Claims parseClaims(String token) {
         return Jwts.parserBuilder()
                 .requireIssuer(props.getIssuer())
                 .setSigningKey(key)

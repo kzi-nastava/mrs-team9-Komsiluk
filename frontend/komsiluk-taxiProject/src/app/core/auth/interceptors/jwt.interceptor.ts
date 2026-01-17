@@ -60,7 +60,7 @@ export const jwtInterceptor: HttpInterceptorFn = (
       }
 
       if (error.status === 403) {
-        router.navigate(['/forbidden']);
+        router.navigate(['/login']);
       }
 
       return throwError(() => error);

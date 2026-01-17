@@ -102,6 +102,10 @@ export class PassengerRegistrationComponent {
             return;
           }
 
+          if (err?.status === 403) {
+            this.toast.show('Account is not activated. Please check your email.');
+            return;
+          }
           this.toast.show('Something went wrong. Please try again.');
         },
       });
