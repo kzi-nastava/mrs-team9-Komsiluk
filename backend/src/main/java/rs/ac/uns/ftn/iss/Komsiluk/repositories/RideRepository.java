@@ -1,5 +1,6 @@
 package rs.ac.uns.ftn.iss.Komsiluk.repositories;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -20,5 +21,22 @@ public interface RideRepository extends JpaRepository<Ride, Long> {
 	          AND r.createdBy.id = :userId
 	        """)
 	Collection<Ride> findScheduledByUserId(@Param("userId") Long userId, @Param("status") RideStatus status);
-	
+
+
+    @Query("""
+        SELECT DISTINCT r
+        FROM Ride r
+        LEFT JOIN r.passengers p
+        WHERE
+            (r.driver.id = :userId OR p.id = :userId)
+            AND r.status IN :statuses
+            AND (:from IS NULL OR r.createdAt >= :from)
+            AND (:to IS NULL OR r.createdAt <= :to)
+    """)
+    Collection<Ride> findAdminRideHistoryForUser(
+            @Param("userId") Long userId,
+            @Param("statuses") Collection<RideStatus> statuses,
+            @Param("from") LocalDateTime from,
+            @Param("to") LocalDateTime to
+    );
 }

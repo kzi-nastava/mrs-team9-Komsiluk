@@ -418,30 +418,30 @@ public class RideService implements IRideService {
         return response;
     }
 
-    public Collection<AdminRideHistoryDTO> getAdminRideHistory(
-            LocalDate from,
-            LocalDate to,
-            String sortBy
-    ) {
-
-        return rideRepository.findAll().stream()
-                .filter(r ->
-                        r.getStatus() == RideStatus.FINISHED ||
-                                r.getStatus() == RideStatus.CANCELLED
-                )
-                .filter(r -> {
-                    if (from != null && r.getCreatedAt().toLocalDate().isBefore(from)) {
-                        return false;
-                    }
-                    if (to != null && r.getCreatedAt().toLocalDate().isAfter(to)) {
-                        return false;
-                    }
-                    return true;
-                })
-                .sorted(getAdminSortComparator(sortBy))
-                .map(adminRideHistoryMapper::toDto)
-                .toList();
-    }
+//    public Collection<AdminRideHistoryDTO> getAdminRideHistory(
+//            LocalDate from,
+//            LocalDate to,
+//            String sortBy
+//    ) {
+//
+//        return rideRepository.findAll().stream()
+//                .filter(r ->
+//                        r.getStatus() == RideStatus.FINISHED ||
+//                                r.getStatus() == RideStatus.CANCELLED
+//                )
+//                .filter(r -> {
+//                    if (from != null && r.getCreatedAt().toLocalDate().isBefore(from)) {
+//                        return false;
+//                    }
+//                    if (to != null && r.getCreatedAt().toLocalDate().isAfter(to)) {
+//                        return false;
+//                    }
+//                    return true;
+//                })
+//                .sorted(getAdminSortComparator(sortBy))
+//                .map(adminRideHistoryMapper::toDto)
+//                .toList();
+//    }
 
     public AdminRideDetailsDTO getAdminRideDetails(Long rideId) {
 
@@ -455,50 +455,55 @@ public class RideService implements IRideService {
     }
 
 
+    @Override
     public Collection<AdminRideHistoryDTO> getAdminRideHistoryForUser(
             Long userId,
             LocalDate from,
             LocalDate to,
             String sortBy
     ) {
-        return rideRepository.findAll().stream()
-                .filter(ride -> isUserOnRide(ride, userId))
-                .filter(r ->
-                        r.getStatus() == RideStatus.FINISHED ||
-                                r.getStatus() == RideStatus.CANCELLED
+        var statuses = List.of(
+                RideStatus.FINISHED,
+                RideStatus.CANCELLED
+        );
+
+        LocalDateTime fromDateTime = from != null
+                ? from.atStartOfDay()
+                : null;
+
+        LocalDateTime toDateTime = to != null
+                ? to.atTime(23, 59, 59)
+                : null;
+
+        return rideRepository
+                .findAdminRideHistoryForUser(
+                        userId,
+                        statuses,
+                        fromDateTime,
+                        toDateTime
                 )
-                .filter(ride -> {
-                    if (from != null && ride.getCreatedAt().toLocalDate().isBefore(from)) {
-                        return false;
-                    }
-                    if (to != null && ride.getCreatedAt().toLocalDate().isAfter(to)) {
-                        return false;
-                    }
-                    return true;
-                })
-
+                .stream()
                 .sorted(getAdminSortComparator(sortBy))
-
                 .map(adminRideHistoryMapper::toDto)
-
                 .toList();
     }
 
-    private boolean isUserOnRide(Ride ride, Long userId) {
-        // ako je vozač
-        if (ride.getDriver() != null &&
-                ride.getDriver().getId().equals(userId)) {
-            return true;
-        }
 
-        // ako je putnik
-        if (ride.getPassengers() != null) {
-            return ride.getPassengers().stream()
-                    .anyMatch(p -> p != null && p.getId().equals(userId));
-        }
-
-        return false;
-    }
+//    private boolean isUserOnRide(Ride ride, Long userId) {
+//        // ako je vozač
+//        if (ride.getDriver() != null &&
+//                ride.getDriver().getId().equals(userId)) {
+//            return true;
+//        }
+//
+//        // ako je putnik
+//        if (ride.getPassengers() != null) {
+//            return ride.getPassengers().stream()
+//                    .anyMatch(p -> p != null && p.getId().equals(userId));
+//        }
+//
+//        return false;
+//    }
 
 
 

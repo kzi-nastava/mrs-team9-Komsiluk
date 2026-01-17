@@ -22,23 +22,23 @@ public class AdminController {
     @Autowired
     private IRideService rideService;
 
-    @GetMapping(value = "/rides", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Collection<AdminRideHistoryDTO>> getAllRides(
-            @RequestParam(required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-            LocalDate from,
-
-            @RequestParam(required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-            LocalDate to,
-
-            @RequestParam(required = false)
-            String sortBy
-    ) {
-        return ResponseEntity.ok(
-                rideService.getAdminRideHistory(from, to, sortBy)
-        );
-    }
+//    @GetMapping(value = "/rides", produces = MediaType.APPLICATION_JSON_VALUE)
+//    public ResponseEntity<Collection<AdminRideHistoryDTO>> getAllRides(
+//            @RequestParam(required = false)
+//            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+//            LocalDate from,
+//
+//            @RequestParam(required = false)
+//            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+//            LocalDate to,
+//
+//            @RequestParam(required = false)
+//            String sortBy
+//    ) {
+//        return ResponseEntity.ok(
+//                rideService.getAdminRideHistory(from, to, sortBy)
+//        );
+//    }
 
     @GetMapping(value = "/users/{userId}/rides", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Collection<AdminRideHistoryDTO>> getUserRides(
