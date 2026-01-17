@@ -6,6 +6,7 @@ import { ToastService } from '../toast/toast.service';
 import { AuthService } from '../../../core/auth/services/auth.service';
 
 import { MESSAGE_REGISTRY, MessageAction, MessageId } from './message-registry';
+import { RidePlannerService } from '../map/services/ride-planner.service';
 
 @Component({
   selector: 'app-message-page',
@@ -20,6 +21,7 @@ export class MessagePageComponent {
 
   constructor(
     private route: ActivatedRoute,
+    private ridePlanner: RidePlannerService,
     private router: Router,
     private auth: AuthService,
     private toast: ToastService
@@ -46,5 +48,6 @@ export class MessagePageComponent {
     this.auth.logout();
     if (a.toast) this.toast.show(a.toast);
     this.router.navigateByUrl(a.urlAfter);
+    this.ridePlanner.reset();
   }
 }

@@ -17,59 +17,55 @@ import { GeoPoint } from '../../../../../shared/components/map/services/routing.
 })
 export class GuestBookRidePanelComponent {
 
-  // input text
-  pickupText = signal('');
-  destinationText = signal('');
 
-  // suggestions
+
   pickupSuggestions = signal<AddressSuggestion[]>([]);
   destinationSuggestions = signal<AddressSuggestion[]>([]);
 
   constructor(
     private geocoding: GeocodingService,
     public ridePlanner: RidePlannerService,
-    private loginRequiredModal: LoginRequiredModalService
+    private loginRequiredModal: LoginRequiredModalService,
+    private toast: ToastService
   ) { }
 
-  /* ---------------- SEARCH ---------------- */
+
 
   searchPickup() {
-    const q = this.pickupText();
+    const q = this.ridePlanner.pickupText();
     this.geocoding.search(q).subscribe(list => {
       this.pickupSuggestions.set(list);
     });
   }
 
   searchDestination() {
-    const q = this.destinationText();
+    const q = this.ridePlanner.destinationText();
     this.geocoding.search(q).subscribe(list => {
       this.destinationSuggestions.set(list);
     });
   }
 
-  /* ---------------- SELECT ---------------- */
+
 
   selectPickup(s: AddressSuggestion) {
-    this.pickupText.set(s.label);
+    this.ridePlanner.setPickupText(s.label);
     this.pickupSuggestions.set([]);
 
     this.ridePlanner.setPickup(this.toPoint(s));
   }
 
   selectDestination(s: AddressSuggestion) {
-    this.destinationText.set(s.label);
+    this.ridePlanner.setDestinationText(s.label);
     this.destinationSuggestions.set([]);
 
     this.ridePlanner.setDestination(this.toPoint(s));
   }
 
-  /* ---------------- STATE ---------------- */
 
-  hasRoute = computed(() => {
-    return this.ridePlanner.route() !== null;
-  });
 
-  /* ---------------- ACTION ---------------- */
+  hasRoute = computed(() => this.ridePlanner.route() !== null);
+
+
 
   requestLogin() {
     this.loginRequiredModal.open({
@@ -80,7 +76,17 @@ export class GuestBookRidePanelComponent {
     });
   }
 
-  /* ---------------- UTIL ---------------- */
+  onBookClick() {
+    if (!this.ridePlanner.pickup() || !this.ridePlanner.destination()) {
+      this.toast.show('Please select both pickup and destination locations.');
+      return;
+    }
+
+    this.requestLogin();
+  }
+
+
+
 
   private toPoint(s: AddressSuggestion): GeoPoint {
     return {
