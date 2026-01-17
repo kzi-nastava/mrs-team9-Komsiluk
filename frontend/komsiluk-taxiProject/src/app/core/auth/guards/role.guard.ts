@@ -18,6 +18,6 @@ export const roleGuard: CanActivateFn = (
     return true;
   }
 
-  router.navigate(['/forbidden']);
+  router.navigate(['/']);
   return false;
 };

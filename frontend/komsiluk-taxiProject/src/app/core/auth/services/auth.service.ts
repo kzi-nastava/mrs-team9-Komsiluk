@@ -64,7 +64,7 @@ export class AuthService {
         location.href = '/login';
       }
 
-    
+
       if (event.key === 'auth_token' && event.newValue) {
         const role = localStorage.getItem('auth_role');
         const userId = localStorage.getItem('auth_user_id');
@@ -93,19 +93,24 @@ export class AuthService {
     return this.tokenSig();
   }
 
-  private setAuthState(token: string, role: UserRole, userId: number | null) {
+  private setAuthState(token: string, role: any, userId: number | null) {
+    const parsedRole = Object.values(UserRole).includes(role)
+      ? role
+      : UserRole.GUEST;
+
     this.tokenSig.set(token);
-    this.roleSig.set(role);
+    this.roleSig.set(parsedRole);
     this.userIdSig.set(userId);
 
     localStorage.setItem('auth_token', token);
-    localStorage.setItem('auth_role', role);
+    localStorage.setItem('auth_role', parsedRole);
     if (userId !== null) {
       localStorage.setItem('auth_user_id', userId.toString());
     } else {
       localStorage.removeItem('auth_user_id');
     }
   }
+
 
   private clearAuthState() {
     this.tokenSig.set(null);
@@ -122,11 +127,14 @@ export class AuthService {
     const role = localStorage.getItem('auth_role') as UserRole | null;
     const userId = localStorage.getItem('auth_user_id');
 
-    if (token && role) {
+    if (token && role && Object.values(UserRole).includes(role)) {
       this.tokenSig.set(token);
       this.roleSig.set(role);
       this.userIdSig.set(userId ? +userId : null);
+    } else {
+      this.clearAuthState();
     }
+
   }
 
   registerPassenger(payload: RegisterPassengerRequest) {
