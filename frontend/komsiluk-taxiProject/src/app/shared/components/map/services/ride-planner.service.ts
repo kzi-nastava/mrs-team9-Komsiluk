@@ -5,6 +5,22 @@ import { VehicleType } from '../../../models/profile.models';
 
 @Injectable({ providedIn: 'root' })
 export class RidePlannerService {
+
+
+  private pickupTextSig = signal('');
+  private destinationTextSig = signal('');
+
+  pickupText = computed(() => this.pickupTextSig());
+  destinationText = computed(() => this.destinationTextSig());
+
+  setPickupText(v: string) {
+    this.pickupTextSig.set(v);
+  }
+
+  setDestinationText(v: string) {
+    this.destinationTextSig.set(v);
+  }
+
   private pickupSig = signal<GeoPoint | null>(null);
   private destSig = signal<GeoPoint | null>(null);
   private stopsSig = signal<GeoPoint[]>([]);
@@ -35,7 +51,7 @@ export class RidePlannerService {
   constructor(
     private routing: RoutingService,
     private mapFacade: MapFacadeService
-  ) {}
+  ) { }
 
   setPickup(p: GeoPoint | null) {
     this.pickupSig.set(p);
@@ -79,4 +95,17 @@ export class RidePlannerService {
       }
     });
   }
+
+  reset(): void {
+    this.pickupTextSig.set('');
+    this.destinationTextSig.set('');
+
+    this.pickupSig.set(null);
+    this.destSig.set(null);
+    this.stopsSig.set([]);
+    this.routeSig.set(null);
+
+    this.mapFacade.setState(null);
+  }
+
 }

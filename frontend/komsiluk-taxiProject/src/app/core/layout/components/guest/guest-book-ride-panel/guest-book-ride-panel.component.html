@@ -5,26 +5,21 @@
     <div class="br-label">Pickup location</div>
 
     <div class="br-input-wrap">
-      <input
-        class="br-input"
-        type="text"
-        placeholder="Start"
-        [value]="pickupText()"
-        (input)="pickupText.set($any($event.target).value)"
-      />
+      <input class="br-input" type="text" placeholder="Start" [value]="ridePlanner.pickupText()"
+        (input)="ridePlanner.setPickupText($any($event.target).value)" />
       <button class="br-search-btn" type="button" (click)="searchPickup()">
         <span class="material-symbols-outlined btn-search-icon">search</span>
       </button>
     </div>
 
     @if (pickupSuggestions().length) {
-      <div class="br-suggest">
-        @for (s of pickupSuggestions(); track s.lat + ',' + s.lon) {
-          <button class="br-suggest__item" (click)="selectPickup(s)">
-            {{ s.label }}
-          </button>
-        }
-      </div>
+    <div class="br-suggest">
+      @for (s of pickupSuggestions(); track s.lat + ',' + s.lon) {
+      <button class="br-suggest__item" (click)="selectPickup(s)">
+        {{ s.label }}
+      </button>
+      }
+    </div>
     }
   </div>
 
@@ -33,52 +28,42 @@
     <div class="br-label">Destination</div>
 
     <div class="br-input-wrap">
-      <input
-        class="br-input"
-        type="text"
-        placeholder="Finish"
-        [value]="destinationText()"
-        (input)="destinationText.set($any($event.target).value)"
-      />
+      <input class="br-input" type="text" placeholder="Finish" [value]="ridePlanner.destinationText()"
+        (input)="ridePlanner.setDestinationText($any($event.target).value)" />
       <button class="br-search-btn" type="button" (click)="searchDestination()">
         <span class="material-symbols-outlined btn-search-icon">search</span>
       </button>
     </div>
 
     @if (destinationSuggestions().length) {
-      <div class="br-suggest">
-        @for (s of destinationSuggestions(); track s.lat + ',' + s.lon) {
-          <button class="br-suggest__item" (click)="selectDestination(s)">
-            {{ s.label }}
-          </button>
-        }
-      </div>
+    <div class="br-suggest">
+      @for (s of destinationSuggestions(); track s.lat + ',' + s.lon) {
+      <button class="br-suggest__item" (click)="selectDestination(s)">
+        {{ s.label }}
+      </button>
+      }
+    </div>
     }
   </div>
 
   <!-- Stats -->
   @if (hasRoute()) {
-    <div class="br-stats">
-      <div class="br-stat">
-        <span class="material-symbols-outlined">route</span>
-        <span>Kilometers: {{ ridePlanner.km().toFixed(1) }}</span>
-      </div>
-
-      <div class="br-stat">
-        <span class="material-symbols-outlined">schedule</span>
-        <span>Drive time: {{ ridePlanner.minutes() }} min</span>
-      </div>
+  <div class="br-stats">
+    <div class="br-stat">
+      <span class="material-symbols-outlined">route</span>
+      <span>Kilometers: {{ ridePlanner.km().toFixed(1) }}</span>
     </div>
+
+    <div class="br-stat">
+      <span class="material-symbols-outlined">schedule</span>
+      <span>Drive time: {{ ridePlanner.minutes() }} min</span>
+    </div>
+  </div>
   }
 
-  <!-- Action -->
-  <button
-    class="btn btn--primary btn-scale"
-    type="button"
-    [disabled]="!hasRoute()"
-    (click)="requestLogin()"
-  >
+  <button class="btn btn--primary btn-scale" type="button" (click)="onBookClick()">
     Book a ride
   </button>
+
 
 </div>
