@@ -20,16 +20,10 @@ import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.IAuthService;
 public class AuthController {
 
     private final IAuthService authService;
-    private final IUserTokenService userTokenService;
-    private final IUserService userService;
 
     public AuthController(
-            IAuthService authService,
-            IUserService userService,
-            IUserTokenService userTokenService) {
+            IAuthService authService) {
         this.authService = authService;
-        this.userTokenService = userTokenService;
-        this.userService = userService;
     }
 
 
