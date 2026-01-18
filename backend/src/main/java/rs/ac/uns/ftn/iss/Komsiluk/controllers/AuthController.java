@@ -2,10 +2,12 @@ package rs.ac.uns.ftn.iss.Komsiluk.controllers;
 
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import org.springframework.web.multipart.MultipartFile;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.User;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.UserRole;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.auth.*;
@@ -34,11 +36,16 @@ public class AuthController {
     }
 
 
-    @PostMapping("/registration/passenger")
+    @PostMapping(
+            value = "/registration/passenger",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
     public ResponseEntity<RegisterResponseDTO> registerPassenger(
-            @RequestBody RegisterPassengerRequestDTO dto) {
+            @RequestPart("data") RegisterPassengerRequestDTO requestDto,
+            @RequestPart(value="profileImage", required = false) MultipartFile profileImage
+    ) {
 
-        authService.registerPassenger(dto);
+        authService.registerPassenger(requestDto, profileImage);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)

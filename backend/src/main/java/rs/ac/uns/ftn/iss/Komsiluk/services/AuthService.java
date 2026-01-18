@@ -1,5 +1,6 @@
 package rs.ac.uns.ftn.iss.Komsiluk.services;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -7,6 +8,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.User;
@@ -36,6 +39,9 @@ public class AuthService implements IAuthService {
     private final RegisterPassengerMapper registerPassengerMapper;
     private final AuthenticationManager authenticationManager;
 
+    @Value("${app.user.default-profile-image}")
+    private String defaultProfileImageUrl;
+
     public AuthService(
             IUserService userService,
             IUserTokenService userTokenService,
@@ -54,7 +60,9 @@ public class AuthService implements IAuthService {
     }
 
     @Override
-    public void registerPassenger(RegisterPassengerRequestDTO dto) {
+    @Transactional
+    public void registerPassenger(RegisterPassengerRequestDTO dto,
+                                  MultipartFile profileImage) {
 
         User existing = userService.findByEmail(dto.getEmail());
 
@@ -66,7 +74,14 @@ public class AuthService implements IAuthService {
         }
 
         User user = registerPassengerMapper.toEntity(dto);
+
+        user.setProfileImageUrl(defaultProfileImageUrl);
+
         userService.save(user);
+
+        if (profileImage != null && !profileImage.isEmpty()) {
+            userService.updateProfileImage(user.getId(), profileImage);
+        }
 
         UserTokenResponseDTO token =
                 userTokenService.createActivationToken(user.getId());

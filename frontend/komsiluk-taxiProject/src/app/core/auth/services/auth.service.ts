@@ -137,12 +137,13 @@ export class AuthService {
 
   }
 
-  registerPassenger(payload: RegisterPassengerRequest) {
+  registerPassenger(formData: FormData) {
     return this.http.post<void>(
       `${this.API}/auth/registration/passenger`,
-      payload
+      formData
     );
   }
+
 
   resendActivation(email: string) {
     return this.http.post<void>(
