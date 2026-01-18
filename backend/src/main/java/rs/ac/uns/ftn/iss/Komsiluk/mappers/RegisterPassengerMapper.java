@@ -25,11 +25,6 @@ public class RegisterPassengerMapper {
         user.setAddress(dto.getAddress());
         user.setCity(dto.getCity());
         user.setPhoneNumber(dto.getPhoneNumber());
-        user.setProfileImageUrl(
-                dto.getProfileImageUrl() != null
-                        ? dto.getProfileImageUrl()
-                        : "/images/default.png"
-        );
 
         user.setRole(UserRole.PASSENGER);
         user.setActive(false);
