@@ -66,6 +66,15 @@ public class RideController {
         return ResponseEntity.ok().build();
     }
 
+    @PostMapping("/{id}/panic")
+    public ResponseEntity<Void> invokePanicButton(
+            @PathVariable Long id,
+            @RequestBody PanicRequestDTO dto) {
+
+        rideService.handlePanicButton(id, dto);
+        return ResponseEntity.ok().build();
+    }
+
 
     @PostMapping("/{id}/finish")
     public ResponseEntity<RideResponseDTO> finishRide(@PathVariable Long id) {

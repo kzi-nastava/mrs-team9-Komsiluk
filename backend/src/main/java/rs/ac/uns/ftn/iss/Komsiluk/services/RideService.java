@@ -340,6 +340,8 @@ public class RideService implements IRideService {
         ride.setCancellationSource(CancellationSource.DRIVER);
 
         rideRepository.save(ride);
+
+        notifyRideParticipants(ride, NotificationType.RIDE_CANCELLED);
     }
 
     public void cancelByPassenger(Long rideId, PassengerCancelRideDTO dto) {
@@ -347,24 +349,20 @@ public class RideService implements IRideService {
         Ride ride = rideRepository.findById(rideId)
                 .orElseThrow(NotFoundException::new);
 
-        // status mora biti ASSIGNED ili SCHEDULED
         if (ride.getStatus() != RideStatus.ASSIGNED &&
                 ride.getStatus() != RideStatus.SCHEDULED) {
             throw new BadRequestException();
         }
 
-        // mora postojati zakazano vreme
         if (ride.getScheduledAt() == null) {
             throw new BadRequestException();
         }
 
-        // mora biti bar 10 minuta pre početka
         if (LocalDateTime.now().isAfter(
                 ride.getScheduledAt().minusMinutes(10))) {
             throw new BadRequestException();
         }
 
-        // razlog obavezan
         if (dto.getReason() == null || dto.getReason().isBlank()) {
             throw new BadRequestException();
         }
@@ -374,6 +372,8 @@ public class RideService implements IRideService {
         ride.setCancellationSource(CancellationSource.PASSENGER);
 
         rideRepository.save(ride);
+
+        notifyRideParticipants(ride, NotificationType.RIDE_CANCELLED);
     }
 
 
@@ -387,21 +387,20 @@ public class RideService implements IRideService {
             throw new BadRequestException();
         }
 
-        if (dto.getStopAddress() == null || dto.getStopAddress().isBlank()) {
-            throw new BadRequestException();
-        }
 
         LocalDateTime endTime = LocalDateTime.now();
         ride.setEndTime(endTime);
 
-        // TODO update everything about the route
         Route route = ride.getRoute();
         route.setEndAddress(dto.getStopAddress());
+        route.setStops(dto.getVisitedStops());
+        route.setDistanceKm(dto.getDistanceTravelledKm());
+        route.setEstimatedDurationMin(dto.getDurationMinutes());
         ride.setRoute(route);
 
         ride.setStatus(RideStatus.FINISHED);
 
-        BigDecimal price = calculatePrice(ride.getDriver().getVehicle().getType(), ride.getRoute().getDistanceKm());
+        BigDecimal price = calculatePrice(ride.getDriver().getVehicle().getType(), dto.getDistanceTravelledKm());
 
         ride.setPrice(price);
 
@@ -413,9 +412,68 @@ public class RideService implements IRideService {
         response.setPrice(price.doubleValue());
 
 
-        // TODO: notify passengers and driver that ride has ended
-        // TODO : mozda promena statusa vozaca
+        notifyRideParticipants(ride, NotificationType.RIDE_STOPPED);
         return response;
+    }
+
+    public void handlePanicButton(Long rideId, PanicRequestDTO initiator) {
+        Ride ride = rideRepository.findById(rideId)
+                .orElseThrow(NotFoundException::new);
+
+        if (ride.getStatus() != RideStatus.ACTIVE) {
+            throw new BadRequestException();
+        }
+
+        ride.setPanicTriggered(true);
+
+        rideRepository.save(ride);
+
+        NotificationCreateDTO notificationDTOCreator = new NotificationCreateDTO();
+        notificationDTOCreator.setUserId(initiator.getInitiatorId());
+        notificationDTOCreator.setType(NotificationType.PANIC);
+        notificationDTOCreator.setTitle("PANIC activated");
+        notificationDTOCreator.setMessage("You have activated the panic button.");
+        notificationService.createNotification(notificationDTOCreator);
+    }
+
+    private void notifyRideParticipants(Ride ride, NotificationType type) {
+        String title = "";
+        String message = "";
+        switch(type) {
+            case RIDE_CANCELLED:
+                title = "Ride Cancelled";
+                message = "Your ride from " + ride.getRoute().getStartAddress() +
+                        "to " + ride.getRoute().getEndAddress() + " has been cancelled.";
+                break;
+            case RIDE_STOPPED:
+                title = "Ride Stopped";
+                message = "Your ride from has stopped at " + ride.getRoute().getEndAddress() + ".";
+                break;
+            case PANIC:
+                title = "Panic Button Pressed";
+                message = "PANIC button pressed!";
+                break;
+            default:
+                throw new BadRequestException();
+        }
+
+        NotificationCreateDTO notificationDTOCreator = new NotificationCreateDTO();
+        notificationDTOCreator.setUserId(ride.getCreatedBy().getId());
+        notificationDTOCreator.setType(type);
+        notificationDTOCreator.setTitle(title);
+        notificationDTOCreator.setMessage(message);
+        notificationService.createNotification(notificationDTOCreator);
+
+        List<User> passengers = ride.getPassengers();
+
+        for (User passenger : passengers) {
+            NotificationCreateDTO notificationDTOPassenger = new NotificationCreateDTO();
+            notificationDTOPassenger.setUserId(passenger.getId());
+            notificationDTOCreator.setType(type);
+            notificationDTOCreator.setTitle(title);
+            notificationDTOCreator.setMessage(message);
+            notificationService.createNotification(notificationDTOPassenger);
+        }
     }
 
 //    public Collection<AdminRideHistoryDTO> getAdminRideHistory(

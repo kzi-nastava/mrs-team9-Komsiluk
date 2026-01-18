@@ -32,6 +32,8 @@ public interface IRideService {
 
 //    public Collection<AdminRideHistoryDTO> getAdminRideHistory(LocalDate from,LocalDate to,String sortBy);
 
+    public void handlePanicButton(Long rideId, PanicRequestDTO driverId);
+
     public AdminRideDetailsDTO getAdminRideDetails(Long rideId);
 
     public Collection<AdminRideHistoryDTO> getAdminRideHistoryForUser(Long userId,LocalDate from,LocalDate to,String sortBy);
