@@ -54,10 +54,17 @@ export class ForgotPasswordComponent {
           queryParams: { email },
         });
       },
-      error: () => {
+      error: (err) => {
         this.loading = false;
-        this.toast.show('Something went wrong. Please try again later.');
-      },
+
+        const message = err?.error?.message;
+
+        if (message) {
+          this.toast.show(message);
+        } else {
+          this.toast.show('Something went wrong. Please try again later.');
+        }
+      }
     });
   }
 }

@@ -7,7 +7,7 @@
                 <label class="auth-label text-semibold">Firstname</label>
                 <input class="auth-input text-medium" type="text" formControlName="firstName" />
                 @if (isInvalid('firstName')) {
-                <div class="form-error">Minimum 2 letters. No numbers.</div>
+                <div class="form-error">2-50 characters. No numbers.</div>
                 }
             </div>
 
@@ -15,7 +15,7 @@
                 <label class="auth-label text-semibold">Lastname</label>
                 <input class="auth-input text-medium" type="text" formControlName="lastName" />
                 @if (isInvalid('lastName')) {
-                <div class="form-error">Minimum 2 letters. No numbers.</div>
+                <div class="form-error">Min 2, Max 50 characters. No numbers.</div>
                 }
             </div>
 
@@ -23,7 +23,7 @@
                 <label class="auth-label text-semibold">Address (Street and number)</label>
                 <input class="auth-input text-medium" type="text" formControlName="address" />
                 @if (isInvalid('address')) {
-                <div class="form-error">Address is required.</div>
+                <div class="form-error">Address is required (5-100 characters).</div>
                 }
             </div>
 
@@ -31,7 +31,7 @@
                 <label class="auth-label text-semibold">City</label>
                 <input class="auth-input text-medium" type="text" formControlName="city" />
                 @if (isInvalid('city')) {
-                <div class="form-error">City is required.</div>
+                <div class="form-error">City is required (2-50 characters).</div>
                 }
             </div>
             <div class="auth-field">

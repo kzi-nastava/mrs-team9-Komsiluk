@@ -21,6 +21,14 @@ export const personName: ValidatorFn = (control: AbstractControl): ValidationErr
   return ok ? null : { name: true };
 };
 
+// Name\Surname: min 2 letters,max 50 letters, just letters, space, dash, apostrophe
+export const authPersonName: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
+  const v = String(control.value ?? '').trim();
+  if (!v) return null; // required rešava prazno
+  const ok = /^[\p{L}][\p{L}\s'-]{1,49}$/u.test(v);
+  return ok ? null : { name: true };
+};
+
 // Phone number: digits, optional + at start, length 7-15
 export const phoneNumber: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
   const v = String(control.value ?? '').trim();

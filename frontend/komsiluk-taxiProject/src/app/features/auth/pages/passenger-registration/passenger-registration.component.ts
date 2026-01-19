@@ -3,6 +3,7 @@ import { AuthCardComponent } from '../../components/auth-card/auth-card.componen
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import {
+  authPersonName,
   personName,
   phoneNumber,
   strongPassword,
@@ -33,10 +34,10 @@ export class PassengerRegistrationComponent {
   ) {
     this.form = this.fb.group(
       {
-        firstName: ['', [trimRequired, Validators.minLength(2), personName]],
-        lastName: ['', [trimRequired, Validators.minLength(2), personName]],
-        address: ['', [trimRequired, Validators.minLength(5)]],
-        city: ['', [trimRequired, Validators.minLength(2)]],
+        firstName: ['', [trimRequired, authPersonName]],
+        lastName: ['', [trimRequired, authPersonName]],
+        address: ['', [trimRequired, Validators.minLength(5), Validators.maxLength(100)]],
+        city: ['', [trimRequired, Validators.minLength(2), Validators.maxLength(50)]],
         phone: ['', [trimRequired, phoneNumber]],
         email: ['', [trimRequired, Validators.email]],
         password: ['', [trimRequired, strongPassword]],
