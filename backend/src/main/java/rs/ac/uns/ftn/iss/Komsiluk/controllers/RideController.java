@@ -2,6 +2,8 @@ package rs.ac.uns.ftn.iss.Komsiluk.controllers;
 
 import java.util.Collection;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -41,8 +43,8 @@ public class RideController {
 
     @PostMapping("/{id}/cancel/driver")
     public ResponseEntity<Void> cancelByDriver(
-            @PathVariable Long id,
-            @RequestBody DriverCancelRideDTO dto) {
+            @PathVariable @Positive Long id,
+            @Valid @RequestBody DriverCancelRideDTO dto) {
 
         rideService.cancelByDriver(id, dto);
         return ResponseEntity.ok().build();
@@ -50,8 +52,8 @@ public class RideController {
 
     @PostMapping("/{id}/cancel/passenger")
     public ResponseEntity<Void> cancelByPassenger(
-            @PathVariable Long id,
-            @RequestBody PassengerCancelRideDTO dto) {
+            @PathVariable @Positive Long id,
+            @Valid @RequestBody PassengerCancelRideDTO dto) {
 
         rideService.cancelByPassenger(id, dto);
         return ResponseEntity.ok().build();
@@ -59,8 +61,8 @@ public class RideController {
 
     @PostMapping("/{id}/stop")
     public ResponseEntity<Void> stopRide(
-            @PathVariable Long id,
-            @RequestBody StopRideRequestDTO dto) {
+            @PathVariable @Positive Long id,
+            @Valid @RequestBody StopRideRequestDTO dto) {
 
         rideService.stopRide(id, dto);
         return ResponseEntity.ok().build();
@@ -68,8 +70,8 @@ public class RideController {
 
     @PostMapping("/{id}/panic")
     public ResponseEntity<Void> invokePanicButton(
-            @PathVariable Long id,
-            @RequestBody PanicRequestDTO dto) {
+            @PathVariable @Positive Long id,
+            @Valid @RequestBody PanicRequestDTO dto) {
 
         rideService.handlePanicButton(id, dto);
         return ResponseEntity.ok().build();

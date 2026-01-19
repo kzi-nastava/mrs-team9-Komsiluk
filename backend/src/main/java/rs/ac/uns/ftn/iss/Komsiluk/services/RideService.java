@@ -330,10 +330,6 @@ public class RideService implements IRideService {
             throw new BadRequestException();
         }
 
-        if (dto.getReason() == null || dto.getReason().isBlank()) {
-            throw new BadRequestException();
-        }
-
 
         ride.setStatus(RideStatus.CANCELLED);
         ride.setCancellationReason(dto.getReason());
@@ -363,9 +359,6 @@ public class RideService implements IRideService {
             throw new BadRequestException();
         }
 
-        if (dto.getReason() == null || dto.getReason().isBlank()) {
-            throw new BadRequestException();
-        }
 
         ride.setStatus(RideStatus.CANCELLED);
         ride.setCancellationReason(dto.getReason());
