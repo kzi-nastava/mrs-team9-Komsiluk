@@ -506,38 +506,25 @@ public class RideService implements IRideService {
     }
 
 
-    @Override
     public Collection<AdminRideHistoryDTO> getAdminRideHistoryForUser(
             Long userId,
             LocalDate from,
             LocalDate to,
-            String sortBy
+            AdminRideSortBy sortBy
     ) {
-        var statuses = List.of(
-                RideStatus.FINISHED,
-                RideStatus.CANCELLED
-        );
+        var statuses = List.of(RideStatus.FINISHED, RideStatus.CANCELLED);
 
-        LocalDateTime fromDateTime = from != null
-                ? from.atStartOfDay()
-                : null;
-
-        LocalDateTime toDateTime = to != null
-                ? to.atTime(23, 59, 59)
-                : null;
+        LocalDateTime fromDateTime = from != null ? from.atStartOfDay() : LocalDateTime.MIN;
+        LocalDateTime toDateTime = to != null ? to.atTime(23, 59, 59) : LocalDateTime.MAX;
 
         return rideRepository
-                .findAdminRideHistoryForUser(
-                        userId,
-                        statuses,
-                        fromDateTime,
-                        toDateTime
-                )
+                .findAdminRideHistoryForUser(userId, statuses, fromDateTime, toDateTime)
                 .stream()
                 .sorted(getAdminSortComparator(sortBy))
                 .map(adminRideHistoryMapper::toDto)
                 .toList();
     }
+
 
 
 //    private boolean isUserOnRide(Ride ride, Long userId) {
@@ -559,18 +546,60 @@ public class RideService implements IRideService {
 
 
 
-    private Comparator<Ride> getAdminSortComparator(String sortBy) {
+    private Comparator<Ride> getAdminSortComparator(AdminRideSortBy sortBy) {
         if (sortBy == null) {
             return Comparator.comparing(Ride::getCreatedAt).reversed();
         }
 
         return switch (sortBy) {
-            case "price" -> Comparator.comparing(Ride::getPrice, Comparator.nullsLast(BigDecimal::compareTo));
-            case "startTime" -> Comparator.comparing(Ride::getStartTime, Comparator.nullsLast(LocalDateTime::compareTo));
-            case "endTime" -> Comparator.comparing(Ride::getEndTime, Comparator.nullsLast(LocalDateTime::compareTo));
-            default -> Comparator.comparing(Ride::getCreatedAt).reversed();
+            case DATE ->
+                    Comparator.comparing(Ride::getCreatedAt).reversed();
+
+            case PRICE ->
+                    Comparator.comparing(Ride::getPrice,
+                            Comparator.nullsLast(BigDecimal::compareTo));
+
+            case START_TIME ->
+                    Comparator.comparing(Ride::getStartTime,
+                            Comparator.nullsLast(LocalDateTime::compareTo));
+
+            case END_TIME ->
+                    Comparator.comparing(Ride::getEndTime,
+                            Comparator.nullsLast(LocalDateTime::compareTo));
+
+            case START_ADDRESS ->
+                    Comparator.comparing(r -> r.getRoute().getStartAddress(),
+                            Comparator.nullsLast(String::compareToIgnoreCase));
+
+            case END_ADDRESS ->
+                    Comparator.comparing(r -> r.getRoute().getEndAddress(),
+                            Comparator.nullsLast(String::compareToIgnoreCase));
+
+            case ROUTE ->
+                    Comparator.comparing(this::buildRouteString,
+                            String.CASE_INSENSITIVE_ORDER);
+
+            case CANCELLED ->
+                    Comparator.comparing(r -> r.getStatus() == RideStatus.CANCELLED);
+
+            case CANCELLED_BY ->
+                    Comparator.comparing(Ride::getCancellationSource,
+                            Comparator.nullsLast(Enum::compareTo));
+
+            case PANIC ->
+                    Comparator.comparing(Ride::isPanicTriggered);
         };
     }
+
+    private String buildRouteString(Ride ride) {
+        Route r = ride.getRoute();
+        return String.join(" | ",
+                r.getStartAddress(),
+                r.getStops() == null ? "" : r.getStops(),
+                r.getEndAddress()
+        );
+    }
+
 
 
 }

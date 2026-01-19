@@ -24,19 +24,20 @@ public interface RideRepository extends JpaRepository<Ride, Long> {
 
 
     @Query("""
-        SELECT DISTINCT r
-        FROM Ride r
-        LEFT JOIN r.passengers p
-        WHERE
-            (r.driver.id = :userId OR p.id = :userId)
-            AND r.status IN :statuses
-            AND (:from IS NULL OR r.createdAt >= :from)
-            AND (:to IS NULL OR r.createdAt <= :to)
-    """)
+    SELECT DISTINCT r
+    FROM Ride r
+    LEFT JOIN r.passengers p
+    WHERE
+        (r.driver.id = :userId OR p.id = :userId)
+        AND r.status IN :statuses
+        AND r.createdAt >= :from
+        AND r.createdAt <= :to
+""")
     Collection<Ride> findAdminRideHistoryForUser(
             @Param("userId") Long userId,
             @Param("statuses") Collection<RideStatus> statuses,
             @Param("from") LocalDateTime from,
             @Param("to") LocalDateTime to
     );
+
 }
