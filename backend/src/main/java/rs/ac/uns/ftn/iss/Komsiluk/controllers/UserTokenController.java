@@ -2,6 +2,7 @@ package rs.ac.uns.ftn.iss.Komsiluk.controllers;
 
 import java.util.Collection;
 
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -54,7 +55,7 @@ public class UserTokenController {
     @PostMapping(value = "/activation/passenger",
             consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> activatePassenger(
-            @RequestBody UserTokenPassengerActivationDTO dto) {
+            @Valid @RequestBody UserTokenPassengerActivationDTO dto) {
 
         userTokenService.activate(dto.getToken());
         return ResponseEntity.ok().build();
@@ -65,7 +66,7 @@ public class UserTokenController {
             consumes = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity<Void> resetPassword(
-            @RequestBody ResetPasswordRequestDTO dto) {
+            @Valid @RequestBody ResetPasswordRequestDTO dto) {
 
         if (!dto.getNewPassword().equals(dto.getConfirmPassword())) {
             return ResponseEntity.badRequest().build();

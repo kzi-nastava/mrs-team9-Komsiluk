@@ -75,9 +75,14 @@ export class ResetPasswordComponent {
         this.toast.show('Password changed successfully!');
         this.router.navigate(['/login']);
       },
-      error: () => {
+      error: (err) => {
         this.loading = false;
-        this.toast.show('Reset link is invalid or expired.');
+        if (err?.status === 400) {
+          this.toast.show(err.error?.message || 'Invalid request.');
+        }
+        else {
+          this.toast.show('Something unexpected happened.');
+        }
         this.router.navigate(['/forgot-password']);
       }
     });

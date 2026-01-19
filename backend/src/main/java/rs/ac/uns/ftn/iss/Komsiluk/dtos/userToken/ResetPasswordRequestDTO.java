@@ -1,9 +1,16 @@
 package rs.ac.uns.ftn.iss.Komsiluk.dtos.userToken;
 
+import jakarta.validation.constraints.NotBlank;
+
 public class ResetPasswordRequestDTO {
 
+    @NotBlank(message = "Token is required")
     private String token;
+
+    @NotBlank(message = "New password is required")
     private String newPassword;
+
+    @NotBlank(message = "Confirm password is required")
     private String confirmPassword;
 
     public ResetPasswordRequestDTO() {
