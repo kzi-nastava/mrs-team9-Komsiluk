@@ -31,23 +31,14 @@ public class InconsistencyReportController {
         return new ResponseEntity<>(reports, HttpStatus.OK);
     }
 
-    @PostMapping(value = "/{rideId}/inconsistencies", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/{rideId}/inconsistencies",
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<InconsistencyReportResponseDTO> create(
             @PathVariable Long rideId,
             @RequestBody InconsistencyReportCreateDTO dto
     ) {
-        // Dobijanje trenutnog ulogovanog korisnika iz tokena
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        Long loggedInUserId = Long.parseLong(auth.getName()); // username u tokenu je userId
-
-       System.out.println(loggedInUserId);
-       System.out.println(rideId);
-
-
-        // Prosledi dto dalje u servis
         InconsistencyReportResponseDTO created = inconsistencyReportService.create(rideId, dto);
-        System.out.println(created.getMessage());
-
         return new ResponseEntity<>(created, HttpStatus.CREATED);
     }
 }

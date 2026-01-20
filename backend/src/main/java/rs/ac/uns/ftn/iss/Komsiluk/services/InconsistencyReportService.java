@@ -44,7 +44,10 @@ public class InconsistencyReportService implements IInconsistencyReportService {
         if (ride.getStatus() != RideStatus.ACTIVE) throw new BadRequestException();
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        Long reporterId = Long.parseLong(auth.getName());
+        String email = auth.getName();
+
+        User reporter = userRepository.findByEmail(email);
+        Long reporterId = reporter.getId();
 
         boolean isDriver = auth.getAuthorities().stream()
                 .anyMatch(a -> a.getAuthority().equals("ROLE_DRIVER"));
@@ -68,7 +71,6 @@ public class InconsistencyReportService implements IInconsistencyReportService {
             }
         }
 
-        User reporter = userRepository.findById(reporterId).orElseThrow(NotFoundException::new);
 
         InconsistencyReport report = new InconsistencyReport();
         report.setRide(ride);
@@ -128,7 +130,7 @@ public class InconsistencyReportService implements IInconsistencyReportService {
         dto.setReporterId(report.getReporter().getId());
         dto.setMessage(report.getMessage());
         dto.setCreatedAt(report.getCreatedAt());
-        dto.setReporterRole(report.getReporter().getRole());
+        dto.setReporterRole(report.getReporterRole());
         return dto;
     }
 }
