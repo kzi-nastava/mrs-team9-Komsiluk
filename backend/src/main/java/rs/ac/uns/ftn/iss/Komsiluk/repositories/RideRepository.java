@@ -22,6 +22,16 @@ public interface RideRepository extends JpaRepository<Ride, Long> {
 	        """)
 	Collection<Ride> findScheduledByUserId(@Param("userId") Long userId, @Param("status") RideStatus status);
 
+    Collection<Ride> findByDriverIdAndStatusOrderByCreatedAtDesc(Long driverId, RideStatus status);
+
+    Collection<Ride> findByDriverIdAndStatusAndCreatedAtGreaterThanEqualOrderByCreatedAtDesc(
+            Long driverId, RideStatus status, LocalDateTime from);
+
+    Collection<Ride> findByDriverIdAndStatusAndCreatedAtLessThanEqualOrderByCreatedAtDesc(
+            Long driverId, RideStatus status, LocalDateTime to);
+
+    Collection<Ride> findByDriverIdAndStatusAndCreatedAtBetweenOrderByCreatedAtDesc(
+            Long driverId, RideStatus status, LocalDateTime from, LocalDateTime to);
 
     @Query("""
         SELECT DISTINCT r

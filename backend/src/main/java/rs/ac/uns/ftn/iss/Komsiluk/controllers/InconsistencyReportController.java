@@ -12,7 +12,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.inconsistency.InconsistencyReportCreateDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.inconsistency.InconsistencyReportResponseDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.IInconsistencyReportService;
@@ -30,10 +31,13 @@ public class InconsistencyReportController {
         return new ResponseEntity<>(reports, HttpStatus.OK);
     }
 
-    @PostMapping(value = "/{rideId}/inconsistencies", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<InconsistencyReportResponseDTO> create(@PathVariable Long rideId,
-                                                                 @RequestBody InconsistencyReportCreateDTO dto) {
-
+    @PostMapping(value = "/{rideId}/inconsistencies",
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<InconsistencyReportResponseDTO> create(
+            @PathVariable Long rideId,
+            @RequestBody InconsistencyReportCreateDTO dto
+    ) {
         InconsistencyReportResponseDTO created = inconsistencyReportService.create(rideId, dto);
         return new ResponseEntity<>(created, HttpStatus.CREATED);
     }

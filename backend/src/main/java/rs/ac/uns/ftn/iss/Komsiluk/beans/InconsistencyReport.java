@@ -1,26 +1,44 @@
 package rs.ac.uns.ftn.iss.Komsiluk.beans;
 
+import jakarta.persistence.*;
+import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.UserRole;
+
 import java.time.LocalDateTime;
 
+
+@Entity
+@Table(name = "inconsistency_reports",
+        indexes = {
+                @Index(name="idx_ir_ride", columnList = "ride_id"),
+                @Index(name="idx_ir_reporter", columnList = "reporter_id")
+        })
 public class InconsistencyReport {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Long rideId;
-    private Long passengerId;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "ride_id", nullable = false)
+    private Ride ride;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "reporter_id", nullable = false)
+    private User reporter;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "reporter_role", nullable = false, length = 20)
+    private UserRole reporterRole; // DRIVER / PASSENGER
+
+    @Column(nullable = false, length = 1000)
     private String message;
+
+    @Column(nullable = false)
     private LocalDateTime createdAt;
 
-    public InconsistencyReport() {
-        super();
-    }
-
-    public InconsistencyReport(Long id, Long rideId, Long passengerId, String message, LocalDateTime createdAt) {
-        super();
-        this.id = id;
-        this.rideId = rideId;
-        this.passengerId = passengerId;
-        this.message = message;
-        this.createdAt = createdAt;
+    @PrePersist
+    void prePersist() {
+        if (createdAt == null) createdAt = LocalDateTime.now();
     }
 
     public Long getId() {
@@ -31,20 +49,28 @@ public class InconsistencyReport {
         this.id = id;
     }
 
-    public Long getRideId() {
-        return rideId;
+    public Ride getRide() {
+        return ride;
     }
 
-    public void setRideId(Long rideId) {
-        this.rideId = rideId;
+    public void setRide(Ride ride) {
+        this.ride = ride;
     }
 
-    public Long getPassengerId() {
-        return passengerId;
+    public User getReporter() {
+        return reporter;
     }
 
-    public void setPassengerId(Long passengerId) {
-        this.passengerId = passengerId;
+    public void setReporter(User reporter) {
+        this.reporter = reporter;
+    }
+
+    public UserRole getReporterRole() {
+        return reporterRole;
+    }
+
+    public void setReporterRole(UserRole reporterRole) {
+        this.reporterRole = reporterRole;
     }
 
     public String getMessage() {
@@ -63,3 +89,5 @@ public class InconsistencyReport {
         this.createdAt = createdAt;
     }
 }
+
+

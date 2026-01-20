@@ -1,23 +1,43 @@
 package rs.ac.uns.ftn.iss.Komsiluk.beans;
 
 import java.time.LocalDateTime;
+import jakarta.persistence.*;
 
+@Entity
+@Table(
+        name = "ratings",
+        uniqueConstraints = @UniqueConstraint(name = "uk_rating_ride_rater", columnNames = {"ride_id", "rater_id"})
+)
 public class Rating {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-
+    @Column(name="ride_id", nullable=false)
     private Long rideId;
 
+    @Column(name="rater_id", nullable=false)
     private Long raterId;
 
+    @Column(name="driver_id")
     private Long driverId;
+
+    @Column(name="vehicle_id")
     private Long vehicleId;
 
+    @Column(name="vehicle_grade", nullable=false)
     private Integer vehicleGrade;
+
+    @Column(name="driver_grade", nullable=false)
     private Integer driverGrade;
+
+    @Column(name="comment")
     private String comment;
+
+    @Column(name="created_at", nullable=false)
     private LocalDateTime createdAt;
+
 
     public Rating() { }
 
