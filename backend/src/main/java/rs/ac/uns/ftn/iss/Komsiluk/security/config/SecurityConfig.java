@@ -2,6 +2,7 @@ package rs.ac.uns.ftn.iss.Komsiluk.security.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -43,12 +44,29 @@ public class SecurityConfig {
                         .requestMatchers("/api/tokens/reset-password").permitAll()
                         .requestMatchers("/h2-console/**").permitAll()
                         .requestMatchers("/images/**").permitAll()
+
                         // ROLE BASED
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/drivers/**").hasRole("DRIVER")
                         .requestMatchers("/api/passenger/**").hasRole("PASSENGER")
 
-                        // SVE OSTALO
+                        // RIDES (stabilni matcher-i)
+                        .requestMatchers(HttpMethod.POST, "/api/rides/*/inconsistencies")
+                        .authenticated()
+
+                        .requestMatchers(HttpMethod.POST, "/api/rides/*/ratings").hasRole("PASSENGER")
+                        .requestMatchers(HttpMethod.GET,  "/api/rides/*/ratings/**").hasAnyRole("PASSENGER", "DRIVER", "ADMIN")
+
+
+                        .requestMatchers(HttpMethod.POST, "/api/rides/*/finish").hasAnyRole("DRIVER", "ADMIN")
+                        .requestMatchers(HttpMethod.GET,  "/api/rides/*/live").hasAnyRole("DRIVER", "PASSENGER", "ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/rides/*/live" ).hasAnyRole("DRIVER", "ADMIN")
+                        // (ako koristiš start/stop/cancel/estimate/order)
+                        .requestMatchers(HttpMethod.POST, "/api/rides/**").authenticated()
+                        .requestMatchers(HttpMethod.GET,  "/api/rides/**").authenticated()
+                        .requestMatchers(HttpMethod.PUT,  "/api/rides/**").authenticated()
+
+                        // sve ostalo
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);

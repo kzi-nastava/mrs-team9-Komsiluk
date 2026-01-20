@@ -32,7 +32,9 @@ import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.*;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.DriverLocation;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.ride.RideLiveInfoDTO;
 
-
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 @Service
 public class RideService implements IRideService {
 
@@ -256,22 +258,34 @@ public class RideService implements IRideService {
     @Override
     public Collection<RideResponseDTO> getDriverRideHistory(Long driverId, LocalDate from, LocalDate to) {
 
-        return rideRepository.findAll().stream()
-                .filter(r -> r.getDriver() != null && r.getDriver().getId() != null
-                        && r.getDriver().getId().equals(driverId))
-                .filter(r -> {
-                    if (from == null && to == null) return true;
-                    if (r.getCreatedAt() == null) return false;
+        userService.findById(driverId);
+        if (from != null && to != null && from.isAfter(to)) {
+            throw new BadRequestException();
+        }
 
-                    LocalDate created = r.getCreatedAt().toLocalDate();
-                    if (from != null && created.isBefore(from)) return false;
-                    if (to != null && created.isAfter(to)) return false;
-                    return true;
-                })
-                .sorted(Comparator.comparing(Ride::getCreatedAt, Comparator.nullsLast(Comparator.naturalOrder())).reversed())
+        LocalDateTime fromDt = (from == null) ? null : from.atStartOfDay();
+        LocalDateTime toDt = (to == null) ? null : to.plusDays(1).atStartOfDay().minusNanos(1);
+
+        List<Ride> rides;
+
+        if (fromDt == null && toDt == null) {
+            rides = (List<Ride>) rideRepository.findByDriverIdAndStatusOrderByCreatedAtDesc(driverId, RideStatus.FINISHED);
+        } else if (fromDt != null && toDt == null) {
+            rides = (List<Ride>) rideRepository.findByDriverIdAndStatusAndCreatedAtGreaterThanEqualOrderByCreatedAtDesc(
+                    driverId, RideStatus.FINISHED, fromDt);
+        } else if (fromDt == null && toDt != null) {
+            rides = (List<Ride>) rideRepository.findByDriverIdAndStatusAndCreatedAtLessThanEqualOrderByCreatedAtDesc(
+                    driverId, RideStatus.FINISHED, toDt);
+        } else {
+            rides = (List<Ride>) rideRepository.findByDriverIdAndStatusAndCreatedAtBetweenOrderByCreatedAtDesc(
+                    driverId, RideStatus.FINISHED, fromDt, toDt);
+        }
+
+        return rides.stream()
                 .map(rideMapper::toResponseDTO)
-                .collect(Collectors.toList());
+                .toList();
     }
+
 
 
 

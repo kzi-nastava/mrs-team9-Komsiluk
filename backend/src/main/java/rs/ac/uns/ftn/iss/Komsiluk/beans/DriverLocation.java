@@ -1,9 +1,12 @@
 package rs.ac.uns.ftn.iss.Komsiluk.beans;
 
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
-
+@Entity
+@Table(name =  "driver_location")
 public class DriverLocation {
-
+    @Id
+    @Column(name = "driver_id", nullable = false)
     private Long driverId;
     private double lat;
     private double lng;

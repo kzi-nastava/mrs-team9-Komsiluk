@@ -12,7 +12,5 @@ public interface IDriverLocationService {
 
     Collection<DriverLocation> getAllLiveLocations();
 
-    void onDriverBecameActive(Long driverId);
 
-    void onDriverBecameInactive(Long driverId);
 }

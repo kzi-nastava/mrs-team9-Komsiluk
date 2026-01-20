@@ -12,7 +12,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.inconsistency.InconsistencyReportCreateDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.inconsistency.InconsistencyReportResponseDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.IInconsistencyReportService;
@@ -31,10 +32,22 @@ public class InconsistencyReportController {
     }
 
     @PostMapping(value = "/{rideId}/inconsistencies", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<InconsistencyReportResponseDTO> create(@PathVariable Long rideId,
-                                                                 @RequestBody InconsistencyReportCreateDTO dto) {
+    public ResponseEntity<InconsistencyReportResponseDTO> create(
+            @PathVariable Long rideId,
+            @RequestBody InconsistencyReportCreateDTO dto
+    ) {
+        // Dobijanje trenutnog ulogovanog korisnika iz tokena
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Long loggedInUserId = Long.parseLong(auth.getName()); // username u tokenu je userId
 
+       System.out.println(loggedInUserId);
+       System.out.println(rideId);
+
+
+        // Prosledi dto dalje u servis
         InconsistencyReportResponseDTO created = inconsistencyReportService.create(rideId, dto);
+        System.out.println(created.getMessage());
+
         return new ResponseEntity<>(created, HttpStatus.CREATED);
     }
 }

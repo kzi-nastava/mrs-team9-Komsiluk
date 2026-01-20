@@ -2,12 +2,16 @@ package rs.ac.uns.ftn.iss.Komsiluk.services;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import rs.ac.uns.ftn.iss.Komsiluk.beans.DriverLocation;
+import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.DriverStatus;
+import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.UserRole;
 import rs.ac.uns.ftn.iss.Komsiluk.repositories.DriverLocationRepository;
+import rs.ac.uns.ftn.iss.Komsiluk.repositories.UserRepository;
 import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.IDriverLocationService;
 
 @Service
@@ -18,40 +22,36 @@ public class DriverLocationService implements IDriverLocationService {
 
     @Autowired
     private DriverLocationRepository locationRepository;
+    @Autowired
+    private UserRepository userRepository;
+
 
     @Override
     public void updateLiveLocation(Long driverId, double lat, double lng) {
         DriverLocation loc = new DriverLocation(driverId, lat, lng, LocalDateTime.now());
-        locationRepository.putLive(loc);
+        locationRepository.save(loc);
     }
 
     @Override
     public DriverLocation getLiveLocation(Long driverId) {
-        return locationRepository.getLive(driverId);
+        return locationRepository.findById(driverId).orElse(null);
     }
 
     @Override
     public Collection<DriverLocation> getAllLiveLocations() {
-        return locationRepository.getAllLive();
+        return getActiveDriverLocations();
     }
 
-    @Override
-    public void onDriverBecameActive(Long driverId) {
-        DriverLocation last = locationRepository.getLastKnown(driverId);
-        if (last == null) {
-            last = new DriverLocation(driverId, DEFAULT_LAT, DEFAULT_LNG, LocalDateTime.now());
-        } else {
-            last.setUpdatedAt(LocalDateTime.now());
-        }
-        locationRepository.putLive(last);
+
+    public Collection<DriverLocation> getActiveDriverLocations() {
+        List<Long> activeDriverIds =
+                userRepository.findDriverIdsByStatus(UserRole.DRIVER, DriverStatus.ACTIVE);
+
+        if (activeDriverIds.isEmpty()) return List.of();
+
+        return locationRepository.findByDriverIdIn(activeDriverIds);
     }
 
-    @Override
-    public void onDriverBecameInactive(Long driverId) {
-        DriverLocation live = locationRepository.getLive(driverId);
-        if (live != null) {
-            locationRepository.saveLastKnown(live);
-        }
-        locationRepository.removeLive(driverId);
-    }
+
+
 }

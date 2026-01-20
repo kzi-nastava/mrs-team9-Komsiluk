@@ -83,12 +83,10 @@ public class DriverService implements IDriverService {
         
         if (oldStatus == DriverStatus.INACTIVE && newStatus != DriverStatus.INACTIVE) {
             driverActivityService.startActivity(driver);
-            driverLocationService.onDriverBecameActive(driverId);
         }
 
         if (oldStatus != DriverStatus.INACTIVE && newStatus == DriverStatus.INACTIVE) {
             driverActivityService.endActivity(driver);
-            driverLocationService.onDriverBecameInactive(driverId);
         }
             
         driver.setDriverStatus(newStatus);

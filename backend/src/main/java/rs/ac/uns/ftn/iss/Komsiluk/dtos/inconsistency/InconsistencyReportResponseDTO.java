@@ -1,14 +1,19 @@
 package rs.ac.uns.ftn.iss.Komsiluk.dtos.inconsistency;
 
+import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.UserRole;
+
 import java.time.LocalDateTime;
 
 public class InconsistencyReportResponseDTO {
 
     private Long id;
     private Long rideId;
-    private Long passengerId;
+    private Long reporterId;
+    private UserRole reporterRole;
     private String message;
     private LocalDateTime createdAt;
+
+    // Getters and Setters
 
     public Long getId() {
         return id;
@@ -26,12 +31,20 @@ public class InconsistencyReportResponseDTO {
         this.rideId = rideId;
     }
 
-    public Long getPassengerId() {
-        return passengerId;
+    public Long getReporterId() {
+        return reporterId;
     }
 
-    public void setPassengerId(Long passengerId) {
-        this.passengerId = passengerId;
+    public void setReporterId(Long reporterId) {
+        this.reporterId = reporterId;
+    }
+
+    public UserRole getReporterRole() {
+        return reporterRole;
+    }
+
+    public void setReporterRole(UserRole reporterRole) {
+        this.reporterRole = reporterRole;
     }
 
     public String getMessage() {
@@ -50,3 +63,4 @@ public class InconsistencyReportResponseDTO {
         this.createdAt = createdAt;
     }
 }
+
