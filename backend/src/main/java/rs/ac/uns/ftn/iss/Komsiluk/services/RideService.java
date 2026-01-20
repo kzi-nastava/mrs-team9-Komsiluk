@@ -384,11 +384,13 @@ public class RideService implements IRideService {
         LocalDateTime endTime = LocalDateTime.now();
         ride.setEndTime(endTime);
 
+        long durationMinutes = java.time.Duration.between(ride.getStartTime(), endTime).toMinutes();
+
         Route route = ride.getRoute();
         route.setEndAddress(dto.getStopAddress());
         route.setStops(dto.getVisitedStops());
         route.setDistanceKm(dto.getDistanceTravelledKm());
-        route.setEstimatedDurationMin(dto.getDurationMinutes());
+        route.setEstimatedDurationMin((int) durationMinutes);
         ride.setRoute(route);
 
         ride.setStatus(RideStatus.FINISHED);

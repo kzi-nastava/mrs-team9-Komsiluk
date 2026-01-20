@@ -14,8 +14,6 @@ public class StopRideRequestDTO {
     @Positive(message = "Travelled distance must be greater than zero")
     private double distanceTravelledKm;
 
-    @PositiveOrZero(message = "Duration must be zero or positive")
-    private int durationMinutes;
 
     public StopRideRequestDTO() {}
 
@@ -43,11 +41,4 @@ public class StopRideRequestDTO {
         this.distanceTravelledKm = distanceTravelledKm;
     }
 
-    public int getDurationMinutes() {
-        return durationMinutes;
-    }
-
-    public void setDurationMinutes(int durationMinutes) {
-        this.durationMinutes = durationMinutes;
-    }
 }

@@ -120,4 +120,20 @@ export class GeocodingService {
       catchError(() => of(null))
     );
   }
+
+  reverseGeocode(lat: number, lon: number) {
+    const params = new HttpParams()
+      .set('format', 'jsonv2')
+      .set('lat', lat.toString())
+      .set('lon', lon.toString())
+      .set('addressdetails', '1');
+
+    return this.http.get<any>('https://nominatim.openstreetmap.org/reverse', { params }).pipe(
+      map(res => {
+        if (!res) return 'Unknown address';
+        return this.formatLabel(res);
+      }),
+      catchError(() => of('Unknown address'))
+    );
+  }
 }
