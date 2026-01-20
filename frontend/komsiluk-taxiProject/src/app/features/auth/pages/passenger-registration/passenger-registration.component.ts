@@ -76,12 +76,19 @@ export class PassengerRegistrationComponent {
       phoneNumber: this.c('phone').value,
       email: this.c('email').value,
       password: this.c('password').value,
-      confirmPassword: this.c('repeat').value,
-      profileImageUrl: null as string | null, // backend očekuje URL string (ne File)
+      confirmPassword: this.c('repeat').value
     };
 
+    const formData = new FormData();
+    formData.append('data', new Blob([JSON.stringify(payload)], { type: 'application/json' }));
+
+    const file = this.c('profilePhoto').value;
+    if (file) {
+      formData.append('profileImage', file);
+    }
+
     this.auth
-      .registerPassenger(payload)
+      .registerPassenger(formData)
       .pipe(finalize(() => (this.loading = false)))
       .subscribe({
         next: () => {
@@ -102,6 +109,10 @@ export class PassengerRegistrationComponent {
             return;
           }
 
+          if (err?.status === 403) {
+            this.toast.show('Account is not activated. Please check your email.');
+            return;
+          }
           this.toast.show('Something went wrong. Please try again.');
         },
       });
@@ -109,17 +120,23 @@ export class PassengerRegistrationComponent {
 
   onFileSelected(event: Event) {
     const input = event.target as HTMLInputElement;
-
     if (!input.files || input.files.length === 0) return;
 
     const file = input.files[0];
 
+    if (!file.type.startsWith('image/')) {
+      this.toast.show('Please select an image file.');
+      return;
+    }
+    if (file.size > 8 * 1024 * 1024) {
+      this.toast.show('Image is too large (max 8MB).');
+      return;
+    }
+
     this.form.patchValue({
       profilePhoto: file,
     });
-
     this.form.get('profilePhoto')?.markAsTouched();
-
-    // NOTE: file upload rešavamo kasnije (backend trenutno prima URL string)
   }
+
 }

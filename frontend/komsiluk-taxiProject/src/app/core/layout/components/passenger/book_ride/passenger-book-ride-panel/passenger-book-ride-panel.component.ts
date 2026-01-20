@@ -1,5 +1,5 @@
 import { Component, signal, OnDestroy, OnInit, ChangeDetectorRef, ElementRef, ViewChild } from '@angular/core';
-import { Subscription, switchMap, catchError, of, tap, map, finalize, forkJoin} from 'rxjs';
+import { Subscription, switchMap, catchError, of, tap, map, finalize, forkJoin } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { FormArray, FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { VehicleType } from '../../../../../../shared/models/profile.models';
@@ -79,7 +79,44 @@ export class PassengerBookRidePanelComponent implements OnInit, OnDestroy {
     });
   }
 
+  private prefillFromPlanner(): void {
+    const pickup = this.ridePlanner.pickup();
+    const dest = this.ridePlanner.destination();
+
+    if (pickup) {
+      this.form.patchValue({ pickup: pickup.label }, { emitEvent: false });
+      this.pickupPoint = pickup
+        ? {
+          lat: pickup.lat,
+          lon: pickup.lon,
+          label: pickup.label ?? '',
+        }
+        : null;
+
+    }
+
+    if (dest) {
+      this.form.patchValue({ destination: dest.label }, { emitEvent: false });
+      this.destinationPoint = dest
+        ? {
+          lat: dest.lat,
+          lon: dest.lon,
+          label: dest.label ?? '',
+        }
+        : null;
+
+    }
+
+    this.cdr.detectChanges();
+  }
+
+  
+
+
+
   ngOnInit(): void {
+    this.prefillFromPlanner();
+
     this.subs.push(
       this.form.get('vehicleType')!.valueChanges.subscribe(v => {
         if (v) this.ridePlanner.setVehicleType(v as any);
@@ -271,7 +308,7 @@ export class PassengerBookRidePanelComponent implements OnInit, OnDestroy {
         : null;
 
     const stops = this.stationPoints
-      .filter((p): p is {lat:number; lon:number; label:string} => !!p)
+      .filter((p): p is { lat: number; lon: number; label: string } => !!p)
       .map(p => p.label);
 
     const passengerEmails = (this.users.value as any[])
@@ -299,6 +336,8 @@ export class PassengerBookRidePanelComponent implements OnInit, OnDestroy {
       this.toast.show('Not logged in.');
       return;
     }
+
+
 
     this.profileService.isUserBlocked(+userId).pipe(
       switchMap(res => {
@@ -353,7 +392,7 @@ export class PassengerBookRidePanelComponent implements OnInit, OnDestroy {
         if (fresh.length > 0) return fresh;
 
         if ((notifs ?? []).length > 0) {
-          const sorted = [...notifs].sort((a,b) => +new Date(b.createdAt) - +new Date(a.createdAt));
+          const sorted = [...notifs].sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt));
           return sorted.slice(0, 1);
         }
 
@@ -371,7 +410,7 @@ export class PassengerBookRidePanelComponent implements OnInit, OnDestroy {
         }
 
         for (const n of notifsToShow) {
-          this.notification.markRead(n.id, true).subscribe({ error: () => {} });
+          this.notification.markRead(n.id, true).subscribe({ error: () => { } });
         }
       }),
 

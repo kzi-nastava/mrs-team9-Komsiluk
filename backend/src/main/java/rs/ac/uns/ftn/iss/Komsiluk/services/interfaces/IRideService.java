@@ -20,8 +20,6 @@ public interface IRideService {
 
     public boolean userHasActiveRide(Long userId);
 
-    public RideEstimateResponseDTO estimate(RideEstimateRequestDTO dto);
-
     public void cancelByDriver(Long rideId, DriverCancelRideDTO dto);
 
     public void cancelByPassenger(Long rideId, PassengerCancelRideDTO dto);
@@ -32,7 +30,7 @@ public interface IRideService {
 
     public Collection<RideResponseDTO> getDriverRideHistory(Long driverId, LocalDate from, LocalDate to);
 
-    public Collection<AdminRideHistoryDTO> getAdminRideHistory(LocalDate from,LocalDate to,String sortBy);
+//    public Collection<AdminRideHistoryDTO> getAdminRideHistory(LocalDate from,LocalDate to,String sortBy);
 
     public AdminRideDetailsDTO getAdminRideDetails(Long rideId);
 

@@ -1,7 +1,15 @@
 package rs.ac.uns.ftn.iss.Komsiluk.services;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.User;
@@ -11,7 +19,11 @@ import rs.ac.uns.ftn.iss.Komsiluk.dtos.auth.LoginRequestDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.auth.LoginResponseDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.auth.RegisterPassengerRequestDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.userToken.UserTokenResponseDTO;
+import rs.ac.uns.ftn.iss.Komsiluk.mappers.RegisterPassengerMapper;
 import rs.ac.uns.ftn.iss.Komsiluk.security.jwt.JwtService;
+import rs.ac.uns.ftn.iss.Komsiluk.services.exceptions.AccountNotActivatedException;
+import rs.ac.uns.ftn.iss.Komsiluk.services.exceptions.EmailAlreadyExistsException;
+import rs.ac.uns.ftn.iss.Komsiluk.services.exceptions.InvalidCredentialsException;
 import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.IAuthService;
 import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.IUserService;
 import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.IUserTokenService;
@@ -24,46 +36,52 @@ public class AuthService implements IAuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final MailService mailService;
+    private final RegisterPassengerMapper registerPassengerMapper;
+    private final AuthenticationManager authenticationManager;
+
+    @Value("${app.user.default-profile-image}")
+    private String defaultProfileImageUrl;
 
     public AuthService(
             IUserService userService,
             IUserTokenService userTokenService,
             PasswordEncoder passwordEncoder,
             JwtService jwtService,
-            MailService mailService) {
+            MailService mailService,
+            RegisterPassengerMapper registerPassengerMapper,
+            AuthenticationManager authenticationManager) {
         this.userService = userService;
         this.userTokenService = userTokenService;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
         this.mailService = mailService;
+        this.registerPassengerMapper = registerPassengerMapper;
+        this.authenticationManager = authenticationManager;
     }
 
     @Override
-    public void registerPassenger(RegisterPassengerRequestDTO dto) {
+    @Transactional
+    public void registerPassenger(RegisterPassengerRequestDTO dto,
+                                  MultipartFile profileImage) {
 
-        if (userService.findByEmail(dto.getEmail()) != null) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already exists");
+        User existing = userService.findByEmail(dto.getEmail());
+
+        if (existing != null) {
+            if (!existing.isActive()) {
+                throw new AccountNotActivatedException();
+            }
+            throw new EmailAlreadyExistsException(dto.getEmail());
         }
 
+        User user = registerPassengerMapper.toEntity(dto);
 
-        User user = new User();
-        user.setEmail(dto.getEmail());
-        user.setPasswordHash(passwordEncoder.encode(dto.getPassword()));
-        user.setFirstName(dto.getFirstName());
-        user.setLastName(dto.getLastName());
-        user.setAddress(dto.getAddress());
-        user.setCity(dto.getCity());
-        user.setPhoneNumber(dto.getPhoneNumber());
-        user.setProfileImageUrl(
-                dto.getProfileImageUrl() != null
-                        ? dto.getProfileImageUrl()
-                        : "/images/default.png"
-        );
-        user.setRole(UserRole.PASSENGER);
-        user.setActive(false);
-        user.setBlocked(false);
+        user.setProfileImageUrl(defaultProfileImageUrl);
 
         userService.save(user);
+
+        if (profileImage != null && !profileImage.isEmpty()) {
+            userService.updateProfileImage(user.getId(), profileImage);
+        }
 
         UserTokenResponseDTO token =
                 userTokenService.createActivationToken(user.getId());
@@ -73,6 +91,7 @@ public class AuthService implements IAuthService {
                 token.getToken()
         );
     }
+
 
     public void resendActivation(String email) {
         User user = userService.findByEmail(email);
@@ -93,42 +112,34 @@ public class AuthService implements IAuthService {
 
     @Override
     public LoginResponseDTO login(LoginRequestDTO dto) {
-
-        User user = findUserOrThrowUnauthorized(dto.getEmail());
-
-        if (!passwordEncoder.matches(dto.getPassword(), user.getPasswordHash())) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
-        }
-
-        if (!user.isActive()) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
-        }
-
-        if (user.getRole() == UserRole.DRIVER) {
-            user.setDriverStatus(DriverStatus.ACTIVE);
-            userService.save(user);
-        }
-
-        String accessToken = jwtService.generateAccessToken(user);
-
-        return new LoginResponseDTO(
-                accessToken,
-                user.getId(),
-                user.getEmail(),
-                user.getRole(),
-                user.getDriverStatus()
-        );
-    }
-
-    private User findUserOrThrowUnauthorized(String email) {
         try {
-            User user = userService.findByEmail(email);
-            if (user == null) throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
-            return user;
-        } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(dto.getEmail(), dto.getPassword()));
+
+            User user = (User) authentication.getPrincipal();
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+
+
+            if (user.getRole() == UserRole.DRIVER) {
+                user.setDriverStatus(DriverStatus.ACTIVE);
+                userService.save(user);
+            }
+
+
+            String token = jwtService.generateAccessToken(user);
+
+            return new LoginResponseDTO(
+                    token,
+                    user.getId(),
+                    user.getEmail(),
+                    user.getRole(),
+                    user.getDriverStatus()
+            );
+        }
+        catch (AuthenticationException ex) {
+            throw ex;
         }
     }
+
 
     @Override
     public void forgotPassword(String email) {
