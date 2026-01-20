@@ -1,6 +1,7 @@
 package rs.ac.uns.ftn.iss.Komsiluk.controllers;
 
 
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -30,7 +31,7 @@ public class AuthController {
 
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponseDTO> login(@RequestBody LoginRequestDTO dto) {
+    public ResponseEntity<LoginResponseDTO> login(@Valid @RequestBody LoginRequestDTO dto) {
         LoginResponseDTO response = authService.login(dto);
         return ResponseEntity.ok(response);
     }
@@ -41,7 +42,7 @@ public class AuthController {
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
     public ResponseEntity<RegisterResponseDTO> registerPassenger(
-            @RequestPart("data") RegisterPassengerRequestDTO requestDto,
+            @Valid @RequestPart("data") RegisterPassengerRequestDTO requestDto,
             @RequestPart(value="profileImage", required = false) MultipartFile profileImage
     ) {
 
@@ -56,7 +57,7 @@ public class AuthController {
 
     @PostMapping("/registration/resend")
     public ResponseEntity<Void> resendActivation(
-            @RequestBody ResendActivationDTO dto) {
+            @Valid @RequestBody ResendActivationDTO dto) {
 
         authService.resendActivation(dto.getEmail());
         return ResponseEntity.ok().build();
@@ -66,7 +67,7 @@ public class AuthController {
 
     @PostMapping("/forgot-password")
     public ResponseEntity<Void> forgotPassword(
-            @RequestBody ForgotPasswordRequestDTO dto) {
+            @Valid @RequestBody ForgotPasswordRequestDTO dto) {
 
         authService.forgotPassword(dto.getEmail());
         return ResponseEntity.ok().build();

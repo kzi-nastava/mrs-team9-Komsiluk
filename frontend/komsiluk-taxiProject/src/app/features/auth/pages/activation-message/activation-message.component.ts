@@ -38,7 +38,10 @@ export class ActivationMessageComponent {
       error: (err: { status: number; }) => {
         if (err?.status === 429) {
           this.toast.show('Activation email already sent. Please check your inbox.');
-        } else {
+        } else if(err?.status === 400) {
+          this.toast.show('Invalid email address.');
+        }
+          else {
           this.toast.show('Something went wrong. Please try again later.');
         }
         this.loading = false;

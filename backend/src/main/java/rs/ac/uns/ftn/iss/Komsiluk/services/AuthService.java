@@ -24,6 +24,7 @@ import rs.ac.uns.ftn.iss.Komsiluk.security.jwt.JwtService;
 import rs.ac.uns.ftn.iss.Komsiluk.services.exceptions.AccountNotActivatedException;
 import rs.ac.uns.ftn.iss.Komsiluk.services.exceptions.EmailAlreadyExistsException;
 import rs.ac.uns.ftn.iss.Komsiluk.services.exceptions.InvalidCredentialsException;
+import rs.ac.uns.ftn.iss.Komsiluk.services.exceptions.PasswordsDoNotMatchException;
 import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.IAuthService;
 import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.IUserService;
 import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.IUserTokenService;
@@ -63,6 +64,11 @@ public class AuthService implements IAuthService {
     @Transactional
     public void registerPassenger(RegisterPassengerRequestDTO dto,
                                   MultipartFile profileImage) {
+
+
+        if (!dto.getPassword().equals(dto.getConfirmPassword())) {
+            throw new PasswordsDoNotMatchException();
+        }
 
         User existing = userService.findByEmail(dto.getEmail());
 

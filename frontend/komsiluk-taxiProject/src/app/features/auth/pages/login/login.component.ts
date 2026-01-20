@@ -52,8 +52,12 @@ export class LoginComponent {
         this.toast.show('Successful Log in!');
         this.router.navigateByUrl('/');
       },
-      error: () => {
-        this.toast.show('Invalid credentials');
+      error: (err) => {
+        if (err.status === 400 && err.error?.message) {
+          this.toast.show(err.error.message);
+        } else {
+          this.toast.show('Invalid credentials');
+        }
       }
     });
   }
