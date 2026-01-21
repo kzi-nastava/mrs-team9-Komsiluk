@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.validation.Valid;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.route.RouteCreateDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.route.RouteResponseDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.IRouteService;
@@ -31,7 +32,7 @@ public class RouteController {
 
 	@PreAuthorize("hasAnyRole('PASSENGER', 'DRIVER')")
     @PostMapping(value = "/find-or-create", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<RouteResponseDTO> findOrCreate(@RequestBody RouteCreateDTO dto) {
+    public ResponseEntity<RouteResponseDTO> findOrCreate(@Valid @RequestBody RouteCreateDTO dto) {
         RouteResponseDTO route = routeService.findOrCreate(dto);
         return ResponseEntity.ok(route);
     }

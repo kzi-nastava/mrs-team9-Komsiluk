@@ -1,15 +1,28 @@
 package rs.ac.uns.ftn.iss.Komsiluk.dtos.vehicle;
 
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.VehicleType;
 
 public class VehicleUpdateDTO {
 
-	private String model;
-	private VehicleType type;
-	private String licencePlate;
-	private int seatCount;
-	private boolean babyFriendly;
-	private boolean petFriendly;
+	@Size(min = 1, max = 50)
+    private String model;
+
+    private VehicleType type;
+
+    @Size(min = 3, max = 15)
+    @Pattern(regexp = "^$|^[A-Za-z0-9\\-]{3,15}$")
+    private String licencePlate;
+
+    @Min(1)
+    @Max(8)
+    private Integer seatCount;
+    
+    private Boolean babyFriendly;
+    private Boolean petFriendly;
 	
 	public VehicleUpdateDTO() {
 		super();

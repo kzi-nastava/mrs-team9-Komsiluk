@@ -3,21 +3,45 @@ package rs.ac.uns.ftn.iss.Komsiluk.dtos.ride;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.VehicleType;
 
 public class RideCreateDTO {
 
-	private Long creatorId;
+	@NotNull
+    @Positive
+    private Long creatorId;
+
+    @NotBlank
+    @Size(min = 2, max = 150)
     private String startAddress;
+
+    @NotBlank
+    @Size(min = 2, max = 150)
     private String endAddress;
-    private List<String> stops;
+
+    @Size(max = 10)
+    private List<@NotBlank @Size(min = 2, max = 150) String> stops;
+
+    @Positive
     private double distanceKm;
+
+    @Positive
     private int estimatedDurationMin;
+
+    @NotNull
     private VehicleType vehicleType;
+
     private boolean babyFriendly;
     private boolean petFriendly;
+
     private LocalDateTime scheduledAt;
-    private List<String> passengerEmails;
+
+    private List<@Email String> passengerEmails;
 
     public Long getCreatorId() {
 		return creatorId;

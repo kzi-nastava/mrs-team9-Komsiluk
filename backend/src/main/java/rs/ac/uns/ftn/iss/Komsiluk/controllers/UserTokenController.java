@@ -23,7 +23,7 @@ public class UserTokenController {
     private IUserTokenService userTokenService;
 
     @PostMapping(value = "/activation", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> activate(@RequestBody UserTokenActivationDTO dto) {
+    public ResponseEntity<Void> activate(@Valid @RequestBody UserTokenActivationDTO dto) {
         userTokenService.activateWithPassword(dto.getToken(), dto.getPassword());
         return new ResponseEntity<>(HttpStatus.OK);
     }

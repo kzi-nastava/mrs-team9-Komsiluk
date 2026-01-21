@@ -26,7 +26,7 @@ public class RideController {
 
 	@PreAuthorize("hasRole('PASSENGER')")
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<RideResponseDTO> orderRide(@RequestBody RideCreateDTO dto) {
+    public ResponseEntity<RideResponseDTO> orderRide(@Valid @RequestBody RideCreateDTO dto) {
         RideResponseDTO created = rideService.orderRide(dto);
         return new ResponseEntity<>(created, HttpStatus.CREATED);
     }

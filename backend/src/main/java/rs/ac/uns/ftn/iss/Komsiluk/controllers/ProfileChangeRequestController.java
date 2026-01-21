@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.validation.Valid;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.driver.ProfileChangeRequestCreateDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.driver.ProfileChangeRequestResponseDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.IProfileChangeRequestService;
@@ -31,7 +32,7 @@ public class ProfileChangeRequestController {
 
     @PreAuthorize("hasRole('DRIVER')")
     @PostMapping("/{driverId}")
-    public ResponseEntity<ProfileChangeRequestResponseDTO> create(@PathVariable Long driverId, @RequestBody ProfileChangeRequestCreateDTO dto) {
+    public ResponseEntity<ProfileChangeRequestResponseDTO> create(@PathVariable Long driverId, @Valid @RequestBody ProfileChangeRequestCreateDTO dto) {
         var created = service.createRequest(driverId, dto);
         return new ResponseEntity<>(created, HttpStatus.CREATED);
     }

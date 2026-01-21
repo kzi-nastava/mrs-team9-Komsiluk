@@ -2,15 +2,32 @@ package rs.ac.uns.ftn.iss.Komsiluk.dtos.favoriteRoute;
 
 import java.util.List;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.VehicleType;
 
 public class FavoriteRouteCreateDTO {
 
+	@NotBlank
+	@Size(min = 2, max = 500)
 	private String title;
+	
+	@NotNull
+	@Positive
     private Long routeId;
+	
+	@NotNull
+	@Positive
     private Long userId;
-    private List<String> passengersEmails;
+	
+    private List<@Email String> passengersEmails;
+    
+    @NotNull
     private VehicleType vehicleType;
+    
     private boolean petFriendly;
     private boolean babyFriendly;
    

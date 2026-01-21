@@ -1,13 +1,26 @@
 package rs.ac.uns.ftn.iss.Komsiluk.dtos.user;
 
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
+
 public class UserProfileUpdateDTO {
 
-	private String firstName;
-	private String lastName;
-	private String address;
-	private String city;
-	private String phoneNumber;
-	private String profileImageUrl;
+    @Size(max = 50)
+    private String firstName;
+
+    @Size(max = 50)
+    private String lastName;
+
+    @Size(max = 100)
+    private String address;
+
+    @Size(max = 60)
+    private String city;
+
+    @Pattern(regexp = "^$|^\\+?[0-9]{8,15}$")
+    private String phoneNumber;
+
+    private String profileImageUrl;
 	
 	public UserProfileUpdateDTO() {
 		super();

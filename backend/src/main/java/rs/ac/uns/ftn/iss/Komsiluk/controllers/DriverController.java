@@ -65,7 +65,7 @@ public class DriverController {
 
     @PreAuthorize("hasRole('DRIVER')")
     @PutMapping("/{id}/status")
-    public ResponseEntity<DriverResponseDTO> updateStatus(@PathVariable Long id, @RequestBody DriverStatusUpdateDTO dto) {
+    public ResponseEntity<DriverResponseDTO> updateStatus(@PathVariable Long id, @Valid @RequestBody DriverStatusUpdateDTO dto) {
         DriverResponseDTO updated = driverService.updateDriverStatus(id, dto.getStatus());
         return new ResponseEntity<>(updated, HttpStatus.OK);
     }

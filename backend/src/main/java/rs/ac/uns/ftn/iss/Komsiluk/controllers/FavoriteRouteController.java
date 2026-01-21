@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.validation.Valid;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.favoriteRoute.FavoriteRouteCreateDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.favoriteRoute.FavoriteRouteResponseDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.favoriteRoute.FavoriteRouteUpdateDTO;
@@ -35,14 +36,14 @@ public class FavoriteRouteController {
     }
 
     @PostMapping("/users/{userId}/favorites")
-    public ResponseEntity<FavoriteRouteResponseDTO> addFavorite(@PathVariable Long userId, @RequestBody FavoriteRouteCreateDTO dto) {
+    public ResponseEntity<FavoriteRouteResponseDTO> addFavorite(@PathVariable Long userId, @Valid @RequestBody FavoriteRouteCreateDTO dto) {
         dto.setUserId(userId);
         FavoriteRouteResponseDTO created = favoriteRouteService.create(dto);
         return new ResponseEntity<>(created, HttpStatus.CREATED);
     }
 
     @PutMapping("/favorites/{favoriteId}")
-    public ResponseEntity<FavoriteRouteResponseDTO> renameFavorite(@PathVariable Long favoriteId, @RequestBody FavoriteRouteUpdateDTO dto) {
+    public ResponseEntity<FavoriteRouteResponseDTO> renameFavorite(@PathVariable Long favoriteId, @Valid @RequestBody FavoriteRouteUpdateDTO dto) {
         FavoriteRouteResponseDTO updated = favoriteRouteService.updateTitle(favoriteId, dto);
         return new ResponseEntity<>(updated, HttpStatus.OK);
     }
