@@ -1,0 +1,54 @@
+.da-form{
+  width: min(400px, 100%);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.da-desc{
+  font-size: var(--fs-md);
+  opacity: 0.9;
+  margin-bottom: 20px;
+}
+
+.da-field{
+  width: min(360px, 100%);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0 auto;
+}
+
+.da-label{
+  font-size: var(--fs-lg);
+  font-weight: var(--weight-regular);
+}
+
+.da-input{
+  height: 42px;
+  border-radius: 6px;
+  border: none;
+  outline: none;
+  background: var(--color-white);
+  color: var(--color-text);
+  padding: 0 16px;
+  box-sizing: border-box;
+}
+
+.da-actions{
+  display: flex;
+  justify-content: right;
+  margin-top: 20px;
+  margin-bottom: -30px;
+  font-size: var(--fs-lg);
+}
+
+.da-success{
+  text-align: left;
+  font-size: var(--fs-lg);
+}
+
+:host(.auth-card--narrow) .card-panel {
+  width: min(300px, 92vw);
+}

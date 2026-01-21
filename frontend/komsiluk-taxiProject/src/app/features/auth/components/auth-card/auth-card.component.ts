@@ -7,5 +7,8 @@ import { Component, Input } from '@angular/core';
   styleUrl: './auth-card.component.css',
 })
 export class AuthCardComponent {
+
+  constructor() {}
+
   @Input() title!: string;
 }

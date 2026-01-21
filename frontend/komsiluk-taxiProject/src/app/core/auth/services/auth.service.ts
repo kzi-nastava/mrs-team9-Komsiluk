@@ -39,6 +39,10 @@ export interface ResetPasswordRequest {
   confirmPassword: string;
 }
 
+export interface DriverActivationRequest {
+  token: string;
+  password: string;
+}
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -167,4 +171,8 @@ export class AuthService {
     return this.http.post<void>(`${this.API}/tokens/reset-password`, payload);
   }
 
+  activateDriver(token: string, password: string) {
+    const payload: DriverActivationRequest = { token, password };
+    return this.http.post<void>(`${this.API}/tokens/activation`, payload);
+  }
 }
