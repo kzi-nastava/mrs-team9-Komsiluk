@@ -3,6 +3,7 @@ package rs.ac.uns.ftn.iss.Komsiluk.services.interfaces;
 import java.util.Collection;
 
 import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.DriverStatus;
+import rs.ac.uns.ftn.iss.Komsiluk.dtos.driver.DriverBasicDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.driver.DriverCreateDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.driver.DriverResponseDTO;
 
@@ -15,4 +16,6 @@ public interface IDriverService {
     public DriverResponseDTO registerDriver(DriverCreateDTO dto);
 
     public DriverResponseDTO updateDriverStatus(Long driverId, DriverStatus newStatus);
+
+    Collection<DriverBasicDTO> getDriversBasic();
 }

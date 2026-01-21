@@ -8,11 +8,13 @@ public class DriverLocationResponseDTO {
     private double lat;
     private double lng;
     private LocalDateTime updatedAt;
+    private boolean busy;
 
     public DriverLocationResponseDTO() {
         super();
     }
-
+    public boolean isBusy() { return busy; }
+    public void setBusy(boolean busy) { this.busy = busy; }
     public Long getDriverId() {
         return driverId;
     }

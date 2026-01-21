@@ -20,6 +20,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.format.annotation.DateTimeFormat.ISO;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import rs.ac.uns.ftn.iss.Komsiluk.dtos.driver.DriverBasicDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.driver.DriverCreateDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.driver.DriverResponseDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.driver.DriverStatusUpdateDTO;
@@ -28,7 +29,6 @@ import rs.ac.uns.ftn.iss.Komsiluk.dtos.ride.RideResponseDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.IRideService;
 
 @RestController
-@PreAuthorize("hasRole('DRIVER')")
 @RequestMapping(value = "/api/drivers")
 public class DriverController {
 
@@ -38,31 +38,31 @@ public class DriverController {
     @Autowired
     private IRideService rideService;
 
-
+    @PreAuthorize("hasRole('DRIVER')")
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Collection<DriverResponseDTO>> getAllDrivers() {
         Collection<DriverResponseDTO> drivers = driverService.getAllDrivers();
         return new ResponseEntity<>(drivers, HttpStatus.OK);
     }
-
+    @PreAuthorize("hasRole('DRIVER')")
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<DriverResponseDTO> getDriver(@PathVariable("id") Long id) {
         DriverResponseDTO driver = driverService.getDriver(id);
         return new ResponseEntity<>(driver, HttpStatus.OK);
     }
-
+    @PreAuthorize("hasRole('DRIVER')")
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<DriverResponseDTO> registerDriver(@RequestBody DriverCreateDTO dto) {
         DriverResponseDTO created = driverService.registerDriver(dto);
         return new ResponseEntity<>(created, HttpStatus.CREATED);
     }
-
+    @PreAuthorize("hasRole('DRIVER')")
     @PutMapping("/{id}/status")
     public ResponseEntity<DriverResponseDTO> updateStatus(@PathVariable Long id, @RequestBody DriverStatusUpdateDTO dto) {
         DriverResponseDTO updated = driverService.updateDriverStatus(id, dto.getStatus());
         return new ResponseEntity<>(updated, HttpStatus.OK);
     }
-
+    @PreAuthorize("hasRole('DRIVER')")
     @GetMapping(value = "/{id}/rides/history", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Collection<RideResponseDTO>> getDriverRideHistory(
             @PathVariable("id") Long driverId,
@@ -71,6 +71,10 @@ public class DriverController {
     ) {
         Collection<RideResponseDTO> history = rideService.getDriverRideHistory(driverId, from, to);
         return new ResponseEntity<>(history, HttpStatus.OK);
+    }
+    @GetMapping(value = "/basic", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Collection<DriverBasicDTO>> getDriversBasic() {
+        return new ResponseEntity<>(driverService.getDriversBasic(), HttpStatus.OK);
     }
 
 }

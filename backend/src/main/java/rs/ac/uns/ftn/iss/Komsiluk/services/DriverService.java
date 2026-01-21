@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.User;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.DriverStatus;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.UserRole;
+import rs.ac.uns.ftn.iss.Komsiluk.dtos.driver.DriverBasicDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.driver.DriverCreateDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.driver.DriverResponseDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.mappers.DriverDTOMapper;
@@ -95,4 +96,10 @@ public class DriverService implements IDriverService {
 
         return driverMapper.toResponseDTO(driver);
     }
+
+    @Override
+    public Collection<DriverBasicDTO> getDriversBasic() {
+        return userRepository.findDriverBasics();
+    }
+
 }

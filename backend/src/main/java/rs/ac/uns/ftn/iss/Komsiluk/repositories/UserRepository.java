@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.User;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.DriverStatus;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.UserRole;
+import rs.ac.uns.ftn.iss.Komsiluk.dtos.driver.DriverBasicDTO;
 
 import java.util.List;
 
@@ -31,5 +32,14 @@ public interface UserRepository extends JpaRepository<User, Long> {
             @Param("role") UserRole role,
             @Param("driverStatus") DriverStatus driverStatus
     );
+
+    @Query("""
+   SELECT new rs.ac.uns.ftn.iss.Komsiluk.dtos.driver.DriverBasicDTO(u.id, u.firstName, u.lastName)
+   FROM User u
+   WHERE u.role = rs.ac.uns.ftn.iss.Komsiluk.beans.enums.UserRole.DRIVER
+     AND u.active = true
+     AND u.blocked = false
+""")
+    List<DriverBasicDTO> findDriverBasics();
 }
 

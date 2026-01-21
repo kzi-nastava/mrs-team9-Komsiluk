@@ -1,9 +1,12 @@
-import { Component, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component, effect } from '@angular/core';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Subscription } from 'rxjs';
 
 import {
   RideHistoryCard,
-  RideHistoryCardComponent
+  RideHistoryCardComponent,
+  RideStatus,
 } from '../../components/ride-history-card/ride-history-card.component';
 
 import { RideHistoryFilterService } from '../../services/driver-history-filter.service';
@@ -11,11 +14,36 @@ import { RideHistoryFilterService } from '../../services/driver-history-filter.s
 import {
   RideHistoryDetailsModalComponent,
   RideHistoryDetailsVm,
-  PassengerRating
+  PassengerRating,
 } from '../../components/ride-history-details-modal/ride-history-details-modal.component';
 
-import { AuthService, UserRole } from '../../../../core/auth/services/auth.service';
-import { Router } from '@angular/router';
+import { AuthService } from '../../../../core/auth/services/auth.service';
+
+// Backend DTO (prema JSON-u koji si poslao)
+type RideHistoryBackendDTO = {
+  id: number;
+  createdAt: string;
+
+  startTime: string | null;
+  endTime: string | null;
+  scheduledAt: string | null;
+
+  startAddress: string;
+  endAddress: string;
+
+  status: string; // npr "FINISHED"
+  panicTriggered: boolean;
+
+  passengerIds: number[];
+
+  distanceKm: number;
+  estimatedDurationMin: number;
+
+  price: number;
+
+  stops: string[];
+  vehicleType: string;
+};
 
 @Component({
   selector: 'app-driver-ride-history-page',
@@ -25,34 +53,103 @@ import { Router } from '@angular/router';
   styleUrls: ['./driver-ride-history-page.component.css'],
 })
 export class DriverRideHistoryPageComponent {
-  rides: RideHistoryCard[] = [
-    { id: '1', date: '13.12.2025', startTime: '12:00', endTime: '14:14', pickup: 'Brace Ribnikara 45', destination: 'Ilariona Ruvarca 27', status: 'completed', passengers: 3, kilometers: 100, durationText: '2h 14min', price: 200, mapImageUrl: 'assets/taxi.png' },
-    { id: '2', date: '14.12.2025', startTime: '13:00', endTime: '15:00', pickup: 'Bulevar Oslobođenja 120', destination: 'Dr. Ivana Ribara 55', status: 'in-progress', passengers: 2, kilometers: 45, durationText: '1h 15min', price: 120, mapImageUrl: 'assets/taxi.png' },
-    { id: '3', date: '15.12.2025', startTime: '16:00', endTime: '17:30', pickup: 'Cara Dušana 33', destination: 'Kralja Petra 71', status: 'completed', passengers: 1, kilometers: 30, durationText: '1h 30min', price: 80, mapImageUrl: 'assets/taxi.png' },
-    { id: '4', date: '16.12.2025', startTime: '08:00', endTime: '09:45', pickup: 'Kneza Miloša 25', destination: 'Bulevar Zorana Đinđića 44', status: 'completed', passengers: 4, kilometers: 50, durationText: '1h 45min', price: 150, mapImageUrl: 'assets/taxi.png' },
-    { id: '5', date: '17.12.2025', startTime: '10:30', endTime: '11:40', pickup: 'Vojvode Stepe 65', destination: 'Mihaila Pupina 22', status: 'completed', passengers: 2, kilometers: 55, durationText: '1h 10min', price: 140, mapImageUrl: 'assets/taxi.png' },
-    { id: '6', date: '18.12.2025', startTime: '13:00', endTime: '14:10', pickup: 'Stevana Sremca 12', destination: 'Pasterova 18', status: 'canceled', passengers: 1, kilometers: 25, durationText: '1h 10min', price: 60, mapImageUrl: 'assets/taxi.png' },
-    { id: '7', date: '19.12.2025', startTime: '14:30', endTime: '16:00', pickup: 'Svetogorska 22', destination: 'Kopaonik 10', status: 'in-progress', passengers: 3, kilometers: 120, durationText: '1h 30min', price: 300, mapImageUrl: 'assets/taxi.png' },
-    { id: '8', date: '20.12.2025', startTime: '07:30', endTime: '09:00', pickup: 'Bulevar kralja Aleksandra 70', destination: 'Visnjiceva 10', status: 'completed', passengers: 2, kilometers: 80, durationText: '1h 30min', price: 190, mapImageUrl: 'assets/taxi.png' },
-  ];
+  private readonly API_BASE = 'http://localhost:8081/api/drivers';
 
-  userRole: UserRole;
+  rides: RideHistoryCard[] = [];
+  filteredRides: RideHistoryCard[] = [];
 
-  filteredRides: RideHistoryCard[] = [...this.rides];
+  private rawById = new Map<string, RideHistoryBackendDTO>();
 
-  // --- MODAL STATE ---
   detailsOpen = false;
   detailsVm: RideHistoryDetailsVm | null = null;
 
-  constructor(private filterSvc: RideHistoryFilterService, private auth: AuthService, private router: Router) {
-    effect(() => {
+  loading = false;
+  error: string | null = null;
+
+  constructor(
+    private http: HttpClient,
+    private filterSvc: RideHistoryFilterService,
+    private auth: AuthService
+  ) {
+    effect((onCleanup) => {
       const { from, to } = this.filterSvc.range();
-      this.filteredRides = this.applyDateFilter(this.rides, from, to);
+
+      const sub = this.loadHistory(from, to);
+      onCleanup(() => sub.unsubscribe());
     });
-    this.userRole = this.auth.userRole();
-    if (this.userRole !== UserRole.DRIVER) { // ovo treba izbaciti kada se implementiraju i istorije za ostale korisnike
-      this.router.navigate(['/']);
-    }
+  }
+
+  // -------------------- BACKEND --------------------
+
+  private loadHistory(from: string, to: string): Subscription {
+    const driverId = Number(this.auth.userId());
+
+    this.loading = true;
+    this.error = null;
+
+    let params = new HttpParams();
+    if (from?.trim()) params = params.set('from', from);
+    if (to?.trim()) params = params.set('to', to);
+
+    const url = `${this.API_BASE}/${driverId}/rides/history`;
+
+    return this.http.get<RideHistoryBackendDTO[]>(url, { params }).subscribe({
+      next: (res) => this.applyBackendResult(res ?? []),
+      error: (err) => {
+        this.loading = false;
+        this.error = err?.error?.message ?? 'Greška pri učitavanju istorije vožnji.';
+        this.rides = [];
+        this.filteredRides = [];
+        this.rawById.clear();
+      },
+    });
+  }
+
+  private applyBackendResult(list: RideHistoryBackendDTO[]) {
+    this.rawById.clear();
+
+    const mapped = list.map((dto) => {
+      const card = this.mapDtoToCard(dto);
+      this.rawById.set(card.id, dto);
+      return card;
+    });
+
+    this.rides = mapped;
+    this.filteredRides = [...mapped]; // backend već filtrira by from/to
+    this.loading = false;
+  }
+
+  // -------------------- DETAILS --------------------
+
+  onDetails(id: string) {
+    const card = this.rides.find((r) => r.id === id);
+    const raw = this.rawById.get(id);
+    if (!card || !raw) return;
+
+    const passengers = this.buildPassengers(raw.passengerIds);
+
+    const vm: RideHistoryDetailsVm = {
+      passengers,
+      ratings: this.buildRatings(passengers),
+
+      mapImageUrl: card.mapImageUrl,
+      pickupLocation: card.pickup,
+      station1: raw.stops?.[0] ?? '',
+      station2: raw.stops?.[1] ?? '',
+      destination: card.destination,
+      startTime: card.startTime,
+      endTime: card.endTime,
+
+      kilometers: raw.distanceKm,
+      durationText: `${raw.estimatedDurationMin} min`,
+      price: raw.price,
+
+      panicPressed: !!raw.panicTriggered,
+      inconsistencyReport: null,
+    };
+
+    this.detailsVm = vm;
+    this.detailsOpen = true;
   }
 
   closeDetails() {
@@ -60,82 +157,75 @@ export class DriverRideHistoryPageComponent {
     this.detailsVm = null;
   }
 
-  private buildPassengers(count: number): string[] {
-    const c = Math.max(0, Math.floor(count || 0));
-    return Array.from({ length: c }, (_, i) => `user${i + 1}@gmail.com`);
+  // -------------------- HELPERS --------------------
+
+  private buildPassengers(passengerIds: number[] | null | undefined): string[] {
+    if (!passengerIds || passengerIds.length === 0) return ['—'];
+    return passengerIds.map((id) => `Passenger #${id}`);
   }
 
   private buildRatings(passengers: string[]): PassengerRating[] {
-    // demo podaci kao na slici; posle možeš vezati na backend
-    return passengers.map((email, idx) => {
-      if (idx === 0) return { email, driverRating: 5, vehicleRating: 5, comment: 'Very pleasant experience!' };
-      if (idx === 1) return { email, driverRating: 4, vehicleRating: 5, comment: null };
-      return { email, driverRating: null, vehicleRating: null, comment: null };
-    });
+    // placeholder dok ne vežeš ratings endpoint
+    return passengers.map((p) => ({
+      email: p,
+      driverRating: null,
+      vehicleRating: null,
+      comment: null,
+    }));
   }
 
-  onDetails(id: string) {
-    const ride = this.rides.find(r => r.id === id);
-    if (!ride) return;
+  private mapDtoToCard(dto: RideHistoryBackendDTO): RideHistoryCard {
+    const startIso = dto.startTime ?? dto.createdAt;
+    const endIso = dto.endTime ?? dto.createdAt;
 
-    const passengers = this.buildPassengers(ride.passengers);
+    return {
+      id: String(dto.id),
 
-    this.detailsVm = {
-      passengers,
-      ratings: this.buildRatings(passengers),
+      date: this.formatDate(startIso),
+      startTime: this.formatTime(startIso),
+      endTime: this.formatTime(endIso),
 
-      // ako imaš map sliku, ovde stavi npr. 'assets/mock/map.png'
-      mapImageUrl: ride.mapImageUrl,
+      pickup: dto.startAddress ?? '—',
+      destination: dto.endAddress ?? '—',
 
-      pickupLocation: ride.pickup,
-      station1: 'Medical Faculty',
-      station2: 'Suboticka 12',
-      destination: ride.destination,
-      startTime: ride.startTime,
-      endTime: ride.endTime,
+      status: this.mapStatus(dto.status),
 
-      kilometers: ride.kilometers,
-      durationText: ride.durationText,
-      price: ride.price,
+      passengers: (dto.passengerIds ?? []).length,
+      kilometers: Number(dto.distanceKm ?? 0),
+      durationText: `${dto.estimatedDurationMin ?? 0} min`,
+      price: Number(dto.price ?? 0),
 
-      panicPressed: false,
-      inconsistencyReport: null,
+      mapImageUrl: 'assets/taxi.png',
     };
-
-    this.detailsOpen = true;
   }
 
-  private parseDmy(dmy: string): Date | null {
-    const parts = dmy.split('.');
-    if (parts.length < 3) return null;
-    const day = Number(parts[0]);
-    const month = Number(parts[1]);
-    const year = Number(parts[2]);
-    if (!day || !month || !year) return null;
-    return new Date(year, month - 1, day);
+  private mapStatus(status: string): RideStatus {
+    const s = (status ?? '').toUpperCase();
+    if (s === 'FINISHED' || s === 'COMPLETED') return 'completed';
+    if (s === 'CANCELED' || s === 'CANCELLED') return 'canceled';
+    return 'in-progress';
   }
 
-  private parseIso(iso: string): Date | null {
+  private formatDate(iso: string): string {
+    const d = this.safeDate(iso);
+    if (!d) return '—';
+    const dd = String(d.getDate()).padStart(2, '0');
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const yyyy = String(d.getFullYear());
+    return `${dd}.${mm}.${yyyy}`;
+  }
+
+  private formatTime(iso: string): string {
+    const d = this.safeDate(iso);
+    if (!d) return '—';
+    const hh = String(d.getHours()).padStart(2, '0');
+    const min = String(d.getMinutes()).padStart(2, '0');
+    return `${hh}:${min}`;
+  }
+
+  private safeDate(iso: string): Date | null {
     if (!iso) return null;
-    const [y, m, d] = iso.split('-').map(Number);
-    if (!y || !m || !d) return null;
-    return new Date(y, m - 1, d);
-  }
-
-  private applyDateFilter(rides: RideHistoryCard[], from: string, to: string) {
-    const fromDate = this.parseIso(from);
-    const toDate = this.parseIso(to);
-    if (toDate) toDate.setHours(23, 59, 59, 999);
-
-    if (!fromDate && !toDate) return [...rides];
-
-    return rides.filter(r => {
-      const rideDate = this.parseDmy(r.date);
-      if (!rideDate) return false;
-
-      const okFrom = fromDate ? rideDate >= fromDate : true;
-      const okTo = toDate ? rideDate <= toDate : true;
-      return okFrom && okTo;
-    });
+    const d = new Date(iso);
+    return isNaN(d.getTime()) ? null : d;
   }
 }
