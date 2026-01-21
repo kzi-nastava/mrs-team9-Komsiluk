@@ -10,6 +10,15 @@ export interface VehicleResponseDTO {
   petFriendly: boolean;
 }
 
+export interface VehicleCreateDTO {
+  model: string;
+  type: VehicleType;
+  licencePlate: string;
+  seatCount: number;
+  babyFriendly: boolean;
+  petFriendly: boolean;
+}
+
 export interface UserProfileResponseDTO {
   email: string;
   firstName: string;

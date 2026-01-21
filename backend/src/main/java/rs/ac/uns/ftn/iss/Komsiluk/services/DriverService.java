@@ -4,23 +4,28 @@ import java.util.Collection;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import rs.ac.uns.ftn.iss.Komsiluk.beans.User;
+import rs.ac.uns.ftn.iss.Komsiluk.beans.Vehicle;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.DriverStatus;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.UserRole;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.driver.DriverBasicDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.driver.DriverCreateDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.driver.DriverResponseDTO;
+import rs.ac.uns.ftn.iss.Komsiluk.dtos.userToken.UserTokenResponseDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.mappers.DriverDTOMapper;
+import rs.ac.uns.ftn.iss.Komsiluk.mappers.VehicleDTOMapper;
 import rs.ac.uns.ftn.iss.Komsiluk.repositories.UserRepository;
 import rs.ac.uns.ftn.iss.Komsiluk.services.exceptions.AlreadyExistsException;
 import rs.ac.uns.ftn.iss.Komsiluk.services.exceptions.NotFoundException;
 import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.IDriverActivityService;
 import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.IDriverService;
+import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.IUserService;
 import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.IUserTokenService;
-import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.IVehicleService;
-import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.IDriverLocationService;
 
 @Service
 public class DriverService implements IDriverService {
@@ -32,12 +37,15 @@ public class DriverService implements IDriverService {
 	@Autowired
     private IUserTokenService userTokenService;
 	@Autowired
-	private IVehicleService vehicleService;
-	@Autowired
 	private IDriverActivityService driverActivityService;
     @Autowired
-    private IDriverLocationService driverLocationService;
-
+    private MailService mailService;
+    @Autowired
+    private VehicleDTOMapper vehicleMapper;
+    @Autowired
+    private IUserService userService;
+    @Value("${app.user.default-profile-image}")
+    private String defaultProfileImageUrl;
 
     @Override
     public Collection<DriverResponseDTO> getAllDrivers() {
@@ -54,7 +62,9 @@ public class DriverService implements IDriverService {
     }
 
     @Override
-    public DriverResponseDTO registerDriver(DriverCreateDTO dto) {
+    @Transactional
+    public DriverResponseDTO registerDriver(DriverCreateDTO dto, MultipartFile profileImage) {
+
         if (userRepository.existsByEmailIgnoreCase(dto.getEmail())) {
             throw new AlreadyExistsException();
         }
@@ -64,18 +74,27 @@ public class DriverService implements IDriverService {
         driver.setRole(UserRole.DRIVER);
         driver.setActive(false);
         driver.setDriverStatus(DriverStatus.INACTIVE);
-        
+
+        driver.setProfileImageUrl(defaultProfileImageUrl);
+
         if (dto.getVehicle() != null) {
-			driver.getVehicle().setId(vehicleService.create(dto.getVehicle()).getId());
-		}
+            Vehicle vehicle = vehicleMapper.fromCreateDTO(dto.getVehicle());
+            driver.setVehicle(vehicle);
+        }
 
         userRepository.save(driver);
 
-        userTokenService.createActivationToken(driver.getId());
+        if (profileImage != null && !profileImage.isEmpty()) {
+            userService.updateProfileImage(driver.getId(), profileImage);
+        }
+
+        UserTokenResponseDTO token = userTokenService.createActivationToken(driver.getId());
+
+        mailService.sendDriverActivationMail(driver.getEmail(), token.getToken());
 
         return driverMapper.toResponseDTO(driver);
     }
-    
+
     @Override
     public DriverResponseDTO updateDriverStatus(Long driverId, DriverStatus newStatus) {
         User driver = userRepository.findById(driverId).orElseThrow(NotFoundException::new);
