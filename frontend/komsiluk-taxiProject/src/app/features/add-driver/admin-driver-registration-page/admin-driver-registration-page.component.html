@@ -1,0 +1,32 @@
+<app-auth-card
+  title="Registration"
+  [ngClass]="{
+    'auth-card--wide': step() === 1,
+    'auth-card--vehicle': step() === 2,
+    'auth-card--success': step() === 3
+  }"
+>
+
+@if (step() === 1) {
+    <app-admin-driver-registration-driver-panel
+    [form]="driverForm"
+    (next)="goNextFromDriver()"
+    />
+}
+
+@if (step() === 2) {
+    <app-admin-driver-registration-vehicle-panel
+    [form]="vehicleForm"
+    [creating]="creating()"
+    (back)="goBackToDriver()"
+    (create)="createDriver()"
+    />
+}
+
+@if (step() === 3) {
+    <app-admin-driver-registration-success-panel
+    (done)="done()"
+    />
+}
+
+</app-auth-card>

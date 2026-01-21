@@ -1,0 +1,54 @@
+<app-auth-card title="Driver activation" class="auth-card--narrow">
+
+  @if (step() === 1) {
+    <form class="da-form" [formGroup]="form" (ngSubmit)="submit()" autocomplete="off">
+      <div class="da-desc text-regular">
+        Set your password to activate your driver account.
+      </div>
+
+      <div class="da-field">
+        <label class="da-label text-semibold">Password</label>
+        <input class="da-input text-medium" type="password" formControlName="password" />
+        @if (isInvalid('password')) {
+          <div class="form-error">Min 8 chars, at least 1 letter and 1 number.</div>
+        }
+      </div>
+
+      <div class="da-field">
+        <label class="da-label text-semibold">Repeat password</label>
+        <input class="da-input text-medium" type="password" formControlName="repeat" />
+        @if (isInvalid('repeat')) {
+          <div class="form-error">Repeat password is required.</div>
+        }
+        @if (mismatch()) {
+          <div class="form-error">Passwords do not match.</div>
+        }
+      </div>
+
+      <div class="da-actions">
+        <button
+          type="submit"
+          class="btn btn--primary btn-scale text-semibold"
+          [disabled]="loading()"
+        >
+          {{ loading() ? 'Activating...' : 'Activate' }}
+        </button>
+      </div>
+    </form>
+  }
+
+  @if (step() === 2) {
+    <ng-container>
+      <div class="da-success text-regular">
+        Your driver account has been successfully activated!
+      </div>
+    </ng-container>
+  }
+
+  @if (step() === 2) {
+    <button card-actions type="button" class="btn btn--primary btn-scale text-semibold" [routerLink]="'/login'">
+      Go to login
+    </button>
+  }
+
+</app-auth-card>

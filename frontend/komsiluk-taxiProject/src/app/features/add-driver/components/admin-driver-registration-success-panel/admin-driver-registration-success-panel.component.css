@@ -1,0 +1,24 @@
+.adr-success{
+  width: min(520px, 100%);
+  margin: 0 auto;
+}
+
+.adr-success__title{
+  font-size: var(--fs-h1);
+  color: rgba(255,255,255,0.95);
+  margin-bottom: 12px;
+}
+
+.adr-success__text{
+  font-size: var(--fs-md);
+  color: rgba(255,255,255,0.9);
+  line-height: 1.25;
+}
+
+.adr-success__actions{
+  display: flex;
+  justify-content: right;
+  margin-top: 22px;
+  margin-bottom: -35px;
+  font-size: var(--fs-lg);
+}

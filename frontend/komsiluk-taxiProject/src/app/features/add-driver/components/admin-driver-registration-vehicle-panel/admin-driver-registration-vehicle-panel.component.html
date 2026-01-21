@@ -1,0 +1,62 @@
+<form class="avr-form" [formGroup]="form" autocomplete="off">
+  <div class="avr-col">
+    <div class="avr-field">
+      <label class="avr-label text-semibold">Model</label>
+      <input class="avr-input text-medium" type="text" formControlName="model" />
+      @if (isInvalid('model')) {
+        <div class="form-error">Model is required.</div>
+      }
+    </div>
+
+    <div class="avr-field">
+      <label class="avr-label text-semibold">Type</label>
+      <select class="avr-input text-medium" formControlName="type">
+        <option value="STANDARD">Standard</option>
+        <option value="VAN">Van</option>
+        <option value="LUXURY">Luxury</option>
+      </select>
+      @if (isInvalid('type')) {
+        <div class="form-error">Type is required.</div>
+      }
+    </div>
+
+    <div class="avr-field">
+      <label class="avr-label text-semibold">License plate</label>
+      <input class="avr-input text-medium" type="text" formControlName="licencePlate" placeholder="NS-123-AB" />
+      @if (isInvalid('licencePlate')) {
+        <div class="form-error">Format example: NS-123-AB</div>
+      }
+    </div>
+
+    <div class="avr-field">
+      <label class="avr-label text-semibold">Number of seats</label>
+      <input class="avr-input text-medium" type="text" formControlName="seatCount" />
+      @if (isInvalid('seatCount')) {
+        <div class="form-error">Seats must be a whole number (1–8).</div>
+      }
+    </div>
+
+    <div class="avr-check-row">
+      <label class="avr-check text-semibold">
+        <input type="checkbox" formControlName="petFriendly" />
+        <span>Pet friendly</span>
+      </label>
+
+      <label class="avr-check text-semibold">
+        <input type="checkbox" formControlName="babyFriendly" />
+        <span>Child seat available</span>
+      </label>
+    </div>
+  </div>
+</form>
+
+<div card-actions class="avr-actions">
+  <button type="button" class="btn btn--ghost text-semibold btn-scale" (click)="back.emit()" [disabled]="creating">
+    Back
+  </button>
+
+  <button type="button" class="btn btn--primary text-semibold btn-scale" (click)="create.emit()" [disabled]="creating">
+    @if (!creating) { Create }
+    @else { Creating... }
+  </button>
+</div>

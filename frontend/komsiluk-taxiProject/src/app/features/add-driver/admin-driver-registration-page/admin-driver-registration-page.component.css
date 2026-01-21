@@ -1,0 +1,11 @@
+:host{
+  display:block;
+}
+
+:host ::ng-deep app-auth-card.auth-card--vehicle .card-panel{
+  width: min(520px, 92vw);
+}
+
+:host ::ng-deep app-auth-card.auth-card--success .card-panel{
+  width: min(520px, 92vw);
+}

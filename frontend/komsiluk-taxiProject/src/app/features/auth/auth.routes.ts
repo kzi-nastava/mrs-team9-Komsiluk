@@ -8,6 +8,7 @@ import { SuccessfulRegistrationComponent } from './pages/successful-registration
 import { ActivationComponent } from './components/activation/activation.component';
 import { ForgotPasswordMessageComponent } from './pages/forgot-password-message/forgot-password-message.component';
 import { GuestGuard } from '../../core/auth/guards/guest.guard';
+import { DriverActivationPageComponent } from './pages/driver-activation-page/driver-activation-page.component';
 
 export const AUTH_ROUTES: Routes = [
   { path: 'login', component: LoginComponent, canActivate: [GuestGuard] },
@@ -17,5 +18,6 @@ export const AUTH_ROUTES: Routes = [
   { path: 'register-passenger', component: PassengerRegistrationComponent, canActivate: [GuestGuard] },
   { path: 'successful-registration', component: SuccessfulRegistrationComponent },
   { path: 'forgot-password-message', component: ForgotPasswordMessageComponent},
-  { path: 'activation', component: ActivationComponent }
+  { path: 'activation', component: ActivationComponent },
+  { path: 'driver-activation', component: DriverActivationPageComponent }
 ];
