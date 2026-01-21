@@ -30,9 +30,6 @@ import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.*;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.DriverLocation;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.ride.RideLiveInfoDTO;
 
-import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 @Service
 public class RideService implements IRideService {
 
@@ -58,8 +55,6 @@ public class RideService implements IRideService {
     private IRatingService ratingService;
     @Autowired
     private IInconsistencyReportService inconsistencyReportService;
-    @Autowired
-    private DriverDTOMapper driverMapper;
     @Autowired
     private AdminRideDetailsMapper adminRideDetailsMapper;
     @Autowired

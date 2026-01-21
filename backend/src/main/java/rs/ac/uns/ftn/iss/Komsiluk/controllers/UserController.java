@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -35,6 +36,7 @@ public class UserController {
         return new ResponseEntity<>(dto, HttpStatus.OK);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'PASSENGER')")
     @PutMapping("/{id}/profile")
     public ResponseEntity<UserProfileResponseDTO> updateProfile(@PathVariable Long id, @RequestBody UserProfileUpdateDTO updateDTO) {
         UserProfileResponseDTO updated = userService.updateProfile(id, updateDTO);
@@ -53,6 +55,7 @@ public class UserController {
         return new ResponseEntity<>(emails, HttpStatus.OK);
     }
     
+    @PreAuthorize("hasAnyRole('DRIVER', 'PASSENGER')")
     @GetMapping("/{id}/blocked")
     public ResponseEntity<UserBlockedDTO> isUserBlocked(@PathVariable Long id) {
         boolean blocked = userService.isBlocked(id);

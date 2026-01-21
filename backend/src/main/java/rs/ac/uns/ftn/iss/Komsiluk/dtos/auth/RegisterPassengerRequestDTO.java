@@ -2,7 +2,6 @@ package rs.ac.uns.ftn.iss.Komsiluk.dtos.auth;
 
 
 import jakarta.validation.constraints.*;
-import java.util.Objects;
 
 public class RegisterPassengerRequestDTO {
 
