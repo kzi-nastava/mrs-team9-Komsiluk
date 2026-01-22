@@ -3,6 +3,7 @@ package rs.ac.uns.ftn.iss.Komsiluk.security.config;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
@@ -85,6 +86,9 @@ public class SecurityConfig {
                         .requestMatchers("/api/tokens/activation/**").permitAll()
                         .requestMatchers("/api/tokens/reset-password").permitAll()
                         .requestMatchers("/images/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/drivers/locations").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/drivers/*/location").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/drivers/basic").permitAll()
 
                         .anyRequest().authenticated()
                 )

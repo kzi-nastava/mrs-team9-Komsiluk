@@ -1,0 +1,33 @@
+<nav class="p-menu">
+
+  <!-- Current Ride -->
+  <button class="p-item" type="button" (click)="toggle('currentRide')">
+    <span class="p-left">
+      <span class="material-symbols-outlined">directions_car</span>
+      <span class="p-text">Current Ride</span>
+    </span>
+    <span class="p-chev" [class.p-chev--open]="currentRideOpen()">▾</span>
+  </button>
+
+  <div *ngIf="currentRideOpen()">
+    <div class="p-panel">
+      <span class="p-panel__label">There is no currente ride</span>
+    </div>
+  </div>
+
+  <!-- Scheduled Rides -->
+  <button class="p-item" type="button" (click)="toggle('scheduledRides')">
+    <span class="p-left">
+      <span class="material-symbols-outlined">schedule</span>
+      <span class="p-text">Scheduled Rides</span>
+    </span>
+    <span class="p-chev" [class.p-chev--open]="scheduledRidesOpen()">▾</span>
+  </button>
+
+  <div *ngIf="scheduledRidesOpen()">
+    <div class="p-panel">
+      <span class="p-panel__label">There are no scheduled rides</span>
+    </div>
+  </div>
+
+</nav>
