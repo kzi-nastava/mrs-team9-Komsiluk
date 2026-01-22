@@ -19,8 +19,6 @@ public class FavoriteRouteCreateDTO {
 	@Positive
     private Long routeId;
 	
-	@NotNull
-	@Positive
     private Long userId;
 	
     private List<@Email String> passengersEmails;

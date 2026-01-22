@@ -89,10 +89,11 @@ public class RideService implements IRideService {
         if (dto.getPassengerEmails() != null) {
             for (String email : dto.getPassengerEmails()) {
                 User passenger= userService.findByEmail(email);
-                if (passenger == null) {
-            	  throw new NotFoundException();
-            	}
-                passengers.add(passenger);
+                if (passenger != null) {
+                    passengers.add(passenger);
+				}
+                
+                //send email
             }
         }
 
@@ -313,7 +314,6 @@ public class RideService implements IRideService {
 
         Collection<DriverResponseDTO> drivers = driverService.getAllDrivers();
 
-        // this is a simplified version, better logic should be implemented
         return drivers.stream()
                 .filter(d -> d.getDriverStatus() == DriverStatus.ACTIVE)
                 .filter(d -> { return driverActivityService.canAcceptNewRide(d.getId());})

@@ -31,7 +31,7 @@ public class ReportController {
         this.userService = userService;
     }
 
-    @PreAuthorize("hasAnyRole('DRIVER, PASSENGER')")
+    @PreAuthorize("hasAnyRole('DRIVER', 'PASSENGER')")
     @GetMapping("/users/{id}")
     public ResponseEntity<RideReportDTO> getUserReport(@PathVariable Long id, @RequestParam("start") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate start,@RequestParam("end")   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate end) {
         RideReportDTO dto = reportService.getUserReport(id, start, end);

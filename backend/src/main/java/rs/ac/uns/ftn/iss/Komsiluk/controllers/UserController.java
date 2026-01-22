@@ -56,7 +56,6 @@ public class UserController {
         return new ResponseEntity<>(emails, HttpStatus.OK);
     }
     
-    @PreAuthorize("hasAnyRole('DRIVER', 'PASSENGER')")
     @GetMapping("/{id}/blocked")
     public ResponseEntity<UserBlockedDTO> isUserBlocked(@PathVariable Long id) {
         boolean blocked = userService.isBlocked(id);
