@@ -27,6 +27,7 @@ type Step = 1 | 2 | 3;
   ],
   templateUrl: './admin-driver-registration-page.component.html',
   styleUrls: ['./admin-driver-registration-page.component.css'],
+  providers: [DriverService, ToastService],
 })
 export class AdminDriverRegistrationPageComponent {
   step = signal<Step>(1);

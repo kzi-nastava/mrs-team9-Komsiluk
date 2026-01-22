@@ -22,14 +22,13 @@ import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.IDriverLocationService;
 @Service
 public class DriverLocationService implements IDriverLocationService {
 
-    private static final double DEFAULT_LAT = 45.2671;
-    private static final double DEFAULT_LNG = 19.8335;
-
     @Autowired
     private DriverLocationRepository locationRepository;
     @Autowired
     private UserRepository userRepository;
 
+    private static final double DEFAULT_LAT = 45.2671;
+    private static final double DEFAULT_LNG = 19.8335;
 
     @Override
     public void updateLiveLocation(Long driverId, double lat, double lng) {

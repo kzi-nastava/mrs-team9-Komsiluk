@@ -66,6 +66,31 @@ public class DriverActivityService implements IDriverActivityService {
                 })
                 .sum();
     }
+    
+    @Override
+    public long getWorkedMinutesLast24hAt(User driver, LocalDateTime ref) {
+        LocalDateTime from = ref.minusHours(24);
+
+        List<DriverActivityPeriod> all = repo.findByDriver(driver);
+
+        return all.stream().mapToLong(p -> {
+            LocalDateTime start = p.getStartTime();
+            if (start == null) return 0L;
+
+            LocalDateTime end = (p.getEndTime() != null) ? p.getEndTime() : ref;
+
+            if (end.isBefore(from) || !start.isBefore(ref)) {
+                return 0L;
+            }
+
+            if (start.isBefore(from)) start = from;
+            if (end.isAfter(ref)) end = ref;
+
+            if (!end.isAfter(start)) return 0L;
+
+            return Duration.between(start, end).toMinutes();
+        }).sum();
+    }
 
     @Override
     public boolean canAcceptNewRide(User driver) {
@@ -78,6 +103,19 @@ public class DriverActivityService implements IDriverActivityService {
     	User driver = userRepository.findById(driverId).orElse(null);
         long minutes = getWorkedMinutesLast24h(driver);
         return minutes < MAX_MINUTES_LAST_24H;
+    }
+    
+    @Override
+    public boolean canAcceptNewRideAt(Long driverId, LocalDateTime rideStart, int rideDurationMin) {
+
+        User driver = userRepository.findById(driverId).orElse(null);
+        if (driver == null) return false;
+
+        long workedMinutes = getWorkedMinutesLast24hAt(driver, rideStart);
+
+        long afterThisRide = workedMinutes + rideDurationMin;
+
+        return afterThisRide <= MAX_MINUTES_LAST_24H;
     }
 
     private DriverActivityPeriod findOpenPeriod(User driver) {

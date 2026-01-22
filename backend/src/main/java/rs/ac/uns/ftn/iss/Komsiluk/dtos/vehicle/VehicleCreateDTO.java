@@ -1,13 +1,30 @@
 package rs.ac.uns.ftn.iss.Komsiluk.dtos.vehicle;
 
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.VehicleType;
 
 public class VehicleCreateDTO {
 	
-	private String model;
-	private VehicleType type;
-	private String licencePlate;
-	private int seatCount;
+	@NotBlank
+    @Size(min = 1, max = 50)
+    private String model;
+
+    @NotNull
+    private VehicleType type;
+
+    @NotBlank
+    @Pattern(regexp = "^[A-Z0-9\\-]{3,15}$")
+    private String licencePlate;
+
+    @Min(1)
+    @Max(8)
+    private int seatCount;
+
 	private boolean babyFriendly;
 	private boolean petFriendly;
 	

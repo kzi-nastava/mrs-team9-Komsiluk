@@ -25,6 +25,8 @@ public class UserDTOMapper {
 	
 	// UserProfileUpdateDTO -> User
 	public void fromUpdateDTO(UserProfileUpdateDTO dto, User user) {
+		String imageUrl = user.getProfileImageUrl();
 		modelMapper.map(dto, user);
+		user.setProfileImageUrl(imageUrl);
 	}
 }
