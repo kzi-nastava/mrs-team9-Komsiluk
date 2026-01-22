@@ -32,6 +32,12 @@ public class RideCreateDTO {
 
     @Positive
     private int estimatedDurationMin;
+    
+    @NotNull
+    private Double startLat;
+    
+    @NotNull
+    private Double startLng;
 
     @NotNull
     private VehicleType vehicleType;
@@ -85,6 +91,22 @@ public class RideCreateDTO {
 
 	public void setEstimatedDurationMin(int estimatedDurationMin) {
 		this.estimatedDurationMin = estimatedDurationMin;
+	}
+	
+	public double getStartLat() {
+		return startLat;
+	}
+	
+	public void setStartLat(double startLat) {
+		this.startLat = startLat;
+	}
+	
+	public double getStartLng() {
+		return startLng;
+	}
+	
+	public void setStartLng(double startLng) {
+		this.startLng = startLng;
 	}
 
 	public VehicleType getVehicleType() {

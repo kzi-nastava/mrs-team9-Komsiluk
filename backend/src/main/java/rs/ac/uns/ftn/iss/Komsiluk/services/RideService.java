@@ -17,13 +17,13 @@ import rs.ac.uns.ftn.iss.Komsiluk.beans.Ride;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.Route;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.User;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.*;
-import rs.ac.uns.ftn.iss.Komsiluk.dtos.driver.DriverResponseDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.notification.NotificationCreateDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.ride.*;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.route.RouteCreateDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.route.RouteResponseDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.mappers.*;
 import rs.ac.uns.ftn.iss.Komsiluk.repositories.RideRepository;
+import rs.ac.uns.ftn.iss.Komsiluk.repositories.UserRepository;
 import rs.ac.uns.ftn.iss.Komsiluk.services.exceptions.BadRequestException;
 import rs.ac.uns.ftn.iss.Komsiluk.services.exceptions.NotFoundException;
 import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.*;
@@ -36,6 +36,8 @@ public class RideService implements IRideService {
 	@Autowired
     private RideRepository rideRepository;
 	@Autowired
+	private UserRepository userRepository;
+	@Autowired
     private IRouteService routeService;
 	@Autowired
     private IUserService userService;
@@ -44,11 +46,7 @@ public class RideService implements IRideService {
 	@Autowired
     private RideDTOMapper rideMapper;
 	@Autowired
-	private IDriverService driverService;
-	@Autowired
 	private RouteDTOMapper routeMapper;
-	@Autowired
-	private IDriverActivityService driverActivityService;
     @Autowired
     private IDriverLocationService driverLocationService;
     @Autowired
@@ -59,13 +57,32 @@ public class RideService implements IRideService {
     private AdminRideDetailsMapper adminRideDetailsMapper;
     @Autowired
     private AdminRideHistoryMapper adminRideHistoryMapper;
+    @Autowired
+    private IDriverActivityService driverActivityService;
+    
+    private static final long MAX_MINUTES_LAST_24H = 480;
 
     @Override
     public RideResponseDTO orderRide(RideCreateDTO dto) {
 
         User creator = userService.findById(dto.getCreatorId());
         
-        if (userHasActiveRide(creator.getId())) {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime newStart = (dto.getScheduledAt() != null) ? dto.getScheduledAt() : now;
+
+        int bufferMinutes = 10;
+        LocalDateTime newEnd = newStart.plusMinutes(dto.getEstimatedDurationMin()).plusMinutes(bufferMinutes);
+
+        boolean hasConflict = rideRepository.existsBlockingRideForCreator(creator.getId(), List.of("SCHEDULED", "ASSIGNED", "ACTIVE"), newStart, newEnd, bufferMinutes);
+
+        if (hasConflict) {
+            NotificationCreateDTO notificationDTOFail = new NotificationCreateDTO();
+            notificationDTOFail.setUserId(creator.getId());
+            notificationDTOFail.setType(NotificationType.RIDE_FAILED);
+            notificationDTOFail.setTitle("Ride Failed");
+            notificationDTOFail.setMessage("You already have a ride scheduled/active in that time window.");
+            notificationService.createNotification(notificationDTOFail);
+
             throw new BadRequestException();
         }
 
@@ -97,12 +114,11 @@ public class RideService implements IRideService {
             }
         }
 
-        LocalDateTime now = LocalDateTime.now();
         LocalDateTime scheduledAt = dto.getScheduledAt();
 
         boolean scheduled = scheduledAt != null;
 
-        Optional<DriverResponseDTO> maybeDriver = findBestDriver(dto.getVehicleType(), dto.isBabyFriendly(), dto.isPetFriendly(), scheduled, scheduledAt);
+        Optional<User> maybeDriver = findBestDriver(dto, passengers.size());
 
         Ride ride = new Ride();
         ride.setCreatedAt(now);
@@ -284,19 +300,6 @@ public class RideService implements IRideService {
                 .toList();
     }
 
-
-
-
-    @Override
-    public boolean userHasActiveRide(Long userId) {
-
-        return rideRepository.findAll().stream().filter(r -> r.getStatus() == RideStatus.ACTIVE).anyMatch(r -> isPassenger(r, userId));
-    }
-
-    private boolean isPassenger(Ride ride, Long userId) {
-        return ride.getPassengers() != null && ride.getPassengers().stream().anyMatch(u -> u.getId().equals(userId));
-    }
-
     private BigDecimal calculatePrice(VehicleType type, double distanceKm) {
         // Here should price logic go
         BigDecimal base = switch (type) {
@@ -310,19 +313,44 @@ public class RideService implements IRideService {
     }
 
  
-    private Optional<DriverResponseDTO> findBestDriver(VehicleType vt, boolean babyFriendly, boolean petFriendly, boolean scheduled, LocalDateTime scheduledAt) {
+    private Optional<User> findBestDriver(RideCreateDTO dto, int passengerCount) {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime start = (dto.getScheduledAt() != null) ? dto.getScheduledAt() : now;
 
-        Collection<DriverResponseDTO> drivers = driverService.getAllDrivers();
+        int bufferMin = 10;
+        LocalDateTime end = start.plusMinutes(dto.getEstimatedDurationMin() + bufferMin);
 
-        return drivers.stream()
-                .filter(d -> d.getDriverStatus() == DriverStatus.ACTIVE)
-                .filter(d -> { return driverActivityService.canAcceptNewRide(d.getId());})
-                .filter(d -> !d.isBlocked())
-                .filter(d -> d.getVehicle() != null)
-                .filter(d -> d.getVehicle().getType() == vt)
-                .filter(d -> !babyFriendly || d.getVehicle().isBabyFriendly())
-                .filter(d -> !petFriendly || d.getVehicle().isPetFriendly())
-                .findFirst();
+        List<User> candidates = userRepository.findAvailableDriversNoConflict(dto.getVehicleType().name(), passengerCount + 1, dto.isBabyFriendly(), dto.isPetFriendly(), start, end, bufferMin);
+
+        if (candidates.isEmpty()) return Optional.empty();
+        
+        candidates = candidates.stream().filter(d -> driverActivityService.getWorkedMinutesLast24hAt(d, start) < MAX_MINUTES_LAST_24H).toList();
+
+        boolean scheduled = dto.getScheduledAt() != null;
+
+        if (scheduled) {
+            return candidates.stream().min(Comparator.comparingLong(d ->rideRepository.countScheduledForDriverFrom(d.getId(), now)));
+        }
+        else {
+        	 double lat = dto.getStartLat();
+    	     double lng = dto.getStartLng();
+
+    	     return candidates.stream()
+	            .filter(d -> driverLocationService.getLiveLocation(d.getId()) != null)
+	            .min(Comparator.comparingDouble(d -> {
+	                DriverLocation loc = driverLocationService.getLiveLocation(d.getId());
+	                return haversineKm(lat, lng, loc.getLat(), loc.getLng());
+	            }));
+		}
+    }
+    
+    private static double haversineKm(double lat1, double lon1, double lat2, double lon2) {
+        final double R = 6371.0;
+        double dLat = Math.toRadians(lat2 - lat1);
+        double dLon = Math.toRadians(lon2 - lon1);
+        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * c;
     }
 
     public void cancelByDriver(Long rideId, DriverCancelRideDTO dto) {

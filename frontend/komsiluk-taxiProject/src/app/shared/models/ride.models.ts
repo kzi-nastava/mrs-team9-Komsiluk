@@ -14,6 +14,8 @@ export interface RideCreateDTO {
   petFriendly: boolean;
   scheduledAt: string | null;
   passengerEmails: string[];
+  startLat: number;
+  startLng: number;
 }
 
 export interface RideResponseDTO {
