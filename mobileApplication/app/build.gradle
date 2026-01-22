@@ -3,6 +3,12 @@ plugins {
     alias(libs.plugins.hilt)
 }
 
+def getIpAddress() {
+    Properties properties = new Properties()
+    properties.load(project.rootProject.file('local.properties').newDataInputStream())
+    return properties.getProperty("ip_addr");
+}
+
 android {
     namespace 'com.komsiluk.taxi'
     compileSdk {
@@ -11,6 +17,7 @@ android {
 
     buildFeatures {
         viewBinding = true
+        buildConfig = true
     }
 
     defaultConfig {
@@ -19,7 +26,7 @@ android {
         targetSdk 36
         versionCode 1
         versionName "1.0"
-
+        buildConfigField "String", "IP_ADDR", "\""+getIpAddress()+"\""
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -48,6 +55,9 @@ dependencies {
     implementation libs.hilt.android
     annotationProcessor libs.hilt.compiler
     implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
+    implementation 'com.squareup.retrofit2:retrofit:2.3.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
+    implementation 'com.squareup.okhttp3:logging-interceptor:3.12.1'
 }
 
 hilt {

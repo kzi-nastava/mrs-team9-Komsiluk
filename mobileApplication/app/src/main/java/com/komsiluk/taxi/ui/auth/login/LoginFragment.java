@@ -7,6 +7,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,31 +16,28 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
-import com.google.android.material.button.MaterialButton;
 import com.komsiluk.taxi.AdminActivity;
 import com.komsiluk.taxi.DriverActivity;
 import com.komsiluk.taxi.MainActivity;
 import com.komsiluk.taxi.R;
 import com.komsiluk.taxi.UserActivity;
-import com.komsiluk.taxi.auth.AuthManager;
 import com.komsiluk.taxi.auth.UserRole;
 import com.komsiluk.taxi.databinding.FragmentLoginBinding;
 import com.komsiluk.taxi.ui.auth.rider_registration.RiderRegistrationFragment;
-
-import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
 
 @AndroidEntryPoint
 public class LoginFragment extends Fragment {
-    @Inject
-    AuthManager authManager;
-
     private FragmentLoginBinding binding;
 
     private Drawable normalBg;
     private Drawable errorBg;
+
+    LoginViewModel viewModel;
+
 
     @Override
     public View onCreateView(
@@ -75,32 +73,19 @@ public class LoginFragment extends Fragment {
         binding.etEmail.addTextChangedListener(watcher);
         binding.etPassword.addTextChangedListener(watcher);
 
-        binding.btnLogin.setOnClickListener(v -> {
-            boolean ok1 = validateEmail();
-            boolean ok2 = validatePassword();
-            if (!ok1 || !ok2) return;
+        viewModel = new ViewModelProvider(requireActivity())
+                .get(LoginViewModel.class);
 
-            boolean success = this.authManager.login(
-                    binding.etEmail.getText().toString().trim(),
-                    binding.etPassword.getText().toString().trim()
-            );
 
-            if (!success) {
-                Toast.makeText(
-                        requireContext(),
-                        getString(R.string.auth_invalid_credentials),
-                        Toast.LENGTH_SHORT
-                ).show();
-                return;
-            }
-
+        viewModel.getLoginSuccess().observe(getViewLifecycleOwner(), event -> {
+            UserRole role = event.getContentIfNotHandled();
+            if (role == null) return;
             Toast.makeText(
                     requireContext(),
                     getString(R.string.auth_login_success),
                     Toast.LENGTH_SHORT
             ).show();
 
-            UserRole role = authManager.getRole();
             Context ctx = requireContext();
             Intent intent;
 
@@ -122,6 +107,30 @@ public class LoginFragment extends Fragment {
             intent.addFlags(android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP | android.content.Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
             requireActivity().finish();
+        });
+
+        viewModel.getErrorMessage().observe(getViewLifecycleOwner(), event -> {
+            String message = event.getContentIfNotHandled();
+            if (message == null) return;
+
+            Toast.makeText(
+                    requireContext(),
+                    message,
+                    Toast.LENGTH_SHORT
+            ).show();
+        });
+
+        binding.btnLogin.setOnClickListener(v -> {
+            boolean ok1 = validateEmail();
+            boolean ok2 = validatePassword();
+            if (!ok1 || !ok2) return;
+
+            String email = binding.etEmail.getText().toString().trim();
+            String password = binding.etPassword.getText().toString().trim();
+
+            viewModel.login(email,password);
+
+
         });
 
         binding.tvForgotPassword.setOnClickListener(v -> {
@@ -167,8 +176,6 @@ public class LoginFragment extends Fragment {
 
         if (pwd.isEmpty()) {
             error = getString(R.string.error_password_required);
-        } else if (pwd.length() < 8) {
-            error = getString(R.string.error_password_too_short);
         }
 
         if (error != null) {

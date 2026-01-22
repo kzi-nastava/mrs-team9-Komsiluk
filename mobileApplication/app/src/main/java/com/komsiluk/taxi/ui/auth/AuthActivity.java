@@ -6,11 +6,14 @@ import android.os.Bundle;
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.komsiluk.taxi.R;
 import com.komsiluk.taxi.databinding.ActivityAuthBinding;
 import com.komsiluk.taxi.ui.auth.login.LoginFragment;
+import com.komsiluk.taxi.ui.auth.login.ForgotPasswordFragment;
 import com.komsiluk.taxi.ui.auth.login.ResetPasswordFragment;
+import com.komsiluk.taxi.ui.about.AboutUsActivity;
 import com.komsiluk.taxi.ui.auth.login.VerificationMessageFragment;
 import com.komsiluk.taxi.ui.auth.rider_registration.RiderRegistrationFragment;
 import com.komsiluk.taxi.ui.menu.BaseNavDrawerActivity;
@@ -21,6 +24,7 @@ import dagger.hilt.android.AndroidEntryPoint;
 public class AuthActivity extends BaseNavDrawerActivity {
 
     private ActivityAuthBinding binding;
+
 
     @Override
     protected int getContentLayoutId() {
@@ -86,16 +90,17 @@ public class AuthActivity extends BaseNavDrawerActivity {
     @Override
     protected void handleDrawerItemClick(int itemId) {
         if (itemId == R.id.nav_login) {
-            Intent i = new Intent(this, AuthActivity.class);
-            i.putExtra("AUTH_DESTINATION", "LOGIN");
-            startActivity(i);
+            showLogin();
         } else if (itemId == R.id.nav_register) {
-            Intent i = new Intent(this, AuthActivity.class);
-            i.putExtra("AUTH_DESTINATION", "REGISTER");
-            startActivity(i);
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.authFragmentContainer, new RiderRegistrationFragment())
+                    .commit();
         } else if (itemId == R.id.nav_about) {
-            // startActivity(new Intent(this, AboutActivity.class));
+            Intent intent = new Intent(this,AboutUsActivity.class);
+            startActivity(intent);
         }
     }
+
 
 }

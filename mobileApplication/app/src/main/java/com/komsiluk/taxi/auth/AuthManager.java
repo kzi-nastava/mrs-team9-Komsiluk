@@ -1,41 +1,30 @@
 package com.komsiluk.taxi.auth;
 
+import com.komsiluk.taxi.data.session.SessionManager;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
 @Singleton
 public class AuthManager {
 
-    private UserRole currentRole = UserRole.GUEST;
+    private final SessionManager sessionManager;
 
     @Inject
-    public AuthManager() {}
-
-    public boolean login(String email, String password) {
-        if (email.equals("passenger@test.com") && password.equals("12345678")) {
-            currentRole = UserRole.PASSENGER;
-            return true;
-        }
-        if (email.equals("driver@test.com") && password.equals("12345678")) {
-            currentRole = UserRole.DRIVER;
-            return true;
-        }
-        if (email.equals("admin@test.com") && password.equals("12345678")) {
-            currentRole = UserRole.ADMIN;
-            return true;
-        }
-        return false;
-    }
-
-    public UserRole getRole() {
-        return currentRole;
+    public AuthManager(SessionManager sessionManager) {
+        this.sessionManager = sessionManager;
     }
 
     public boolean isLoggedIn() {
-        return currentRole != UserRole.GUEST;
+        return sessionManager.getToken() != null;
+    }
+
+    public UserRole getRole() {
+        return sessionManager.getRole();
     }
 
     public void logout() {
-        currentRole = UserRole.GUEST;
+        sessionManager.clear();
     }
 }
+

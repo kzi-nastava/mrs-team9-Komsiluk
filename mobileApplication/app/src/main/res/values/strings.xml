@@ -324,5 +324,9 @@
     <string name="admin_add_driver_vehicle_title">Vehicle details</string>
     <string name="admin_driver_created_title">Driver account created</string>
     <string name="admin_driver_created_message">An activation email has been sent to the driver</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="forgot_password_message_title">Password Reset</string>
+    <string name="forgot_password_message">If the email exists, a password reset link has been sent.\n        Please check your inbox and follow the instructions.</string>
 
 </resources>

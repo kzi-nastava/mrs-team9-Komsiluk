@@ -11,6 +11,7 @@
         android:label="@string/company_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
+        android:networkSecurityConfig="@xml/network_security_config"
         android:theme="@style/Theme.Taxi_Project">
         <activity
             android:name=".ui.add_driver.AddDriverActivity"
@@ -75,5 +76,8 @@
         </activity>
         <activity android:name=".driver.history.DriverHistoryActivity" />
     </application>
+
+    <uses-permission android:name="android.permission.INTERNET" />
+
 
 </manifest>
