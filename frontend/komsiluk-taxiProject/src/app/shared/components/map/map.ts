@@ -1,20 +1,34 @@
-import { Component, AfterViewInit, effect, inject, Injector, runInInjectionContext } from '@angular/core';
+import { Component, AfterViewInit, effect, inject, Injector, runInInjectionContext, DestroyRef, ViewEncapsulation } from '@angular/core';
 import * as L from 'leaflet';
 import { MapFacadeService } from './services/map-facade.service';
+import { DriverLocationService } from './services/driver-location.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-map',
   standalone: true,
   templateUrl: './map.html',
   styleUrls: ['./map.css'],
+  encapsulation: ViewEncapsulation.None,
 })
 export class MapComponent implements AfterViewInit {
   private map!: L.Map;
-  private injector = inject(Injector);
 
+  private injector = inject(Injector);
+  private destroyRef = inject(DestroyRef);
   private facade = inject(MapFacadeService);
+
   private markersLayer = L.layerGroup();
   private routeLayer: L.GeoJSON | null = null;
+
+  private driverNames = new Map<number, string>();
+
+
+  // === DRIVERS layers (novo, odvojeno da clearRoute ne dira vozace) ===
+  private driversLayer = L.layerGroup();
+  private driverMarkers = new Map<number, L.Marker>();
+
+  constructor(private driverLocService: DriverLocationService) {}
 
   private initMap(): void {
     const noviSadBounds = L.latLngBounds(
@@ -38,6 +52,7 @@ export class MapComponent implements AfterViewInit {
 
     this.map.fitBounds(noviSadBounds);
     this.markersLayer.addTo(this.map);
+    this.driversLayer.addTo(this.map);
   }
 
   ngAfterViewInit(): void {
@@ -56,6 +71,28 @@ export class MapComponent implements AfterViewInit {
         this.renderRoute(s.points, s.geometry);
       });
     });
+
+
+  this.driverLocService
+      .getDriversBasic()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (drivers) => {
+          this.driverNames.clear();
+          for (const d of drivers) {
+            this.driverNames.set(d.id, `${d.firstName} ${d.lastName}`);
+          }
+        },
+        error: (err) => {
+          console.warn('getDriversBasic failed, fallback to driverId', err);
+        }
+      });
+
+
+    this.driverLocService
+      .pollLocations()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((locations) => this.renderDrivers(locations));
   }
 
   private clearRoute() {
@@ -106,5 +143,57 @@ export class MapComponent implements AfterViewInit {
 
     const bounds = this.routeLayer.getBounds();
     if (bounds.isValid()) this.map.fitBounds(bounds.pad(0.2));
+  }
+
+  // (opciono) lepši ikonice za busy/free
+  private driverFreeIcon = L.divIcon({
+    className: 'km-driver km-driver--free',
+    html: `<span class="material-symbols-outlined km-driver__icon">local_taxi</span>`,
+    iconSize: [26, 26],
+    iconAnchor: [13, 13],
+  });
+
+  private driverBusyIcon = L.divIcon({
+    className: 'km-driver km-driver--busy',
+    html: `<span class="material-symbols-outlined km-driver__icon">local_taxi</span>`,
+    iconSize: [26, 26],
+    iconAnchor: [13, 13],
+  });
+
+  private renderDrivers(
+    locations: { driverId: number; lat: number; lng: number; busy: boolean }[]
+  ): void {
+    if (!this.map) return;
+
+    const incomingIds = new Set(locations.map(l => l.driverId));
+
+    // remove markere kojih vise nema
+    for (const [id, marker] of this.driverMarkers.entries()) {
+      if (!incomingIds.has(id)) {
+        this.driversLayer.removeLayer(marker);
+        this.driverMarkers.delete(id);
+      }
+    }
+
+    // upsert markeri
+    for (const loc of locations) {
+      const name = this.driverNames.get(loc.driverId) ?? `Driver #${loc.driverId}`;
+      const text = `${name} • ${loc.busy ? 'BUSY' : 'FREE'}`;
+
+      const icon = loc.busy ? this.driverBusyIcon : this.driverFreeIcon;
+
+      const existing = this.driverMarkers.get(loc.driverId);
+      if (existing) {
+        existing.setLatLng([loc.lat, loc.lng]);
+        existing.setIcon(icon);
+        existing.bindPopup(text);
+      } else {
+        const marker = L.marker([loc.lat, loc.lng], { icon });
+        marker.bindPopup(text);
+        this.driversLayer.addLayer(marker);
+
+        this.driverMarkers.set(loc.driverId, marker);
+      }
+    }
   }
 }

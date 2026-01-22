@@ -25,6 +25,7 @@ import org.springframework.format.annotation.DateTimeFormat.ISO;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 
+import rs.ac.uns.ftn.iss.Komsiluk.dtos.driver.DriverBasicDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.driver.DriverCreateDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.driver.DriverResponseDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.driver.DriverStatusUpdateDTO;
@@ -69,7 +70,6 @@ public class DriverController {
         DriverResponseDTO updated = driverService.updateDriverStatus(id, dto.getStatus());
         return new ResponseEntity<>(updated, HttpStatus.OK);
     }
-
     @PreAuthorize("hasRole('DRIVER')")
     @GetMapping(value = "/{id}/rides/history", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Collection<RideResponseDTO>> getDriverRideHistory(
@@ -79,6 +79,10 @@ public class DriverController {
     ) {
         Collection<RideResponseDTO> history = rideService.getDriverRideHistory(driverId, from, to);
         return new ResponseEntity<>(history, HttpStatus.OK);
+    }
+    @GetMapping(value = "/basic", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Collection<DriverBasicDTO>> getDriversBasic() {
+        return new ResponseEntity<>(driverService.getDriversBasic(), HttpStatus.OK);
     }
 
 }

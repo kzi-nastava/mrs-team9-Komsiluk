@@ -3,6 +3,7 @@ package rs.ac.uns.ftn.iss.Komsiluk.util;
 import java.time.LocalDateTime;
 
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -14,6 +15,7 @@ import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.VehicleType;
 import rs.ac.uns.ftn.iss.Komsiluk.repositories.UserRepository;
 
 @Component
+@Order(1)
 public class MockUserSeeder implements CommandLineRunner {
 
     private final UserRepository userRepository;
@@ -26,12 +28,14 @@ public class MockUserSeeder implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        seedUser("driver@test.com", "driver12345", UserRole.DRIVER, true);
-        seedUser("passenger@test.com", "pass12345", UserRole.PASSENGER, false);
-        seedUser("admin@test.com", "admin12345", UserRole.ADMIN, false);
+        seedUser("driver@test.com", "driver12345", UserRole.DRIVER, true,"NS-123-AB");
+        seedUser("driver2@test.com", "driver12345", UserRole.DRIVER, true, "NS-102-AA");
+        seedUser("driver3@test.com", "driver12345", UserRole.DRIVER, true, "NS-103-AA");
+        seedUser("passenger@test.com", "pass12345", UserRole.PASSENGER, false,null);
+        seedUser("admin@test.com", "admin12345", UserRole.ADMIN, false,null);
     }
 
-    private void seedUser(String email, String rawPassword, UserRole role, boolean withVehicle) {
+    private void seedUser(String email, String rawPassword, UserRole role, boolean withVehicle, String plate) {
         if (userRepository.existsByEmailIgnoreCase(email)) {
             return;
         }
@@ -42,6 +46,19 @@ public class MockUserSeeder implements CommandLineRunner {
 
         user.setFirstName("Test");
         user.setLastName(role.name());
+        if (role == UserRole.DRIVER && user.getEmail().equalsIgnoreCase("driver@test.com")) {
+            user.setFirstName("Uros");
+            user.setLastName("Milinovic");
+        }
+        else if (role == UserRole.DRIVER && user.getEmail().equalsIgnoreCase("driver2@test.com")) {
+            user.setFirstName("Branislav");
+            user.setLastName("Markovic");
+        }
+        else if (role == UserRole.DRIVER && user.getEmail().equalsIgnoreCase("driver3@test.com")) {
+            user.setFirstName("Nikola");
+            user.setLastName("Savic");
+        }
+
         user.setCity("Novi Sad");
         user.setAddress("Test Address");
         user.setPhoneNumber("+381600000000");
@@ -52,15 +69,21 @@ public class MockUserSeeder implements CommandLineRunner {
         user.setBlocked(false);
         user.setCreatedAt(LocalDateTime.now());
 
-        if (role == UserRole.DRIVER) {
+        if (role == UserRole.DRIVER && user.getEmail().equalsIgnoreCase("driver@test.com")) {
             user.setDriverStatus(DriverStatus.ACTIVE);
+        }
+        else if (role == UserRole.DRIVER && user.getEmail().equalsIgnoreCase("driver2@test.com")) {
+            user.setDriverStatus(DriverStatus.IN_RIDE);
+        }
+        else if (role == UserRole.DRIVER && user.getEmail().equalsIgnoreCase("driver3@test.com")) {
+            user.setDriverStatus(DriverStatus.INACTIVE);
         }
 
         if (withVehicle) {
             Vehicle vehicle = new Vehicle();
             vehicle.setModel("Test Model");
             vehicle.setType(VehicleType.STANDARD);
-            vehicle.setLicencePlate("NS-123-AB");
+            vehicle.setLicencePlate(plate);
             vehicle.setSeatCount(4);
             vehicle.setPetFriendly(false);
             vehicle.setBabyFriendly(true);
