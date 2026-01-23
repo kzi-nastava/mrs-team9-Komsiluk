@@ -33,7 +33,9 @@ import { AccountBlockedDialogComponent } from './core/layout/components/passenge
 import { AccountBlockedModalService } from './shared/components/modal-shell/services/account-blocked-modal.service';
 import { ActivatedRoute, NavigationEnd } from '@angular/router';
 import { LeftSidebarCommandService } from './core/layout/components/passenger/services/left-sidebar-command-service.service';
-
+import { DriverActivityConfirmModalService } from './shared/components/modal-shell/services/driver-activity-confirm-modal.service';
+import { DriverActivityConfirmDialogComponent } from './core/layout/components/driver/driver-activity-confirm-dialog/driver-activity-confirm-dialog.component';
+import { DriverRuntimeStateService } from './core/layout/components/driver/services/driver-runtime-state.service';
 import { LoginRequiredDialogComponent } from './core/layout/components/guest/login-required-dialog/login-required-dialog.component';
 
 @Component({
@@ -55,7 +57,8 @@ import { LoginRequiredDialogComponent } from './core/layout/components/guest/log
     ScheduledDetailsDialogComponent,
     BlockUserConfirmDialogComponent,
     AccountBlockedDialogComponent,
-    LoginRequiredDialogComponent
+    LoginRequiredDialogComponent,
+    DriverActivityConfirmDialogComponent
   ],
   templateUrl: './app.html',
   styleUrl: './app.css'
@@ -73,9 +76,13 @@ export class App implements OnInit {
     public addFavModal: AddFavoriteModalService, public favDetailsModal: FavoriteDetailsModalService, public renameFavModal: RenameFavoriteModalService,
     public deleteFavModal: DeleteFavoriteModalService, public toastService: ToastService, private favoriteApi: FavoriteRouteService, private favBus: FavoritesBusService,
     public schedDetailsModal: ScheduledDetailsModalService, public blockUserModal: BlockUserConfirmModalService, public blockedModal: AccountBlockedModalService,
-    private leftCmd: LeftSidebarCommandService, private route: ActivatedRoute, private location: Location) {}
+    private leftCmd: LeftSidebarCommandService, private route: ActivatedRoute, private location: Location, public modal: DriverActivityConfirmModalService,
+    public driverActModal: DriverActivityConfirmModalService, private driverRuntimeState: DriverRuntimeStateService) {}
 
     ngOnInit(): void {
+    
+    this.driverRuntimeState.initIfDriver();
+
     this.router.events
       .pipe(filter(e => e instanceof NavigationStart))
       .subscribe((e: any) => {
@@ -113,24 +120,21 @@ export class App implements OnInit {
   }
 
   toggleLeftSidebar() { this.isLeftSidebarOpen = !this.isLeftSidebarOpen; }
-toggleRightSidebar(mode: 'profile' | 'admin') {
-  // ako je otvoren i klikneš isto dugme (isti mode) -> zatvori
-  if (this.rightOpen && this.rightMode === mode) {
-    this.rightOpen = false;
-    return;
+    toggleRightSidebar(mode: 'profile' | 'admin') {
+    if (this.rightOpen && this.rightMode === mode) {
+      this.rightOpen = false;
+      return;
+    }
+
+    this.rightMode = mode;
+    this.rightOpen = true;
+    this.isLeftSidebarOpen = false;
   }
-
-  // ako je otvoren ali menjaš mode -> samo promeni sadržaj (ostaje otvoren)
-  this.rightMode = mode;
-  this.rightOpen = true;
-  this.isLeftSidebarOpen = false;
-}
   openRightSidebar(mode: 'profile' | 'admin') {
-  this.rightMode = mode;
-  this.rightOpen = true;
-  this.isLeftSidebarOpen = false;
-}
-
+    this.rightMode = mode;
+    this.rightOpen = true;
+    this.isLeftSidebarOpen = false;
+  }
 
   toggleFilter() { this.filterSvc.toggle(); }
 
@@ -198,9 +202,13 @@ toggleRightSidebar(mode: 'profile' | 'admin') {
   }
 
   openAdminSidebar() {
-  this.rightMode = 'admin';
-  this.rightOpen = true;
-  this.isLeftSidebarOpen = false;
-}
+    this.rightMode = 'admin';
+    this.rightOpen = true;
+    this.isLeftSidebarOpen = false;
+  }
 
+  confirmDriverActivity() {
+    this.driverRuntimeState.toggleStatusWithBackend();
+    this.driverActModal.close();
+  }
 }

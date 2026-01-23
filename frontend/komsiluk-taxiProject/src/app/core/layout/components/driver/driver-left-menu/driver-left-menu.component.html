@@ -1,33 +1,48 @@
-<nav class="p-menu">
+<div class="d-top">
+  <div class="d-status-row">
+    <div class="d-status" [class.d-status--active]="driverState.isActiveLike()" [class.d-status--inactive]="!driverState.isActiveLike()">
+      {{ driverState.isActiveLike() ? 'Active' : 'Inactive' }}
+    </div>
 
-  <!-- Current Ride -->
-  <button class="p-item" type="button" (click)="toggle('currentRide')">
-    <span class="p-left">
-      <span class="material-symbols-outlined">directions_car</span>
-      <span class="p-text">Current Ride</span>
-    </span>
-    <span class="p-chev" [class.p-chev--open]="currentRideOpen()">▾</span>
-  </button>
+    <button type="button" class="d-switch text-semibold btn-scale" (click)="onSwitchClick()">
+      Switch
+    </button>
 
-  <div *ngIf="currentRideOpen()">
-    <div class="p-panel">
-      <span class="p-panel__label">There is no currente ride</span>
+    <div class="d-today text-regular">
+      <div class="d-today__label">Active today:</div>
+      <div class="d-today__val">{{ driverState.activeTodayText() }}</div>
     </div>
   </div>
 
-  <!-- Scheduled Rides -->
-  <button class="p-item" type="button" (click)="toggle('scheduledRides')">
+  <div class="d-sep"></div>
+</div>
+
+<nav class="p-menu">
+  <button class="p-item" type="button" (click)="toggle('current')">
+    <span class="p-left">
+      <span class="material-symbols-outlined">local_taxi</span>
+      <span class="p-text">Current ride</span>
+    </span>
+    <span class="p-chev" [class.p-chev--open]="currentOpen()">▾</span>
+  </button>
+
+  @if (currentOpen()) {
+    <div class="p-panel">
+      <span class="p-panel__label">TODO: current ride panel</span>
+    </div>
+  }
+
+  <button class="p-item" type="button" (click)="toggle('scheduled')">
     <span class="p-left">
       <span class="material-symbols-outlined">schedule</span>
-      <span class="p-text">Scheduled Rides</span>
+      <span class="p-text">Scheduled rides</span>
     </span>
-    <span class="p-chev" [class.p-chev--open]="scheduledRidesOpen()">▾</span>
+    <span class="p-chev" [class.p-chev--open]="scheduledOpen()">▾</span>
   </button>
 
-  <div *ngIf="scheduledRidesOpen()">
+  @if (scheduledOpen()) {
     <div class="p-panel">
-      <span class="p-panel__label">There are no scheduled rides</span>
+      <span class="p-panel__label">TODO: scheduled rides panel</span>
     </div>
-  </div>
-
+  }
 </nav>

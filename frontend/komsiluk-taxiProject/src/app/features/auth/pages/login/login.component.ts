@@ -3,8 +3,10 @@ import { AuthCardComponent } from '../../components/auth-card/auth-card.componen
 import { ReactiveFormsModule, FormBuilder, Validators } from "@angular/forms";
 import { ToastService } from '../../../../shared/components/toast/toast.service';
 import { Router, RouterModule } from '@angular/router';
-import { trimRequired, strongPassword } from '../../../../shared/util/validators/field-validators.service';
-import { AuthService } from '../../../../core/auth/services/auth.service';
+import { trimRequired } from '../../../../shared/util/validators/field-validators.service';
+import { AuthService, UserRole } from '../../../../core/auth/services/auth.service';
+import { DriverService } from '../../../../core/layout/components/driver/services/driver.service';
+import { DriverRuntimeStateService } from '../../../../core/layout/components/driver/services/driver-runtime-state.service';
 
 @Component({
   selector: 'app-login',
@@ -20,7 +22,9 @@ export class LoginComponent {
     private fb: FormBuilder,
     private toast: ToastService,
     private router: Router,
-    private authService: AuthService
+    private authService: AuthService,
+    private driverApi: DriverService,
+    private driverState: DriverRuntimeStateService
   ) {
     this.form = this.fb.group(
       {
@@ -49,6 +53,27 @@ export class LoginComponent {
 
     this.authService.login(email, password).subscribe({
       next: () => {
+        const id = Number(this.authService.userId());
+        const role = this.authService.userRole();
+        const s = this.driverState.status();
+    
+        const shouldGoActive = role === UserRole.DRIVER && id && (s === 'INACTIVE');
+    
+        if (shouldGoActive) {
+          this.driverApi.updateStatus(id, 'ACTIVE').subscribe({
+            next: () => {
+              this.driverState.setStatus('ACTIVE');
+              this.toast.show('Successful Log in!');
+              this.router.navigateByUrl('/');
+            },
+            error: () => {
+              this.toast.show('Successful Log in!');
+              this.router.navigateByUrl('/');
+            }
+          });
+          return;
+        }
+
         this.toast.show('Successful Log in!');
         this.router.navigateByUrl('/');
       },

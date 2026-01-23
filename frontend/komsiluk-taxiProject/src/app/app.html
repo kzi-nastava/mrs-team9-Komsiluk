@@ -83,5 +83,11 @@
   (closed)="blockedModal.close()">
 </app-account-blocked-dialog>
 
+<app-driver-activity-confirm-dialog
+  [open]="driverActModal.open()"
+  [mode]="driverActModal.mode()"
+  (cancel)="driverActModal.close()"
+  (confirm)="confirmDriverActivity()">
+</app-driver-activity-confirm-dialog>
 
 <app-login-required-dialog />

@@ -1,27 +1,31 @@
 import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { DriverActivityConfirmModalService } from '../../../../../shared/components/modal-shell/services/driver-activity-confirm-modal.service';
+import { DriverRuntimeStateService } from '../services/driver-runtime-state.service';
 
 @Component({
   selector: 'app-driver-left-menu',
   standalone: true,
   imports: [CommonModule],
   templateUrl: './driver-left-menu.component.html',
-  styleUrls: ['./driver-left-menu.component.css'],
+  styleUrl: './driver-left-menu.component.css',
 })
-export class DriverSidebarComponent {
-  currentRideOpen = signal(false);
-  scheduledRidesOpen = signal(false);
+export class DriverLeftMenuComponent {
+  currentOpen = signal(true);
+  scheduledOpen = signal(false);
 
-  toggle(which: 'currentRide' | 'scheduledRides') {
-    if (which === 'currentRide') this.currentRideOpen.set(!this.currentRideOpen());
-    if (which === 'scheduledRides') this.scheduledRidesOpen.set(!this.scheduledRidesOpen());
+  constructor(
+    public modal: DriverActivityConfirmModalService,
+    public driverState: DriverRuntimeStateService
+  ) {}
+
+  toggle(which: 'current' | 'scheduled') {
+    if (which === 'current') this.currentOpen.set(!this.currentOpen());
+    if (which === 'scheduled') this.scheduledOpen.set(!this.scheduledOpen());
   }
 
-  currentRideOpenStatus() {
-    return this.currentRideOpen();
-  }
-
-  scheduledRidesOpenStatus() {
-    return this.scheduledRidesOpen();
+  onSwitchClick() {
+    const toActive = !this.driverState.isActiveLike();
+    this.modal.openModal(toActive ? 'TO_ACTIVE' : 'TO_INACTIVE');
   }
 }
