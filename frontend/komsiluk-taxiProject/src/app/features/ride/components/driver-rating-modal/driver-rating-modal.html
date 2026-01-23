@@ -1,0 +1,37 @@
+<div class="rating-modal" (click)="close.emit()">
+  <div class="rating-dialog" (click)="$event.stopPropagation()">
+    <h2 class="rating-title">Rate your ride</h2>
+
+    <div class="rating-body">
+      <div class="rating-section">
+        <label>Rate the driver:</label>
+        <div class="stars">
+          <span *ngFor="let s of [1,2,3,4,5]" 
+                class="material-symbols-outlined star"
+                [class.filled]="s <= driverGrade"
+                (click)="driverGrade = s">star</span>
+        </div>
+      </div>
+
+      <div class="rating-section">
+        <label>Rate the vehicle:</label>
+        <div class="stars">
+          <span *ngFor="let s of [1,2,3,4,5]" 
+                class="material-symbols-outlined star"
+                [class.filled]="s <= vehicleGrade"
+                (click)="vehicleGrade = s">star</span>
+        </div>
+      </div>
+
+      <div class="rating-section">
+        <label>Your comment (optional):</label>
+        <textarea [(ngModel)]="comment" placeholder="Write your experience..."></textarea>
+      </div>
+    </div>
+
+    <div class="rating-footer">
+      <button class="btn-cancel" (click)="close.emit()">Cancel</button>
+      <button class="btn-submit" [disabled]="!driverGrade || !vehicleGrade" (click)="submit()">Submit</button>
+    </div>
+  </div>
+</div>

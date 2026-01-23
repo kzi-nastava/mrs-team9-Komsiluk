@@ -55,6 +55,8 @@ public class RideService implements IRideService {
     private AdminRideHistoryMapper adminRideHistoryMapper;
     @Autowired
     private IDriverActivityService driverActivityService;
+    @Autowired
+    private MailService mailService;
     
     private static final long MAX_MINUTES_LAST_24H = 480;
 
@@ -191,6 +193,9 @@ public class RideService implements IRideService {
     @Override
     public RideResponseDTO startRide(Long rideId) {
         Ride ride = rideRepository.findById(rideId).orElseThrow(NotFoundException::new);
+        User driver = ride.getDriver();
+        User createdBy = ride.getCreatedBy();
+        List<User> passengers = ride.getPassengers();
         if (ride == null) {
             throw new NotFoundException();
         }
@@ -204,6 +209,32 @@ public class RideService implements IRideService {
 
         rideRepository.save(ride);
 
+        driver.setDriverStatus(DriverStatus.IN_RIDE);
+        userRepository.save(driver);
+
+        Set<String> emails = new HashSet<>();
+
+        if (createdBy != null && createdBy.getEmail() != null) {
+            emails.add(createdBy.getEmail());
+        }
+
+        if (passengers != null) {
+            for (User p : passengers) {
+                if (p != null && p.getEmail() != null) {
+                    emails.add(p.getEmail());
+                }
+            }
+        }
+
+        if (driver.getEmail() != null) {
+            emails.remove(driver.getEmail());
+        }
+
+        for (String email : emails) {
+            mailService.sendLinkedPassengerAddedMail(email, ride.getId());
+        }
+
+
         return rideMapper.toResponseDTO(ride);
     }
 
@@ -215,16 +246,42 @@ public class RideService implements IRideService {
             throw new BadRequestException();
         }
 
-        User user = ride.getDriver();
+        User driver = ride.getDriver();
+        User createdBy = ride.getCreatedBy();
+        List<User> passengers = ride.getPassengers();
 
         ride.setStatus(RideStatus.FINISHED);
         ride.setEndTime(LocalDateTime.now());
 
         rideRepository.save(ride);
 
-        user.setDriverStatus(DriverStatus.ACTIVE);
+        driver.setDriverStatus(DriverStatus.ACTIVE);
 
-        userRepository.save(user);
+        userRepository.save(driver);
+
+        Set<String> emails = new HashSet<>();
+
+        if (createdBy != null && createdBy.getEmail() != null) {
+            emails.add(createdBy.getEmail());
+        }
+
+        if (passengers != null) {
+            for (User p : passengers) {
+                if (p != null && p.getEmail() != null) {
+                    emails.add(p.getEmail());
+                }
+            }
+        }
+
+        if (driver.getEmail() != null) {
+            emails.remove(driver.getEmail());
+        }
+
+        for (String email : emails) {
+            mailService.sendRideFinishedMail(email, ride.getId());
+        }
+
+
 
 
         return rideMapper.toResponseDTO(ride);

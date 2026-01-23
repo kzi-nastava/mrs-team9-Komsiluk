@@ -1,0 +1,103 @@
+.rating-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.85) !important; /* Jače zatamnjenje da vidiš razliku */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 99999 !important; /* Ekstremno visok z-index */
+}
+/* Sam prozorčić u sredini */
+.rating-dialog {
+  width: 100%;
+  max-width: 450px;
+  background: #121212; /* Tamna tema kao tvoj ostatak aplikacije */
+  border: 2px solid var(--color-secondary);
+  border-radius: 12px;
+  padding: 30px;
+  color: white;
+  box-shadow: 0 15px 50px rgba(0,0,0,0.8);
+  position: relative;
+}
+
+.rating-title {
+  margin: 0 0 20px;
+  text-align: center;
+  font-weight: 800;
+  color: var(--color-secondary);
+}
+
+.rating-section {
+  margin-bottom: 20px;
+}
+
+.rating-section label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+/* Stilovi za zvezdice i ostalo ostaju isti, samo dodajemo bolji razmak */
+.stars {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.star {
+  font-size: 40px; /* Veće zvezdice za lakši klik */
+  cursor: pointer;
+  color: #444;
+  transition: transform 0.1s;
+}
+
+.star:hover {
+  transform: scale(1.1);
+}
+
+.star.filled {
+  color: #ffc107;
+}
+
+textarea {
+  width: 100%;
+  margin-top: 15px;
+  background: #1e1e1e;
+  border: 1px solid #333;
+  border-radius: 8px;
+  color: white;
+  padding: 12px;}
+
+.rating-footer {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
+.btn-submit {
+  background: var(--color-secondary);
+  color: black;
+  border: none;
+  padding: 10px 25px;
+  border-radius: 999px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.btn-submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-cancel {
+  background: transparent;
+  color: white;
+  border: 1px solid #555;
+  padding: 10px 25px;
+  border-radius: 999px;
+  cursor: pointer;
+}

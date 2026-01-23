@@ -67,5 +67,46 @@ public class MailService {
         mailSender.send(message);
     }
 
+    public void sendRideFinishedMail(String to, Long rideId) {
+        // TODO: replace with real frontend link (this current one looks like a placeholder/typo)
+        String ratingLink = "http://localhost:4200=" + rideId;
+
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(to);
+        message.setSubject("Ride completed");
+        message.setText(
+                        "Your ride has just been completed.\n" +
+                        "You can rate the driver and the vehicle and leave a comment.\n\n" +
+                        "Rating link:\n" +
+                        ratingLink + "\n\n" +
+                        "You have 3 days from the ride completion time to submit your rating.\n\n" +
+                        "Thank you for using Komsiluk Taxi!"
+        );
+
+        mailSender.send(message);
+    }
+
+    public void sendLinkedPassengerAddedMail(String to, Long rideId) {
+
+        // TODO: add tracking link later (once the ride tracking page is implemented)
+        // String trackingLink = "http://localhost:4200/ride-live?rideId=" + rideId;
+
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(to);
+        message.setSubject("You were added to a ride");
+        message.setText(
+                        "You have been added as a linked passenger to a ride.\n" +
+                        "A suitable driver has been found and the ride has been accepted.\n\n" +
+                        "Ride tracking will be available in the app (a link will be added later).\n\n" +
+                        "Thank you!\n" +
+                        "Komsiluk Taxi"
+        );
+
+        mailSender.send(message);
+    }
+
+
+
+
 }
 
