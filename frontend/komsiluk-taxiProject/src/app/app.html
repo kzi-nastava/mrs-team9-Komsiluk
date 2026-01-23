@@ -90,4 +90,10 @@
   (confirm)="confirmDriverActivity()">
 </app-driver-activity-confirm-dialog>
 
+<app-driver-start-ride-confirm-dialog
+  [open]="startRideModal.open()"
+  (cancel)="startRideModal.close()"
+  (confirm)="startRideModal.confirm()"
+/>
+
 <app-login-required-dialog />

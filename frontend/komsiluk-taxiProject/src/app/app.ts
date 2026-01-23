@@ -37,6 +37,9 @@ import { DriverActivityConfirmModalService } from './shared/components/modal-she
 import { DriverActivityConfirmDialogComponent } from './core/layout/components/driver/driver-activity-confirm-dialog/driver-activity-confirm-dialog.component';
 import { DriverRuntimeStateService } from './core/layout/components/driver/services/driver-runtime-state.service';
 import { LoginRequiredDialogComponent } from './core/layout/components/guest/login-required-dialog/login-required-dialog.component';
+import { DriverStartRideConfirmModalService } from './shared/components/modal-shell/services/driver-start-ride-confirm-modal.service';
+import { DriverStartRideConfirmDialogComponent } from './core/layout/components/driver/driver-start-ride-confirm-dialog/driver-start-ride-confirm-dialog.component';
+
 
 @Component({
   selector: 'app-root',
@@ -58,7 +61,8 @@ import { LoginRequiredDialogComponent } from './core/layout/components/guest/log
     BlockUserConfirmDialogComponent,
     AccountBlockedDialogComponent,
     LoginRequiredDialogComponent,
-    DriverActivityConfirmDialogComponent
+    DriverActivityConfirmDialogComponent,
+    DriverStartRideConfirmDialogComponent
   ],
   templateUrl: './app.html',
   styleUrl: './app.css'
@@ -77,7 +81,7 @@ export class App implements OnInit {
     public deleteFavModal: DeleteFavoriteModalService, public toastService: ToastService, private favoriteApi: FavoriteRouteService, private favBus: FavoritesBusService,
     public schedDetailsModal: ScheduledDetailsModalService, public blockUserModal: BlockUserConfirmModalService, public blockedModal: AccountBlockedModalService,
     private leftCmd: LeftSidebarCommandService, private route: ActivatedRoute, private location: Location, public modal: DriverActivityConfirmModalService,
-    public driverActModal: DriverActivityConfirmModalService, private driverRuntimeState: DriverRuntimeStateService) {}
+    public driverActModal: DriverActivityConfirmModalService, private driverRuntimeState: DriverRuntimeStateService, public startRideModal: DriverStartRideConfirmModalService) {}
 
     ngOnInit(): void {
     

@@ -2,11 +2,12 @@ import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DriverActivityConfirmModalService } from '../../../../../shared/components/modal-shell/services/driver-activity-confirm-modal.service';
 import { DriverRuntimeStateService } from '../services/driver-runtime-state.service';
+import { DriverCurrentRidePanelComponent } from '../driver-current-ride-panel/driver-current-ride-panel.component';
 
 @Component({
   selector: 'app-driver-left-menu',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, DriverCurrentRidePanelComponent],
   templateUrl: './driver-left-menu.component.html',
   styleUrl: './driver-left-menu.component.css',
 })
