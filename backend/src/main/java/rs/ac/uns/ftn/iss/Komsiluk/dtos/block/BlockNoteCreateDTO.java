@@ -1,9 +1,21 @@
 package rs.ac.uns.ftn.iss.Komsiluk.dtos.block;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
+
 public class BlockNoteCreateDTO {
 	
+	@NotBlank
+	@Email
     private String blockedUserEmail;
+	
+	@Positive
     private long adminId;
+	
+	@NotBlank
+	@Size(min = 5, max = 500)
     private String reason;
 
     public BlockNoteCreateDTO() {}

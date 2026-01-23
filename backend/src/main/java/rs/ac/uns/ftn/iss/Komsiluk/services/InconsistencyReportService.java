@@ -1,6 +1,5 @@
 package rs.ac.uns.ftn.iss.Komsiluk.services;
 
-import java.nio.file.AccessDeniedException;
 import java.util.Collection;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,9 +81,6 @@ public class InconsistencyReportService implements IInconsistencyReportService {
 
         return toResponseDTO(report);
     }
-
-
-
 
     private boolean isValidReporter(Ride ride, User reporter) {
         if (ride.getDriver().equals(reporter)) {

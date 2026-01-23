@@ -1,19 +1,42 @@
 package rs.ac.uns.ftn.iss.Komsiluk.dtos.driver;
 
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.VehicleType;
 
 public class ProfileChangeRequestCreateDTO {
 
+	@Size(max = 30)
     private String newName;
+	
+	@Size(max = 30)
     private String newSurname;
+	
+	@Size(max = 100)
     private String newAddress;
+	
+	@Size(max = 50)
     private String newCity;
+	
+    @Pattern(regexp = "^$|^\\+?[0-9]{8,15}$")
     private String newPhoneNumber;
+    
     private String newProfileImageUrl;
+    
+    @Size(max = 50)
     private String newModel;
+    
     private VehicleType newType;
+    
+    @Pattern(regexp = "^$|^[A-Z0-9\\-]{3,15}$")
     private String newLicencePlate;
+    
+    @Min(1)
+    @Max(8)
     private Integer newSeatCount;
+    
     private Boolean newBabyFriendly;
     private Boolean newPetFriendly;
     

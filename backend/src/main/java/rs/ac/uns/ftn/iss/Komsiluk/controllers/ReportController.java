@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,24 +31,28 @@ public class ReportController {
         this.userService = userService;
     }
 
+    @PreAuthorize("hasAnyRole('DRIVER', 'PASSENGER')")
     @GetMapping("/users/{id}")
     public ResponseEntity<RideReportDTO> getUserReport(@PathVariable Long id, @RequestParam("start") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate start,@RequestParam("end")   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate end) {
         RideReportDTO dto = reportService.getUserReport(id, start, end);
         return ResponseEntity.ok(dto);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/drivers")
     public ResponseEntity<RideReportDTO> getAllDriversReport(@RequestParam("start") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate start, @RequestParam("end")   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate end) {
         RideReportDTO dto = reportService.getAllDriversReport(start, end);
         return ResponseEntity.ok(dto);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/passengers")
     public ResponseEntity<RideReportDTO> getAllPassengersReport( @RequestParam("start") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate start, @RequestParam("end")   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate end) {
         RideReportDTO dto = reportService.getAllPassengersReport(start, end);
         return ResponseEntity.ok(dto);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/users/by-email")
     public ResponseEntity<RideReportDTO> getUserReportByEmail(@RequestParam("email") String email, @RequestParam("start") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate start, @RequestParam("end")   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate end) {
         User user = userService.findByEmail(email);

@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.validation.Valid;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.notification.NotificationCreateDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.notification.NotificationResponseDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.INotificationService;
@@ -30,7 +31,7 @@ public class NotificationController {
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<NotificationResponseDTO> create(@RequestBody NotificationCreateDTO dto) {
+    public ResponseEntity<NotificationResponseDTO> create(@Valid @RequestBody NotificationCreateDTO dto) {
         NotificationResponseDTO created = notificationService.createNotification(dto);
         return new ResponseEntity<>(created, HttpStatus.CREATED);
     }

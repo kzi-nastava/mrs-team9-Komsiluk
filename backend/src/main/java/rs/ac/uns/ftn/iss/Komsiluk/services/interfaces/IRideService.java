@@ -19,8 +19,6 @@ public interface IRideService {
 
     public RideResponseDTO finishRide(Long rideId);
 
-    public boolean userHasActiveRide(Long userId);
-
     public void cancelByDriver(Long rideId, DriverCancelRideDTO dto);
 
     public void cancelByPassenger(Long rideId, PassengerCancelRideDTO dto);

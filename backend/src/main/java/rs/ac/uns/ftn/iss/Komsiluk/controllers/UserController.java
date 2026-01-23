@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import jakarta.validation.Valid;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.user.UserBlockedDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.user.UserChangePasswordDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.user.UserProfileResponseDTO;
@@ -35,14 +37,15 @@ public class UserController {
         return new ResponseEntity<>(dto, HttpStatus.OK);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'PASSENGER')")
     @PutMapping("/{id}/profile")
-    public ResponseEntity<UserProfileResponseDTO> updateProfile(@PathVariable Long id, @RequestBody UserProfileUpdateDTO updateDTO) {
+    public ResponseEntity<UserProfileResponseDTO> updateProfile(@PathVariable Long id, @Valid @RequestBody UserProfileUpdateDTO updateDTO) {
         UserProfileResponseDTO updated = userService.updateProfile(id, updateDTO);
         return new ResponseEntity<>(updated, HttpStatus.OK);
     }
 
     @PutMapping("/{id}/password")
-    public ResponseEntity<Void> changePassword(@PathVariable Long id, @RequestBody UserChangePasswordDTO dto) {
+    public ResponseEntity<Void> changePassword(@PathVariable Long id, @Valid @RequestBody UserChangePasswordDTO dto) {
         userService.changePassword(id, dto);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
