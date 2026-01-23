@@ -9,25 +9,39 @@ import org.springframework.stereotype.Component;
 
 import rs.ac.uns.ftn.iss.Komsiluk.beans.User;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.Vehicle;
+import rs.ac.uns.ftn.iss.Komsiluk.beans.Pricing;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.DriverStatus;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.UserRole;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.VehicleType;
 import rs.ac.uns.ftn.iss.Komsiluk.repositories.UserRepository;
+import rs.ac.uns.ftn.iss.Komsiluk.repositories.PricingRepository;
 
 @Component
 @Order(1)
 public class MockUserSeeder implements CommandLineRunner {
 
     private final UserRepository userRepository;
+    private final PricingRepository pricingRepository; // Dodato
     private final PasswordEncoder passwordEncoder;
 
-    public MockUserSeeder(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public MockUserSeeder(UserRepository userRepository,
+                          PricingRepository pricingRepository,
+                          PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.pricingRepository = pricingRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
     @Override
     public void run(String... args) {
+        // Seed korisnika
+        seedUsers();
+
+        // Seed cena
+        seedPricing();
+    }
+
+    private void seedUsers() {
         seedUser("driver@test.com", "driver12345", UserRole.DRIVER, true,"NS-123-AB");
         seedUser("driver2@test.com", "driver12345", UserRole.DRIVER, true, "NS-102-AA");
         seedUser("driver3@test.com", "driver12345", UserRole.DRIVER, true, "NS-103-AA");
@@ -35,6 +49,32 @@ public class MockUserSeeder implements CommandLineRunner {
         seedUser("passenger2@test.com", "pass12345", UserRole.PASSENGER, false,null);
         seedUser("passenger3@test.com", "pass12345", UserRole.PASSENGER, false,null);
         seedUser("admin@test.com", "admin12345", UserRole.ADMIN, false,null);
+    }
+
+    private void seedPricing() {
+        // Provera za svaki tip vozila pojedinačno
+        for (VehicleType type : VehicleType.values()) {
+            if (pricingRepository.findByVehicleType(type).isEmpty()) {
+                Pricing pricing = new Pricing();
+                pricing.setVehicleType(type);
+
+                switch (type) {
+                    case LUXURY -> {
+                        pricing.setStartingPrice(500);
+                        pricing.setPricePerKm(200);
+                    }
+                    case VAN -> {
+                        pricing.setStartingPrice(400);
+                        pricing.setPricePerKm(150);
+                    }
+                    default -> { // STANDARD
+                        pricing.setStartingPrice(250);
+                        pricing.setPricePerKm(120);
+                    }
+                }
+                pricingRepository.save(pricing);
+            }
+        }
     }
 
     private void seedUser(String email, String rawPassword, UserRole role, boolean withVehicle, String plate) {
