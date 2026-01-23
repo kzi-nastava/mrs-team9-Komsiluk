@@ -19,12 +19,12 @@ public class MailService {
 
     public void sendActivationMail(String to, String token) {
         // DEV shortcut: svi mejlovi idu na test inbox
-        String devInbox = "banemarkovic2004@gmail.com";  // zajednički inbox
+        String devInbox = "komsiluk.tim@gmail.com";  // zajednički inbox
         to = devInbox;
 
 
         String activationLink = frontendUrl +
-                "activation?token=" + token;
+                "/activation?token=" + token;
 
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(to);
@@ -41,12 +41,12 @@ public class MailService {
 
     public void sendPasswordResetMail(String to, String token) {
         // DEV shortcut: svi mejlovi idu na test inbox
-        String devInbox = "banemarkovic2004@gmail.com";  // zajednički inbox
+        String devInbox = "komsiluk.tim@gmail.com";  // zajednički inbox
         to = devInbox;
 
 
         String resetLink = frontendUrl +
-                "reset-password?token=" + token;
+                "/reset-password?token=" + token;
 
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(to);

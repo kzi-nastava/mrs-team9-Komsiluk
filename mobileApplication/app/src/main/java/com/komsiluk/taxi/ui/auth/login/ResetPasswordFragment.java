@@ -26,6 +26,14 @@ public class ResetPasswordFragment extends Fragment {
     private Drawable normalBg;
     private Drawable errorBg;
 
+    public static ResetPasswordFragment newInstance(String token) {
+        ResetPasswordFragment fragment = new ResetPasswordFragment();
+        Bundle args = new Bundle();
+        args.putString("token", token);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
     @Override
     public View onCreateView(
             @NonNull LayoutInflater inflater,

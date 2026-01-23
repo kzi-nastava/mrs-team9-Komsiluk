@@ -1,6 +1,7 @@
 package com.komsiluk.taxi.ui.auth;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.activity.EdgeToEdge;
@@ -45,18 +46,27 @@ public class AuthActivity extends BaseNavDrawerActivity {
         navigationView.getMenu().clear();
         navigationView.inflateMenu(R.menu.menu_guest_drawer);
 
+        Fragment startFragment;
+
+        // Provera deep link-a
+        Uri data = getIntent().getData();
+        if (data != null && data.getPath() != null && data.getPath().startsWith("/reset-password")) {
+            String token = data.getQueryParameter("token");
+            // Prosledjuj token fragmentu
+            startFragment = ResetPasswordFragment.newInstance(token);
+        } else {
+            // Normalna logika
+            startFragment = resolveStartFragment();
+        }
 
         if (savedInstanceState == null) {
             getSupportFragmentManager()
                     .beginTransaction()
-                    .replace(
-                            binding.authFragmentContainer.getId(),
-                            resolveStartFragment()
-                    )
+                    .replace(binding.authFragmentContainer.getId(), startFragment)
                     .commit();
         }
-
     }
+
 
     private Fragment resolveStartFragment() {
         String dest = getIntent().getStringExtra("AUTH_DESTINATION");
