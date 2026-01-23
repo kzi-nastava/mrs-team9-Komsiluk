@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, HostListener, Input, Output } from '@angular/core';
-
+import { RideDetailsMapComponent } from '../ride-details-map/ride-details-map.component';
 export interface PassengerRating {
   email: string;
   driverRating?: number | null;
@@ -10,7 +10,7 @@ export interface PassengerRating {
 
 export interface RideHistoryDetailsVm {
   // Left
-  passengers: string[];
+  passengers: string[];          // ovde će sada biti EMAIL-ovi
   ratings: PassengerRating[];
 
   // Center
@@ -18,8 +18,7 @@ export interface RideHistoryDetailsVm {
 
   // Right
   pickupLocation: string;
-  station1?: string | null;
-  station2?: string | null;
+  stops: string[];
   destination: string;
   startTime: string;
   endTime: string;
@@ -32,12 +31,16 @@ export interface RideHistoryDetailsVm {
   // Bottom center
   panicPressed: boolean;
   inconsistencyReport?: string | null;
+
+  statusText?: string | null;             
+  cancellationSource?: string | null;    
+  cancellationReason?: string | null;
 }
 
 @Component({
   selector: 'app-ride-history-details-modal',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RideDetailsMapComponent],
   templateUrl: './ride-history-details-modal.component.html',
   styleUrls: ['./ride-history-details-modal.component.css'],
 })
@@ -65,4 +68,20 @@ export class RideHistoryDetailsModalComponent {
   fmtText(v?: string | null) {
     return v && v.trim().length ? v : 'N/A';
   }
+
+  isCanceled(): boolean {
+    return (this.data.statusText ?? '').toUpperCase().includes('CANCEL');
+  }
+
+get allLocations(): string[] {
+  if (!this.data) return [];
+  
+  const validStops = (this.data.stops || []).filter(s => !!s);
+  
+  return [
+    this.data.pickupLocation,
+    ...validStops,
+    this.data.destination
+  ];
+}
 }

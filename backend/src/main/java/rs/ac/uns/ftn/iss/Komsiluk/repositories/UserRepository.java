@@ -9,6 +9,7 @@ import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.DriverStatus;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.UserRole;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.driver.DriverBasicDTO;
 
+import java.util.Collection;
 import java.util.List;
 
 @Repository
@@ -41,5 +42,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
      AND u.blocked = false
 """)
     List<DriverBasicDTO> findDriverBasics();
+
+    List<User> findByIdIn(Collection<Long> ids);
 }
 

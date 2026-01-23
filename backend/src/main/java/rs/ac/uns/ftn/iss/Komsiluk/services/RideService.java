@@ -2,13 +2,9 @@ package rs.ac.uns.ftn.iss.Komsiluk.services;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.time.Duration;
 import java.time.LocalDate;
-import java.util.Comparator;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +20,7 @@ import rs.ac.uns.ftn.iss.Komsiluk.dtos.route.RouteCreateDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.route.RouteResponseDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.mappers.*;
 import rs.ac.uns.ftn.iss.Komsiluk.repositories.RideRepository;
+import rs.ac.uns.ftn.iss.Komsiluk.repositories.UserRepository;
 import rs.ac.uns.ftn.iss.Komsiluk.services.exceptions.BadRequestException;
 import rs.ac.uns.ftn.iss.Komsiluk.services.exceptions.NotFoundException;
 import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.*;
@@ -64,6 +61,8 @@ public class RideService implements IRideService {
     private AdminRideDetailsMapper adminRideDetailsMapper;
     @Autowired
     private AdminRideHistoryMapper adminRideHistoryMapper;
+    @Autowired
+    private UserRepository userRepository;
 
     @Override
     public RideResponseDTO orderRide(RideCreateDTO dto) {
@@ -202,18 +201,22 @@ public class RideService implements IRideService {
     @Override
     public RideResponseDTO finishRide(Long rideId) {
         Ride ride = rideRepository.findById(rideId).orElseThrow(NotFoundException::new);
-        if (ride == null) {
-            throw new NotFoundException();
-        }
 
         if (ride.getStatus() != RideStatus.ACTIVE) {
             throw new BadRequestException();
         }
 
+        User user = ride.getDriver();
+
         ride.setStatus(RideStatus.FINISHED);
         ride.setEndTime(LocalDateTime.now());
 
         rideRepository.save(ride);
+
+        user.setDriverStatus(DriverStatus.ACTIVE);
+
+        userRepository.save(user);
+
 
         return rideMapper.toResponseDTO(ride);
     }
@@ -283,8 +286,60 @@ public class RideService implements IRideService {
                     driverId, RideStatus.FINISHED, fromDt, toDt);
         }
 
+        // --------- (1) all  userIds ----------
+        Set<Long> ids = new HashSet<>();
+
+        for (Ride r : rides) {
+            // creator
+            if (r.getCreatedBy() != null && r.getCreatedBy().getId() != null) {
+                ids.add(r.getCreatedBy().getId());
+            }
+
+            // passengers
+            if (r.getPassengers() != null) {
+                for (User p : r.getPassengers()) {
+                    if (p != null && p.getId() != null) ids.add(p.getId());
+                }
+            }
+        }
+
+        // --------- (2) batch fetch email map ----------
+        Map<Long, String> emailById = ids.isEmpty()
+                ? Map.of()
+                : userRepository.findByIdIn(ids).stream()
+                .collect(Collectors.toMap(User::getId, User::getEmail));
+
+        // --------- (3) filling  DTO ----------
         return rides.stream()
-                .map(rideMapper::toResponseDTO)
+                .map(ride -> {
+                    RideResponseDTO dto = rideMapper.toResponseDTO(ride);
+
+                    // creatorEmail
+                    Long creatorId = dto.getCreatorId();
+                    String creatorEmail = (creatorId == null) ? null : emailById.get(creatorId);
+                    dto.setCreatorEmail(creatorEmail);
+
+                    // passengerEmails
+                    List<Long> pids = dto.getPassengerIds();
+                    List<String> passengerEmails;
+
+                    if (pids == null || pids.isEmpty()) {
+                        passengerEmails = new java.util.ArrayList<>();
+                    } else {
+                        passengerEmails = pids.stream()
+                                .map(emailById::get)
+                                .filter(java.util.Objects::nonNull)
+                                .collect(java.util.stream.Collectors.toCollection(java.util.ArrayList::new));
+                    }
+
+                    if (creatorEmail != null && !passengerEmails.contains(creatorEmail)) {
+                        passengerEmails.add(0, creatorEmail);
+                    }
+
+                    dto.setPassengerEmails(passengerEmails);
+
+                    return dto;
+                })
                 .toList();
     }
 

@@ -31,9 +31,7 @@
       </section>
 
       <!-- CENTER -->
-      <section class="rh-center">
-        <img class="rh-map" [src]="data.mapImageUrl" alt="Map" />
-      </section>
+      <app-ride-details-map [locations]="allLocations"></app-ride-details-map>
 
       <!-- RIGHT -->
       <section class="rh-right">
@@ -43,16 +41,10 @@
             <span class="rh-value">{{ data.pickupLocation }}</span>
           </div>
 
-          <div class="rh-info__row" *ngIf="data.station1">
-            <span class="rh-label">Station 1:</span>
-            <span class="rh-value">{{ data.station1 }}</span>
+          <div class="rh-info__row" *ngFor="let stop of data.stops; let i = index">
+            <span class="rh-label">Station {{ i + 1 }}:</span>
+            <span class="rh-value">{{ stop }}</span>
           </div>
-
-          <div class="rh-info__row" *ngIf="data.station2">
-            <span class="rh-label">Station 2:</span>
-            <span class="rh-value">{{ data.station2 }}</span>
-          </div>
-
           <div class="rh-info__row">
             <span class="rh-label">Destination:</span>
             <span class="rh-value">{{ data.destination }}</span>
@@ -67,6 +59,21 @@
             <span class="rh-label">End time:</span>
             <span class="rh-value">{{ data.endTime }}</span>
           </div>
+        </div>
+
+        <div class="rh-info__row" *ngIf="data.statusText">
+          <span class="rh-label">Status:</span>
+          <span class="rh-value">{{ data.statusText }}</span>
+        </div>
+
+        <div class="rh-info__row" *ngIf="isCanceled() && data.cancellationSource">
+          <span class="rh-label">Canceled by:</span>
+          <span class="rh-value">{{ data.cancellationSource }}</span>
+        </div>
+
+        <div class="rh-info__row" *ngIf="isCanceled() && data.cancellationReason">
+          <span class="rh-label">Reason:</span>
+          <span class="rh-value">{{ data.cancellationReason }}</span>
         </div>
 
         <div class="rh-stats">

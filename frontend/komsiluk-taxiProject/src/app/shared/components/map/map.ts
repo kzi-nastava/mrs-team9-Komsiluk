@@ -3,6 +3,7 @@ import * as L from 'leaflet';
 import { MapFacadeService } from './services/map-facade.service';
 import { DriverLocationService } from './services/driver-location.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { AuthService } from '../../../core/auth/services/auth.service';
 
 @Component({
   selector: 'app-map',
@@ -17,6 +18,7 @@ export class MapComponent implements AfterViewInit {
   private injector = inject(Injector);
   private destroyRef = inject(DestroyRef);
   private facade = inject(MapFacadeService);
+  private authService = inject(AuthService);
 
   private markersLayer = L.layerGroup();
   private routeLayer: L.GeoJSON | null = null;
@@ -28,7 +30,17 @@ export class MapComponent implements AfterViewInit {
   private driversLayer = L.layerGroup();
   private driverMarkers = new Map<number, L.Marker>();
 
-  constructor(private driverLocService: DriverLocationService) {}
+
+  constructor(private driverLocService: DriverLocationService) {
+    effect(() => {
+      const isLogged = this.authService.isLoggedIn();
+      if (isLogged) {
+        console.log('Korisnik ulogovan - uklanjam vozače sa mape');
+        this.driversLayer.clearLayers();
+        this.driverMarkers.clear();
+      }
+    });
+  }
 
   private initMap(): void {
     const noviSadBounds = L.latLngBounds(
@@ -92,7 +104,13 @@ export class MapComponent implements AfterViewInit {
     this.driverLocService
       .pollLocations()
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((locations) => this.renderDrivers(locations));
+      .subscribe((locations) => {
+        // <--- KORAK 3: Provera u pretplati
+        if (this.authService.isLoggedIn()) {
+          return; 
+        }
+        this.renderDrivers(locations);
+      });
   }
 
   private clearRoute() {

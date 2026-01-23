@@ -32,6 +32,8 @@ public class MockUserSeeder implements CommandLineRunner {
         seedUser("driver2@test.com", "driver12345", UserRole.DRIVER, true, "NS-102-AA");
         seedUser("driver3@test.com", "driver12345", UserRole.DRIVER, true, "NS-103-AA");
         seedUser("passenger@test.com", "pass12345", UserRole.PASSENGER, false,null);
+        seedUser("passenger2@test.com", "pass12345", UserRole.PASSENGER, false,null);
+        seedUser("passenger3@test.com", "pass12345", UserRole.PASSENGER, false,null);
         seedUser("admin@test.com", "admin12345", UserRole.ADMIN, false,null);
     }
 

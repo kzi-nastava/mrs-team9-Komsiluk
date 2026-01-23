@@ -16,7 +16,7 @@
 /* Dialog */
 .rh-modal__dialog{
   width: min(1040px, 96vw);
-  max-height: min(680px, 92vh);
+  max-height: min(1800px, 96vh);
 
   background: rgba(0,0,0,0.92);
   border: 3px solid var(--color-secondary);
@@ -243,6 +243,11 @@
 .details-bottom-value{
   color: var(--color-secondary);   /* žuto kao ostale vrednosti */
   font-weight: 700;
+}
+
+.rh-info {
+  display: flex;
+  flex-direction: column;
 }
 
 
