@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel;
 
 import com.komsiluk.taxi.data.remote.auth.AuthService;
 import com.komsiluk.taxi.data.remote.auth.ForgotPasswordRequest;
+import com.komsiluk.taxi.data.remote.auth.ResetPasswordRequest;
 import com.komsiluk.taxi.util.Event;
 
 import javax.inject.Inject;
@@ -16,7 +17,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 @HiltViewModel
-public class ForgotPasswordViewModel extends ViewModel {
+public class ResetPasswordViewModel extends ViewModel {
 
     private MutableLiveData<Event<Boolean>> successEvent = new MutableLiveData<>();
 
@@ -29,13 +30,15 @@ public class ForgotPasswordViewModel extends ViewModel {
     private AuthService authService;
 
     @Inject
-    public ForgotPasswordViewModel(AuthService authService) { this.authService = authService;}
+    public ResetPasswordViewModel(AuthService authService) { this.authService = authService;}
 
-    public void forgotPassword(String email) {
-        ForgotPasswordRequest request = new ForgotPasswordRequest();
-        request.setEmail(email);
+    public void resetPassword(String token, String newPassword, String confirmPassword) {
+        ResetPasswordRequest request = new ResetPasswordRequest();
+        request.setToken(token);
+        request.setNewPassword(newPassword);
+        request.setConfirmPassword(confirmPassword);
 
-        Call<Void> call = authService.forgotPassword(request);
+        Call<Void> call = authService.resetPassword(request);
         call.enqueue(new Callback<Void>() {
 
             @Override

@@ -59,7 +59,7 @@ public class LoginViewModel extends ViewModel {
                     sessionManager.saveSession(response.body().getToken(),response.body().getId(),response.body().getRole());
                     loginResultEvent.setValue(new Event<>(response.body().getRole()));
                 } else {
-                    errorMessageEvent.postValue(new Event<>("Failed to fetch product. Code: " + response.code()
+                    errorMessageEvent.postValue(new Event<>("Problem with connection occured. Code: " + response.code()
                             + ", message: " + response.message()));
                 }
             }

@@ -21,4 +21,11 @@ public interface AuthService {
     })
     @POST("auth/forgot-password")
     Call<Void> forgotPassword(@Body ForgotPasswordRequest request);
+
+    @Headers({
+            "User-Agent: Mobile-Android",
+            "Content-Type:application/json"
+    })
+    @POST("tokens/reset-password")
+    Call<Void> resetPassword(@Body ResetPasswordRequest request);
 }

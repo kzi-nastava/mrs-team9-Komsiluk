@@ -13,6 +13,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.komsiluk.taxi.R;
 import com.komsiluk.taxi.databinding.FragmentResetPasswordBinding;
@@ -25,6 +26,10 @@ public class ResetPasswordFragment extends Fragment {
 
     private Drawable normalBg;
     private Drawable errorBg;
+
+    ResetPasswordViewModel viewModel;
+
+    private String token;
 
     public static ResetPasswordFragment newInstance(String token) {
         ResetPasswordFragment fragment = new ResetPasswordFragment();
@@ -41,6 +46,9 @@ public class ResetPasswordFragment extends Fragment {
             @Nullable Bundle savedInstanceState
     ) {
         binding = FragmentResetPasswordBinding.inflate(inflater, container, false);
+        if (getArguments() != null) {
+            token = getArguments().getString("token");
+        }
         return binding.getRoot();
     }
 
@@ -65,22 +73,48 @@ public class ResetPasswordFragment extends Fragment {
             }
         };
 
+        viewModel = new ViewModelProvider(requireActivity())
+                .get(ResetPasswordViewModel.class);
+
         binding.etPassword.addTextChangedListener(watcher);
         binding.etRepeat.addTextChangedListener(watcher);
+
+        viewModel.getSuccessEvent().observe(getViewLifecycleOwner(), event -> {
+            Boolean success = event.getContentIfNotHandled();
+
+            if (success == null) return;
+
+            ((AuthActivity) requireActivity())
+                    .showLogin();
+            Toast.makeText(
+                    requireContext(),
+                    getString(R.string.auth_reset_success),
+                    Toast.LENGTH_SHORT
+            ).show();
+        });
+
+        viewModel.getErrorMessageEvent().observe(getViewLifecycleOwner(), event -> {
+            String message = event.getContentIfNotHandled();
+            if (message == null) return;
+
+            Toast.makeText(
+                    requireContext(),
+                    message,
+                    Toast.LENGTH_SHORT
+            ).show();
+        });
 
         binding.btnConfirm.setOnClickListener(v -> {
             boolean ok1 = validatePassword();
             boolean ok2 = validateRepeat();
             if (!ok1 || !ok2) return;
 
-            Toast.makeText(
-                    requireContext(),
-                    getString(R.string.auth_reset_success),
-                    Toast.LENGTH_SHORT
-            ).show();
 
-            ((AuthActivity) requireActivity())
-                    .showLogin();
+
+            viewModel.resetPassword(
+                    token,
+                    binding.etPassword.getText().toString().trim(),
+                    binding.etRepeat.getText().toString().trim());
         });
 
         binding.btnCancel.setOnClickListener(v -> {
