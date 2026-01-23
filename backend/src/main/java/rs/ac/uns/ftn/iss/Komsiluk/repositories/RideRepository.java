@@ -2,6 +2,7 @@ package rs.ac.uns.ftn.iss.Komsiluk.repositories;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -77,5 +78,7 @@ public interface RideRepository extends JpaRepository<Ride, Long> {
             @Param("from") LocalDateTime from,
             @Param("to") LocalDateTime to
     );
+    
+    Optional<Ride> findFirstByDriverIdAndStatusInOrderByCreatedAtDesc(Long driverId, Collection<RideStatus> statuses);
 
 }

@@ -1,0 +1,18 @@
+<app-modal-shell [open]="open" (closed)="cancel.emit()">
+  <div class="sr-title text-regular">Begin this ride</div>
+
+  <div class="sr-sub text-regular">
+    Confirm that all passengers are in the car<br />
+    and you're ready to begin the trip.
+  </div>
+
+  <div class="sr-actions">
+    <button type="button" class="btn btn--ghost text-semibold btn-scale" (click)="cancel.emit()">
+      Cancel
+    </button>
+
+    <button type="button" class="btn btn--primary text-semibold btn-scale" (click)="confirm.emit()">
+      Confirm
+    </button>
+  </div>
+</app-modal-shell>

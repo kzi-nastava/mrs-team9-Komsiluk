@@ -30,6 +30,18 @@ public class RideController {
         RideResponseDTO created = rideService.orderRide(dto);
         return new ResponseEntity<>(created, HttpStatus.CREATED);
     }
+	
+	@PreAuthorize("hasRole('DRIVER')")
+	@GetMapping("/driver/{driverId}/current")
+	public ResponseEntity<RideResponseDTO> getDriverCurrentRide(@PathVariable Long driverId) {
+	    RideResponseDTO dto = rideService.getCurrentRideForDriver(driverId);
+
+	    if (dto == null) {
+	        return ResponseEntity.noContent().build();
+	    }
+
+	    return ResponseEntity.ok(dto);
+	}
 
 	@PreAuthorize("hasAnyRole('PASSENGER', 'DRIVER')")
     @GetMapping("/user/{userId}/scheduled")

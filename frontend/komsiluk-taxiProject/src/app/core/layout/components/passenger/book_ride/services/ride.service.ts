@@ -5,6 +5,7 @@ import { RideCreateDTO, RideResponseDTO } from '../../../../../../shared/models/
 import { ToastService } from '../../../../../../shared/components/toast/toast.service';
 import { NotificationService } from '../../../../../../features/menu/services/notification.service';
 import { AuthService } from '../../../../../../core/auth/services/auth.service';
+import { HttpResponse } from '@angular/common/http';
 
 @Injectable({ providedIn: 'root' })
 export class RideService {
@@ -19,6 +20,16 @@ export class RideService {
 
   orderRide(dto: RideCreateDTO): Observable<RideResponseDTO> {
     return this.http.post<RideResponseDTO>(`${this.API}`, dto);
+  }
+
+  getDriverCurrentRide(driverId: number): Observable<HttpResponse<RideResponseDTO>> {
+    return this.http.get<RideResponseDTO>(`${this.API}/driver/${driverId}/current`, {
+      observe: 'response',
+    });
+  }
+
+  startRide(rideId: number): Observable<RideResponseDTO> {
+    return this.http.post<RideResponseDTO>(`${this.API}/${rideId}/start`, null);
   }
 
   cancelRidePassenger(rideId: number, reason: string): void {

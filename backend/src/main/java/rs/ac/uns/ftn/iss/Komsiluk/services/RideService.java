@@ -182,6 +182,17 @@ public class RideService implements IRideService {
     }
     
     @Override
+    public RideResponseDTO getCurrentRideForDriver(Long driverId) {
+        User u = userService.findById(driverId);
+
+        if (u.getRole() != UserRole.DRIVER) {
+            throw new NotFoundException();
+        }
+
+        return rideRepository.findFirstByDriverIdAndStatusInOrderByCreatedAtDesc(driverId,List.of(RideStatus.ASSIGNED, RideStatus.ACTIVE)).map(rideMapper::toResponseDTO).orElse(null);
+    }
+    
+    @Override
     public Collection<RideResponseDTO> getScheduledRidesForUser(Long userId) {
         if (userService.findById(userId) == null) {
             throw new NotFoundException();
@@ -202,6 +213,10 @@ public class RideService implements IRideService {
         if (ride.getStatus() != RideStatus.ASSIGNED && ride.getStatus() != RideStatus.SCHEDULED) {
             throw new BadRequestException();
         }
+        
+        User driver = ride.getDriver();
+        driver.setDriverStatus(DriverStatus.IN_RIDE);
+        userRepository.save(driver);
 
         ride.setStatus(RideStatus.ACTIVE);
         ride.setStartTime(LocalDateTime.now());

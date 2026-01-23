@@ -1,0 +1,22 @@
+.da-title{
+  font-size: var(--fs-h1);
+  margin-bottom: 18px;
+  color: var(--color-white);
+  text-align: left;
+}
+
+.da-sub{
+  font-size: var(--fs-md);
+  color: var(--color-white);
+  line-height: 1.35;
+  margin: 0 auto 18px;
+  max-width: 520px;
+  text-align: left;
+}
+
+.da-actions{
+  display: flex;
+  justify-content: flex-end;
+  gap: 20px;
+  margin-top: 10px;
+}
