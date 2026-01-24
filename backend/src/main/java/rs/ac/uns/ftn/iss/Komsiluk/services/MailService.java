@@ -86,24 +86,39 @@ public class MailService {
         mailSender.send(message);
     }
 
-    public void sendLinkedPassengerAddedMail(String to, Long rideId) {
-
-        // TODO: add tracking link later (once the ride tracking page is implemented)
-        // String trackingLink = "http://localhost:4200/ride-live?rideId=" + rideId;
-
+    public void sendAddedToRideMail(String to, Long rideId) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(to);
         message.setSubject("You were added to a ride");
         message.setText(
-                        "You have been added as a linked passenger to a ride.\n" +
-                        "A suitable driver has been found and the ride has been accepted.\n\n" +
-                        "Ride tracking will be available in the app (a link will be added later).\n\n" +
+                        "You have been added to a ride.\n\n" +
+                        "You will receive another email when the ride starts.\n\n" +
                         "Thank you!\n" +
                         "Komsiluk Taxi"
         );
 
         mailSender.send(message);
     }
+
+    public void sendRideStartedMail(String to, Long rideId) {
+        // TODO: replace with real tracking link once the frontend route exists
+        String trackingLink = "http://localhost:4200/ride-live?rideId=" + rideId;
+
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(to);
+        message.setSubject("Your ride has started");
+        message.setText(
+                        "Your ride has just started.\n\n" +
+                        "If you want to track the ride in real time, open this link:\n" +
+                        trackingLink + "\n\n" +
+                        "Note: Ride tracking is available only for registered (logged-in) users.\n\n" +
+                        "Thank you!\n" +
+                        "Komsiluk Taxi"
+        );
+
+        mailSender.send(message);
+    }
+
 
 
 

@@ -137,4 +137,8 @@ export class RideService {
       )
       .subscribe();
   }
+
+  getScheduledRides(userId: number): Observable<RideResponseDTO[]> {
+    return this.http.get<RideResponseDTO[]>(`${this.API}/user/${userId}/scheduled`);
+  }
 }

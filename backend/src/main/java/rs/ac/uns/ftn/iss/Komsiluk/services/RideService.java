@@ -100,12 +100,14 @@ public class RideService implements IRideService {
         BigDecimal price = calculatePrice(dto.getVehicleType(), dto.getDistanceKm());
 		
         List<User> passengers = new ArrayList<>();
+        List<User> linkedPassengers = new ArrayList<>();
 
         if (dto.getPassengerEmails() != null) {
             for (String email : dto.getPassengerEmails()) {
                 User passenger= userService.findByEmail(email);
                 if (passenger != null) {
                     passengers.add(passenger);
+                    linkedPassengers.add(passenger);
 				}
                 
                 //send email
@@ -150,6 +152,12 @@ public class RideService implements IRideService {
         ride.setStatus(scheduled ? RideStatus.SCHEDULED : RideStatus.ASSIGNED);
 
         ride = rideRepository.save(ride);
+
+        for (User lp : linkedPassengers) {
+            if (lp.getEmail() != null) {
+                mailService.sendAddedToRideMail(lp.getEmail(), ride.getId());
+            }
+        }
 
         NotificationCreateDTO notificationDTODriver = new NotificationCreateDTO();
         notificationDTODriver.setUserId(driver.getId());
@@ -215,7 +223,6 @@ public class RideService implements IRideService {
             throw new BadRequestException();
         }
         
-        User driver = ride.getDriver();
         driver.setDriverStatus(DriverStatus.IN_RIDE);
         userRepository.save(driver);
 
@@ -246,7 +253,7 @@ public class RideService implements IRideService {
         }
 
         for (String email : emails) {
-            mailService.sendLinkedPassengerAddedMail(email, ride.getId());
+            mailService.sendRideStartedMail(email, ride.getId());
         }
 
 

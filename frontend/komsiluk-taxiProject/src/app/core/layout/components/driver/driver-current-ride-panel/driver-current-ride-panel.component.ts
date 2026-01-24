@@ -8,6 +8,8 @@ import { ToastService } from '../../../../../shared/components/toast/toast.servi
 import { RideService } from '../../passenger/book_ride/services/ride.service';
 import { DriverStartRideConfirmModalService } from '../../../../../shared/components/modal-shell/services/driver-start-ride-confirm-modal.service';
 import { RideResponseDTO } from '../../../../../shared/models/ride.models';
+import { GeocodingService } from '../../../../../shared/components/map/services/geocoding.service';
+import { MapFacadeService } from '../../../../../shared/components/map/services/map-facade.service';
 
 @Component({
   selector: 'app-driver-current-ride-panel',
@@ -29,13 +31,18 @@ export class DriverCurrentRidePanelComponent implements OnInit {
     return s === 'SCHEDULED' || s === 'ASSIGNED';
   });
 
+  // ✅ NEW: da ne geocode-uje stalno na refresh/poll
+  private lastRideIdForDriveTo: number | null = null;
+
   constructor(
     private fb: FormBuilder,
     private auth: AuthService,
     private api: RideService,
     private toast: ToastService,
     private startModal: DriverStartRideConfirmModalService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private geo: GeocodingService,
+    private mapFacade: MapFacadeService,
   ) {
     this.form = this.fb.group({
       pickup: [{ value: '', disabled: true }],
@@ -65,12 +72,21 @@ export class DriverCurrentRidePanelComponent implements OnInit {
       if (!resp || resp.status === 204) {
         this.ride.set(null);
         this.fillForm(null);
+
+        // ✅ NEW: ocisti mapu kad nema voznje
+        this.lastRideIdForDriveTo = null;
+        this.mapFacade.clearDriveTo?.();
+        this.mapFacade.setState?.(null);
+
         return;
       }
 
       const dto = resp.body as RideResponseDTO;
       this.ride.set(dto);
       this.fillForm(dto);
+
+      // ✅ NEW: pre-ride faza – vozi do pickup lokacije (ASSIGNED/SCHEDULED)
+      this.maybeDriveToPickup(dto);
     });
   }
 
@@ -96,6 +112,36 @@ export class DriverCurrentRidePanelComponent implements OnInit {
     queueMicrotask(() => this.cdr.detectChanges());
   }
 
+  // ✅ NEW: kad je ride ASSIGNED/SCHEDULED – geocode pickup i posalji mapi driveTo
+  private maybeDriveToPickup(dto: RideResponseDTO) {
+    const status = dto?.status ?? '';
+    if (status !== 'ASSIGNED' && status !== 'SCHEDULED') return;
+
+    // samo jednom po ride-u
+    if (this.lastRideIdForDriveTo === dto.id) return;
+    this.lastRideIdForDriveTo = dto.id;
+
+    const pickupText = this.asText(dto.startAddress);
+    if (!pickupText) return;
+
+    const driverId = Number(this.auth.userId());
+    if (!driverId) return;
+
+    // Nominatim lookup (lookupOne treba da vrati {lat, lon} ili null)
+    this.geo.lookupOne(pickupText).pipe(
+      catchError(() => of(null))
+    ).subscribe((res: any) => {
+      if (!res) return;
+
+      const lat = Number(res.lat);
+      const lon = Number(res.lon);
+      if (!Number.isFinite(lat) || !Number.isFinite(lon)) return;
+
+      // MapComponent slusa facade.driveTo i animira do pickup-a
+      this.mapFacade.setDriveTo(driverId, lat, lon);
+    });
+  }
+
   openStartConfirm() {
     const r = this.ride();
     if (!r) return;
@@ -114,6 +160,9 @@ export class DriverCurrentRidePanelComponent implements OnInit {
       next: (updated) => {
         this.ride.set(updated);
         this.fillForm(updated);
+
+        // ✅ NEW (opciono): kad startuje voznju, vise nam ne treba pre-ride driveTo
+        this.mapFacade.clearDriveTo?.();
       },
       error: () => {
         this.toast.show('Could not start ride.');

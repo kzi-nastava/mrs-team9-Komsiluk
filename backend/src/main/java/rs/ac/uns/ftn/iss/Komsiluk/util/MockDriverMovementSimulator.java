@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 import java.util.Random;
 
 @Order(4)
-@Component
+//@Component
 public class MockDriverMovementSimulator {
 
     private final UserRepository userRepository;

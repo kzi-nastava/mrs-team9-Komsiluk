@@ -112,13 +112,13 @@ public class MockUserSeeder implements CommandLineRunner {
         user.setCreatedAt(LocalDateTime.now());
 
         if (role == UserRole.DRIVER && user.getEmail().equalsIgnoreCase("driver@test.com")) {
-            user.setDriverStatus(DriverStatus.ACTIVE);
+            user.setDriverStatus(DriverStatus.INACTIVE);
         }
         else if (role == UserRole.DRIVER && user.getEmail().equalsIgnoreCase("driver2@test.com")) {
             user.setDriverStatus(DriverStatus.IN_RIDE);
         }
         else if (role == UserRole.DRIVER && user.getEmail().equalsIgnoreCase("driver3@test.com")) {
-            user.setDriverStatus(DriverStatus.INACTIVE);
+            user.setDriverStatus(DriverStatus.ACTIVE);
         }
 
         if (withVehicle) {
