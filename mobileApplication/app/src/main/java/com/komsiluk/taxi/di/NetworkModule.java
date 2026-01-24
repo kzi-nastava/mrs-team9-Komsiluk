@@ -4,6 +4,7 @@ package com.komsiluk.taxi.di;
 import java.util.concurrent.TimeUnit;
 import com.komsiluk.taxi.BuildConfig;
 import com.komsiluk.taxi.auth.AuthInterceptor;
+import com.komsiluk.taxi.auth.TokenAuthenticator;
 import com.komsiluk.taxi.data.remote.auth.AuthService;
 
 import javax.inject.Singleton;
@@ -23,7 +24,7 @@ public class NetworkModule {
 
     @Provides
     @Singleton
-    public static OkHttpClient provideOkHttpClient(AuthInterceptor authInterceptor) {
+    public static OkHttpClient provideOkHttpClient(AuthInterceptor authInterceptor, TokenAuthenticator tokenAuthenticator) {
 
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
         logging.setLevel(
@@ -35,6 +36,7 @@ public class NetworkModule {
         return new OkHttpClient.Builder()
                 .addInterceptor(authInterceptor)
                 .addInterceptor(logging)
+                .authenticator(tokenAuthenticator)
                 .connectTimeout(10, TimeUnit.SECONDS)
                 .readTimeout(15, TimeUnit.SECONDS)
                 .writeTimeout(15, TimeUnit.SECONDS)

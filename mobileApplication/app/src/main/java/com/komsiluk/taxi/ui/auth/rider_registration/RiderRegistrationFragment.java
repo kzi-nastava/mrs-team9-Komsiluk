@@ -226,6 +226,11 @@ public class RiderRegistrationFragment extends Fragment {
             });
         }
 
+        binding.tvChoosePhoto.setOnClickListener(v -> {
+            imagePickerLauncher.launch("image/*");
+        });
+
+
         prViewModel.getSuccessMessageEvent().observe(getViewLifecycleOwner(), event -> {
             String successMessage = event.getContentIfNotHandled();
 

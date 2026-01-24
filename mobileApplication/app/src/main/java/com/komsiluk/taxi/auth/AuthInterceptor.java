@@ -24,6 +24,12 @@ public class AuthInterceptor implements Interceptor {
     @Override
     public Response intercept(Chain chain) throws IOException {
         Request original = chain.request();
+        String path = original.url().encodedPath();
+
+        if (path.startsWith("/api/auth")
+                || path.startsWith("/api/tokens")) {
+            return chain.proceed(original); // 🚫 bez tokena
+        }
 
         String token = sessionManager.getToken();
         if (token == null) {
@@ -36,5 +42,6 @@ public class AuthInterceptor implements Interceptor {
 
         return chain.proceed(request);
     }
+
 }
 
