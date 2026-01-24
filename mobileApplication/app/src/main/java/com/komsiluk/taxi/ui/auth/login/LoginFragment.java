@@ -61,6 +61,9 @@ public class LoginFragment extends Fragment {
         errorBg = requireContext().getDrawable(R.drawable.bg_input_error);
 
 
+        /**
+         * REGISTER FIELDS TO VIEWMODEL FIELDS AND VALIDATORS
+         * **/
         binding.etEmail.addTextChangedListener(new SimpleTextWatcher() {
             @Override
             public void afterTextChanged(Editable s) {
@@ -77,11 +80,13 @@ public class LoginFragment extends Fragment {
             }
         });
 
-
+        // injecting ViewModel and setting authActivity as it's owner
         viewModel = new ViewModelProvider(requireActivity())
                 .get(LoginViewModel.class);
 
 
+
+        /**  OBSERVING FOR REST RESPONSES **/
         viewModel.getLoginSuccess().observe(getViewLifecycleOwner(), event -> {
             UserRole role = event.getContentIfNotHandled();
             if (role == null) return;
@@ -125,6 +130,9 @@ public class LoginFragment extends Fragment {
             ).show();
         });
 
+
+
+
         binding.btnLogin.setOnClickListener(v -> {
             boolean ok1 = validateEmail();
             boolean ok2 = validatePassword();
@@ -134,8 +142,6 @@ public class LoginFragment extends Fragment {
             String password = binding.etPassword.getText().toString().trim();
 
             viewModel.login(email,password);
-
-
         });
 
         binding.tvForgotPassword.setOnClickListener(v -> {

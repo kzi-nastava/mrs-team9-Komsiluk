@@ -19,11 +19,8 @@ public class TokenAuthenticator implements Authenticator {
 
     @Override
     public Request authenticate(Route route, Response response) {
-        // Obrisati stari token
         sessionManager.clear();
 
-        // Opcionalno: možeš obavestiti korisnika ili redirectovati na login
-        // Na OkHttp nivou, vraća null -> request se prekida
         return null;
     }
 }
