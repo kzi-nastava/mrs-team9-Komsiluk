@@ -25,6 +25,11 @@
     </svg>
   </button>
 
+  <span *ngIf="userRole() === UserRole.DRIVER"
+    class="app-navbar__driver-dot"
+    [class.app-navbar__driver-dot--active]="driverState.isActiveLike()"
+    [class.app-navbar__driver-dot--inactive]="!driverState.isActiveLike()">
+  </span>
 </div>
 
 

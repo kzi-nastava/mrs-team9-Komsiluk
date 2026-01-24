@@ -83,5 +83,17 @@
   (closed)="blockedModal.close()">
 </app-account-blocked-dialog>
 
+<app-driver-activity-confirm-dialog
+  [open]="driverActModal.open()"
+  [mode]="driverActModal.mode()"
+  (cancel)="driverActModal.close()"
+  (confirm)="confirmDriverActivity()">
+</app-driver-activity-confirm-dialog>
+
+<app-driver-start-ride-confirm-dialog
+  [open]="startRideModal.open()"
+  (cancel)="startRideModal.close()"
+  (confirm)="startRideModal.confirm()"
+/>
 
 <app-login-required-dialog />

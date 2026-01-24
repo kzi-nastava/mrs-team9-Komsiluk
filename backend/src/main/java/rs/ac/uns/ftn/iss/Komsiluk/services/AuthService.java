@@ -11,8 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.User;
-import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.DriverStatus;
-import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.UserRole;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.auth.LoginRequestDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.auth.LoginResponseDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.auth.RegisterPassengerRequestDTO;
@@ -120,13 +118,6 @@ public class AuthService implements IAuthService {
 
             User user = (User) authentication.getPrincipal();
             SecurityContextHolder.getContext().setAuthentication(authentication);
-
-
-            if (user.getRole() == UserRole.DRIVER) {
-                user.setDriverStatus(DriverStatus.ACTIVE);
-                userService.save(user);
-            }
-
 
             String token = jwtService.generateAccessToken(user);
 

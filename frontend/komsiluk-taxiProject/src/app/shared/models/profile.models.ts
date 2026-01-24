@@ -1,4 +1,5 @@
 export type VehicleType = 'STANDARD' | 'LUXURY' | 'VAN' | string;
+export type DriverStatus = 'ACTIVE' | 'INACTIVE' | 'IN_RIDE';
 
 export interface VehicleResponseDTO {
   id: number;
@@ -29,6 +30,7 @@ export interface UserProfileResponseDTO {
   profileImageUrl: string;
   vehicle: VehicleResponseDTO | null;
   activeMinutesLast24h: number;
+    driverStatus?: DriverStatus;
 }
 
 export interface UserProfileUpdateDTO {

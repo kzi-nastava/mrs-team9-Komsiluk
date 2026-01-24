@@ -11,6 +11,8 @@ import rs.ac.uns.ftn.iss.Komsiluk.dtos.ride.*;
 
 public interface IRideService {
 	
+    public RideResponseDTO getCurrentRideForDriver(Long driverId);
+	
 	public Collection<RideResponseDTO> getScheduledRidesForUser(Long userId);
 
     public RideResponseDTO orderRide(RideCreateDTO dto);

@@ -210,3 +210,19 @@
   background: rgba(255, 238, 2, 0.12);
 }
 
+.app-navbar__driver-dot{
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid var(--color-secondary);
+  margin-left: 15px;
+  box-sizing: border-box;
+}
+
+.app-navbar__driver-dot--active{
+  background: #1aa34a;
+}
+
+.app-navbar__driver-dot--inactive{
+  background: #c51515;
+}
