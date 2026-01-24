@@ -1,7 +1,7 @@
 import { Component, signal, computed, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { catchError, finalize, of } from 'rxjs';
+import { catchError, finalize, of, from, map, concatMap, toArray } from 'rxjs';
 import { ChangeDetectorRef } from '@angular/core';
 import { AuthService } from '../../../../auth/services/auth.service';
 import { ToastService } from '../../../../../shared/components/toast/toast.service';
@@ -10,6 +10,8 @@ import { DriverStartRideConfirmModalService } from '../../../../../shared/compon
 import { RideResponseDTO } from '../../../../../shared/models/ride.models';
 import { GeocodingService } from '../../../../../shared/components/map/services/geocoding.service';
 import { MapFacadeService } from '../../../../../shared/components/map/services/map-facade.service';
+
+type Waypoint = { lat: number; lon: number; label?: string };
 
 @Component({
   selector: 'app-driver-current-ride-panel',
@@ -31,8 +33,9 @@ export class DriverCurrentRidePanelComponent implements OnInit {
     return s === 'SCHEDULED' || s === 'ASSIGNED';
   });
 
-  // ✅ NEW: da ne geocode-uje stalno na refresh/poll
   private lastRideIdForDriveTo: number | null = null;
+
+  private pickupCoordCache: { rideId: number; lat: number; lon: number } | null = null;
 
   constructor(
     private fb: FormBuilder,
@@ -73,9 +76,11 @@ export class DriverCurrentRidePanelComponent implements OnInit {
         this.ride.set(null);
         this.fillForm(null);
 
-        // ✅ NEW: ocisti mapu kad nema voznje
         this.lastRideIdForDriveTo = null;
+        this.pickupCoordCache = null;
+
         this.mapFacade.clearDriveTo?.();
+        (this.mapFacade as any).clearRidePath?.();
         this.mapFacade.setState?.(null);
 
         return;
@@ -85,7 +90,6 @@ export class DriverCurrentRidePanelComponent implements OnInit {
       this.ride.set(dto);
       this.fillForm(dto);
 
-      // ✅ NEW: pre-ride faza – vozi do pickup lokacije (ASSIGNED/SCHEDULED)
       this.maybeDriveToPickup(dto);
     });
   }
@@ -112,12 +116,10 @@ export class DriverCurrentRidePanelComponent implements OnInit {
     queueMicrotask(() => this.cdr.detectChanges());
   }
 
-  // ✅ NEW: kad je ride ASSIGNED/SCHEDULED – geocode pickup i posalji mapi driveTo
   private maybeDriveToPickup(dto: RideResponseDTO) {
     const status = dto?.status ?? '';
     if (status !== 'ASSIGNED' && status !== 'SCHEDULED') return;
 
-    // samo jednom po ride-u
     if (this.lastRideIdForDriveTo === dto.id) return;
     this.lastRideIdForDriveTo = dto.id;
 
@@ -127,7 +129,6 @@ export class DriverCurrentRidePanelComponent implements OnInit {
     const driverId = Number(this.auth.userId());
     if (!driverId) return;
 
-    // Nominatim lookup (lookupOne treba da vrati {lat, lon} ili null)
     this.geo.lookupOne(pickupText).pipe(
       catchError(() => of(null))
     ).subscribe((res: any) => {
@@ -137,7 +138,9 @@ export class DriverCurrentRidePanelComponent implements OnInit {
       const lon = Number(res.lon);
       if (!Number.isFinite(lat) || !Number.isFinite(lon)) return;
 
-      // MapComponent slusa facade.driveTo i animira do pickup-a
+      // ✅ cache za startRide (da ne ponavlja geocoding pickup-a)
+      this.pickupCoordCache = { rideId: dto.id, lat, lon };
+
       this.mapFacade.setDriveTo(driverId, lat, lon);
     });
   }
@@ -161,13 +164,67 @@ export class DriverCurrentRidePanelComponent implements OnInit {
         this.ride.set(updated);
         this.fillForm(updated);
 
-        // ✅ NEW (opciono): kad startuje voznju, vise nam ne treba pre-ride driveTo
         this.mapFacade.clearDriveTo?.();
+
+        if ((updated?.status ?? '') === 'ACTIVE') {
+          this.buildRidePath(updated).subscribe((points) => {
+            if (!points) {
+              this.toast.show('Could not build ride path (geocoding failed).');
+              return;
+            }
+            (this.mapFacade as any).setRidePath?.(points);
+          });
+        }
       },
       error: () => {
         this.toast.show('Could not start ride.');
       }
     });
+  }
+
+  private buildRidePath(dto: RideResponseDTO) {
+    const pickupText = this.asText(dto.startAddress);
+    const destText = this.asText(dto.endAddress);
+    const stopsText = (dto.stops ?? []).map(s => this.asText(s)).filter(Boolean);
+
+    const textsInOrder = [pickupText, ...stopsText, destText].filter(Boolean);
+    if (textsInOrder.length < 2) return of<Waypoint[] | null>(null);
+
+    const canUsePickupCache =
+      this.pickupCoordCache && this.pickupCoordCache.rideId === dto.id;
+
+    return from(textsInOrder).pipe(
+      concatMap((txt, idx) => {
+        if (idx === 0 && canUsePickupCache) {
+          return of<Waypoint>({
+            lat: this.pickupCoordCache!.lat,
+            lon: this.pickupCoordCache!.lon,
+            label: 'Pickup'
+          });
+        }
+
+        return this.geo.lookupOne(txt).pipe(
+          map((res: any) => {
+            if (!res) return null;
+
+            const lat = Number(res.lat);
+            const lon = Number(res.lon);
+            if (!Number.isFinite(lat) || !Number.isFinite(lon)) return null;
+
+            let label: string | undefined;
+            if (idx === 0) label = 'Pickup';
+            else if (idx === textsInOrder.length - 1) label = 'Destination';
+            else label = `Stop ${idx}`;
+
+            return { lat, lon, label } as Waypoint;
+          }),
+          catchError(() => of(null))
+        );
+      }),
+      toArray(),
+      map(arr => arr.filter(Boolean) as Waypoint[]),
+      map(points => (points.length >= 2 ? points : null))
+    );
   }
 
   cancel() {

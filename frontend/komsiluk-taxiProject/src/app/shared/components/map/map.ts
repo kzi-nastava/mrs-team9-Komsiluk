@@ -1,13 +1,4 @@
-import {
-  Component,
-  AfterViewInit,
-  effect,
-  inject,
-  Injector,
-  runInInjectionContext,
-  DestroyRef,
-  ViewEncapsulation,
-} from '@angular/core';
+import {Component,AfterViewInit,effect,inject,Injector,runInInjectionContext,DestroyRef,ViewEncapsulation,} from '@angular/core';
 import * as L from 'leaflet';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
@@ -39,7 +30,6 @@ export class MapComponent implements AfterViewInit {
   private selfLayer = L.layerGroup();
   private selfMarker: L.Marker | null = null;
 
-  // startna pozicija self markera (dok ne dobiješ realnu)
   private selfPos = L.latLng(45.2671, 19.8335);
 
   private animToken = 0;
@@ -47,19 +37,22 @@ export class MapComponent implements AfterViewInit {
 
   private driverNames = new Map<number, string>();
 
-  // === DRIVERS layers (odvojeno da clearRoute ne dira vozace) ===
   private driversLayer = L.layerGroup();
   private driverMarkers = new Map<number, L.Marker>();
 
-  // === PRE-RIDE visuals (linija koja se skraćuje + cilj marker) ===
   private preRideLine: L.Polyline | null = null;
   private preRideTargetMarker: L.Marker | null = null;
+
+  private liveRideLine: L.Polyline | null = null;
+  private liveRideTargetMarker: L.Marker | null = null;
+
+  private lastLocationPushAt = 0;
+  private locationPushEveryMs = 1000;
 
   constructor(private driverLocService: DriverLocationService) {
     effect(() => {
       const isLogged = this.authService.isLoggedIn();
       if (isLogged) {
-        // sakrij druge vozace kad je ulogovan korisnik (driver)
         this.driversLayer.clearLayers();
         this.driverMarkers.clear();
       }
@@ -68,6 +61,7 @@ export class MapComponent implements AfterViewInit {
     this.destroyRef.onDestroy(() => {
       this.stopSelfAnimation();
       this.clearPreRideVisuals();
+      this.clearLiveRideVisuals();
     });
   }
 
@@ -98,7 +92,6 @@ export class MapComponent implements AfterViewInit {
   private ensureSelfMarker() {
     if (this.selfMarker) return;
 
-    // self marker (ulogovani vozac)
     this.selfMarker = L.marker(this.selfPos, { icon: this.driverFreeIcon });
     this.selfLayer.addLayer(this.selfMarker);
   }
@@ -108,7 +101,6 @@ export class MapComponent implements AfterViewInit {
     setTimeout(() => this.map.invalidateSize(), 0);
 
     runInInjectionContext(this.injector, () => {
-      // Standardno rutiranje (npr. za putnika / book ride) — ostaje isto
       effect(() => {
         const s = this.facade.state();
         if (!this.map) return;
@@ -120,13 +112,11 @@ export class MapComponent implements AfterViewInit {
         this.renderRoute(s.points, s.geometry);
       });
 
-      // PRE-RIDE: slušaj driveTo i vozi self marker do pickup-a
       effect(() => {
         const d = (this.facade as any).driveTo?.();
         if (!this.map) return;
         if (!d) return;
 
-        // ako driveTo ima driverId, ignoriši ako nije naš
         const myId = Number((this.authService as any).userId?.() ?? 0);
         if (d.driverId && myId && d.driverId !== myId) return;
 
@@ -136,9 +126,16 @@ export class MapComponent implements AfterViewInit {
 
         this.driveSelfTo(lat, lon);
       });
+
+      effect(() => {
+        const pts = (this.facade as any).ridePath?.();
+        if (!this.map) return;
+        if (!pts || !Array.isArray(pts) || pts.length < 2) return;
+
+        this.startLiveRide(pts);
+      });
     });
 
-    // imena vozaca (za mapu na pocetnoj)
     this.driverLocService
       .getDriversBasic()
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -154,7 +151,6 @@ export class MapComponent implements AfterViewInit {
         },
       });
 
-    // polling lokacija (samo kad nije ulogovan)
     this.driverLocService
       .pollLocations()
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -193,11 +189,9 @@ export class MapComponent implements AfterViewInit {
     }
   }
 
-  // Pre-ride: napravi rutu do pickup-a i animiraj marker + “pojedaj” liniju
   private driveSelfTo(lat: number, lon: number) {
     this.ensureSelfMarker();
 
-    // stop prethodno + ocisti pre-ride
     this.stopSelfAnimation();
     this.clearPreRideVisuals();
 
@@ -216,20 +210,17 @@ export class MapComponent implements AfterViewInit {
         const coords = (geometry.coordinates ?? []) as [number, number][];
         const path = coords.map(([x, y]) => L.latLng(y, x)); // [lon,lat] -> LatLng
 
-        if (!path.length) return;
+        if (path.length < 2) return;
 
-        // cilj marker (pickup) – samo ovaj marker prikazujemo, nema start ikonice
         const target = L.latLng(lat, lon);
         this.preRideTargetMarker = L.marker(target, { icon: this.stopIcon }).addTo(this.map);
 
-        // linija (plava) koja se skraćuje
         this.preRideLine = L.polyline(path).addTo(this.map);
 
         const b = this.preRideLine.getBounds();
         if (b.isValid()) this.map.fitBounds(b.pad(0.2));
 
-        // animacija
-        this.animateSelfAlong(path, 600);
+        this.animateSelfAlongPreRide(path, 600);
       },
       error: (err: any) => {
         console.warn('Could not build route to pickup', err);
@@ -237,8 +228,7 @@ export class MapComponent implements AfterViewInit {
     });
   }
 
-  // Animacija + skraćivanje linije (nestaje iza vozača)
-  private animateSelfAlong(path: L.LatLng[], stepMs = 600) {
+  private animateSelfAlongPreRide(path: L.LatLng[], stepMs = 600) {
     if (!path.length) return;
     this.ensureSelfMarker();
     if (!this.selfMarker) return;
@@ -250,10 +240,14 @@ export class MapComponent implements AfterViewInit {
       if (token !== this.animToken) return;
 
       const p = path[i];
+      if (!p) return;
+
       this.selfMarker!.setLatLng(p);
       this.selfPos = p;
 
-      // “pojedaj” liniju: ostavi samo preostali deo od trenutne tacke do kraja
+      this.maybePushLocationToBackend(p);
+
+
       if (this.preRideLine) {
         const remaining = path.slice(i);
         this.preRideLine.setLatLngs(remaining);
@@ -265,11 +259,125 @@ export class MapComponent implements AfterViewInit {
       } else {
         this.animTimer = null;
 
-        // stigao na pickup -> ukloni cilj marker i liniju
         this.clearPreRideVisuals();
 
-        // opcionalno: očisti driveTo da se ne okida ponovo
         (this.facade as any).clearDriveTo?.();
+      }
+    };
+
+    tick();
+  }
+
+    private maybePushLocationToBackend(p: L.LatLng) {
+      
+    if (!this.authService.isLoggedIn()) return;
+
+    const now = Date.now();
+    if (now - this.lastLocationPushAt < this.locationPushEveryMs) return;
+    this.lastLocationPushAt = now;
+
+    const driverId = Number((this.authService as any).userId?.() ?? 0);
+    if (!driverId) return;
+
+    this.driverLocService.updateLocation(driverId, p.lat, p.lng).subscribe({
+      error: () => {
+      },
+    });
+  }
+
+
+  // ===== LIVE RIDE =====
+
+  private clearLiveRideVisuals() {
+    if (this.liveRideLine) {
+      this.map.removeLayer(this.liveRideLine);
+      this.liveRideLine = null;
+    }
+    if (this.liveRideTargetMarker) {
+      this.map.removeLayer(this.liveRideTargetMarker);
+      this.liveRideTargetMarker = null;
+    }
+  }
+
+  private startLiveRide(points: { lat: number; lon: number; label?: string }[]) {
+    this.ensureSelfMarker();
+    if (!this.selfMarker) return;
+
+    this.stopSelfAnimation();
+    this.clearPreRideVisuals();
+    this.clearLiveRideVisuals();
+    this.clearRoute();
+
+    const pickup = L.latLng(points[0].lat, points[0].lon);
+    this.selfMarker.setLatLng(pickup);
+    this.selfPos = pickup;
+
+    (this.routing as any).route(points).subscribe({
+      next: (r: any) => {
+        const geometry: GeoJSON.LineString | null = r?.geometry ?? r?.geojson ?? r;
+
+        if (!geometry || geometry.type !== 'LineString') {
+          console.warn('RoutingService returned unexpected geometry:', r);
+          return;
+        }
+
+        const coords = (geometry.coordinates ?? []) as [number, number][];
+        const path = coords.map(([x, y]) => L.latLng(y, x));
+
+        if (path.length < 2) return;
+
+        const dest = points[points.length - 1];
+        this.liveRideTargetMarker = L.marker([dest.lat, dest.lon], { icon: this.endIcon }).addTo(this.map);
+
+        this.liveRideLine = L.polyline(path).addTo(this.map);
+
+        const b = this.liveRideLine.getBounds();
+        if (b.isValid()) this.map.fitBounds(b.pad(0.2));
+
+        this.animateSelfAlongLiveRide(path, 600);
+      },
+      error: (err: any) => {
+        console.warn('route failed', err);
+      },
+    });
+  }
+
+  private animateSelfAlongLiveRide(path: L.LatLng[], stepMs = 600) {
+    if (!path.length) return;
+    this.ensureSelfMarker();
+    if (!this.selfMarker) return;
+
+    const token = ++this.animToken;
+    let i = 0;
+
+    const tick = () => {
+      if (token !== this.animToken) return;
+
+      const p = path[i];
+      if (!p) return;
+
+      this.selfMarker!.setLatLng(p);
+      this.selfPos = p;
+
+      this.maybePushLocationToBackend(p);
+
+      if (this.liveRideLine) {
+        const remaining = path.slice(i);
+        this.liveRideLine.setLatLngs(remaining);
+      }
+
+      i++;
+      if (i < path.length) {
+        this.animTimer = setTimeout(tick, stepMs);
+      } else {
+        this.animTimer = null;
+
+        if (this.liveRideLine) {
+          this.map.removeLayer(this.liveRideLine);
+          this.liveRideLine = null;
+        }
+
+        (this.facade as any).clearRidePath?.();
       }
     };
 
@@ -299,7 +407,6 @@ export class MapComponent implements AfterViewInit {
     iconAnchor: [15, 22],
   });
 
-  // Standardno: render rute (sa start/stop/end ikonama) — ostaje kako je bilo
   private renderRoute(
     points: { lat: number; lon: number; label?: string }[],
     geometry: GeoJSON.LineString

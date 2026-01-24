@@ -10,6 +10,7 @@ export interface RouteRenderState {
   points: GeoPoint[];
   geometry: GeoJSON.LineString;
 }
+export type RideWaypoint = { lat: number; lon: number; label?: string };
 
 @Injectable({ providedIn: 'root' })
 export class MapFacadeService {
@@ -18,6 +19,8 @@ export class MapFacadeService {
 
   private driveToSig = signal<{driverId: number, target: {lat: number, lon: number}} | null>(null);
   driveTo = computed(() => this.driveToSig());
+
+   ridePath = signal<RideWaypoint[] | null>(null);
 
   setState(s: RouteRenderState | null) {
     this.stateSig.set(s);
@@ -29,5 +32,12 @@ export class MapFacadeService {
   }
   clearDriveTo() {
     this.driveToSig.set(null);
+  }
+  setRidePath(points: RideWaypoint[]) {
+    this.ridePath.set(points);
+  }
+
+  clearRidePath() {
+    this.ridePath.set(null);
   }
 }
