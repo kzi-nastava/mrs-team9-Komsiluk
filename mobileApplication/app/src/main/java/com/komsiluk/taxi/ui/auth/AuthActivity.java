@@ -17,6 +17,7 @@ import com.komsiluk.taxi.ui.auth.login.ResetPasswordFragment;
 import com.komsiluk.taxi.ui.about.AboutUsActivity;
 import com.komsiluk.taxi.ui.auth.login.VerificationMessageFragment;
 import com.komsiluk.taxi.ui.auth.rider_registration.RiderRegistrationFragment;
+import com.komsiluk.taxi.ui.auth.rider_registration.SuccessfulRegistrationFragment;
 import com.komsiluk.taxi.ui.menu.BaseNavDrawerActivity;
 
 import dagger.hilt.android.AndroidEntryPoint;
@@ -48,13 +49,40 @@ public class AuthActivity extends BaseNavDrawerActivity {
 
         Fragment startFragment;
 
-        // Provera deep link-a
+
+
         Uri data = getIntent().getData();
         if (data != null && data.getPath() != null && data.getPath().startsWith("/reset-password")) {
             String token = data.getQueryParameter("token");
-            // Prosledjuj token fragmentu
             startFragment = ResetPasswordFragment.newInstance(token);
-        } else {
+        } else if(data != null && data.getPath() != null && data.getPath().startsWith("/activation")) {
+            String token = data.getQueryParameter("token");
+
+            AuthViewModel authViewModel =
+                    new ViewModelProvider(this).get(AuthViewModel.class);
+
+            authViewModel.getActivationState().observe(this, state -> {
+                if (state == AuthViewModel.ActivationState.SUCCESS) {
+                    getSupportFragmentManager()
+                            .beginTransaction()
+                            .replace(R.id.authFragmentContainer, new SuccessfulRegistrationFragment())
+                            .commit();
+                } else if (state == AuthViewModel.ActivationState.ERROR) {
+                    getSupportFragmentManager()
+                            .beginTransaction()
+                            .replace(R.id.authFragmentContainer, new VerificationMessageFragment())
+                            .commit();
+                }
+            });
+
+            if (token == null) {
+                startFragment = new VerificationMessageFragment();
+            } else {
+                authViewModel.activatePassenger(token);
+                startFragment = new LoginFragment();
+            }
+        }
+        else {
             // Normalna logika
             startFragment = resolveStartFragment();
         }
@@ -78,10 +106,6 @@ public class AuthActivity extends BaseNavDrawerActivity {
         switch (dest) {
             case "REGISTER":
                 return new RiderRegistrationFragment();
-//            case "RESET":
-//                return new ResetPasswordFragment();
-//            case "REGISTER_SUCCESS":
-//                return new RegisterSuccessFragment();
             case "VERIFY":
                 return new VerificationMessageFragment();
             case "LOGIN":

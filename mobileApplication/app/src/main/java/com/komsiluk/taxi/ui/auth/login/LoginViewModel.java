@@ -59,14 +59,13 @@ public class LoginViewModel extends ViewModel {
                     sessionManager.saveSession(response.body().getToken(),response.body().getId(),response.body().getRole());
                     loginResultEvent.setValue(new Event<>(response.body().getRole()));
                 } else {
-                    errorMessageEvent.postValue(new Event<>("Problem with connection occured. Code: " + response.code()
-                            + ", message: " + response.message()));
+                    errorMessageEvent.postValue(new Event<>("Login failed. Invalid credentials!"));
                 }
             }
 
             @Override
             public void onFailure(Call<LoginResponse> call, Throwable t) {
-                errorMessageEvent.postValue(new Event<>(t.getMessage()));
+                errorMessageEvent.postValue(new Event<>("Unable to connect. Please check your internet connection."));
             }
         });
     }

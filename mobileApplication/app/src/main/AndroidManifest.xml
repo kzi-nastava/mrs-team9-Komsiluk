@@ -60,6 +60,12 @@
                     android:host="localhost"
                     android:port="4200"
                     android:pathPrefix="/reset-password"/>
+
+                <data
+                    android:scheme="http"
+                    android:host="localhost"
+                    android:port="4200"
+                    android:pathPrefix="/activation"/>
             </intent-filter>
         </activity>
         <activity

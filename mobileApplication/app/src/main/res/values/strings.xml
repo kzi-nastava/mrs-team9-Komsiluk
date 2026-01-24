@@ -328,5 +328,7 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="forgot_password_message_title">Password Reset</string>
     <string name="forgot_password_message">If the email exists, a password reset link has been sent.\n        Please check your inbox and follow the instructions.</string>
+    <string name="select_image_error">Please select an image.</string>
+    <string name="image_too_large">Image is too large (max 8MB).</string>
 
 </resources>

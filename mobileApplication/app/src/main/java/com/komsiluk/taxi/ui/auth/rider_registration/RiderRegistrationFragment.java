@@ -8,7 +8,10 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -19,9 +22,20 @@ import com.komsiluk.taxi.databinding.FragmentRiderRegistrationBinding;
 import com.komsiluk.taxi.ui.add_driver.AddDriverViewModel;
 import com.komsiluk.taxi.ui.add_driver.DriverVehicleFragment;
 
+
+
+import java.io.File;
+
+import com.komsiluk.taxi.ui.auth.AuthActivity;
+import com.komsiluk.taxi.ui.auth.login.ForgotPasswordMessageFragment;
+import com.komsiluk.taxi.ui.auth.login.VerificationMessageFragment;
+import com.komsiluk.taxi.util.FileUtils;
+
 public class RiderRegistrationFragment extends Fragment {
 
     private static final String ARG_ADMIN_ADD_DRIVER = "ARG_ADMIN_ADD_DRIVER";
+
+    private ActivityResultLauncher<String> imagePickerLauncher;
 
     private FragmentRiderRegistrationBinding binding;
     private Drawable normalBg;
@@ -29,6 +43,8 @@ public class RiderRegistrationFragment extends Fragment {
 
     private boolean isAdminAddDriver;
     private AddDriverViewModel vm;
+
+    private PassengerRegistrationViewModel prViewModel;
 
     public static RiderRegistrationFragment newInstanceAdminAddDriver() {
         RiderRegistrationFragment f = new RiderRegistrationFragment();
@@ -45,6 +61,43 @@ public class RiderRegistrationFragment extends Fragment {
             @Nullable Bundle savedInstanceState
     ) {
         binding = FragmentRiderRegistrationBinding.inflate(inflater, container, false);
+
+        imagePickerLauncher = registerForActivityResult(
+                new ActivityResultContracts.GetContent(),
+                uri -> {
+                    if (uri == null) return;
+
+                    // validacija
+                    String type = requireContext().getContentResolver().getType(uri);
+                    if (type == null || !type.startsWith("image/")) {
+                        Toast.makeText(
+                                requireContext(),
+                                getString(R.string.select_image_error),
+                                Toast.LENGTH_SHORT
+                        ).show();
+                        return;
+                    }
+
+                    File file = FileUtils.from(requireContext(), uri);
+                    if (file.length() > 8 * 1024 * 1024) {
+                        Toast.makeText(
+                                requireContext(),
+                                getString(R.string.image_too_large),
+                                Toast.LENGTH_SHORT
+                        ).show();
+                        return;
+                    }
+
+                    // sacuvaj u ViewModel
+                    prViewModel.profileImageFile = file;
+
+                    // preview
+                    binding.ivProfilePhoto.setImageURI(uri);
+                    binding.tvChoosePhoto.setText(file.getName());
+                }
+        );
+
+
         return binding.getRoot();
     }
 
@@ -54,7 +107,11 @@ public class RiderRegistrationFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         isAdminAddDriver = getArguments() != null && getArguments().getBoolean(ARG_ADMIN_ADD_DRIVER, false);
-        vm = new ViewModelProvider(requireActivity()).get(AddDriverViewModel.class);
+        if (isAdminAddDriver) {
+            vm = new ViewModelProvider(requireActivity()).get(AddDriverViewModel.class);
+        } else {
+            prViewModel = new ViewModelProvider(requireActivity()).get(PassengerRegistrationViewModel.class);
+        }
 
         normalBg = requireContext().getDrawable(R.drawable.bg_input_normal);
         errorBg  = requireContext().getDrawable(R.drawable.bg_input_error);
@@ -72,43 +129,138 @@ public class RiderRegistrationFragment extends Fragment {
             binding.tvErrorRepeat.setVisibility(View.GONE);
         }
 
-        TextWatcher watcher = new SimpleTextWatcher() {
-            @Override public void afterTextChanged(Editable s) {
+        // Binding za firstName
+        binding.etFirstname.addTextChangedListener(new SimpleTextWatcher() {
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (isAdminAddDriver) {
+                    vm.firstName = s.toString();
+                } else {
+                    prViewModel.firstName.setValue(s.toString());
+                }
                 validateFirstname();
+            }
+        });
+
+        // Binding za lastName
+        binding.etLastname.addTextChangedListener(new SimpleTextWatcher() {
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (isAdminAddDriver) {
+                    vm.lastName = s.toString();
+                } else {
+                    prViewModel.lastName.setValue(s.toString());
+                }
                 validateLastname();
+            }
+        });
+
+        // Binding za address
+        binding.etAddress.addTextChangedListener(new SimpleTextWatcher() {
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (isAdminAddDriver) {
+                    vm.address = s.toString();
+                } else {
+                    prViewModel.address.setValue(s.toString());
+                }
                 validateAddress();
+            }
+        });
+
+        // Binding za city
+        binding.etCity.addTextChangedListener(new SimpleTextWatcher() {
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (isAdminAddDriver) {
+                    vm.city = s.toString();
+                } else {
+                    prViewModel.city.setValue(s.toString());
+                }
                 validateCity();
+            }
+        });
+
+        // Binding za phone
+        binding.etPhone.addTextChangedListener(new SimpleTextWatcher() {
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (isAdminAddDriver) {
+                    vm.phone = s.toString();
+                } else {
+                    prViewModel.phone.setValue(s.toString());
+                }
                 validatePhone();
+            }
+        });
+
+        // Binding za email
+        binding.etEmail.addTextChangedListener(new SimpleTextWatcher() {
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (isAdminAddDriver) {
+                    vm.email = s.toString();
+                } else {
+                    prViewModel.email.setValue(s.toString());
+                }
                 validateEmail();
-                if (!isAdminAddDriver) {
+            }
+        });
+
+        // Binding za password (samo ako nije admin add driver)
+        if (!isAdminAddDriver) {
+            binding.etPassword.addTextChangedListener(new SimpleTextWatcher() {
+                @Override
+                public void afterTextChanged(Editable s) {
+                    prViewModel.password.setValue(s.toString());
                     validatePassword();
+                }
+            });
+
+            binding.etRepeat.addTextChangedListener(new SimpleTextWatcher() {
+                @Override
+                public void afterTextChanged(Editable s) {
+                    prViewModel.repeat.setValue(s.toString());
                     validateRepeat();
                 }
-            }
-        };
-
-        binding.etFirstname.addTextChangedListener(watcher);
-        binding.etLastname.addTextChangedListener(watcher);
-        binding.etAddress.addTextChangedListener(watcher);
-        binding.etCity.addTextChangedListener(watcher);
-        binding.etPhone.addTextChangedListener(watcher);
-        binding.etEmail.addTextChangedListener(watcher);
-
-        if (!isAdminAddDriver) {
-            binding.etPassword.addTextChangedListener(watcher);
-            binding.etRepeat.addTextChangedListener(watcher);
+            });
         }
+
+        prViewModel.getSuccessMessageEvent().observe(getViewLifecycleOwner(), event -> {
+            String successMessage = event.getContentIfNotHandled();
+
+            if (successMessage == null) return;
+
+            VerificationMessageFragment verificationFragment = VerificationMessageFragment.newInstance(binding.etEmail.getText().toString().trim());
+            getParentFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.authFragmentContainer, verificationFragment)
+                    .commit();
+            Toast.makeText(
+                    requireContext(),
+                    successMessage,
+                    Toast.LENGTH_SHORT
+            ).show();
+        });
+
+        prViewModel.getErrorMessageEvent().observe(getViewLifecycleOwner(), event -> {
+            String message = event.getContentIfNotHandled();
+            if (message == null) return;
+
+            Toast.makeText(
+                    requireContext(),
+                    message,
+                    Toast.LENGTH_SHORT
+            ).show();
+        });
+
+
+
 
         binding.btnSubmit.setOnClickListener(v -> {
             if (!validateAll()) return;
 
             if (isAdminAddDriver) {
-                vm.firstName = binding.etFirstname.getText().toString().trim();
-                vm.lastName  = binding.etLastname.getText().toString().trim();
-                vm.address   = binding.etAddress.getText().toString().trim();
-                vm.city      = binding.etCity.getText().toString().trim();
-                vm.phone     = binding.etPhone.getText().toString().trim();
-                vm.email     = binding.etEmail.getText().toString().trim();
 
                 getParentFragmentManager()
                         .beginTransaction()
@@ -116,10 +268,7 @@ public class RiderRegistrationFragment extends Fragment {
                         .addToBackStack("add_driver_step1")
                         .commit();
             } else {
-                getParentFragmentManager()
-                        .beginTransaction()
-                        .replace(R.id.authFragmentContainer, new SuccessfulRegistrationFragment())
-                        .commit();
+                prViewModel.submit();
             }
         });
     }

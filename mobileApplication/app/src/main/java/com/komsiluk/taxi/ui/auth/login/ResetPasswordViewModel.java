@@ -9,6 +9,8 @@ import com.komsiluk.taxi.data.remote.auth.ForgotPasswordRequest;
 import com.komsiluk.taxi.data.remote.auth.ResetPasswordRequest;
 import com.komsiluk.taxi.util.Event;
 
+import org.json.JSONObject;
+
 import javax.inject.Inject;
 
 import dagger.hilt.android.lifecycle.HiltViewModel;
@@ -43,18 +45,44 @@ public class ResetPasswordViewModel extends ViewModel {
 
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
-                if(response.isSuccessful()) {
+                if (response.isSuccessful()) {
                     successEvent.setValue(new Event<>(true));
                 } else {
-                    errorMessageEvent.setValue(new Event<>("Problem with connection occured. Code: " + response.code()
-                            + ", message: " + response.message()));
+                    String backendMessage = parseErrorMessage(response);
+
+                    if (response.code() == 404) {
+                        errorMessageEvent.setValue(
+                                new Event<>("Reset failed. Invalid or expired token.")
+                        );
+                    } else {
+                        errorMessageEvent.setValue(new Event<>(backendMessage));
+                    }
                 }
             }
 
+
             @Override
             public void onFailure(Call<Void> call, Throwable t) {
-                errorMessageEvent.postValue(new Event<>(t.getMessage()));
+                errorMessageEvent.postValue(new Event<>("Unable to connect. Please check your internet connection."));
             }
         });
     }
+
+    private String parseErrorMessage(Response<?> response) {
+        try {
+            if (response.errorBody() != null) {
+                String body = response.errorBody().string();
+                try {
+                    JSONObject obj = new JSONObject(body);
+                    return obj.optString("message", body); // koristi plain text ako nema message polja
+                } catch (Exception e) {
+                    return body; // plain text
+                }
+            }
+        } catch (Exception e) {
+            return "Unexpected error occurred";
+        }
+        return "Unknown error";
+    }
+
 }

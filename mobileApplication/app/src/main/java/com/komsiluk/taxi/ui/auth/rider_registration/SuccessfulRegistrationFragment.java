@@ -12,11 +12,21 @@ import androidx.fragment.app.Fragment;
 
 import com.komsiluk.taxi.databinding.FragmentSuccessfulRegistrationBinding;
 import com.komsiluk.taxi.ui.auth.AuthActivity;
+import com.komsiluk.taxi.ui.auth.login.ResetPasswordFragment;
 
 
 public class SuccessfulRegistrationFragment extends Fragment {
 
     private FragmentSuccessfulRegistrationBinding binding;
+
+    public static SuccessfulRegistrationFragment newInstance(String token) {
+        SuccessfulRegistrationFragment fragment = new SuccessfulRegistrationFragment();
+        Bundle args = new Bundle();
+        args.putString("token", token);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
 
 
     @Override
