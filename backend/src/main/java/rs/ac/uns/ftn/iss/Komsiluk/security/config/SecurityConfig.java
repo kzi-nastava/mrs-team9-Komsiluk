@@ -3,6 +3,7 @@ package rs.ac.uns.ftn.iss.Komsiluk.security.config;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
@@ -32,8 +33,7 @@ public class SecurityConfig {
     private final JwtAuthFilter jwtAuthFilter;
     private final CustomUserDetailsService userDetailsService;
 
-    public SecurityConfig(JwtAuthFilter jwtAuthFilter,
-                          CustomUserDetailsService userDetailsService) {
+    public SecurityConfig(JwtAuthFilter jwtAuthFilter, CustomUserDetailsService userDetailsService) {
         this.jwtAuthFilter = jwtAuthFilter;
         this.userDetailsService = userDetailsService;
     }
@@ -52,8 +52,6 @@ public class SecurityConfig {
     public AccessDeniedHandler accessDeniedHandler() {
         return new RestAccessDeniedHandler();
     }
-
-
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -74,9 +72,7 @@ public class SecurityConfig {
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable())
-                .sessionManagement(sm ->
-                        sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                )
+                .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .anonymous(Customizer.withDefaults())
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint(restAuthenticationEntryPoint())
@@ -90,13 +86,14 @@ public class SecurityConfig {
                         .requestMatchers("/api/tokens/activation/**").permitAll()
                         .requestMatchers("/api/tokens/reset-password").permitAll()
                         .requestMatchers("/images/**").permitAll()
-
+                        .requestMatchers(HttpMethod.GET, "/api/drivers/locations").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/drivers/*/location").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/drivers/basic").permitAll()
 
                         .anyRequest().authenticated()
                 )
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
-
 
         return http.build();
     }
@@ -110,8 +107,7 @@ public class SecurityConfig {
         config.setAllowedHeaders(List.of("Authorization", "Content-Type"));
         config.setAllowCredentials(true);
 
-        UrlBasedCorsConfigurationSource source =
-                new UrlBasedCorsConfigurationSource();
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
 
         return source;

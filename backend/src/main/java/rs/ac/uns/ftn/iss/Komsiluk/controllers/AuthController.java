@@ -5,17 +5,11 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import org.springframework.web.multipart.MultipartFile;
-import rs.ac.uns.ftn.iss.Komsiluk.beans.User;
-import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.UserRole;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.auth.*;
-import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.IUserService;
-import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.IUserTokenService;
 import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.IAuthService;
-
 
 
 @RestController

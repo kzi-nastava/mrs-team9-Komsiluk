@@ -11,6 +11,7 @@ import { forkJoin, of } from 'rxjs';
 import { catchError, finalize, switchMap, tap } from 'rxjs/operators';
 import { DriverBlockedDialogComponent } from '../../components/driver-blocked-dialog/driver-blocked-dialog.component';
 import { signal } from '@angular/core';
+import { ToastService } from '../../../../shared/components/toast/toast.service';
 
 @Component({
   selector: 'app-driver-car-view',
@@ -22,11 +23,13 @@ export class DriverCarViewComponent {
   profile: UserProfileResponseDTO | null = null;
   loading = false;
 
+  avatarVersion = 0;
+
   isBlocked = signal(false);
   blockNote: BlockNoteResponseDTO | null = null;
   blockedDialogOpen = signal(false);
 
-  constructor(private profileService: ProfileService, private auth: AuthService, private cdr: ChangeDetectorRef, private blockNoteService: BlockNoteService) {}
+  constructor(private profileService: ProfileService, private auth: AuthService, private cdr: ChangeDetectorRef, private blockNoteService: BlockNoteService, private toast: ToastService) {}
 
   get isDriver(): boolean {
     return this.auth.userRole() === UserRole.DRIVER;
@@ -40,6 +43,39 @@ export class DriverCarViewComponent {
     const hours = Math.floor(minutes / 60);
     const mins = minutes % 60;
     return `${hours}h ${mins}m`;
+  }
+
+  onProfileImagePicked(file: File) {
+    if (!file.type.startsWith('image/')) {
+      this.toast.show('Please pick an image file.');
+      return;
+    }
+    if (file.size > 8 * 1024 * 1024) {
+      this.toast.show('Image is too large (max 8MB).');
+      return;
+    }
+
+    this.loading = true;
+
+    this.profileService.updateMyProfileImage(file).pipe(
+      finalize(() => {
+        this.loading = false;
+        this.cdr.detectChanges();
+      })
+    ).subscribe({
+      next: (updated) => {
+        this.profile = updated;
+
+        this.avatarVersion++;
+
+        this.toast.show('Profile image updated.');
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        this.toast.show(err?.error?.message || 'Upload failed.');
+        this.cdr.detectChanges();
+      }
+    });
   }
 
   ngOnInit(): void {

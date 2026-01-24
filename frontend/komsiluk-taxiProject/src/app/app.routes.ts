@@ -18,6 +18,8 @@ import { roleGuard } from './core/auth/guards/role.guard';
 import { UserRole } from './core/auth/services/auth.service';
 import { AdminDriverChangeRequestsPageComponent } from './features/approve-edit/admin-driver-change-requests-page/admin-driver-change-requests-page.component';
 
+import { AdminDriverRegistrationPageComponent } from './features/add-driver/admin-driver-registration-page/admin-driver-registration-page.component';
+
 export const routes: Routes = [
 
   // ===== PUBLIC =====
@@ -69,6 +71,12 @@ export const routes: Routes = [
   { 
     path: 'driver-change-requests',
     component: AdminDriverChangeRequestsPageComponent,
+    canActivate: [authGuard, roleGuard],
+    data: { roles: [UserRole.ADMIN] }
+  },
+  {
+    path: 'admin/add-driver',
+    component: AdminDriverRegistrationPageComponent,
     canActivate: [authGuard, roleGuard],
     data: { roles: [UserRole.ADMIN] }
   },

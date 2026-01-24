@@ -1,6 +1,5 @@
 package rs.ac.uns.ftn.iss.Komsiluk.controllers;
 
-import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Positive;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -13,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.AdminRideSortBy;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.ride.AdminRideDetailsDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.ride.AdminRideHistoryDTO;
-import rs.ac.uns.ftn.iss.Komsiluk.services.exceptions.BadRequestException;
 import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.IRideService;
 import rs.ac.uns.ftn.iss.Komsiluk.util.validators.ValidDateRange;
 

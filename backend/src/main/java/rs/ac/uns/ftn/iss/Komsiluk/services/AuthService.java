@@ -1,7 +1,6 @@
 package rs.ac.uns.ftn.iss.Komsiluk.services;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -10,11 +9,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.server.ResponseStatusException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.User;
-import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.DriverStatus;
-import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.UserRole;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.auth.LoginRequestDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.auth.LoginResponseDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.auth.RegisterPassengerRequestDTO;
@@ -23,7 +19,6 @@ import rs.ac.uns.ftn.iss.Komsiluk.mappers.RegisterPassengerMapper;
 import rs.ac.uns.ftn.iss.Komsiluk.security.jwt.JwtService;
 import rs.ac.uns.ftn.iss.Komsiluk.services.exceptions.AccountNotActivatedException;
 import rs.ac.uns.ftn.iss.Komsiluk.services.exceptions.EmailAlreadyExistsException;
-import rs.ac.uns.ftn.iss.Komsiluk.services.exceptions.InvalidCredentialsException;
 import rs.ac.uns.ftn.iss.Komsiluk.services.exceptions.PasswordsDoNotMatchException;
 import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.IAuthService;
 import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.IUserService;
@@ -123,13 +118,6 @@ public class AuthService implements IAuthService {
 
             User user = (User) authentication.getPrincipal();
             SecurityContextHolder.getContext().setAuthentication(authentication);
-
-
-            if (user.getRole() == UserRole.DRIVER) {
-                user.setDriverStatus(DriverStatus.ACTIVE);
-                userService.save(user);
-            }
-
 
             String token = jwtService.generateAccessToken(user);
 

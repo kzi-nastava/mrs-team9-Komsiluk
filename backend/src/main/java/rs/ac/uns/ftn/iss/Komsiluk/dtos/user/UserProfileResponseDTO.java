@@ -1,5 +1,6 @@
 package rs.ac.uns.ftn.iss.Komsiluk.dtos.user;
 
+import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.DriverStatus;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.vehicle.VehicleResponseDTO;
 
 public class UserProfileResponseDTO {
@@ -13,6 +14,7 @@ public class UserProfileResponseDTO {
 	private String profileImageUrl;
 	private VehicleResponseDTO vehicle;
 	private long activeMinutesLast24h;
+	private DriverStatus driverStatus;
 	
 	public UserProfileResponseDTO() {
 		super();
@@ -88,5 +90,13 @@ public class UserProfileResponseDTO {
 	
 	public void setActiveMinutesLast24h(long activeMinutesLast24h) {
 		this.activeMinutesLast24h = activeMinutesLast24h;
+	}
+	
+	public DriverStatus getDriverStatus() {
+		return driverStatus;
+	}
+	
+	public void setDriverStatus(DriverStatus driverStatus) {
+		this.driverStatus = driverStatus;
 	}
 }

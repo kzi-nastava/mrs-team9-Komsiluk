@@ -4,7 +4,9 @@
     [isDriver]="true"
     [activeToday]="activeToday"
     [isBlocked]="isBlocked()"
+    [avatarVersion]="avatarVersion"
     (blockedClick)="openBlockedInfo()"
+    (profileImagePicked)="onProfileImagePicked($event)"
   >
   </app-profile-sidebar>
 

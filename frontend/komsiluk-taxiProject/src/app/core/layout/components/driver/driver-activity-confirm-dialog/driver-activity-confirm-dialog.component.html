@@ -1,0 +1,17 @@
+<app-modal-shell [open]="open" (closed)="cancel.emit()">
+  <div class="da-title text-regular">{{ title }}</div>
+
+  <div class="da-sub text-regular">
+    {{ text }}
+  </div>
+
+  <div class="da-actions">
+    <button type="button" class="btn btn--ghost text-semibold btn-scale" (click)="cancel.emit()">
+      Cancel
+    </button>
+
+    <button type="button" class="btn btn--primary text-semibold btn-scale" (click)="confirm.emit()">
+      Confirm
+    </button>
+  </div>
+</app-modal-shell>

@@ -1,0 +1,85 @@
+.adr-form{
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.adr-form--wide{
+  width: min(860px, 100%);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 70px;
+  row-gap: 12px;
+  margin: 0 auto;
+}
+
+.adr-col{
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.adr-field{
+  width: min(320px, 100%);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.adr-label{
+  font-size: var(--fs-lg);
+  font-weight: var(--weight-regular);
+}
+
+.adr-input{
+  height: 36px;
+  border-radius: 6px;
+  border: none;
+  outline: none;
+  background: var(--color-white);
+  color: var(--color-text);
+  padding: 0 14px;
+  box-sizing: border-box;
+}
+
+.file-input{
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  color: #999;
+}
+
+.file-input.has-file{
+  color: var(--color-text);
+}
+
+.adr-actions{
+  display: flex;
+  justify-content: right;
+  font-size: var(--fs-lg);
+  margin-top: 15px;
+  margin-bottom: -30px;
+}
+
+@media (max-width: 900px){
+  .adr-form--wide{
+    grid-template-columns: 1fr;
+    column-gap: 0;
+
+    justify-items: center;
+  }
+
+  .adr-col{
+    width: 100%;
+    align-items: center;
+  }
+
+  .adr-field{
+    width: min(320px, 100%);
+  }
+
+  .adr-actions{
+    justify-content: center; /* ili flex-end ako hoćeš desno */
+  }
+}

@@ -1,0 +1,19 @@
+.sr-title{
+  font-size: var(--fs-h1);
+  margin-bottom: 18px;
+  color: var(--color-white);
+}
+
+.sr-sub{
+  margin-bottom: 18px;
+  font-size: var(--fs-md);
+  color: var(--color-white);
+  line-height: 1.35;
+}
+
+.sr-actions{
+  display: flex;
+  justify-content: flex-end;
+  gap: 20px;
+  margin-top: 10px;
+}

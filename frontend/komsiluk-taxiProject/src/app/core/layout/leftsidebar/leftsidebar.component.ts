@@ -6,6 +6,7 @@ import { AuthService, UserRole } from '../../auth/services/auth.service';
 import { PassengerLeftMenuComponent } from '../components/passenger/passenger-left-menu/passenger-left-menu.component';
 import { AdminLeftMenuComponent } from '../components/admin/admin-left-menu/admin-left-menu.component';
 import { GuestLeftMenuComponent } from '../components/guest/guest-left-menu/guest-left-menu.component';
+import { DriverLeftMenuComponent } from "../components/driver/driver-left-menu/driver-left-menu.component";
 
 @Component({
   selector: 'app-leftsidebar',
@@ -15,7 +16,8 @@ import { GuestLeftMenuComponent } from '../components/guest/guest-left-menu/gues
     PassengerLeftMenuComponent,
     AdminLeftMenuComponent,
     GuestLeftMenuComponent,
-  ],
+    DriverLeftMenuComponent
+],
   templateUrl: './leftsidebar.component.html',
   styleUrl: './leftsidebar.component.css',
 })

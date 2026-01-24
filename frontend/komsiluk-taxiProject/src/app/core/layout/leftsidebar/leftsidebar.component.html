@@ -17,10 +17,8 @@
       @else if (userRole() === UserRole.ADMIN) {
         <app-admin-left-menu />
       }
-      @else {
-        <div class="role-label">
-          {{ userRole() }}
-        </div>
+      @else if (userRole() === UserRole.DRIVER) {
+        <app-driver-left-menu />
       }
 
     </div>

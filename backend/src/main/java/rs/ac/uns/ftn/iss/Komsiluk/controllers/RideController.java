@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.ride.*;
@@ -23,24 +24,40 @@ public class RideController {
 	@Autowired
     private IRideService rideService;
 
+	@PreAuthorize("hasRole('PASSENGER')")
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<RideResponseDTO> orderRide(@RequestBody RideCreateDTO dto) {
+    public ResponseEntity<RideResponseDTO> orderRide(@Valid @RequestBody RideCreateDTO dto) {
         RideResponseDTO created = rideService.orderRide(dto);
         return new ResponseEntity<>(created, HttpStatus.CREATED);
     }
+	
+	@PreAuthorize("hasRole('DRIVER')")
+	@GetMapping("/driver/{driverId}/current")
+	public ResponseEntity<RideResponseDTO> getDriverCurrentRide(@PathVariable Long driverId) {
+	    RideResponseDTO dto = rideService.getCurrentRideForDriver(driverId);
 
+	    if (dto == null) {
+	        return ResponseEntity.noContent().build();
+	    }
+
+	    return ResponseEntity.ok(dto);
+	}
+
+	@PreAuthorize("hasAnyRole('PASSENGER', 'DRIVER')")
     @GetMapping("/user/{userId}/scheduled")
     public ResponseEntity<Collection<RideResponseDTO>> getScheduledRidesForUser(@PathVariable Long userId) {
         Collection<RideResponseDTO> rides = rideService.getScheduledRidesForUser(userId);
         return new ResponseEntity<>(rides, HttpStatus.OK);
     }
     
+	@PreAuthorize("hasRole('DRIVER')")
     @PostMapping("/{id}/start")
     public ResponseEntity<RideResponseDTO> startRide(@PathVariable Long id) {
         RideResponseDTO dto = rideService.startRide(id);
         return new ResponseEntity<>(dto, HttpStatus.OK);
     }
 
+	@PreAuthorize("hasRole('DRIVER')")
     @PostMapping("/{id}/cancel/driver")
     public ResponseEntity<Void> cancelByDriver(
             @PathVariable @Positive Long id,
@@ -50,6 +67,7 @@ public class RideController {
         return ResponseEntity.ok().build();
     }
 
+	@PreAuthorize("hasRole('PASSENGER')")
     @PostMapping("/{id}/cancel/passenger")
     public ResponseEntity<Void> cancelByPassenger(
             @PathVariable @Positive Long id,
@@ -59,6 +77,7 @@ public class RideController {
         return ResponseEntity.ok().build();
     }
 
+	@PreAuthorize("hasRole('DRIVER')")
     @PostMapping("/{id}/stop")
     public ResponseEntity<Void> stopRide(
             @PathVariable @Positive Long id,
@@ -68,6 +87,7 @@ public class RideController {
         return ResponseEntity.ok().build();
     }
 
+	@PreAuthorize("hasAnyRole('PASSENGER', 'DRIVER')")
     @PostMapping("/{id}/panic")
     public ResponseEntity<Void> invokePanicButton(
             @PathVariable @Positive Long id,
@@ -77,7 +97,7 @@ public class RideController {
         return ResponseEntity.ok().build();
     }
 
-
+	@PreAuthorize("hasRole('DRIVER')")
     @PostMapping("/{id}/finish")
     public ResponseEntity<RideResponseDTO> finishRide(@PathVariable Long id) {
         RideResponseDTO dto = rideService.finishRide(id);

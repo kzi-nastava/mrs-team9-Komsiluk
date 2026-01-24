@@ -4,7 +4,6 @@ import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.stereotype.Service;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.User;
-import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.UserRole;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
@@ -27,9 +26,7 @@ public class JwtService {
         Instant now = Instant.now();
         Instant exp = now.plusSeconds(props.getExpirationSeconds());
 
-        Map<String, Object> claims = Map.of(
-                "role", user.getRole().name()
-        );
+        Map<String, Object> claims = Map.of("role", user.getRole().name());
 
         return Jwts.builder()
                 .setIssuer(props.getIssuer())

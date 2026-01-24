@@ -327,6 +327,8 @@ export class PassengerBookRidePanelComponent implements OnInit, OnDestroy {
       petFriendly: !!this.form.get('petFriendly')!.value,
       scheduledAt,
       passengerEmails,
+      startLat: this.pickupPoint!.lat,
+      startLng: this.pickupPoint!.lon,
     };
   }
 

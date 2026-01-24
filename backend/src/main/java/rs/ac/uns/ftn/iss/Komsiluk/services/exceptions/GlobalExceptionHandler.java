@@ -36,7 +36,8 @@ public class GlobalExceptionHandler {
     
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<?> handleBadRequestException(BadRequestException ex) {
-		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", ex.getMessage()));
+    	String msg = (ex.getMessage() != null && !ex.getMessage().isBlank()) ? ex.getMessage() : "Bad request";
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", msg));
     }
     
     @ExceptionHandler(AlreadyExistsException.class)

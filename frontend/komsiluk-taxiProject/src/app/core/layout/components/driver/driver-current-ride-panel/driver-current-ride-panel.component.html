@@ -1,0 +1,68 @@
+<div class="cr" [formGroup]="form">
+
+  @if (!hasRide() && !loading()) {
+    <div class="cr-empty text-regular">
+      You currently don’t have any<br />
+      rides.
+    </div>
+  }
+
+  @if (loading()) {
+    <div class="cr-loading text-regular">Loading...</div>
+  }
+
+  @if (hasRide() && !loading()) {
+    <div class="cr-field">
+      <div class="cr-label text-regular">Pickup location</div>
+      <input class="cr-input text-medium" type="text" formControlName="pickup" />
+    </div>
+
+    @if (stationsArr.length > 0) {
+      <div class="cr-field">
+        <div class="cr-label text-regular">Stations</div>
+
+        <div class="cr-list" formArrayName="stations">
+          @for (ctrl of stationsArr.controls; track $index; let i = $index) {
+            <input class="cr-input cr-input--chip text-medium" type="text" [formControlName]="$index" />
+          }
+        </div>
+      </div>
+    }
+
+    <div class="cr-field">
+      <div class="cr-label text-regular">Destination</div>
+      <input class="cr-input text-medium" type="text" formControlName="destination" />
+    </div>
+
+    @if (isScheduledLike()) {
+      <div class="cr-actions">
+        <button type="button" class="btn btn--ghost text-semibold btn-scale" (click)="cancel()">
+          Cancel
+        </button>
+
+        <button type="button" class="btn btn--primary text-semibold btn-scale" (click)="openStartConfirm()">
+          Start
+        </button>
+      </div>
+    }
+
+    @if (isActive()) {
+      <div class="cr-actions cr-actions--active">
+        <button type="button" class="btn btn--primary text-semibold btn-scale cr-finish" (click)="finish()">
+          Finish
+        </button>
+
+        <div class="cr-row">
+          <button type="button" class="btn-sm btn--ghost text-semibold btn-scale" (click)="stop()">
+            Stop
+          </button>
+
+          <button type="button" class="btn-sm btn--danger text-semibold btn-scale" (click)="panic()">
+            Panic
+          </button>
+        </div>
+      </div>
+    }
+  }
+
+</div>

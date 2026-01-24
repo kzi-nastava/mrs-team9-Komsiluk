@@ -38,6 +38,24 @@ public class MailService {
 
         mailSender.send(message);
     }
+    
+    public void sendDriverActivationMail(String to, String token) {
+
+        String activationLink =
+                "http://localhost:4200/driver-activation?token=" + token;
+
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(to);
+        message.setSubject("Activate your Komsiluk account");
+        message.setText(
+                "Welcome!\n\n" +
+                        "Click the link below to activate your account:\n\n" +
+                        activationLink + "\n\n" +
+                        "This link expires in 24 hours."
+        );
+
+        mailSender.send(message);
+    }
 
     public void sendPasswordResetMail(String to, String token) {
         // DEV shortcut: svi mejlovi idu na test inbox

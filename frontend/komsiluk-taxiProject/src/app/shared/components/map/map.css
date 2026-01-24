@@ -23,3 +23,38 @@
   width: 100%;
   height: 100%;
 }
+
+/* Leaflet divIcon wrapper */
+.km-driver {
+  width: 26px;
+  height: 26px;
+  border-radius: 999px;
+
+  display: grid;
+  place-items: center;
+
+  border: 2px solid rgba(0,0,0,.6) !important;
+  box-shadow: 0 6px 14px rgba(0,0,0,.35) !important;
+}
+
+/* boje */
+.km-driver--free {
+  background: #22c55e !important; /* zeleno */
+}
+
+.km-driver--busy {
+  background: #ef4444 !important; /* crveno */
+}
+
+/* ikonica unutra */
+.km-driver__icon {
+  font-size: 18px;
+  line-height: 18px;
+  color: #111 !important;
+}
+
+/* Leaflet često doda border/pozadinu na divIcon */
+.leaflet-div-icon.km-driver {
+  background: transparent !important;
+  border: none !important;
+}
