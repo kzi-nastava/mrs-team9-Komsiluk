@@ -18,6 +18,8 @@ import retrofit2.Response;
 @HiltViewModel
 public class ForgotPasswordViewModel extends ViewModel {
 
+
+    public final MutableLiveData<String> email = new MutableLiveData<>("");
     private MutableLiveData<Event<Boolean>> successEvent = new MutableLiveData<>();
 
     private MutableLiveData<Event<String>> errorMessageEvent = new MutableLiveData<>();

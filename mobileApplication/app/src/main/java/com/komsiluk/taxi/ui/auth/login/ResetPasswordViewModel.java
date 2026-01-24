@@ -21,6 +21,9 @@ import retrofit2.Response;
 @HiltViewModel
 public class ResetPasswordViewModel extends ViewModel {
 
+    public final MutableLiveData<String> newPassword = new MutableLiveData<>("");
+
+    public final MutableLiveData<String> confirmPassword = new MutableLiveData<>("");
     private MutableLiveData<Event<Boolean>> successEvent = new MutableLiveData<>();
 
     private MutableLiveData<Event<String>> errorMessageEvent = new MutableLiveData<>();

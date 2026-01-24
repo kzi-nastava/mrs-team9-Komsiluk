@@ -63,21 +63,25 @@ public class ResetPasswordFragment extends Fragment {
         normalBg = requireContext().getDrawable(R.drawable.bg_input_normal);
         errorBg = requireContext().getDrawable(R.drawable.bg_input_error);
 
-        TextWatcher watcher = new TextWatcher() {
-            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
-            @Override
-            public void afterTextChanged(Editable s) {
-                validatePassword();
-                validateRepeat();
-            }
-        };
 
         viewModel = new ViewModelProvider(requireActivity())
                 .get(ResetPasswordViewModel.class);
 
-        binding.etPassword.addTextChangedListener(watcher);
-        binding.etRepeat.addTextChangedListener(watcher);
+        binding.etPassword.addTextChangedListener(new SimpleTextWatcher() {
+            @Override
+            public void afterTextChanged(Editable s) {
+                viewModel.newPassword.setValue(s.toString());
+                validatePassword();
+            }
+        });
+
+        binding.etRepeat.addTextChangedListener(new SimpleTextWatcher() {
+            @Override
+            public void afterTextChanged(Editable s) {
+                viewModel.confirmPassword.setValue(s.toString());
+                validateRepeat();
+            }
+        });
 
         viewModel.getSuccessEvent().observe(getViewLifecycleOwner(), event -> {
             Boolean success = event.getContentIfNotHandled();
@@ -123,14 +127,17 @@ public class ResetPasswordFragment extends Fragment {
 
     }
 
+    private static final String PASSWORD_REGEX =
+            "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d@$!%*#?&]{8,}$";
+
     private boolean validatePassword() {
-        String pwd = binding.etPassword.getText().toString();
+        String pwd = binding.etPassword.getText().toString().trim();
         String error = null;
 
         if (pwd.isEmpty()) {
             error = getString(R.string.error_password_required);
-        } else if (pwd.length() < 8) {
-            error = getString(R.string.error_password_too_short);
+        } else if (!pwd.matches(PASSWORD_REGEX)) {
+            error = getString(R.string.error_password_invalid_format);
         }
 
         if (error != null) {
@@ -140,11 +147,12 @@ public class ResetPasswordFragment extends Fragment {
             return false;
         } else {
             binding.etPassword.setBackground(normalBg);
-            binding.tvPasswordError.setText("");
+            binding.tvPasswordError.setText(null);
             binding.tvPasswordError.setVisibility(View.GONE);
             return true;
         }
     }
+
 
     private boolean validateRepeat() {
         String pwd = binding.etPassword.getText().toString();
@@ -164,16 +172,22 @@ public class ResetPasswordFragment extends Fragment {
             return false;
         } else {
             binding.etRepeat.setBackground(normalBg);
-            binding.tvRepeatError.setText("");
+            binding.tvRepeatError.setText(null);
             binding.tvRepeatError.setVisibility(View.GONE);
             return true;
         }
     }
 
 
+
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
+    }
+
+    private abstract static class SimpleTextWatcher implements TextWatcher {
+        @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+        @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
     }
 }

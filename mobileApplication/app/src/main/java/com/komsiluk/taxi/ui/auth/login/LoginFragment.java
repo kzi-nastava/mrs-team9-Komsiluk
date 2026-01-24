@@ -60,18 +60,23 @@ public class LoginFragment extends Fragment {
         normalBg = requireContext().getDrawable(R.drawable.bg_input_normal);
         errorBg = requireContext().getDrawable(R.drawable.bg_input_error);
 
-        TextWatcher watcher = new TextWatcher() {
-            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
+
+        binding.etEmail.addTextChangedListener(new SimpleTextWatcher() {
             @Override
             public void afterTextChanged(Editable s) {
+                viewModel.email.setValue(s.toString());
                 validateEmail();
+            }
+        });
+
+        binding.etPassword.addTextChangedListener(new SimpleTextWatcher() {
+            @Override
+            public void afterTextChanged(Editable s) {
+                viewModel.password.setValue(s.toString());
                 validatePassword();
             }
-        };
+        });
 
-        binding.etEmail.addTextChangedListener(watcher);
-        binding.etPassword.addTextChangedListener(watcher);
 
         viewModel = new ViewModelProvider(requireActivity())
                 .get(LoginViewModel.class);
@@ -195,5 +200,10 @@ public class LoginFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
+    }
+
+    private abstract static class SimpleTextWatcher implements TextWatcher {
+        @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+        @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
     }
 }

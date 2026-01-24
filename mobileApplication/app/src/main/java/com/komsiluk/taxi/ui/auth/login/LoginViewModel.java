@@ -22,6 +22,10 @@ import retrofit2.Response;
 public class LoginViewModel extends ViewModel {
 
 
+    public final MutableLiveData<String> email = new MutableLiveData<>("");
+
+    public final MutableLiveData<String> password = new MutableLiveData<>("");
+
     private final MutableLiveData<Event<UserRole>> loginResultEvent = new MutableLiveData<>();
 
 

@@ -33,6 +33,16 @@ import com.komsiluk.taxi.util.FileUtils;
 
 public class RiderRegistrationFragment extends Fragment {
 
+    private static final String NAME_REGEX =
+            "^[\\p{L}][\\p{L}\\s'-]{1,49}$";
+
+    private static final String PHONE_REGEX =
+            "^\\+?\\d{7,15}$";
+
+    private static final String PASSWORD_REGEX =
+            "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d@$!%*#?&]{8,}$";
+
+
     private static final String ARG_ADMIN_ADD_DRIVER = "ARG_ADMIN_ADD_DRIVER";
 
     private ActivityResultLauncher<String> imagePickerLauncher;
@@ -293,38 +303,78 @@ public class RiderRegistrationFragment extends Fragment {
     }
 
     private boolean validateFirstname() {
-        return validateText(binding.etFirstname, binding.tvErrorFirstname,
-                binding.etFirstname.getText().toString().trim(),
-                getString(R.string.err_firstname_required), 2);
+        String v = binding.etFirstname.getText().toString().trim();
+
+        if (v.isEmpty()) {
+            showError(binding.etFirstname, binding.tvErrorFirstname,
+                    getString(R.string.err_firstname_required));
+            return false;
+        }
+        if (!v.matches(NAME_REGEX)) {
+            showError(binding.etFirstname, binding.tvErrorFirstname,
+                    getString(R.string.err_firstname_invalid));
+            return false;
+        }
+        clearError(binding.etFirstname, binding.tvErrorFirstname);
+        return true;
     }
 
     private boolean validateLastname() {
-        return validateText(binding.etLastname, binding.tvErrorLastname,
-                binding.etLastname.getText().toString().trim(),
-                getString(R.string.err_lastname_required), 2);
+        String v = binding.etLastname.getText().toString().trim();
+
+        if (v.isEmpty()) {
+            showError(binding.etLastname, binding.tvErrorLastname,
+                    getString(R.string.err_lastname_required));
+            return false;
+        }
+        if (!v.matches(NAME_REGEX)) {
+            showError(binding.etLastname, binding.tvErrorLastname,
+                    getString(R.string.err_lastname_invalid));
+            return false;
+        }
+        clearError(binding.etLastname, binding.tvErrorLastname);
+        return true;
     }
+
 
     private boolean validateAddress() {
-        return validateText(binding.etAddress, binding.tvErrorAddress,
-                binding.etAddress.getText().toString().trim(),
-                getString(R.string.err_address_required), 1);
+        String v = binding.etAddress.getText().toString().trim();
+
+        if (v.length() < 5) {
+            showError(binding.etAddress, binding.tvErrorAddress,
+                    getString(R.string.err_address_required));
+            return false;
+        }
+        clearError(binding.etAddress, binding.tvErrorAddress);
+        return true;
     }
+
 
     private boolean validateCity() {
-        return validateText(binding.etCity, binding.tvErrorCity,
-                binding.etCity.getText().toString().trim(),
-                getString(R.string.err_city_required), 1);
+        String v = binding.etCity.getText().toString().trim();
+
+        if (v.length() < 2) {
+            showError(binding.etCity, binding.tvErrorCity,
+                    getString(R.string.err_city_required));
+            return false;
+        }
+        clearError(binding.etCity, binding.tvErrorCity);
+        return true;
     }
 
+
     private boolean validatePhone() {
-        String phone = binding.etPhone.getText().toString().trim().replace(" ", "");
-        if (phone.isEmpty() || !phone.matches("\\+?\\d{6,}")) {
-            showError(binding.etPhone, binding.tvErrorPhone, getString(R.string.err_phone_invalid));
+        String phone = binding.etPhone.getText().toString().trim();
+
+        if (!phone.matches(PHONE_REGEX)) {
+            showError(binding.etPhone, binding.tvErrorPhone,
+                    getString(R.string.err_phone_invalid));
             return false;
         }
         clearError(binding.etPhone, binding.tvErrorPhone);
         return true;
     }
+
 
     private boolean validateEmail() {
         String email = binding.etEmail.getText().toString().trim();
@@ -342,24 +392,38 @@ public class RiderRegistrationFragment extends Fragment {
 
     private boolean validatePassword() {
         String pwd = binding.etPassword.getText().toString();
-        if (pwd.isEmpty() || pwd.length() < 8) {
-            showError(binding.etPassword, binding.tvErrorPassword, getString(R.string.error_password_too_short));
+
+        if (!pwd.matches(PASSWORD_REGEX)) {
+            showError(
+                    binding.etPassword,
+                    binding.tvErrorPassword,
+                    getString(R.string.error_password_invalid_format)
+            );
             return false;
         }
         clearError(binding.etPassword, binding.tvErrorPassword);
         return true;
     }
 
+
     private boolean validateRepeat() {
         String pwd = binding.etPassword.getText().toString();
         String rep = binding.etRepeat.getText().toString();
+
+        if (rep.isEmpty()) {
+            showError(binding.etRepeat, binding.tvErrorRepeat,
+                    getString(R.string.error_repeat_required));
+            return false;
+        }
         if (!rep.equals(pwd)) {
-            showError(binding.etRepeat, binding.tvErrorRepeat, getString(R.string.error_repeat_mismatch));
+            showError(binding.etRepeat, binding.tvErrorRepeat,
+                    getString(R.string.error_repeat_mismatch));
             return false;
         }
         clearError(binding.etRepeat, binding.tvErrorRepeat);
         return true;
     }
+
 
     private boolean validateText(View field, View errorView, String value, String error, int minLen) {
         if (value.isEmpty() || value.length() < minLen) {

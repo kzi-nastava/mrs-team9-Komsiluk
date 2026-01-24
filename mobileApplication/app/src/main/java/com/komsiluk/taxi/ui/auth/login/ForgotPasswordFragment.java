@@ -50,14 +50,6 @@ public class ForgotPasswordFragment extends Fragment {
         normalBg = requireContext().getDrawable(R.drawable.bg_input_normal);
         errorBg = requireContext().getDrawable(R.drawable.bg_input_error);
 
-        TextWatcher watcher = new TextWatcher() {
-            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
-            @Override
-            public void afterTextChanged(Editable s) {
-                validateEmail();
-            }
-        };
 
         viewModel = new ViewModelProvider(requireActivity())
                 .get(ForgotPasswordViewModel.class);
@@ -85,7 +77,13 @@ public class ForgotPasswordFragment extends Fragment {
             ).show();
         });
 
-        binding.etEmail.addTextChangedListener(watcher);
+        binding.etEmail.addTextChangedListener(new SimpleTextWatcher() {
+            @Override
+            public void afterTextChanged(Editable s) {
+                viewModel.email.setValue(s.toString());
+                validateEmail();
+            }
+        });
 
         binding.btnCancel.setOnClickListener(v -> {
             ((AuthActivity) requireActivity())
@@ -127,5 +125,10 @@ public class ForgotPasswordFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
+    }
+
+    private abstract static class SimpleTextWatcher implements TextWatcher {
+        @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+        @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
     }
 }
