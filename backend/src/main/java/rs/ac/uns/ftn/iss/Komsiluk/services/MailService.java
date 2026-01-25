@@ -68,22 +68,37 @@ public class MailService {
     }
 
     public void sendRideFinishedMail(String to, Long rideId) {
-        // TODO: replace with real frontend link (this current one looks like a placeholder/typo)
-        String ratingLink = "http://localhost:4200=" + rideId;
+        // Popravljen link (dodat /rate/ putanja)
+        String ratingLink = "http://localhost:4200/rate/" + rideId;
 
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(to);
-        message.setSubject("Ride completed");
+        message.setSubject("Komsiluk Taxi - Ride Completed");
         message.setText(
-                        "Your ride has just been completed.\n" +
-                        "You can rate the driver and the vehicle and leave a comment.\n\n" +
-                        "Rating link:\n" +
+                "Your ride has just been completed.\n" +
+                        "You can rate the driver and the vehicle here:\n" +
                         ratingLink + "\n\n" +
-                        "You have 3 days from the ride completion time to submit your rating.\n\n" +
                         "Thank you for using Komsiluk Taxi!"
         );
 
-        mailSender.send(message);
+        try {
+            mailSender.send(message);
+        } catch (Exception e) {
+            System.err.println("Greška pri slanju mejla na " + to + ": " + e.getMessage());
+        }
+    }
+
+    public void sendRideFinishedMailLinkedPasengers(String to, Long rideId) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(to);
+        message.setSubject("Komsiluk Taxi - Ride Completed");
+        message.setText("Your ride has just been completed.\nThank you for using Komsiluk Taxi!");
+
+        try {
+            mailSender.send(message);
+        } catch (Exception e) {
+            System.err.println("Greška pri slanju mejla za povezanog putnika: " + e.getMessage());
+        }
     }
 
     public void sendAddedToRideMail(String to, Long rideId) {

@@ -68,3 +68,35 @@
 .cr-finish{
   width: 100%;
 }
+
+
+.cr-actions{
+  display: flex;
+  gap: 18px;
+  margin-top: 10px;
+}
+
+.cr-actions--active{
+  flex-direction: column;
+  gap: 14px;
+}
+
+.cr-row{
+  display: flex;
+  gap: 18px;
+  width: 100%; /* Osigurava da red zauzme sve */
+}
+
+.cr-full-width {
+  width: 100%;
+}
+
+.cr-flex-1 {
+  flex: 1;
+}
+
+:host {
+  /* Ovo osigurava da sama komponenta ne pravi barijeru za modal */
+  display: contents; 
+}
+

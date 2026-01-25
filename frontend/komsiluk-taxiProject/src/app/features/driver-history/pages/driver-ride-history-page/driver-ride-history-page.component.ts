@@ -157,6 +157,7 @@ onDetails(id: string) {
       : this.buildPassengers(raw.passengerIds);
 
   const vm: RideHistoryDetailsVm = {
+    id: raw.id,
     passengers,
     ratings: this.buildRatings(passengers),
 

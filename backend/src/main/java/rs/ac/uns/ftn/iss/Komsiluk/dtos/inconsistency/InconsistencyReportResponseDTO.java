@@ -10,10 +10,19 @@ public class InconsistencyReportResponseDTO {
     private Long rideId;
     private Long reporterId;
     private UserRole reporterRole;
+    private String reporterEmail;
     private String message;
     private LocalDateTime createdAt;
 
     // Getters and Setters
+
+    public String getReporterEmail() {
+        return reporterEmail;
+    }
+
+    public void setReporterEmail(String reporterEmail) {
+        this.reporterEmail = reporterEmail;
+    }
 
     public Long getId() {
         return id;

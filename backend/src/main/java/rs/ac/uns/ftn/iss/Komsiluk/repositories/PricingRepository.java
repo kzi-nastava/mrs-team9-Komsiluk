@@ -8,5 +8,6 @@ import java.util.Optional;
 
 public interface PricingRepository extends JpaRepository<Pricing, Long> {
     Optional<Pricing> findByVehicleType(VehicleType vehicleType);
+
 }
 

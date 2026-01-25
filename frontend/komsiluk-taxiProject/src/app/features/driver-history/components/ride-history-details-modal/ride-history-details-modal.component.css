@@ -250,4 +250,45 @@
   flex-direction: column;
 }
 
+/* Stil za kontejner izveštaja - imitira .rh-rating */
+.report-item {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+/* Uloga (DRIVER/PASSENGER) - imitira .rh-rating__email */
+.reporter-badge {
+  font-weight: 700;
+  color: var(--color-secondary);
+  font-size: 13px;
+  margin-bottom: 6px;
+  display: block; /* Da bi bio u svom redu kao email */
+  text-transform: uppercase;
+}
+
+/* Datum - imitira suptilne label-e */
+.report-date {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.5);
+  display: block;
+  margin-bottom: 4px;
+}
+
+/* Tekst poruke - imitira .rh-rating__row .rh-value */
+.report-text {
+  font-size: 12px;
+  line-height: 1.25;
+  color: var(--color-secondary);
+  font-weight: 700;
+  margin: 0;
+}
+
+/* Ako nema reportova */
+.no-reports {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.5);
+  margin-top: 8px;
+}
+
 

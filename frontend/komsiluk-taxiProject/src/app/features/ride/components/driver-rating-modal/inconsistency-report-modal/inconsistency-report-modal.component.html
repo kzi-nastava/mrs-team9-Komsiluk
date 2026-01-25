@@ -1,0 +1,26 @@
+<div class="rating-modal" (click)="close.emit()">
+  <div class="rating-dialog" (click)="$event.stopPropagation()">
+    <h2 class="rating-title">Report Inconsistency</h2>
+
+    <div class="rating-body">
+      <div class="rating-section">
+        <label>Describe the issue with the route:</label>
+        <textarea 
+          [(ngModel)]="message" 
+          placeholder="e.g., Street is blocked, wrong turn on map..." 
+          style="width: 100%; min-height: 120px; background: #1a1a1a; color: white; border: 1px solid #444; border-radius: 8px; padding: 10px;">
+        </textarea>
+      </div>
+    </div>
+
+    <div class="rating-footer">
+      <button class="btn-sm btn--ghost text-semibold btn-scale cr-flex-1" (click)="close.emit()">Cancel</button>
+      <button 
+        class="btn btn--primary text-semibold btn-scale cr-full-width"
+        [disabled]="!message.trim() || loading" 
+        (click)="submit()">
+        {{ loading ? 'Sending...' : 'Send Report' }}
+      </button>
+    </div>
+  </div>
+</div>

@@ -9,21 +9,19 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import rs.ac.uns.ftn.iss.Komsiluk.beans.Ride;
-import rs.ac.uns.ftn.iss.Komsiluk.beans.Route;
-import rs.ac.uns.ftn.iss.Komsiluk.beans.User;
+import rs.ac.uns.ftn.iss.Komsiluk.beans.*;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.*;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.notification.NotificationCreateDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.ride.*;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.route.RouteCreateDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.route.RouteResponseDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.mappers.*;
+import rs.ac.uns.ftn.iss.Komsiluk.repositories.PricingRepository;
 import rs.ac.uns.ftn.iss.Komsiluk.repositories.RideRepository;
 import rs.ac.uns.ftn.iss.Komsiluk.repositories.UserRepository;
 import rs.ac.uns.ftn.iss.Komsiluk.services.exceptions.BadRequestException;
 import rs.ac.uns.ftn.iss.Komsiluk.services.exceptions.NotFoundException;
 import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.*;
-import rs.ac.uns.ftn.iss.Komsiluk.beans.DriverLocation;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.ride.RideLiveInfoDTO;
 
 @Service
@@ -57,6 +55,8 @@ public class RideService implements IRideService {
     private IDriverActivityService driverActivityService;
     @Autowired
     private MailService mailService;
+    @Autowired
+    private PricingRepository pricingRepository;
     
     private static final long MAX_MINUTES_LAST_24H = 480;
 
@@ -283,9 +283,7 @@ public class RideService implements IRideService {
 
         Set<String> emails = new HashSet<>();
 
-        if (createdBy != null && createdBy.getEmail() != null) {
-            emails.add(createdBy.getEmail());
-        }
+        mailService.sendRideFinishedMail(createdBy.getEmail(), ride.getId() );
 
         if (passengers != null) {
             for (User p : passengers) {
@@ -300,7 +298,7 @@ public class RideService implements IRideService {
         }
 
         for (String email : emails) {
-            mailService.sendRideFinishedMail(email, ride.getId());
+            mailService.sendRideFinishedMailLinkedPasengers(email, ride.getId());
         }
 
 
@@ -432,14 +430,12 @@ public class RideService implements IRideService {
     }
 
     private BigDecimal calculatePrice(VehicleType type, double distanceKm) {
-        // Here should price logic go
-        BigDecimal base = switch (type) {
-            case STANDARD -> BigDecimal.valueOf(200);
-            case LUXURY -> BigDecimal.valueOf(300);
-            case VAN -> BigDecimal.valueOf(400);
-        };
+        Pricing pricing = pricingRepository.findByVehicleType(type)
+                .orElseThrow(BadRequestException::new);
 
-        BigDecimal perKm = BigDecimal.valueOf(120);
+        BigDecimal base = BigDecimal.valueOf(pricing.getStartingPrice());
+        BigDecimal perKm = BigDecimal.valueOf(pricing.getPricePerKm());
+
         return base.add(perKm.multiply(BigDecimal.valueOf(distanceKm)));
     }
 

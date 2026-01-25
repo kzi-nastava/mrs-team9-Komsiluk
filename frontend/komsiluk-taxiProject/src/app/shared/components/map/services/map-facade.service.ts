@@ -20,7 +20,10 @@ export class MapFacadeService {
   private driveToSig = signal<{driverId: number, target: {lat: number, lon: number}} | null>(null);
   driveTo = computed(() => this.driveToSig());
 
-   ridePath = signal<RideWaypoint[] | null>(null);
+  ridePath = signal<RideWaypoint[] | null>(null);
+
+  activeDriverId = signal<number | null>(null);
+  activeRideMarkers = signal<RideWaypoint[] | null>(null);
 
   setState(s: RouteRenderState | null) {
     this.stateSig.set(s);
@@ -39,5 +42,16 @@ export class MapFacadeService {
 
   clearRidePath() {
     this.ridePath.set(null);
+  }
+
+  // --- NOVE METODE KOJE POZIVAMO IZ KOMPONENTE ---
+  setFocusRide(driverId: number, waypoints: RideWaypoint[]) {
+    this.activeDriverId.set(driverId);
+    this.activeRideMarkers.set(waypoints);
+  }
+
+  clearFocusRide() {
+    this.activeDriverId.set(null);
+    this.activeRideMarkers.set(null);
   }
 }

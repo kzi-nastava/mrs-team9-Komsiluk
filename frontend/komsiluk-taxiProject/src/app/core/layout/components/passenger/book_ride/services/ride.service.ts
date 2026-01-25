@@ -141,4 +141,16 @@ export class RideService {
   getScheduledRides(userId: number): Observable<RideResponseDTO[]> {
     return this.http.get<RideResponseDTO[]>(`${this.API}/user/${userId}/scheduled`);
   }
+  
+  finishRide(rideId: number): Observable<RideResponseDTO> {
+    return this.http.post<RideResponseDTO>(`${this.API}/${rideId}/finish`, {});
+  }
+
+  reportInconsistency(rideId: number, message: string): Observable<any> {
+    return this.http.post(`${this.API}/${rideId}/inconsistencies`, { message });
+  }
+
+  getInconsistencyReports(rideId: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.API}/${rideId}/inconsistencies`);
+  }
 }

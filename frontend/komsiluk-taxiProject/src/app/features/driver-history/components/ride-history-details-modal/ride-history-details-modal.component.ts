@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, HostListener, Input, Output } from '@angular/core';
+import { Component, EventEmitter, HostListener, inject, Input, OnInit, Output, signal } from '@angular/core';
 import { RideDetailsMapComponent } from '../ride-details-map/ride-details-map.component';
+import { RideService } from '../../../../core/layout/components/passenger/book_ride/services/ride.service';
 export interface PassengerRating {
   email: string;
   driverRating?: number | null;
@@ -10,6 +11,7 @@ export interface PassengerRating {
 
 export interface RideHistoryDetailsVm {
   // Left
+  id: number;
   passengers: string[];          // ovde će sada biti EMAIL-ovi
   ratings: PassengerRating[];
 
@@ -44,9 +46,12 @@ export interface RideHistoryDetailsVm {
   templateUrl: './ride-history-details-modal.component.html',
   styleUrls: ['./ride-history-details-modal.component.css'],
 })
-export class RideHistoryDetailsModalComponent {
+export class RideHistoryDetailsModalComponent implements OnInit {
   @Input({ required: true }) data!: RideHistoryDetailsVm;
   @Output() close = new EventEmitter<void>();
+
+  private rideService = inject(RideService);
+  inconsistencyReports = signal<any[]>([]);
 
   onBackdropClick() {
     this.close.emit();
@@ -84,4 +89,20 @@ get allLocations(): string[] {
     this.data.destination
   ];
 }
+
+ngOnInit(): void {
+    this.loadInconsistencyReports();
+  }
+
+  loadInconsistencyReports() {
+    // ISPRAVKA: Koristimo this.data.id umesto this.ride.id
+    if (this.data && this.data.id) {
+      this.rideService.getInconsistencyReports(this.data.id).subscribe({
+        next: (reports) => {
+          this.inconsistencyReports.set(reports);
+        },
+        error: (err) => console.error('Error loading reports:', err)
+      });
+    }
+  }
 }

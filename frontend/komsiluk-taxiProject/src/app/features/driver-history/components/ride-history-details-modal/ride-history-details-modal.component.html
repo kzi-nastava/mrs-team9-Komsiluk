@@ -1,7 +1,7 @@
 <div class="rh-modal" (click)="onBackdropClick()">
   <div class="rh-modal__dialog" (click)="onDialogClick($event)">
     <div class="rh-modal__content">
-      <!-- LEFT -->
+      
       <section class="rh-left">
         <h3 class="rh-title">Passengers:</h3>
         <ul class="rh-list">
@@ -9,38 +9,51 @@
         </ul>
 
         <h3 class="rh-title rh-title--spaced">Ratings:</h3>
-
         <div class="rh-rating" *ngFor="let r of data.ratings">
           <div class="rh-rating__email">{{ r.email }}</div>
-
           <div class="rh-rating__row">
             <span class="rh-label">Driver rating:</span>
             <span class="rh-value">{{ fmtRating(r.driverRating) }}</span>
           </div>
-
           <div class="rh-rating__row">
             <span class="rh-label">Vehicle rating:</span>
             <span class="rh-value">{{ fmtRating(r.vehicleRating) }}</span>
           </div>
-
           <div class="rh-rating__row">
             <span class="rh-label">Comment:</span>
             <span class="rh-value">{{ fmtText(r.comment) }}</span>
           </div>
         </div>
+
+        <h3 class="rh-title rh-title--spaced">Inconsistency Reports:</h3>
+@if (inconsistencyReports().length > 0) {
+  <div class="reports-list">
+    @for (report of inconsistencyReports(); track report.id) {
+      <div class="report-item">
+        <div class="rh-rating__email">{{ report.reporterEmail }}</div>
+        
+        <span class="report-date">{{ report.createdAt | date:'short' }}</span>
+        
+        <div class="rh-rating__row">
+          <span class="rh-label">Message:</span>
+          <span class="rh-value">{{ report.message }}</span>
+        </div>
+      </div>
+    }
+  </div>
+} @else {
+  <p class="no-reports" style="font-size: 13px; opacity: 0.6; color: white;">None.</p>
+}
       </section>
 
-      <!-- CENTER -->
       <app-ride-details-map [locations]="allLocations"></app-ride-details-map>
 
-      <!-- RIGHT -->
       <section class="rh-right">
         <div class="rh-info">
           <div class="rh-info__row">
-            <span class="rh-label">Pickup location:</span>
+            <span class="rh-label">Pickup:</span>
             <span class="rh-value">{{ data.pickupLocation }}</span>
           </div>
-
           <div class="rh-info__row" *ngFor="let stop of data.stops; let i = index">
             <span class="rh-label">Station {{ i + 1 }}:</span>
             <span class="rh-value">{{ stop }}</span>
@@ -49,12 +62,10 @@
             <span class="rh-label">Destination:</span>
             <span class="rh-value">{{ data.destination }}</span>
           </div>
-
           <div class="rh-info__row">
             <span class="rh-label">Start time:</span>
             <span class="rh-value">{{ data.startTime }}</span>
           </div>
-
           <div class="rh-info__row">
             <span class="rh-label">End time:</span>
             <span class="rh-value">{{ data.endTime }}</span>
@@ -79,16 +90,14 @@
         <div class="rh-stats">
           <div class="rh-stat">
             <img class="rh-icon" src="assets/icons/taxi.png" alt="" />
-            <span class="rh-label">Kilometers:</span>
+            <span class="rh-label">Km:</span>
             <span class="rh-value">{{ data.kilometers }}</span>
           </div>
-
           <div class="rh-stat">
             <img class="rh-icon" src="assets/icons/clock.png" alt="" />
             <span class="rh-label">Time:</span>
             <span class="rh-value">{{ data.durationText }}</span>
           </div>
-
           <div class="rh-stat">
             <img class="rh-icon" src="assets/icons/dollar.png" alt="" />
             <span class="rh-label">Price:</span>
@@ -98,20 +107,15 @@
       </section>
     </div>
 
-    <!-- BOTTOM LINE -->
     <div class="details-bottom-row">
-  <div class="details-bottom-item">
-    <span class="details-bottom-label">Panic button pressed:</span>
-    <b class="details-bottom-value">{{ data.panicPressed ? 'True' : 'False' }}</b>
-  </div>
+      <div class="details-bottom-item">
+        <span class="details-bottom-label">Panic button pressed:</span>
+        <b class="details-bottom-value" [style.color]="data.panicPressed ? 'red' : 'inherit'">
+          {{ data.panicPressed ? 'YES' : 'NO' }}
+        </b>
+      </div>
+    </div>
 
-  <div class="details-bottom-item">
-    <span class="details-bottom-label">Inconsistency report:</span>
-    <b class="details-bottom-value">{{ data.inconsistencyReport || 'N/A' }}</b>
-  </div>
-</div>
-
-    <!-- CLOSE -->
     <div class="rh-actions">
       <button class="rh-close" type="button" (click)="close.emit()">Close</button>
     </div>

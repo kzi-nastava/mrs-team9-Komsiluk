@@ -38,4 +38,5 @@ public interface IRideService {
     public AdminRideDetailsDTO getAdminRideDetails(Long rideId);
 
     public Collection<AdminRideHistoryDTO> getAdminRideHistoryForUser(Long userId, LocalDate from, LocalDate to, AdminRideSortBy sortBy);
+
 }

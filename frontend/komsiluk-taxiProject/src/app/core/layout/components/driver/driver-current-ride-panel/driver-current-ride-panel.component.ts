@@ -10,17 +10,19 @@ import { DriverStartRideConfirmModalService } from '../../../../../shared/compon
 import { RideResponseDTO } from '../../../../../shared/models/ride.models';
 import { GeocodingService } from '../../../../../shared/components/map/services/geocoding.service';
 import { MapFacadeService } from '../../../../../shared/components/map/services/map-facade.service';
+import { InconsistencyReportModalComponent } from '../../../../../features/ride/components/driver-rating-modal/inconsistency-report-modal/inconsistency-report-modal.component';
 
 type Waypoint = { lat: number; lon: number; label?: string };
 
 @Component({
   selector: 'app-driver-current-ride-panel',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule,InconsistencyReportModalComponent],
   templateUrl: './driver-current-ride-panel.component.html',
   styleUrl: './driver-current-ride-panel.component.css',
 })
 export class DriverCurrentRidePanelComponent implements OnInit {
+  showReportModal = signal(false);
   loading = signal(false);
   ride = signal<RideResponseDTO | null>(null);
 
@@ -36,6 +38,8 @@ export class DriverCurrentRidePanelComponent implements OnInit {
   private lastRideIdForDriveTo: number | null = null;
 
   private pickupCoordCache: { rideId: number; lat: number; lon: number } | null = null;
+
+  
 
   constructor(
     private fb: FormBuilder,
@@ -231,10 +235,39 @@ export class DriverCurrentRidePanelComponent implements OnInit {
     this.toast.show('Not implemented.');
   }
 
-  finish() {
-    this.toast.show('Not implemented.');
-  }
+// driver-current-ride-panel.component.ts
 
+finish() {
+  const currentRide = this.ride();
+  if (!currentRide) return;
+
+  this.loading.set(true);
+
+  this.api.finishRide(currentRide.id).pipe(
+    finalize(() => this.loading.set(false))
+  ).subscribe({
+    next: (updatedRide) => {
+      this.toast.show('Ride finished successfully.');
+
+      // 1. Ažuriraj lokalni status
+      this.ride.set(updatedRide); 
+      this.fillForm(updatedRide);
+
+      // 2. KLJUČNO: Pozovi čišćenje fasade
+      // Ovo će setovati signale na null, što će trigerovati Effect u mapi 
+      // da obriše sve Layer-e (markere i linije) povezane sa tom vožnjom.
+      this.mapFacade.clearFocusRide();
+      
+      // Opciono: ako tvoja mapa koristi odvojenu metodu za putanju:
+      this.mapFacade.clearRidePath?.();
+
+      setTimeout(() => this.refresh(), 2000);
+    },
+    error: (err) => {
+      this.toast.show('Error while finishing the ride.');
+    }
+  });
+}
   stop() {
     this.toast.show('Not implemented.');
   }
@@ -242,4 +275,7 @@ export class DriverCurrentRidePanelComponent implements OnInit {
   panic() {
     this.toast.show('Not implemented.');
   }
+  reportInconsistency() {
+  this.showReportModal.set(true);
+}
 }
