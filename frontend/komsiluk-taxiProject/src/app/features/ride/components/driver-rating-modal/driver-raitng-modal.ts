@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, Output, Renderer2, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
@@ -12,15 +12,19 @@ import { HttpClient } from '@angular/common/http';
 })
 export class DriverRatingModalComponent {
   @Input({ required: true }) rideId!: number;
-  @Input({ required: true }) raterId!: number; // ID ulogovanog putnika
+  @Input({ required: true }) raterId!: number;
   @Output() close = new EventEmitter<void>();
   @Output() submitted = new EventEmitter<any>();
 
   private http = inject(HttpClient);
-
+  private renderer = inject(Renderer2);
+  private elementRef = inject(ElementRef);
   driverGrade: number = 0;
   vehicleGrade: number = 0;
   comment: string = '';
+  ngOnInit() {
+    this.renderer.appendChild(document.body, this.elementRef.nativeElement);
+  }
 
   submit() {
     const payload = {

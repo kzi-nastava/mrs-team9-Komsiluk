@@ -8,6 +8,7 @@ public class RatingResponseDTO {
 
     private Long rideId;
     private Long raterId;
+    private String raterMail;
 
     private Long driverId;
     private Long vehicleId;
@@ -24,6 +25,14 @@ public class RatingResponseDTO {
 
     public Long getId() {
         return id;
+    }
+
+    public String getRaterMail() {
+        return raterMail;
+    }
+
+    public void setRaterMail(String raterMail) {
+        this.raterMail = raterMail;
     }
 
     public void setId(Long id) {

@@ -159,7 +159,6 @@ onDetails(id: string) {
   const vm: RideHistoryDetailsVm = {
     id: raw.id,
     passengers,
-    ratings: this.buildRatings(passengers),
 
     mapImageUrl: card.mapImageUrl,
     pickupLocation: card.pickup,

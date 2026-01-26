@@ -1,9 +1,9 @@
 import { Component, ElementRef, EventEmitter, Input, Output, Renderer2, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ToastService } from '../../../../../shared/components/toast/toast.service';
+import { ToastService } from '../../../../shared/components/toast/toast.service';
 import { finalize } from 'rxjs';
-import { RideService } from '../../../../../core/layout/components/passenger/book_ride/services/ride.service';
+import { RideService } from '../../../../core/layout/components/passenger/book_ride/services/ride.service';
 
 @Component({
   selector: 'app-inconsistency-report-modal',

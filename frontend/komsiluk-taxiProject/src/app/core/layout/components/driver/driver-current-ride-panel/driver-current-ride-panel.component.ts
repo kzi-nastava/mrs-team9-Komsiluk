@@ -10,7 +10,7 @@ import { DriverStartRideConfirmModalService } from '../../../../../shared/compon
 import { RideResponseDTO } from '../../../../../shared/models/ride.models';
 import { GeocodingService } from '../../../../../shared/components/map/services/geocoding.service';
 import { MapFacadeService } from '../../../../../shared/components/map/services/map-facade.service';
-import { InconsistencyReportModalComponent } from '../../../../../features/ride/components/driver-rating-modal/inconsistency-report-modal/inconsistency-report-modal.component';
+import { InconsistencyReportModalComponent } from '../../../../../features/ride/components/inconsistency-report-modal/inconsistency-report-modal.component';
 
 type Waypoint = { lat: number; lon: number; label?: string };
 
@@ -248,6 +248,7 @@ finish() {
   ).subscribe({
     next: (updatedRide) => {
       this.toast.show('Ride finished successfully.');
+      console.log("Vozač uspešno završio vožnju na backendu", updatedRide);
 
       // 1. Ažuriraj lokalni status
       this.ride.set(updatedRide); 

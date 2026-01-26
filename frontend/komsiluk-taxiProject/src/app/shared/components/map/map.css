@@ -58,5 +58,5 @@
 }
 
 .km-driver {
-  transition: transform 0.1s linear; 
+  transition: all 0.1s linear !important;
 }

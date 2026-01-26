@@ -9,7 +9,7 @@
         </ul>
 
         <h3 class="rh-title rh-title--spaced">Ratings:</h3>
-        <div class="rh-rating" *ngFor="let r of data.ratings">
+        <div class="rh-rating" *ngFor="let r of ratings()">
           <div class="rh-rating__email">{{ r.email }}</div>
           <div class="rh-rating__row">
             <span class="rh-label">Driver rating:</span>

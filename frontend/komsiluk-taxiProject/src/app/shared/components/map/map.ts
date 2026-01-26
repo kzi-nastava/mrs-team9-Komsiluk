@@ -6,6 +6,9 @@ import { MapFacadeService } from './services/map-facade.service';
 import { DriverLocationService } from './services/driver-location.service';
 import { AuthService } from '../../../core/auth/services/auth.service';
 import { RoutingService } from './services/routing.service';
+import { RideService } from '../../../core/layout/components/passenger/book_ride/services/ride.service';
+import { GeocodingService } from './services/geocoding.service';
+import { interval, switchMap } from 'rxjs';
 
 @Component({
   selector: 'app-map',
@@ -30,6 +33,9 @@ export class MapComponent implements AfterViewInit {
   private selfLayer = L.layerGroup();
   private selfMarker: L.Marker | null = null;
 
+  private activePassengerMarkers = L.layerGroup();
+private targetDriverId: number | null = null;
+
   private selfPos = L.latLng(45.2671, 19.8335);
 
   private animToken = 0;
@@ -45,6 +51,9 @@ export class MapComponent implements AfterViewInit {
 
   private liveRideLine: L.Polyline | null = null;
   private liveRideTargetMarker: L.Marker | null = null;
+
+  private rideService = inject(RideService);
+private geocodingService = inject(GeocodingService);
 
   private lastLocationPushAt = 0;
   private locationPushEveryMs = 1000;
@@ -89,76 +98,154 @@ export class MapComponent implements AfterViewInit {
     this.driversLayer.addTo(this.map);
   }
 
-  private ensureSelfMarker() {
-    if (this.selfMarker) return;
+private ensureSelfMarker() {
+  const myId = Number((this.authService as any).userId?.() ?? 0);
+  if (!myId) return;
 
-    this.selfMarker = L.marker(this.selfPos, { icon: this.driverFreeIcon });
-    this.selfLayer.addLayer(this.selfMarker);
+  let marker = this.driverMarkers.get(myId);
+
+  if (!marker) {
+    marker = L.marker(this.selfPos, { icon: this.driverFreeIcon });
+    this.driversLayer.addLayer(marker);
+    this.driverMarkers.set(myId, marker);
   }
+  
+  this.selfMarker = marker;
+}
+ngAfterViewInit(): void {
+  this.initMap();
+  setTimeout(() => this.map.invalidateSize(), 0);
 
-  ngAfterViewInit(): void {
-    this.initMap();
-    setTimeout(() => this.map.invalidateSize(), 0);
-
-    runInInjectionContext(this.injector, () => {
-      effect(() => {
-        const s = this.facade.state();
-        if (!this.map) return;
-
-        if (!s) {
-          this.clearRoute();
-          return;
-        }
+  runInInjectionContext(this.injector, () => {
+    // EFEKAT 1: RUTA ZA PRETRAGU (Pre-book) - OSTAJE NETAKNUTA
+    effect(() => {
+      const s = this.facade.state();
+      if (!this.map) return;
+      
+      // Ako nema pretrage, očisti sloj rute
+      if (!s) {
+        this.clearRoute();
+        return;
+      }
+      
+      // Dokle god nema targetDriverId-a, crtamo rutu pretrage
+      if (!this.targetDriverId) {
         this.renderRoute(s.points, s.geometry);
-      });
-
-      effect(() => {
-        const d = (this.facade as any).driveTo?.();
-        if (!this.map) return;
-        if (!d) return;
-
-        const myId = Number((this.authService as any).userId?.() ?? 0);
-        if (d.driverId && myId && d.driverId !== myId) return;
-
-        const lat = d.target?.lat;
-        const lon = d.target?.lon;
-        if (typeof lat !== 'number' || typeof lon !== 'number') return;
-
-        this.driveSelfTo(lat, lon);
-      });
-
-      effect(() => {
-        const pts = (this.facade as any).ridePath?.();
-        if (!this.map) return;
-        if (!pts || !Array.isArray(pts) || pts.length < 2) return;
-
-        this.startLiveRide(pts);
-      });
+      }
     });
 
-    this.driverLocService
-      .getDriversBasic()
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (drivers) => {
-          this.driverNames.clear();
-          for (const d of drivers) {
-            this.driverNames.set(d.id, `${d.firstName} ${d.lastName}`);
-          }
-        },
-        error: (err) => {
-          console.warn('getDriversBasic failed, fallback to driverId', err);
-        },
-      });
+    // EFEKAT 2: VOZAČ (Drive to pickup)
+    effect(() => {
+      const d = (this.facade as any).driveTo?.();
+      if (!this.map || !d) return;
+      const myId = Number((this.authService as any).userId?.() ?? 0);
+      if (d.driverId && myId && d.driverId !== myId) return;
+      this.driveSelfTo(d.target.lat, d.target.lon);
+    });
 
-    this.driverLocService
-      .pollLocations()
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((locations) => {
-        if (this.authService.isLoggedIn()) return;
-        this.renderDrivers(locations);
+    // EFEKAT 3: SINHRONIZACIJA AKTIVNOG VOZAČA
+    effect(() => {
+      const pts = (this.facade as any).ridePath?.();
+      const activeDriverId = (this.facade as any).activeDriverId?.(); 
+      const role = this.authService.userRole();
+      if (role === 'DRIVER') {
+      // AKO JE VOZAČ: Pokreni animaciju kretanja
+      console.log('VOZAČ: Pokrećem live animaciju');
+      this.startLiveRide(pts);
+    } 
+    else if (role === 'PASSENGER' && activeDriverId) {
+      // AKO JE PUTNIK: Samo postavi ID da bi renderDrivers prikazao vozilo
+      this.targetDriverId = activeDriverId;
+    }
+    });
+  });
+
+  // POLLING LOKACIJA (Za prikaz vozača na mapi)
+  this.driverLocService.pollLocations()
+    .pipe(takeUntilDestroyed(this.destroyRef))
+    .subscribe((locations) => {
+      this.renderDrivers(locations);
+    });
+
+  // POLLING ZA AKTIVNU VOŽNJU (Prelazak sa pretrage na vožnju)
+  
+  if (this.authService.userRole() === 'PASSENGER') {
+    interval(500)
+      .pipe(
+        switchMap(() => this.rideService.getActiveRideForPassenger()),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe((ride) => {
+        if (ride && ride.driverId) {
+          // 1. Postavljamo stanje u fasadi (ovo će okinuti Efekat 3)
+          this.facade.activeDriverId.set(ride.driverId);
+          this.targetDriverId = ride.driverId;
+
+          // 2. BRIŠEMO RUTU PRETRAGE (Search visuals) jer je vožnja postala aktivna
+          this.clearRoute();
+
+          // 3. GEODOKIRANJE I CRTANJE AKTIVNE RUTE
+          const addressQueries = [ride.startAddress, ...ride.stops, ride.endAddress];
+          
+          import('rxjs').then(({ forkJoin }) => {
+            forkJoin(addressQueries.map(addr => this.geocodingService.lookupOne(addr)))
+              .subscribe(results => {
+                const validPoints = results.filter(res => res !== null) as any[];
+                if (validPoints.length >= 2) {
+                  // Crtamo "novu" rutu iz aktivne vožnje
+                  this.calculatePassengerPath(validPoints);
+                }
+              });
+          });
+        }
+        else {
+          // VOŽNJA JE ZAVRŠENA (ili je nema)
+          if (this.targetDriverId !== null) { // Provera da li je vožnja upravo bila aktivna
+            console.log("Vožnja završena - Čistim mapu");
+            this.handleRideFinish();
+          }
+        }
       });
+      
   }
+}
+
+private handleRideFinish() {
+  this.targetDriverId = null;
+  this.facade.activeDriverId.set(null);
+  
+  this.clearLiveRideVisuals();
+  this.activePassengerMarkers.clearLayers();
+  
+  // Ako je putnik, brišemo sve markere vozača sa mape
+  if (this.authService.userRole() === 'PASSENGER') {
+    this.driversLayer.clearLayers();
+    this.driverMarkers.clear();
+  }
+  // Ako je vozač, NE brišemo driversLayer jer on treba da vidi sebe i dalje
+}
+private calculatePassengerPath(points: any[]) {
+  // Ako linija već postoji, nemoj ponovo računati rutu (štedimo resurse)
+  if (this.liveRideLine) return;
+
+  (this.routing as any).route(points).subscribe({
+    next: (r: any) => {
+      const geometry = r?.geometry ?? r?.geojson ?? r;
+      if (!geometry || geometry.type !== 'LineString') return;
+
+      const coords = (geometry.coordinates ?? []) as [number, number][];
+      const path = coords.map(([x, y]) => L.latLng(y, x));
+
+      this.facade.setRidePath(path.map(p => ({ lat: p.lat, lon: p.lng })));
+
+      this.clearLiveRideVisuals();
+      this.liveRideLine = L.polyline(path, { color: 'blue', weight: 5 }).addTo(this.map);
+      this.renderPassengerActiveRide(points);
+    }
+  });
+}
+
+
 
   private clearRoute() {
     this.markersLayer.clearLayers();
@@ -191,6 +278,10 @@ export class MapComponent implements AfterViewInit {
 
   private driveSelfTo(lat: number, lon: number) {
     this.ensureSelfMarker();
+
+    if (this.selfMarker) {
+    this.selfPos = this.selfMarker.getLatLng();
+  }
 
     this.stopSelfAnimation();
     this.clearPreRideVisuals();
@@ -342,47 +433,72 @@ export class MapComponent implements AfterViewInit {
     });
   }
 
-  private animateSelfAlongLiveRide(path: L.LatLng[], stepMs = 600) {
-    if (!path.length) return;
-    this.ensureSelfMarker();
-    if (!this.selfMarker) return;
+private animateSelfAlongLiveRide(path: L.LatLng[], stepMs = 200) {
+  if (!path.length) return;
+  
+  // Koristimo postojeći selfMarker koji je već na mapi
+  this.ensureSelfMarker(); 
+  if (!this.selfMarker) return;
 
-    const token = ++this.animToken;
-    let i = 0;
+  const token = ++this.animToken;
+  let i = 0;
 
-    const tick = () => {
-      if (token !== this.animToken) return;
+  const tick = () => {
+    if (token !== this.animToken) return;
 
-      const p = path[i];
-      if (!p) return;
+    const p = path[i];
+    if (!p) return;
 
-      this.selfMarker!.setLatLng(p);
-      this.selfPos = p;
+    // Direktno pomeranje postojećeg markera
+    this.selfMarker!.setLatLng(p);
+    this.selfPos = p;
 
-      this.maybePushLocationToBackend(p);
+    // Slanje lokacije backendu (ostaje na 1s zbog provere u metodi)
+    this.maybePushLocationToBackend(p);
 
+    if (this.liveRideLine) {
+      const remaining = path.slice(i);
+      this.liveRideLine.setLatLngs(remaining);
+    }
+
+    i++;
+    if (i < path.length) {
+      this.animTimer = setTimeout(tick, stepMs);
+    } else {
+      this.animTimer = null;
+      // Ne brišemo marker na kraju, samo liniju
       if (this.liveRideLine) {
-        const remaining = path.slice(i);
-        this.liveRideLine.setLatLngs(remaining);
+        this.map.removeLayer(this.liveRideLine);
+        this.liveRideLine = null;
       }
+    }
+  };
 
-      i++;
-      if (i < path.length) {
-        this.animTimer = setTimeout(tick, stepMs);
-      } else {
-        this.animTimer = null;
+  tick();
+}
 
-        if (this.liveRideLine) {
-          this.map.removeLayer(this.liveRideLine);
-          this.liveRideLine = null;
-        }
-
-        (this.facade as any).clearRidePath?.();
-      }
-    };
-
-    tick();
+private renderPassengerActiveRide(points: { lat: number; lon: number; label?: string }[]) {
+  // 1. Očisti prethodne markere
+  this.activePassengerMarkers.clearLayers();
+  
+  if (!this.map.hasLayer(this.activePassengerMarkers)) {
+    this.activePassengerMarkers.addTo(this.map);
   }
+
+  // 2. Iscrtaj Pickup, Stanice i Destination
+  points.forEach((p, idx) => {
+    const icon = idx === 0 ? this.startIcon : 
+                 idx === points.length - 1 ? this.endIcon : 
+                 this.stopIcon;
+
+    L.marker([p.lat, p.lon], { icon }).addTo(this.activePassengerMarkers);
+  });
+
+  // 3. Fokusiraj mapu
+  const bounds = L.latLngBounds(points.map(p => [p.lat, p.lon]));
+  if (bounds.isValid()) this.map.fitBounds(bounds.pad(0.3));
+
+}
 
   // ===== ICONS =====
 
@@ -445,38 +561,67 @@ export class MapComponent implements AfterViewInit {
 
   // ===== DRIVERS (home map) =====
 
-  private renderDrivers(
-    locations: { driverId: number; lat: number; lng: number; busy: boolean }[]
-  ): void {
-    if (!this.map) return;
 
-    const incomingIds = new Set(locations.map((l) => l.driverId));
+private renderDrivers(
+  locations: { driverId: number; lat: number; lng: number; busy: boolean }[]
+): void {
+  if (!this.map) return;
 
-    for (const [id, marker] of this.driverMarkers.entries()) {
-      if (!incomingIds.has(id)) {
-        this.driversLayer.removeLayer(marker);
-        this.driverMarkers.delete(id);
-      }
+  const role = this.authService.userRole();
+  const myId = Number(this.authService.userId() ?? 0);
+
+  // 1. FILTRIRANJE (Ostaje isto)
+  let filteredLocations = locations.filter(l => {
+    if (role === 'GUEST') return true;
+    if (role === 'DRIVER') return l.driverId === myId;
+    if (role === 'PASSENGER') {
+      return this.targetDriverId ? l.driverId === this.targetDriverId : false;
     }
+    return false;
+  });
 
-    for (const loc of locations) {
-      const name = this.driverNames.get(loc.driverId) ?? `Driver #${loc.driverId}`;
-      const text = `${name} • ${loc.busy ? 'BUSY' : 'FREE'}`;
+  const incomingIds = new Set(filteredLocations.map(l => l.driverId));
 
-      const icon = loc.busy ? this.driverBusyIcon : this.driverFreeIcon;
+  // 2. BRISANJE MARKERA (Ostaje isto)
+  for (const [id, marker] of this.driverMarkers.entries()) {
+    if (!incomingIds.has(id)) {
+      this.driversLayer.removeLayer(marker);
+      this.driverMarkers.delete(id);
+      if (id === myId) this.selfMarker = null;
+    }
+  }
 
-      const existing = this.driverMarkers.get(loc.driverId);
-      if (existing) {
-        existing.setLatLng([loc.lat, loc.lng]);
-        existing.setIcon(icon);
-        existing.bindPopup(text);
-      } else {
-        const marker = L.marker([loc.lat, loc.lng], { icon });
-        marker.bindPopup(text);
-        this.driversLayer.addLayer(marker);
+  // 3. CRTANJE / AŽURIRANJE
+  for (const loc of filteredLocations) {
+    // Ako smo mi vozač i u toku je animacija kretanja, ne diramo marker da ne bi "seckao"
+    if (loc.driverId === myId && this.animTimer) continue; 
 
-        this.driverMarkers.set(loc.driverId, marker);
+    let marker = this.driverMarkers.get(loc.driverId);
+    const icon = loc.busy ? this.driverBusyIcon : this.driverFreeIcon;
+
+    if (marker) {
+      marker.setLatLng([loc.lat, loc.lng]);
+      marker.setIcon(icon);
+      
+      // --- KLJUČNI DEO ZA ETA ---
+      // Ako je ovo vozač kojeg putnik trenutno prati, šaljemo koordinate u fasadu
+      if (loc.driverId === this.targetDriverId) {
+        this.facade.setDriveTo(loc.driverId, loc.lat, loc.lng);
+      }
+      // --------------------------
+
+      if (loc.driverId === myId && !this.animTimer) {
+        this.selfPos = marker.getLatLng();
+      }
+    } else {
+      marker = L.marker([loc.lat, loc.lng], { icon });
+      this.driversLayer.addLayer(marker);
+      this.driverMarkers.set(loc.driverId, marker);
+      
+      if (loc.driverId === myId) {
+        this.selfMarker = marker;
       }
     }
   }
+}
 }

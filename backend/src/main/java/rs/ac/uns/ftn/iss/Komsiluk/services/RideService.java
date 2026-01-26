@@ -57,6 +57,8 @@ public class RideService implements IRideService {
     private MailService mailService;
     @Autowired
     private PricingRepository pricingRepository;
+    @Autowired
+    private RideDTOMapper  rideDTOMapper;
     
     private static final long MAX_MINUTES_LAST_24H = 480;
 
@@ -766,6 +768,10 @@ public class RideService implements IRideService {
         );
     }
 
-
+    @Override
+    public Optional<RidePassengerActiveDTO> getActiveRideForPassenger(Long userId) {
+        return rideRepository.findActiveRideForPassenger(userId)
+                .map(rideDTOMapper::toActiveResponseDTO); // Samo pozoveš maper
+    }
 
 }

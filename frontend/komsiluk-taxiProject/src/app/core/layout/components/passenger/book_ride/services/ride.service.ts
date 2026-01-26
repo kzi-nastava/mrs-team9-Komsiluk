@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { catchError, EMPTY, Observable, switchMap, tap, throwError } from 'rxjs';
-import { RideCreateDTO, RideResponseDTO } from '../../../../../../shared/models/ride.models';
+import { catchError, EMPTY, map, Observable, of, switchMap, tap, throwError } from 'rxjs';
+import { RideCreateDTO, RidePassengerActiveDTO, RideResponseDTO } from '../../../../../../shared/models/ride.models';
 import { ToastService } from '../../../../../../shared/components/toast/toast.service';
 import { NotificationService } from '../../../../../../features/menu/services/notification.service';
 import { AuthService } from '../../../../../../core/auth/services/auth.service';
@@ -153,4 +153,12 @@ export class RideService {
   getInconsistencyReports(rideId: number): Observable<any[]> {
     return this.http.get<any[]>(`${this.API}/${rideId}/inconsistencies`);
   }
+
+  getActiveRideForPassenger(): Observable<RidePassengerActiveDTO | null> {
+  return this.http.get<RidePassengerActiveDTO>(`${this.API}/passenger/active`, { observe: 'response' })
+    .pipe(
+      map(response => response.status === 204 ? null : response.body),
+      catchError(() => of(null))
+    );
+}
 }

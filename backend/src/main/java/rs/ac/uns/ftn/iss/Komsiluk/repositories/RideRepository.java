@@ -81,4 +81,11 @@ public interface RideRepository extends JpaRepository<Ride, Long> {
     
     Optional<Ride> findFirstByDriverIdAndStatusInOrderByCreatedAtDesc(Long driverId, Collection<RideStatus> statuses);
 
+    @Query("""
+    SELECT r FROM Ride r 
+    LEFT JOIN r.passengers p 
+    WHERE r.status = rs.ac.uns.ftn.iss.Komsiluk.beans.enums.RideStatus.ACTIVE 
+    AND (r.createdBy.id = :userId OR p.id = :userId)
+""")
+    Optional<Ride> findActiveRideForPassenger(@Param("userId") Long userId);
 }

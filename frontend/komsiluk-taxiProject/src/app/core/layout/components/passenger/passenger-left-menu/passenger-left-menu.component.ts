@@ -1,35 +1,63 @@
-import { Component, AfterViewInit, signal, ViewChild, inject, effect} from '@angular/core';
+import { Component, AfterViewInit, OnInit, OnDestroy, signal, ViewChild, inject, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { interval, startWith, switchMap, forkJoin, of, map, Subscription } from 'rxjs';
+
+// Importi tvojih komponenti i servisa
 import { PassengerBookRidePanelComponent } from '../book_ride/passenger-book-ride-panel/passenger-book-ride-panel.component';
 import { FavoriteRidesPanelComponent } from '../favorite/favorite-rides-panel/favorite-rides-panel.component';
-import { BookRidePrefillService } from '../../../../../shared/components/map/services/book-ride-prefill.service';
 import { ScheduledRidesPanelComponent } from '../scheduled/scheduled-rides-panel/scheduled-rides-panel.component';
+import { PassengerActiveRidePanelComponent } from "../passenger-active-ride-panel/passenger-active-ride-panel.component";
+import { RideService } from '../book_ride/services/ride.service';
+import { MapFacadeService } from '../../../../../shared/components/map/services/map-facade.service';
+import { GeocodingService } from '../../../../../shared/components/map/services/geocoding.service';
+import { BookRidePrefillService } from '../../../../../shared/components/map/services/book-ride-prefill.service';
 import { LeftSidebarCommandService } from '../services/left-sidebar-command-service.service';
+import { RidePassengerActiveDTO } from '../../../../../shared/models/ride.models';
+import { AuthService } from '../../../../auth/services/auth.service';
+import { DriverRatingModalComponent } from '../../../../../features/ride/components/driver-rating-modal/driver-raitng-modal';
 
 @Component({
   selector: 'app-passenger-left-menu',
-  imports: [CommonModule, PassengerBookRidePanelComponent, FavoriteRidesPanelComponent, ScheduledRidesPanelComponent],
+  standalone: true,
+  imports: [
+    CommonModule, 
+    PassengerBookRidePanelComponent, 
+    FavoriteRidesPanelComponent, 
+    ScheduledRidesPanelComponent, 
+    PassengerActiveRidePanelComponent,
+    DriverRatingModalComponent
+  ],
   templateUrl: './passenger-left-menu.component.html',
   styleUrl: './passenger-left-menu.component.css',
 })
-export class PassengerLeftMenuComponent implements AfterViewInit {
+export class PassengerLeftMenuComponent implements AfterViewInit, OnInit, OnDestroy {
   bookOpen = signal(false);
   favOpen = signal(false);
   schedOpen = signal(false);
+  activeRide = signal<RidePassengerActiveDTO | null>(null);
 
   @ViewChild('favPanel') favPanel?: FavoriteRidesPanelComponent;
   @ViewChild(PassengerBookRidePanelComponent) bookPanel?: PassengerBookRidePanelComponent;
   @ViewChild('schedPanel') schedPanel?: ScheduledRidesPanelComponent;
 
+  private pollingSub?: Subscription;
+  private rideService = inject(RideService);
+  private mapFacade = inject(MapFacadeService);
+  private geoService = inject(GeocodingService);
   private prefill = inject(BookRidePrefillService);
+  private leftCmd = inject(LeftSidebarCommandService);
 
-  constructor(private leftCmd: LeftSidebarCommandService) {
+  public authService = inject(AuthService); 
+
+  // Signali za kontrolu modala
+  showRatingModal = signal(false);
+  lastFinishedRideId = signal<number | null>(null);
+
+  constructor() {
     effect(() => {
       const data = this.prefill.pending();
       if (!data) return;
-
       this.bookOpen.set(true);
-
       setTimeout(() => {
         this.bookPanel?.applyPrefillFromFavorite(data.favorite, data.passengerEmails);
         this.bookPanel?.scrollIntoView();
@@ -38,32 +66,79 @@ export class PassengerLeftMenuComponent implements AfterViewInit {
     });
   }
 
+  ngOnInit(): void {
+    this.startPolling();
+  }
+
+  private startPolling() {
+    this.pollingSub = interval(4000).pipe(
+      startWith(0),
+      switchMap(() => this.rideService.getActiveRideForPassenger()),
+      switchMap(ride => {
+        if (!ride) return of({ ride: null, waypoints: [] });
+
+        const addresses = [ride.startAddress, ...(ride.stops || []), ride.endAddress];
+        const requests = addresses.map(addr => this.geoService.lookupOne(addr));
+
+        return forkJoin(requests).pipe(
+          map(results => ({
+            ride,
+            waypoints: results.filter(r => !!r).map(r => ({ lat: +r!.lat, lon: +r!.lon, label: r!.label }))
+          }))
+        );
+      })
+    ).subscribe({
+      next: ({ ride, waypoints }) => {
+        const prev = this.activeRide();
+        
+        // --- KLJUČNI DEO ZA MODAL ---
+        if (prev && !ride) {
+          // Vožnja je postojala, a sada je null -> ZAVRŠENA JE
+          console.log("Detektovan kraj vožnje, otvaram rating modal za ID:", prev.rideId);
+          this.lastFinishedRideId.set(prev.rideId);
+          this.showRatingModal.set(true);
+          this.mapFacade.clearFocusRide();
+        }
+        // ----------------------------
+
+        this.activeRide.set(ride);
+
+        if (ride) {
+          if (!prev || prev.rideId !== ride.rideId) {
+            if (waypoints.length >= 2) {
+              this.mapFacade.setFocusRide(ride.driverId ?? 0, waypoints);
+            }
+          }
+        }
+      },
+      error: (err) => {
+        console.error("Greška u pollingu:", err);
+        this.activeRide.set(null);
+        this.mapFacade.clearFocusRide();
+      }
+    });
+  }
+
   toggle(which: 'book' | 'fav' | 'sched') {
     if (which === 'book') this.bookOpen.set(!this.bookOpen());
-
     if (which === 'fav') {
-      const next = !this.favOpen();
-      this.favOpen.set(next);
-      if (next) setTimeout(() => this.favPanel?.load(), 0);
+      this.favOpen.update(v => !v);
+      if (this.favOpen()) setTimeout(() => this.favPanel?.load(), 0);
     }
-
     if (which === 'sched') {
-      const next = !this.schedOpen();
-      this.schedOpen.set(next);
-      if (next) setTimeout(() => this.schedPanel?.load(), 0);
+      this.schedOpen.update(v => !v);
+      if (this.schedOpen()) setTimeout(() => this.schedPanel?.load(), 0);
     }
   }
 
   ngAfterViewInit(): void {
     this.leftCmd.cmd$.subscribe(cmd => {
       this.openSection(cmd.section);
-
-      setTimeout(() => {
-        if (cmd.scrollId) {
-          document.getElementById(cmd.scrollId)
-            ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-      }, 0);
+      if (cmd.scrollId) {
+        setTimeout(() => {
+          document.getElementById(cmd.scrollId!)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 0);
+      }
     });
   }
 
@@ -71,5 +146,9 @@ export class PassengerLeftMenuComponent implements AfterViewInit {
     this.bookOpen.set(section === 'book');
     this.favOpen.set(section === 'fav');
     this.schedOpen.set(section === 'sched');
+  }
+
+  ngOnDestroy(): void {
+    this.pollingSub?.unsubscribe();
   }
 }

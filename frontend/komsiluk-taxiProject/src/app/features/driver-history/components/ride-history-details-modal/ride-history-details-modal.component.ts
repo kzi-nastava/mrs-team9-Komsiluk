@@ -2,8 +2,10 @@ import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, HostListener, inject, Input, OnInit, Output, signal } from '@angular/core';
 import { RideDetailsMapComponent } from '../ride-details-map/ride-details-map.component';
 import { RideService } from '../../../../core/layout/components/passenger/book_ride/services/ride.service';
+import { RatingResponseDTO, RatingService } from '../../services/rating.service';
+
 export interface PassengerRating {
-  email: string;
+  email: string; // Backend trenutno ne vraca email, mapiracemo ID
   driverRating?: number | null;
   vehicleRating?: number | null;
   comment?: string | null;
@@ -12,8 +14,8 @@ export interface PassengerRating {
 export interface RideHistoryDetailsVm {
   // Left
   id: number;
-  passengers: string[];          // ovde će sada biti EMAIL-ovi
-  ratings: PassengerRating[];
+  passengers: string[];
+  // ratings: PassengerRating[]; // Ovo vise ne moramo uzimati iz inputa ako fetchujemo, ali neka stoji za svaki slucaj
 
   // Center
   mapImageUrl: string;
@@ -51,7 +53,11 @@ export class RideHistoryDetailsModalComponent implements OnInit {
   @Output() close = new EventEmitter<void>();
 
   private rideService = inject(RideService);
+  private ratingService = inject(RatingService); // Injektujemo novi servis
+
   inconsistencyReports = signal<any[]>([]);
+  ratings = signal<PassengerRating[]>([]);
+  ratingsLoading = signal(false);
 
   onBackdropClick() {
     this.close.emit();
@@ -78,31 +84,55 @@ export class RideHistoryDetailsModalComponent implements OnInit {
     return (this.data.statusText ?? '').toUpperCase().includes('CANCEL');
   }
 
-get allLocations(): string[] {
-  if (!this.data) return [];
-  
-  const validStops = (this.data.stops || []).filter(s => !!s);
-  
-  return [
-    this.data.pickupLocation,
-    ...validStops,
-    this.data.destination
-  ];
-}
+  get allLocations(): string[] {
+    if (!this.data) return [];
+    
+    const validStops = (this.data.stops || []).filter(s => !!s);
+    
+    return [
+      this.data.pickupLocation,
+      ...validStops,
+      this.data.destination
+    ];
+  }
 
-ngOnInit(): void {
-    this.loadInconsistencyReports();
+  ngOnInit(): void {
+    if (this.data && this.data.id) {
+      this.loadInconsistencyReports();
+      this.loadRatings();
+    }
   }
 
   loadInconsistencyReports() {
-    // ISPRAVKA: Koristimo this.data.id umesto this.ride.id
-    if (this.data && this.data.id) {
-      this.rideService.getInconsistencyReports(this.data.id).subscribe({
-        next: (reports) => {
-          this.inconsistencyReports.set(reports);
-        },
-        error: (err) => console.error('Error loading reports:', err)
-      });
+    this.rideService.getInconsistencyReports(this.data.id).subscribe({
+      next: (reports) => {
+        this.inconsistencyReports.set(reports);
+      },
+      error: (err) => console.error('Error loading reports:', err)
+    });
+  }
+
+  loadRatings() {
+  if (!this.data?.id) return;
+
+  this.ratingsLoading.set(true);
+  this.ratingService.getRatingsForRide(this.data.id).subscribe({
+    next: (dtos: RatingResponseDTO[]) => {
+      const mapped: PassengerRating[] = (dtos ?? []).map(dto => ({
+        // dok backend ne šalje email, prikaži ID
+        email: dto.raterMail || `Rater ID: ${dto.raterId}`,
+        driverRating: dto.driverGrade,
+        vehicleRating: dto.vehicleGrade,
+        comment: dto.comment,
+      }));
+
+      this.ratings.set(mapped);
+      this.ratingsLoading.set(false);
+    },
+    error: (err: any) => {
+      console.error('Error loading ratings:', err);
+      this.ratingsLoading.set(false);
     }
+  });
   }
 }
