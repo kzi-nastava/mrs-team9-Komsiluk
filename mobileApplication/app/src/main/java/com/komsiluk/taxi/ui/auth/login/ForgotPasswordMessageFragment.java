@@ -1,33 +1,28 @@
-package com.komsiluk.taxi.ui.auth.rider_registration;
+package com.komsiluk.taxi.ui.auth.login;
 
 import android.annotation.SuppressLint;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.komsiluk.taxi.databinding.FragmentSuccessfulRegistrationBinding;
+import com.komsiluk.taxi.R;
+import com.komsiluk.taxi.databinding.FragmentForgotPasswordMessageBinding;
 import com.komsiluk.taxi.ui.auth.AuthActivity;
-import com.komsiluk.taxi.ui.auth.login.ResetPasswordFragment;
 
 
-public class SuccessfulRegistrationFragment extends Fragment {
+public class ForgotPasswordMessageFragment extends Fragment {
 
-    private FragmentSuccessfulRegistrationBinding binding;
+    private FragmentForgotPasswordMessageBinding binding;
 
-    public static SuccessfulRegistrationFragment newInstance(String token) {
-        SuccessfulRegistrationFragment fragment = new SuccessfulRegistrationFragment();
-        Bundle args = new Bundle();
-        args.putString("token", token);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-
+    private Drawable normalBg;
+    private Drawable errorBg;
 
     @Override
     public View onCreateView(
@@ -35,7 +30,7 @@ public class SuccessfulRegistrationFragment extends Fragment {
             @Nullable ViewGroup container,
             @Nullable Bundle savedInstanceState
     ) {
-        binding = FragmentSuccessfulRegistrationBinding.inflate(inflater, container, false);
+        binding = FragmentForgotPasswordMessageBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
 
@@ -48,9 +43,9 @@ public class SuccessfulRegistrationFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
 
-
-        binding.btnLogin.setOnClickListener(v -> {
-            ((AuthActivity)requireActivity()).showLogin();
+        binding.btnClose.setOnClickListener(v -> {
+            ((AuthActivity) requireActivity())
+                    .finish();
         });
     }
 

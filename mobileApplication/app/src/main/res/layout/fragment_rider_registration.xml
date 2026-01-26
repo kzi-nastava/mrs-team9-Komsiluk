@@ -312,13 +312,16 @@
                 android:layout_marginBottom="8dp" />
 
             <LinearLayout
+                android:id="@+id/profilePhotoContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
                 android:padding="6dp"
                 android:background="@drawable/bg_profile_photo_selector"
-                android:layout_marginBottom="24dp">
+                android:layout_marginBottom="24dp"
+                android:clickable="true"
+                android:focusable="true">
 
                 <ImageView
                     android:id="@+id/ivProfilePhoto"

@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import jakarta.validation.ConstraintViolationException;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -87,16 +88,20 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<?> handleMethodArgumentNotValid(
+    public ResponseEntity<String> handleMethodArgumentNotValid(
             MethodArgumentNotValidException ex) {
 
-        Map<String, String> errors = new HashMap<>();
+        String message = ex.getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .findFirst()
+                .map(DefaultMessageSourceResolvable::getDefaultMessage)
+                .orElse("Validation error");
 
-        ex.getBindingResult().getFieldErrors().forEach(err ->
-                errors.put(err.getField(), err.getDefaultMessage())
-        );
-
-        return ResponseEntity.badRequest().body(errors);
+        return ResponseEntity
+                .badRequest()
+                .body(message);
     }
+
 
 }

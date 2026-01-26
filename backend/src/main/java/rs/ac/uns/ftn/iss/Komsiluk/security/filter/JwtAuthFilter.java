@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import rs.ac.uns.ftn.iss.Komsiluk.security.jwt.JwtService;
 import rs.ac.uns.ftn.iss.Komsiluk.security.services.CustomUserDetailsService;
+import rs.ac.uns.ftn.iss.Komsiluk.services.exceptions.NotFoundException;
 
 import java.io.IOException;
 
@@ -44,11 +45,22 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         String email = jwtService.extractUsername(token);
 
-        UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+        try {
+            UserDetails userDetails = userDetailsService.loadUserByUsername(email);
 
-        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+            UsernamePasswordAuthenticationToken authentication =
+                    new UsernamePasswordAuthenticationToken(
+                            userDetails,
+                            null,
+                            userDetails.getAuthorities()
+                    );
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+        } catch (NotFoundException ex) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            return;
+        }
+
 
         filterChain.doFilter(request, response);
     }

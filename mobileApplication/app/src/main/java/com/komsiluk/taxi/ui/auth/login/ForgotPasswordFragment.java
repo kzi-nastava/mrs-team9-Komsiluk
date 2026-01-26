@@ -13,6 +13,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.komsiluk.taxi.R;
 import com.komsiluk.taxi.databinding.FragmentForgotPasswordBinding;
@@ -25,6 +26,8 @@ public class ForgotPasswordFragment extends Fragment {
 
     private Drawable normalBg;
     private Drawable errorBg;
+
+    ForgotPasswordViewModel viewModel;
 
     @Override
     public View onCreateView(
@@ -47,16 +50,40 @@ public class ForgotPasswordFragment extends Fragment {
         normalBg = requireContext().getDrawable(R.drawable.bg_input_normal);
         errorBg = requireContext().getDrawable(R.drawable.bg_input_error);
 
-        TextWatcher watcher = new TextWatcher() {
-            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
+
+        viewModel = new ViewModelProvider(requireActivity())
+                .get(ForgotPasswordViewModel.class);
+
+
+        viewModel.getSuccessEvent().observe(getViewLifecycleOwner(), event -> {
+            Boolean success = event.getContentIfNotHandled();
+
+            if (success == null) return;
+
+            getParentFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.authFragmentContainer, new ForgotPasswordMessageFragment())
+                    .commit();
+        });
+
+        viewModel.getErrorMessageEvent().observe(getViewLifecycleOwner(), event -> {
+            String message = event.getContentIfNotHandled();
+            if (message == null) return;
+
+            Toast.makeText(
+                    requireContext(),
+                    message,
+                    Toast.LENGTH_SHORT
+            ).show();
+        });
+
+        binding.etEmail.addTextChangedListener(new SimpleTextWatcher() {
             @Override
             public void afterTextChanged(Editable s) {
+                viewModel.email.setValue(s.toString());
                 validateEmail();
             }
-        };
-
-        binding.etEmail.addTextChangedListener(watcher);
+        });
 
         binding.btnCancel.setOnClickListener(v -> {
             ((AuthActivity) requireActivity())
@@ -67,11 +94,7 @@ public class ForgotPasswordFragment extends Fragment {
             boolean ok = validateEmail();
             if (!ok) return;
 
-            //trebalo bi na verificationMEssage
-            getParentFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.authFragmentContainer, new ResetPasswordFragment())
-                    .commit();
+            viewModel.forgotPassword(binding.etEmail.getText().toString().trim());
         });
     }
 
@@ -102,5 +125,10 @@ public class ForgotPasswordFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
+    }
+
+    private abstract static class SimpleTextWatcher implements TextWatcher {
+        @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+        @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
     }
 }
