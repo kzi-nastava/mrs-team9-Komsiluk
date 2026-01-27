@@ -10,7 +10,7 @@ import { RideService } from '../../../../core/layout/components/passenger/book_r
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './inconsistency-report-modal.component.html',
-  styleUrls: ['./inconsistency-report-modal.component.css'], // Koristi isti CSS kao rating modal
+  styleUrls: ['./inconsistency-report-modal.component.css'],
 })
 export class InconsistencyReportModalComponent {
   @Input({ required: true }) rideId!: number;
@@ -45,12 +45,10 @@ export class InconsistencyReportModalComponent {
   }
 
   ngOnInit() {
-    // Pomera ceo modal na kraj body-ja čim se kreira
     this.renderer.appendChild(document.body, this.elementRef.nativeElement);
   }
 
   ngOnDestroy() {
-    // Uklanja ga iz body-ja kada Angular uništi komponentu
     this.renderer.removeChild(document.body, this.elementRef.nativeElement);
   }
 }

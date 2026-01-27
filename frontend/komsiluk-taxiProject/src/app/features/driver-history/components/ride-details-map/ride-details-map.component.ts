@@ -21,7 +21,6 @@ export class RideDetailsMapComponent implements AfterViewInit, OnDestroy {
   private geoService = inject(GeocodingService);
   private routingService = inject(RoutingService);
 
-  // 1. Definišemo tvoje ikonice iz assets foldera
   private baseIconOptions = {
     shadowUrl: 'assets/marker-shadow.png',
     iconAnchor: [12, 41] as L.PointExpression,
@@ -71,7 +70,6 @@ export class RideDetailsMapComponent implements AfterViewInit, OnDestroy {
 
         if (points.length < 2) return of(null);
 
-        // 2. Logika za markere: prvi i poslednji su veliki, ostali (stanice) su mali
         points.forEach((p, idx) => {
           const isStop = idx > 0 && idx < points.length - 1;
           const iconToUse = isStop ? this.smallIcon : this.largeIcon;
@@ -88,11 +86,9 @@ export class RideDetailsMapComponent implements AfterViewInit, OnDestroy {
 
       if (this.routeLayer) this.map.removeLayer(this.routeLayer);
 
-      // 3. Crtanje putanje sa bojom kao na glavnoj mapi (npr. #242424 ili plava)
-      // Dodajemo "shadow" efekat liniji tako što iscrtamo deblju liniju ispod
       
       const shadowStyle = { color: '#000', weight: 8, opacity: 0.2 };
-      const mainStyle = { color: '#242424', weight: 5, opacity: 0.9 }; // Promeni boju ovde ako treba
+      const mainStyle = { color: '#242424', weight: 5, opacity: 0.9 };
 
       L.geoJSON(routeResult.geometry as any, { style: shadowStyle }).addTo(this.map);
 

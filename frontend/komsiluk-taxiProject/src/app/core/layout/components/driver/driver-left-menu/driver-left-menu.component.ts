@@ -26,8 +26,6 @@ export class DriverLeftMenuComponent {
     this.currentOpen.set(!this.currentOpen());
   }
   if (which === 'scheduled') {
-    // Proveri da li se ovo izvršava
-    console.log('Otvaram scheduled panel...'); 
     this.scheduledOpen.set(!this.scheduledOpen());
   }
 }

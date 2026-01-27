@@ -60,31 +60,15 @@
   gap: 14px;
 }
 
-.cr-row{
-  display: flex;
-  gap: 18px;
-}
 
 .cr-finish{
   width: 100%;
 }
 
-
-.cr-actions{
-  display: flex;
-  gap: 18px;
-  margin-top: 10px;
-}
-
-.cr-actions--active{
-  flex-direction: column;
-  gap: 14px;
-}
-
 .cr-row{
   display: flex;
   gap: 18px;
-  width: 100%; /* Osigurava da red zauzme sve */
+  width: 100%; 
 }
 
 .cr-full-width {
@@ -96,7 +80,6 @@
 }
 
 :host {
-  /* Ovo osigurava da sama komponenta ne pravi barijeru za modal */
   display: contents; 
 }
 

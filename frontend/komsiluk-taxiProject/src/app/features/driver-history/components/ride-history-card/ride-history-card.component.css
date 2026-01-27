@@ -97,11 +97,11 @@
   display: none;
 }
 
-/* crna kartica */
+/* black card */
 .ride-card__label { color: rgba(255,255,255,0.85); }
 .ride-card__value { color: var(--color-secondary); }
 
-/* zuta kartica */
+/* yellow card */
 .ride-card--selected .ride-card__label { color: #fefefe; }
 .ride-card--selected .ride-card__value { color: #000000; }
 
@@ -123,11 +123,11 @@
   }
 
   .ride-card__details--desktop {
-    display: none; /* sakrij desktop dugme */
+    display: none; 
   }
 
   .ride-card__details--mobile {
-    display: block; /* pokaži mobile dugme */
+    display: block;
     width: 100%;
     margin-top: 6px;
   }
