@@ -77,6 +77,10 @@ private geocodingService = inject(GeocodingService);
       this.clearPreRideVisuals();
       
       this.facade.activeDriverId.set(null);
+      if ((this.facade as any).clearDriveTo) {
+        (this.facade as any).clearDriveTo();
+      }
+    
     }
     });
 
