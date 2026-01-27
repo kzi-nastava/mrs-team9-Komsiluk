@@ -19,11 +19,9 @@ export class DriverScheduledRidesPanelComponent implements OnInit {
   loading = signal(true);
 
   constructor() {
-    console.log('1. KOMPONENTA JE KREIRANA U MEMORIJI!');
   }
 
   ngOnInit() {
-    console.log('2. ngOnInit je pokrenut!');
     this.loadScheduledData();
   }
 

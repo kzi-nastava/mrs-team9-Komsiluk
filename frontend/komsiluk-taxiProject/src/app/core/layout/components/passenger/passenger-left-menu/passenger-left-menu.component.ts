@@ -1,8 +1,6 @@
 import { Component, AfterViewInit, OnInit, OnDestroy, signal, ViewChild, inject, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { interval, startWith, switchMap, forkJoin, of, map, Subscription } from 'rxjs';
-
-// Importi tvojih komponenti i servisa
 import { PassengerBookRidePanelComponent } from '../book_ride/passenger-book-ride-panel/passenger-book-ride-panel.component';
 import { FavoriteRidesPanelComponent } from '../favorite/favorite-rides-panel/favorite-rides-panel.component';
 import { ScheduledRidesPanelComponent } from '../scheduled/scheduled-rides-panel/scheduled-rides-panel.component';
@@ -49,7 +47,6 @@ export class PassengerLeftMenuComponent implements AfterViewInit, OnInit, OnDest
 
   public authService = inject(AuthService); 
 
-  // Signali za kontrolu modala
   showRatingModal = signal(false);
   lastFinishedRideId = signal<number | null>(null);
 
@@ -71,7 +68,7 @@ export class PassengerLeftMenuComponent implements AfterViewInit, OnInit, OnDest
   }
 
   private startPolling() {
-    this.pollingSub = interval(4000).pipe(
+    this.pollingSub = interval(2000).pipe(
       startWith(0),
       switchMap(() => this.rideService.getActiveRideForPassenger()),
       switchMap(ride => {
@@ -91,16 +88,11 @@ export class PassengerLeftMenuComponent implements AfterViewInit, OnInit, OnDest
       next: ({ ride, waypoints }) => {
         const prev = this.activeRide();
         
-        // --- KLJUČNI DEO ZA MODAL ---
         if (prev && !ride) {
-          // Vožnja je postojala, a sada je null -> ZAVRŠENA JE
-          console.log("Detektovan kraj vožnje, otvaram rating modal za ID:", prev.rideId);
           this.lastFinishedRideId.set(prev.rideId);
           this.showRatingModal.set(true);
           this.mapFacade.clearFocusRide();
         }
-        // ----------------------------
-
         this.activeRide.set(ride);
 
         if (ride) {
@@ -112,7 +104,7 @@ export class PassengerLeftMenuComponent implements AfterViewInit, OnInit, OnDest
         }
       },
       error: (err) => {
-        console.error("Greška u pollingu:", err);
+        console.error("Pooling error", err);
         this.activeRide.set(null);
         this.mapFacade.clearFocusRide();
       }

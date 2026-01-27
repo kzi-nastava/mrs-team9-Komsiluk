@@ -1,7 +1,7 @@
 <nav class="app-navbar" [class.app-navbar--driver-history]="isDriverHistory">
   <div class="app-navbar__slot app-navbar__slot--left">
 
-  <!-- Home dugme – svuda osim home -->
+  <!-- Home dugme – only not on home -->
   <button
     *ngIf="!isHome"
     class="app-navbar__icon-btn"
@@ -12,7 +12,7 @@
     </svg>
   </button>
 
-  <!-- Hamburger – samo na home -->
+  <!-- Hamburger – only on home -->
   <button
     *ngIf="isHome"
     class="app-navbar__icon-btn"

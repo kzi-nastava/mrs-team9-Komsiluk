@@ -7,7 +7,7 @@
 
 .pricing-container {
   width: 100%;
-  max-width: 850px; /* Malo užeg dizajna radi bolje preglednosti */
+  max-width: 850px;
 }
 
 .page-title {
@@ -32,7 +32,7 @@
 
 .pricing-card {
   display: grid;
-  /* Tri kolone: Tip vozila (levo), Inputi (centar), Dugme (desno) */
+
   grid-template-columns: 1fr 2fr 1fr; 
   align-items: center;
   background: rgba(255, 255, 255, 0.07);
@@ -55,17 +55,16 @@
   letter-spacing: 1px;
 }
 
-/* CENTRALIZACIJA INPUT POLJA */
 .card-inputs {
   display: flex;
-  justify-content: center; /* Centriranje unutar srednje kolone */
-  gap: 30px; /* Razmak između dva polja */
+  justify-content: center;
+  gap: 30px; 
 }
 
 .input-group {
   display: flex;
   flex-direction: column;
-  align-items: center; /* Centriranje labele iznad inputa */
+  align-items: center;
 }
 
 .input-group label {
@@ -82,7 +81,7 @@
   padding: 10px;
   border-radius: 6px;
   width: 100px;
-  text-align: center; /* Brojevi su u sredini polja */
+  text-align: center;
   font-size: 1rem;
   outline: none;
 }
@@ -92,9 +91,9 @@
   background: rgba(0, 0, 0, 0.6);
 }
 
-/* DESNA KOLONA ZA DUGME */
+/* Update button */
 .btn-save {
-  justify-self: end; /* Gura dugme skroz desno u svojoj koloni */
+  justify-self: end; 
   background: #ffff00;
   color: black;
   border: none;

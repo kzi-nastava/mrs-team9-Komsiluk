@@ -1,6 +1,6 @@
 .filter-panel{
   position: fixed;
-  top: 64px;          /* ispod navbara */
+  top: 64px;        
   right: 24px;
   width: min(360px, 92vw);
   padding: 14px;
