@@ -1,7 +1,8 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ModalShellComponent } from '../../../../../../shared/components/modal-shell/modal-shell.component';
 import { RideResponseDTO } from '../../../../../../shared/models/ride.models';
+import { CancelRideModalService } from '../../../../../../shared/components/modal-shell/services/confirm-ride-modal-service';
 
 @Component({
   selector: 'app-scheduled-details-dialog',
@@ -11,12 +12,13 @@ import { RideResponseDTO } from '../../../../../../shared/models/ride.models';
   styleUrl: './scheduled-details-dialog.component.css',
 })
 export class ScheduledDetailsDialogComponent {
+
+  private cancelModalSvc = inject(CancelRideModalService);
   @Input() open = false;
   @Input() ride: RideResponseDTO | null = null;
   @Input() passengerEmails: string[] = [];
 
   @Output() close = new EventEmitter<void>();
-  @Output() cancelRide = new EventEmitter<RideResponseDTO>(); // backend kasnije
 
   get stopsList(): string[] {
     const s: any = this.ride?.stops ?? [];
@@ -41,6 +43,6 @@ export class ScheduledDetailsDialogComponent {
 
   onCancelRide() {
     if (!this.ride) return;
-    this.cancelRide.emit(this.ride);
+    this.cancelModalSvc.open(this.ride, 'passenger');
   }
 }

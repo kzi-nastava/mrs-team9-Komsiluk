@@ -1,0 +1,28 @@
+.cb-title {
+  font-size: var(--fs-h1);
+  margin-bottom: 20px;
+  text-align:center;
+}
+
+.cb-sub {
+  opacity: 0.85;
+  margin-bottom: 15px;
+  font-size: var(--fs-md);
+}
+
+.cb-textarea {
+  width: 100%;
+  padding: 12px;
+  resize: none;
+  border-radius: 8px;
+  background: var(--color-white);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  margin-bottom: 25px;
+}
+
+.cb-actions {
+  display: flex;
+  justify-content: center;
+  gap: 100px;
+}

@@ -39,6 +39,11 @@ import { DriverRuntimeStateService } from './core/layout/components/driver/servi
 import { LoginRequiredDialogComponent } from './core/layout/components/guest/login-required-dialog/login-required-dialog.component';
 import { DriverStartRideConfirmModalService } from './shared/components/modal-shell/services/driver-start-ride-confirm-modal.service';
 import { DriverStartRideConfirmDialogComponent } from './core/layout/components/driver/driver-start-ride-confirm-dialog/driver-start-ride-confirm-dialog.component';
+import { RideService } from './core/layout/components/passenger/book_ride/services/ride.service';
+import { RideResponseDTO } from './shared/models/ride.models';
+import { CancelRideDialogComponent } from './core/layout/components/passenger/cancel_ride/cancel-ride-dialog.component';
+import { CancelRideModalService } from './shared/components/modal-shell/services/confirm-ride-modal-service';
+import { ScheduledRidesService } from './shared/components/modal-shell/services/scheduled-rides-service';
 
 
 @Component({
@@ -62,7 +67,9 @@ import { DriverStartRideConfirmDialogComponent } from './core/layout/components/
     AccountBlockedDialogComponent,
     LoginRequiredDialogComponent,
     DriverActivityConfirmDialogComponent,
-    DriverStartRideConfirmDialogComponent
+    DriverStartRideConfirmDialogComponent,
+    CancelRideDialogComponent,
+    
   ],
   templateUrl: './app.html',
   styleUrl: './app.css'
@@ -76,12 +83,12 @@ export class App implements OnInit {
   rightMode: 'profile' | 'admin' = 'profile';
 
 
-  constructor(public filterSvc: RideHistoryFilterService, private router: Router, public confirmModal: ConfirmBookingModalService,
+  constructor(private schedRides: ScheduledRidesService, public filterSvc: RideHistoryFilterService, private router: Router, public confirmModal: ConfirmBookingModalService,
     public addFavModal: AddFavoriteModalService, public favDetailsModal: FavoriteDetailsModalService, public renameFavModal: RenameFavoriteModalService,
     public deleteFavModal: DeleteFavoriteModalService, public toastService: ToastService, private favoriteApi: FavoriteRouteService, private favBus: FavoritesBusService,
     public schedDetailsModal: ScheduledDetailsModalService, public blockUserModal: BlockUserConfirmModalService, public blockedModal: AccountBlockedModalService,
     private leftCmd: LeftSidebarCommandService, private route: ActivatedRoute, private location: Location, public modal: DriverActivityConfirmModalService,
-    public driverActModal: DriverActivityConfirmModalService, private driverRuntimeState: DriverRuntimeStateService, public startRideModal: DriverStartRideConfirmModalService) {}
+    public driverActModal: DriverActivityConfirmModalService, private driverRuntimeState: DriverRuntimeStateService, public startRideModal: DriverStartRideConfirmModalService, public rideService: RideService,public cancelModalSvc: CancelRideModalService) {}
 
     ngOnInit(): void {
     
@@ -200,10 +207,22 @@ export class App implements OnInit {
     });
   }
 
-  onScheduledCancelRide(r: any) {
-    console.log('CANCEL SCHEDULED (GUI ONLY):', r);
+  confirmGlobalCancel(e: { rideId: number; reason: string }) {
+    const role = this.cancelModalSvc.userRole();
+    
+    if (role === 'driver') {
+      this.rideService.cancelRideDriver(e.rideId, e.reason);
+    } else {
+      this.rideService.cancelRidePassenger(e.rideId, e.reason);
+    }
+    
+    this.toastService.show('Ride successfully cancelled.');
+
     this.schedDetailsModal.close();
+    this.cancelModalSvc.close();
+    setTimeout(() => this.schedRides.triggerRefresh(), 300);
   }
+
 
   openAdminSidebar() {
     this.rightMode = 'admin';

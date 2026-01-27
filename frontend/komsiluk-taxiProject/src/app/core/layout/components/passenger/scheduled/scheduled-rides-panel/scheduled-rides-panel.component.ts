@@ -1,4 +1,4 @@
-import { Component, Input, signal, SimpleChanges } from '@angular/core';
+import { Component, Input, signal, SimpleChanges, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../../../../auth/services/auth.service';
 import { ToastService } from '../../../../../../shared/components/toast/toast.service';
@@ -8,6 +8,7 @@ import { ScheduledDetailsModalService } from '../../../../../../shared/component
 import { ProfileService } from '../../../../../../features/profile/services/profile.service';
 import { forkJoin, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
+import { ScheduledRidesService } from '../../../../../../shared/components/modal-shell/services/scheduled-rides-service';
 
 @Component({
   selector: 'app-scheduled-rides-panel',
@@ -15,9 +16,11 @@ import { catchError, map } from 'rxjs/operators';
   templateUrl: './scheduled-rides-panel.component.html',
   styleUrl: './scheduled-rides-panel.component.css',
 })
-export class ScheduledRidesPanelComponent {
+export class ScheduledRidesPanelComponent{
   loading = signal(false);
   rides = signal<RideResponseDTO[]>([]);
+
+  private schedRidesService = inject(ScheduledRidesService);
 
   constructor(
     private api: ScheduledRideService,
@@ -28,6 +31,12 @@ export class ScheduledRidesPanelComponent {
   ) {}
 
   @Input() open = false;
+
+  ngOnInit(): void {
+    this.schedRidesService.refresh$.subscribe(() => {
+      this.load();
+    });
+  }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['open']?.currentValue === true) {

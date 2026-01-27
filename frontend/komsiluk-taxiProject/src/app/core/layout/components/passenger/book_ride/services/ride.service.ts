@@ -42,7 +42,10 @@ export class RideService {
     this.cancelRideInternal(rideId, reason, 'passenger')
       .pipe(
         switchMap(() => this.notification.getUnread(userId)),
-        tap((notifs) => this.showToastsForInitiator(notifs))
+        tap((notifs) => {
+          const cancelNotifs = notifs.filter(n => n.type === 'RIDE_CANCELLED');
+          this.showToastsForInitiator(cancelNotifs);
+        })
       )
       .subscribe();
   }
@@ -57,14 +60,16 @@ export class RideService {
     this.cancelRideInternal(rideId, reason, 'driver')
       .pipe(
         switchMap(() => this.notification.getUnread(userId)),
-        tap((notifs) => this.showToastsForInitiator(notifs))
+        tap((notifs) => {
+          const cancelNotifs = notifs.filter(n => n.type === 'RIDE_CANCELLED');
+          this.showToastsForInitiator(cancelNotifs);
+        })
       )
       .subscribe();
   }
 
   private showToastsForInitiator(notifs: any[]) {
     if (!notifs?.length) {
-      this.toast.show('No notification received from server.');
       return;
     }
 

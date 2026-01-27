@@ -503,6 +503,13 @@ public class RideService implements IRideService {
 
         rideRepository.save(ride);
 
+        NotificationCreateDTO notificationDTODriver = new NotificationCreateDTO();
+        notificationDTODriver.setUserId(ride.getDriver().getId());
+        notificationDTODriver.setType(NotificationType.RIDE_CANCELLED);
+        notificationDTODriver.setTitle("Ride Cancelled");
+        notificationDTODriver.setMessage("Your ride from " + ride.getRoute().getStartAddress() +
+                "to " + ride.getRoute().getEndAddress() + " has been cancelled.");
+        notificationService.createNotification(notificationDTODriver);
         notifyRideParticipants(ride, NotificationType.RIDE_CANCELLED);
     }
 
@@ -532,6 +539,13 @@ public class RideService implements IRideService {
 
         rideRepository.save(ride);
 
+        NotificationCreateDTO notificationDTODriver = new NotificationCreateDTO();
+        notificationDTODriver.setUserId(ride.getDriver().getId());
+        notificationDTODriver.setType(NotificationType.RIDE_CANCELLED);
+        notificationDTODriver.setTitle("Ride Cancelled");
+        notificationDTODriver.setMessage("Your ride from " + ride.getRoute().getStartAddress() +
+                "to " + ride.getRoute().getEndAddress() + " has been cancelled.");
+        notificationService.createNotification(notificationDTODriver);
         notifyRideParticipants(ride, NotificationType.RIDE_CANCELLED);
     }
 
