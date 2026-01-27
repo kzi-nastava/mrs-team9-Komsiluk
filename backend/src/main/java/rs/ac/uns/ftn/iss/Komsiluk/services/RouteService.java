@@ -29,7 +29,7 @@ public class RouteService implements IRouteService {
 
     @Override
     public RouteResponseDTO getById(Long id) {
-        Route route = routeRepository.findById(id).orElseThrow(NotFoundException::new);
+        Route route = routeRepository.findById(id).orElseThrow(() -> new NotFoundException("Route not found"));
         return mapper.toResponseDTO(route);
     }
 
@@ -42,7 +42,7 @@ public class RouteService implements IRouteService {
 
     @Override
     public void delete(Long id) {
-        Route route = routeRepository.findById(id).orElseThrow(NotFoundException::new);
+        Route route = routeRepository.findById(id).orElseThrow(() -> new NotFoundException("Route not found"));
         routeRepository.deleteById(route.getId());
     }
 

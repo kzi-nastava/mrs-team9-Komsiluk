@@ -18,8 +18,7 @@ public class MailService {
     }
 
     public void sendActivationMail(String to, String token) {
-        // DEV shortcut: svi mejlovi idu na test inbox
-        String devInbox = "komsiluk.tim@gmail.com";  // zajednički inbox
+        String devInbox = "komsiluk.tim@gmail.com";
         to = devInbox;
 
 
@@ -40,9 +39,10 @@ public class MailService {
     }
     
     public void sendDriverActivationMail(String to, String token) {
+        String devInbox = "komsiluk.tim@gmail.com";
+        to = devInbox;
 
-        String activationLink =
-                "http://localhost:4200/driver-activation?token=" + token;
+        String activationLink = frontendUrl + "/driver-activation?token=" + token;
 
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(to);

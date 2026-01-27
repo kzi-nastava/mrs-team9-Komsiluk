@@ -49,7 +49,6 @@ export class PassengerLeftMenuComponent implements AfterViewInit, OnInit, OnDest
 
   public authService = inject(AuthService); 
 
-  // Signali za kontrolu modala
   showRatingModal = signal(false);
   lastFinishedRideId = signal<number | null>(null);
 
@@ -91,15 +90,12 @@ export class PassengerLeftMenuComponent implements AfterViewInit, OnInit, OnDest
       next: ({ ride, waypoints }) => {
         const prev = this.activeRide();
         
-        // --- KLJUČNI DEO ZA MODAL ---
         if (prev && !ride) {
-          // Vožnja je postojala, a sada je null -> ZAVRŠENA JE
           console.log("Detektovan kraj vožnje, otvaram rating modal za ID:", prev.rideId);
           this.lastFinishedRideId.set(prev.rideId);
           this.showRatingModal.set(true);
           this.mapFacade.clearFocusRide();
         }
-        // ----------------------------
 
         this.activeRide.set(ride);
 

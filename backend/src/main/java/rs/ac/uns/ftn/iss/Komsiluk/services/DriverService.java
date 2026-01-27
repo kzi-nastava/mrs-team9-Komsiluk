@@ -54,9 +54,9 @@ public class DriverService implements IDriverService {
 
     @Override
     public DriverResponseDTO getDriver(Long id) {
-        User user = userRepository.findById(id).orElseThrow(NotFoundException::new);
+        User user = userRepository.findById(id).orElseThrow(() -> new NotFoundException("Driver not found"));
         if (user.getRole() != UserRole.DRIVER) {
-            throw new NotFoundException();
+            throw new NotFoundException("Driver not found");
         }
         return driverMapper.toResponseDTO(user);
     }
@@ -66,7 +66,7 @@ public class DriverService implements IDriverService {
     public DriverResponseDTO registerDriver(DriverCreateDTO dto, MultipartFile profileImage) {
 
         if (userRepository.existsByEmailIgnoreCase(dto.getEmail())) {
-            throw new AlreadyExistsException();
+            throw new AlreadyExistsException("User with that email already exists");
         }
 
         User driver = driverMapper.fromCreateDTO(dto);
@@ -97,7 +97,7 @@ public class DriverService implements IDriverService {
 
     @Override
     public DriverResponseDTO updateDriverStatus(Long driverId, DriverStatus newStatus) {
-        User driver = userRepository.findById(driverId).orElseThrow(NotFoundException::new);
+        User driver = userRepository.findById(driverId).orElseThrow(() -> new NotFoundException("Driver not found"));
 
         DriverStatus oldStatus= driver.getDriverStatus();
         

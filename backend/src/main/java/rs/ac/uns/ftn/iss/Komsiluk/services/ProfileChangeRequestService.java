@@ -53,7 +53,7 @@ public class ProfileChangeRequestService implements IProfileChangeRequestService
 
     @Override
     public ProfileChangeRequestResponseDTO approve(Long requestId, Long adminId) {
-        ProfileChangeRequest req = repo.findById(requestId).orElseThrow(() -> new NotFoundException());
+        ProfileChangeRequest req = repo.findById(requestId).orElseThrow(() -> new NotFoundException("Request not found"));
 
         User driver = req.getDriver();
         Vehicle vehicle = driver.getVehicle();
@@ -73,7 +73,7 @@ public class ProfileChangeRequestService implements IProfileChangeRequestService
 
     @Override
     public ProfileChangeRequestResponseDTO reject(Long requestId, Long adminId) {
-        ProfileChangeRequest req = repo.findById(requestId).orElseThrow(() -> new NotFoundException());
+        ProfileChangeRequest req = repo.findById(requestId).orElseThrow(() -> new NotFoundException("Request not found"));
 
         User admin = userService.findById(adminId);
         req.setAdmin(admin);
