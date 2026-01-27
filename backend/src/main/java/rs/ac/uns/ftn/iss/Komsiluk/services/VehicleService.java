@@ -44,14 +44,14 @@ public class VehicleService implements IVehicleService {
     
 	@Override
     public VehicleResponseDTO getOne(Long id) {
-        Vehicle v = vehicleRepository.findById(id).orElseThrow(NotFoundException::new);
+        Vehicle v = vehicleRepository.findById(id).orElseThrow(() -> new NotFoundException("Vehicle not found"));
         return vehicleMapper.toResponseDTO(v);
     }
 
 	@Override
     public VehicleResponseDTO create(VehicleCreateDTO dto) {
     	if (vehicleRepository.existsByLicencePlateIgnoreCase(dto.getLicencePlate())) {
-    		throw new AlreadyExistsException();
+    		throw new AlreadyExistsException("Vehicle with the given licence plate already exists");
     	}
     	Vehicle vehicle = vehicleMapper.fromCreateDTO(dto);
     	vehicleRepository.save(vehicle);
@@ -60,10 +60,10 @@ public class VehicleService implements IVehicleService {
 
 	@Override
     public VehicleResponseDTO update(Long id, VehicleUpdateDTO dto) {
-        Vehicle v = vehicleRepository.findById(id).orElseThrow(NotFoundException::new);
+        Vehicle v = vehicleRepository.findById(id).orElseThrow(() -> new NotFoundException("Vehicle not found"));
         if (dto.getLicencePlate() != null && !dto.getLicencePlate().equals(v.getLicencePlate())) {
 			if (vehicleRepository.existsByLicencePlateIgnoreCase(dto.getLicencePlate())) {
-				throw new AlreadyExistsException();
+				throw new AlreadyExistsException("Vehicle with the given licence plate already exists");
 			}
 		}
         vehicleMapper.fromUpdateDTO(dto, v);
@@ -73,7 +73,7 @@ public class VehicleService implements IVehicleService {
 
 	@Override
     public void delete(Long id) {
-        vehicleRepository.findById(id).orElseThrow(NotFoundException::new);
+        vehicleRepository.findById(id).orElseThrow(() -> new NotFoundException("Vehicle not found"));
 		vehicleRepository.deleteById(id);
     }
 	

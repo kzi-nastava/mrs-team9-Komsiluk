@@ -40,7 +40,7 @@ public class UserTokenService implements IUserTokenService {
 
     @Override
     public UserTokenResponseDTO getOne(Long id) {
-        UserToken token = userTokenRepository.findById(id).orElseThrow(NotFoundException::new);
+        UserToken token = userTokenRepository.findById(id).orElseThrow(() -> new NotFoundException("User token not found"));
         return mapper.toResponseDTO(token);
     }
 
@@ -80,10 +80,10 @@ public class UserTokenService implements IUserTokenService {
 
     @Override
     public UserTokenResponseDTO activateWithPassword(String tokenValue, String rawPassword) {
-        UserToken token = userTokenRepository.findByToken(tokenValue).orElseThrow(NotFoundException::new);
+        UserToken token = userTokenRepository.findByToken(tokenValue).orElseThrow(() -> new NotFoundException("Invalid or expired token"));
 
         if (token.isUsed() || token.getType() != TokenType.ACTIVATION || token.getExpiresAt().isBefore(LocalDateTime.now())) {
-            throw new NotFoundException();
+            throw new NotFoundException("Invalid or expired token");
         }
         
         User user = userService.findById( token.getUser().getId());
@@ -102,10 +102,10 @@ public class UserTokenService implements IUserTokenService {
 
     public void activate(String tokenValue) {
 
-        UserToken token = userTokenRepository.findByToken(tokenValue).orElseThrow(NotFoundException::new);
+        UserToken token = userTokenRepository.findByToken(tokenValue).orElseThrow(() -> new NotFoundException("Invalid or expired token"));
 
         if (token.isUsed() || token.getType() != TokenType.ACTIVATION || token.getExpiresAt().isBefore(LocalDateTime.now())) {
-            throw new NotFoundException();
+            throw new NotFoundException("Invalid or expired token");
         }
 
         User user = token.getUser();
@@ -132,10 +132,10 @@ public class UserTokenService implements IUserTokenService {
 
     public void resetPassword(String tokenValue, String newPassword) {
 
-        UserToken token = userTokenRepository.findByToken(tokenValue).orElseThrow(NotFoundException::new);
+        UserToken token = userTokenRepository.findByToken(tokenValue).orElseThrow(() -> new NotFoundException());
 
         if (token.isUsed() || token.getType() != TokenType.PASSWORD_RESET || token.getExpiresAt().isBefore(LocalDateTime.now())) {
-            throw new NotFoundException();
+            throw new NotFoundException("Invalid or expired token");
         }
 
         User user = token.getUser();

@@ -33,7 +33,7 @@ export class MapComponent implements AfterViewInit {
   private selfMarker: L.Marker | null = null;
 
   private activePassengerMarkers = L.layerGroup();
-private targetDriverId: number | null = null;
+  private targetDriverId: number | null = null;
 
   private selfPos = L.latLng(45.2671, 19.8335);
 

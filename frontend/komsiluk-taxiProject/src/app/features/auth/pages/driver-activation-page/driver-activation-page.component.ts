@@ -42,7 +42,7 @@ export class DriverActivationPageComponent implements OnInit {
 
     if (!this.token) {
       this.toast.show('Invalid activation link.');
-      this.router.navigate(['/activation-message']);
+      this.router.navigate(['']);
       return;
     }
   }
@@ -85,7 +85,7 @@ export class DriverActivationPageComponent implements OnInit {
         this.loading.set(false);
         const msg = err?.error?.message || 'Activation link is invalid or expired.';
         this.toast.show(msg);
-        this.router.navigate(['/activation-message']);
+        this.router.navigate(['']);
       }
     });
   }

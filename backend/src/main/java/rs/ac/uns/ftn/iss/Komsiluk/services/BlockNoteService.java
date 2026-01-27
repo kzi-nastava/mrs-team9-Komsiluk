@@ -28,23 +28,23 @@ public class BlockNoteService implements IBlockNoteService {
     	
         User blocked = userRepository.findByEmailIgnoreCase(dto.getBlockedUserEmail());
         if (blocked == null) {
-			throw new NotFoundException();
+			throw new NotFoundException("Blocked user not found");
 		}
         
-        User admin = userRepository.findById(dto.getAdminId()).orElseThrow(NotFoundException::new);
+        User admin = userRepository.findById(dto.getAdminId()).orElseThrow(() -> new NotFoundException("Admin user not found"));
 
         blocked.setBlocked(true);
         userRepository.save(blocked);
 
-        BlockNote node = new BlockNote();
-        node.setBlockedUser(blocked);
-        node.setAdmin(admin);
-        node.setReason(dto.getReason());
-        node.setCreatedAt(LocalDateTime.now());
+        BlockNote note = new BlockNote();
+        note.setBlockedUser(blocked);
+        note.setAdmin(admin);
+        note.setReason(dto.getReason());
+        note.setCreatedAt(LocalDateTime.now());
 
-        node = blockNoteRepository.save(node);
+        note = blockNoteRepository.save(note);
 
-        return mapper.toResponseDTO(node);
+        return mapper.toResponseDTO(note);
     }
 
     @Override

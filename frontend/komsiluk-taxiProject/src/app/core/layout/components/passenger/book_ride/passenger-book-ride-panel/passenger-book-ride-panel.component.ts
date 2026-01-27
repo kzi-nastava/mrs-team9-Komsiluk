@@ -339,8 +339,6 @@ export class PassengerBookRidePanelComponent implements OnInit, OnDestroy {
       return;
     }
 
-
-
     this.profileService.isUserBlocked(+userId).pipe(
       switchMap(res => {
         if (!res?.blocked) return of({ blocked: false, note: null as any });
@@ -417,18 +415,12 @@ export class PassengerBookRidePanelComponent implements OnInit, OnDestroy {
       }),
 
       catchError((err: HttpErrorResponse) => {
-        if (err.status === 404) {
-          const msg = "Passenger email(s) not found.";
-          this.toast.show(msg);
-          return of(null);
-        }
-
-        if (err.status === 400) {
-          this.toast.show('Bad request.');
-          return of(null);
-        }
-
-        this.toast.show('Failed to order ride.');
+       this.toast.show(
+          err?.error?.message ||
+          err?.error ||
+          err?.message ||
+          'Failed to order ride.'
+        );
         return of(null);
       })
     ).subscribe();

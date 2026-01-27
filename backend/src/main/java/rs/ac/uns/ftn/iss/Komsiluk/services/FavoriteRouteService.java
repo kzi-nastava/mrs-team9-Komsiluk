@@ -41,16 +41,16 @@ public class FavoriteRouteService implements IFavoriteRouteService {
     @Override
     public FavoriteRouteResponseDTO create(FavoriteRouteCreateDTO dto) {
         Route route = routeRepository.findById(dto.getRouteId()).orElse(null);
-        if (route == null) throw new NotFoundException();
+        if (route == null) throw new NotFoundException("Route not found");
 
-        User owner = userRepository.findById(dto.getUserId()).orElseThrow(NotFoundException::new);
+        User owner = userRepository.findById(dto.getUserId()).orElseThrow(() -> new NotFoundException("User not found"));
 
         List<User> passengers = new ArrayList<>();
         if (dto.getPassengersEmails() != null) {
             for (String email : dto.getPassengersEmails()) {
                 User u = userRepository.findByEmailIgnoreCase(email);
                 if (u == null) {
-                    throw new NotFoundException();
+                    throw new NotFoundException("Passenger with email " + email + " not found");
                 }
                 passengers.add(u);
             }
@@ -64,8 +64,8 @@ public class FavoriteRouteService implements IFavoriteRouteService {
 
     @Override
     public FavoriteRouteResponseDTO updateTitle(Long favoriteId, FavoriteRouteUpdateDTO dto) {
-        FavoriteRoute fav = favoriteRouteRepository.findById(favoriteId).orElseThrow(NotFoundException::new);
-        if (fav == null) throw new NotFoundException();
+        FavoriteRoute fav = favoriteRouteRepository.findById(favoriteId).orElseThrow(() -> new NotFoundException("Favorite route not found"));
+        if (fav == null) throw new NotFoundException("Favorite route not found");
 
         fav.setTitle(dto.getTitle());
         favoriteRouteRepository.save(fav);
@@ -75,8 +75,8 @@ public class FavoriteRouteService implements IFavoriteRouteService {
 
     @Override
     public void delete(Long favoriteId) {
-        FavoriteRoute fav = favoriteRouteRepository.findById(favoriteId).orElseThrow(NotFoundException::new);
-        if (fav == null) throw new NotFoundException();
+        FavoriteRoute fav = favoriteRouteRepository.findById(favoriteId).orElseThrow(() -> new NotFoundException("Favorite route not found"));
+        if (fav == null) throw new NotFoundException("Favorite route not found");
         favoriteRouteRepository.deleteById(favoriteId);
     }
 }
