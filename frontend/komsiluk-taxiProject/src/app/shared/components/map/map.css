@@ -1,5 +1,5 @@
 .map-frame{
-  height: calc(100vh - 64px); /* ispod navbara do dna ekrana */
+  height: calc(100vh - 64px);
   width: 100%;
 }
 
@@ -7,13 +7,11 @@
   height: 100%;
   width: 100%;
 }
-/* wrapper oko mape */
 .map-frame {
   position: relative;
-  z-index: 1; /* mapa ispod UI-a */
+  z-index: 1; 
 }
 
-/* sam Leaflet container */
 #map,
 .leaflet-container {
   position: relative;
@@ -24,7 +22,6 @@
   height: 100%;
 }
 
-/* Leaflet divIcon wrapper */
 .km-driver {
   width: 26px;
   height: 26px;
@@ -45,7 +42,6 @@
   background: #ef4444 !important; 
 }
 
-/* ikonica unutra */
 .km-driver__icon {
   font-size: 18px;
   line-height: 18px;

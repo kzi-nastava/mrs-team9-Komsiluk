@@ -1,4 +1,3 @@
-/* Backdrop */
 .rh-modal{
   position: fixed;
   inset: 0;
@@ -13,7 +12,6 @@
   box-sizing: border-box;
 }
 
-/* Dialog */
 .rh-modal__dialog{
   width: min(1040px, 96vw);
   max-height: min(1800px, 96vh);
@@ -29,7 +27,6 @@
   overflow: hidden;
 }
 
-/* Main 3-col area */
 .rh-modal__content{
   display: grid;
   grid-template-columns: 260px 1fr 320px;
@@ -135,7 +132,6 @@
   height: 18px;
 }
 
-/* Shared label/value styling */
 .rh-label{
   color: rgba(255,255,255,0.85);
 }
@@ -215,33 +211,31 @@
 .details-bottom-row{
   display: flex;
   align-items: baseline;
-  justify-content: center; /* ili space-between ako želiš razvučeno */
-  gap: 28px;               /* razmak između ta 2 podatka */
+  justify-content: center; 
+  gap: 28px;              
   width: 100%;
-  margin-top: 12px;        /* po potrebi */
+  margin-top: 12px;        
 }
 
 .details-bottom-item{
   display: inline-flex;
   align-items: baseline;
   gap: 8px;
-  white-space: nowrap;     /* ključ: nema prelaska u novi red */
+  white-space: nowrap;    
 }
 
-/* ako želiš da budu po pola širine i simetrično */
 .details-bottom-item{
   flex: 1;
-  justify-content: center; /* ili flex-start / flex-end */
+  justify-content: center; 
 }
 
-/* Bottom row – iste boje kao ostatak */
 .details-bottom-label{
-  color: rgba(255,255,255,0.85);   /* kao label svuda */
-  opacity: 1;                      /* da ne bude sivo */
+  color: rgba(255,255,255,0.85);  
+  opacity: 1;                     
 }
 
 .details-bottom-value{
-  color: var(--color-secondary);   /* žuto kao ostale vrednosti */
+  color: var(--color-secondary);
   font-weight: 700;
 }
 
@@ -250,24 +244,21 @@
   flex-direction: column;
 }
 
-/* Stil za kontejner izveštaja - imitira .rh-rating */
 .report-item {
   margin-top: 10px;
   padding-top: 10px;
   border-top: 1px solid rgba(255, 255, 255, 0.12);
 }
 
-/* Uloga (DRIVER/PASSENGER) - imitira .rh-rating__email */
 .reporter-badge {
   font-weight: 700;
   color: var(--color-secondary);
   font-size: 13px;
   margin-bottom: 6px;
-  display: block; /* Da bi bio u svom redu kao email */
+  display: block;
   text-transform: uppercase;
 }
 
-/* Datum - imitira suptilne label-e */
 .report-date {
   font-size: 11px;
   color: rgba(255, 255, 255, 0.5);
@@ -275,7 +266,6 @@
   margin-bottom: 4px;
 }
 
-/* Tekst poruke - imitira .rh-rating__row .rh-value */
 .report-text {
   font-size: 12px;
   line-height: 1.25;
@@ -284,7 +274,6 @@
   margin: 0;
 }
 
-/* Ako nema reportova */
 .no-reports {
   font-size: 13px;
   color: rgba(255, 255, 255, 0.5);

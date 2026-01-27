@@ -115,12 +115,11 @@ public class RideController {
     @PreAuthorize("hasRole('PASSENGER')")
     @GetMapping("/passenger/active")
     public ResponseEntity<RidePassengerActiveDTO> getActiveRide() {
-        // Uzimamo ID trenutno ulogovanog korisnika iz SecurityContext-a
         User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         return rideService.getActiveRideForPassenger(currentUser.getId())
                 .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.noContent().build()); // 204 No Content ako nema vožnje
+                .orElse(ResponseEntity.noContent().build());
     }
 }
 

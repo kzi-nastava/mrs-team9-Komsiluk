@@ -1,5 +1,5 @@
 .history-page {
-  min-height: calc(100vh - 64px); /* ispod navbara */
+  min-height: calc(100vh - 64px); 
   padding: 18px 22px 26px;
   box-sizing: border-box;
 }

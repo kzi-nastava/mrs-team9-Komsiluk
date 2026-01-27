@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import rs.ac.uns.ftn.iss.Komsiluk.beans.DriverLocation;
@@ -24,13 +25,13 @@ public class DriverLocationController {
 
     @Autowired
     private UserRepository userRepository;
-
+    @PreAuthorize("hasRole('DRIVER')")
     @PutMapping("/{id}/location")
     public ResponseEntity<?> updateLocation(@PathVariable Long id, @RequestBody DriverLocationUpdateDTO dto) {
         driverLocationService.updateLiveLocation(id, dto.getLat(), dto.getLng());
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
-    // GET: sve aktivne lokacije (anonimno dozvoljeno u SecurityConfig)
+
     @GetMapping(value = "/locations", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Collection<DriverLocationResponseDTO>> getAllActiveDriverLocations() {
         Collection<DriverLocation> locations = driverLocationService.getAllLiveLocations();

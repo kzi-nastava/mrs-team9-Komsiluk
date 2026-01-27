@@ -15,14 +15,16 @@ import rs.ac.uns.ftn.iss.Komsiluk.dtos.notification.NotificationCreateDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.ride.*;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.route.RouteCreateDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.route.RouteResponseDTO;
-import rs.ac.uns.ftn.iss.Komsiluk.mappers.*;
+import rs.ac.uns.ftn.iss.Komsiluk.mappers.AdminRideDetailsMapper;
+import rs.ac.uns.ftn.iss.Komsiluk.mappers.AdminRideHistoryMapper;
+import rs.ac.uns.ftn.iss.Komsiluk.mappers.RideDTOMapper;
+import rs.ac.uns.ftn.iss.Komsiluk.mappers.RouteDTOMapper;
 import rs.ac.uns.ftn.iss.Komsiluk.repositories.PricingRepository;
 import rs.ac.uns.ftn.iss.Komsiluk.repositories.RideRepository;
 import rs.ac.uns.ftn.iss.Komsiluk.repositories.UserRepository;
 import rs.ac.uns.ftn.iss.Komsiluk.services.exceptions.BadRequestException;
 import rs.ac.uns.ftn.iss.Komsiluk.services.exceptions.NotFoundException;
 import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.*;
-import rs.ac.uns.ftn.iss.Komsiluk.dtos.ride.RideLiveInfoDTO;
 
 @Service
 public class RideService implements IRideService {
@@ -300,7 +302,7 @@ public class RideService implements IRideService {
         }
 
         for (String email : emails) {
-            mailService.sendRideFinishedMailLinkedPasengers(email, ride.getId());
+            mailService.sendRideFinishedMail(email, ride.getId());
         }
 
 

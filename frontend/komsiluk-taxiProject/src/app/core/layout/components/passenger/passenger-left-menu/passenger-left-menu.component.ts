@@ -1,8 +1,6 @@
 import { Component, AfterViewInit, OnInit, OnDestroy, signal, ViewChild, inject, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { interval, startWith, switchMap, forkJoin, of, map, Subscription } from 'rxjs';
-
-// Importi tvojih komponenti i servisa
 import { PassengerBookRidePanelComponent } from '../book_ride/passenger-book-ride-panel/passenger-book-ride-panel.component';
 import { FavoriteRidesPanelComponent } from '../favorite/favorite-rides-panel/favorite-rides-panel.component';
 import { ScheduledRidesPanelComponent } from '../scheduled/scheduled-rides-panel/scheduled-rides-panel.component';
@@ -15,6 +13,7 @@ import { LeftSidebarCommandService } from '../services/left-sidebar-command-serv
 import { RidePassengerActiveDTO } from '../../../../../shared/models/ride.models';
 import { AuthService } from '../../../../auth/services/auth.service';
 import { DriverRatingModalComponent } from '../../../../../features/ride/components/driver-rating-modal/driver-raitng-modal';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-passenger-left-menu',
@@ -35,6 +34,8 @@ export class PassengerLeftMenuComponent implements AfterViewInit, OnInit, OnDest
   favOpen = signal(false);
   schedOpen = signal(false);
   activeRide = signal<RidePassengerActiveDTO | null>(null);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
 
   @ViewChild('favPanel') favPanel?: FavoriteRidesPanelComponent;
   @ViewChild(PassengerBookRidePanelComponent) bookPanel?: PassengerBookRidePanelComponent;
@@ -49,7 +50,6 @@ export class PassengerLeftMenuComponent implements AfterViewInit, OnInit, OnDest
 
   public authService = inject(AuthService); 
 
-  // Signali za kontrolu modala
   showRatingModal = signal(false);
   lastFinishedRideId = signal<number | null>(null);
 
@@ -66,12 +66,27 @@ export class PassengerLeftMenuComponent implements AfterViewInit, OnInit, OnDest
     });
   }
 
-  ngOnInit(): void {
-    this.startPolling();
-  }
+ngOnInit(): void {
+  this.route.queryParams.subscribe(params => {
+    const rideIdFromUrl = params['rateRideId'];
+    
+    if (rideIdFromUrl) {
+      this.lastFinishedRideId.set(Number(rideIdFromUrl));
+      this.showRatingModal.set(true);
+      
+      this.router.navigate([], {
+        queryParams: { rateRideId: null },
+        queryParamsHandling: 'merge',
+        replaceUrl: true 
+      });
+    }
+  });
+
+  this.startPolling();
+}
 
   private startPolling() {
-    this.pollingSub = interval(4000).pipe(
+    this.pollingSub = interval(2000).pipe(
       startWith(0),
       switchMap(() => this.rideService.getActiveRideForPassenger()),
       switchMap(ride => {
@@ -91,16 +106,11 @@ export class PassengerLeftMenuComponent implements AfterViewInit, OnInit, OnDest
       next: ({ ride, waypoints }) => {
         const prev = this.activeRide();
         
-        // --- KLJUČNI DEO ZA MODAL ---
         if (prev && !ride) {
-          // Vožnja je postojala, a sada je null -> ZAVRŠENA JE
-          console.log("Detektovan kraj vožnje, otvaram rating modal za ID:", prev.rideId);
           this.lastFinishedRideId.set(prev.rideId);
           this.showRatingModal.set(true);
           this.mapFacade.clearFocusRide();
         }
-        // ----------------------------
-
         this.activeRide.set(ride);
 
         if (ride) {
@@ -112,7 +122,7 @@ export class PassengerLeftMenuComponent implements AfterViewInit, OnInit, OnDest
         }
       },
       error: (err) => {
-        console.error("Greška u pollingu:", err);
+        console.error("Pooling error", err);
         this.activeRide.set(null);
         this.mapFacade.clearFocusRide();
       }
