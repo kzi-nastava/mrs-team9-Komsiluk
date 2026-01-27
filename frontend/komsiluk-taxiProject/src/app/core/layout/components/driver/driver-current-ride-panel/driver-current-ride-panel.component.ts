@@ -1,4 +1,4 @@
-import { Component, signal, computed, OnInit } from '@angular/core';
+import { Component, signal, computed, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { catchError, finalize, of, from, map, concatMap, toArray } from 'rxjs';
@@ -11,6 +11,7 @@ import { RideResponseDTO } from '../../../../../shared/models/ride.models';
 import { GeocodingService } from '../../../../../shared/components/map/services/geocoding.service';
 import { MapFacadeService } from '../../../../../shared/components/map/services/map-facade.service';
 import { InconsistencyReportModalComponent } from '../../../../../features/ride/components/inconsistency-report-modal/inconsistency-report-modal.component';
+import { PanicModalService } from '../../../../../shared/components/modal-shell/services/panic-modal-service';
 
 type Waypoint = { lat: number; lon: number; label?: string };
 
@@ -25,6 +26,8 @@ export class DriverCurrentRidePanelComponent implements OnInit {
   showReportModal = signal(false);
   loading = signal(false);
   ride = signal<RideResponseDTO | null>(null);
+
+  private panicModalSvc = inject(PanicModalService);
 
   form: FormGroup;
 
@@ -274,8 +277,13 @@ finish() {
   }
 
   panic() {
-    this.toast.show('Not implemented.');
+  const currentRide = this.ride();
+  if (currentRide) {
+    this.panicModalSvc.openModal(currentRide.id);
+  } else {
+    this.toast.show('No active ride found to initiate PANIC.');
   }
+}
   reportInconsistency() {
   this.showReportModal.set(true);
 }

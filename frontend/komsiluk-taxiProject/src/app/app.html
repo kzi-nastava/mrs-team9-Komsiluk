@@ -104,3 +104,9 @@
   (cancel)="cancelModalSvc.close()"
   (confirm)="confirmGlobalCancel($event)">
 </app-cancel-ride-dialog>
+
+<app-panic-dialog
+  [open]="panicModalSvc.open()"
+  (cancel)="panicModalSvc.close()"
+  (confirm)="confirmGlobalPanic()">
+</app-panic-dialog>

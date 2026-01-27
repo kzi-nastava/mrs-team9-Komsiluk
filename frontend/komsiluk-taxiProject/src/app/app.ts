@@ -44,6 +44,8 @@ import { RideResponseDTO } from './shared/models/ride.models';
 import { CancelRideDialogComponent } from './core/layout/components/passenger/cancel_ride/cancel-ride-dialog.component';
 import { CancelRideModalService } from './shared/components/modal-shell/services/confirm-ride-modal-service';
 import { ScheduledRidesService } from './shared/components/modal-shell/services/scheduled-rides-service';
+import { PanicModalService } from './shared/components/modal-shell/services/panic-modal-service';
+import { PanicDialogComponent } from './shared/components/panic-dialog/panic-dialog.component';
 
 
 @Component({
@@ -69,7 +71,7 @@ import { ScheduledRidesService } from './shared/components/modal-shell/services/
     DriverActivityConfirmDialogComponent,
     DriverStartRideConfirmDialogComponent,
     CancelRideDialogComponent,
-    
+    PanicDialogComponent
   ],
   templateUrl: './app.html',
   styleUrl: './app.css'
@@ -83,7 +85,7 @@ export class App implements OnInit {
   rightMode: 'profile' | 'admin' = 'profile';
 
 
-  constructor(private schedRides: ScheduledRidesService, public filterSvc: RideHistoryFilterService, private router: Router, public confirmModal: ConfirmBookingModalService,
+  constructor(public panicModalSvc: PanicModalService,private schedRides: ScheduledRidesService, public filterSvc: RideHistoryFilterService, private router: Router, public confirmModal: ConfirmBookingModalService,
     public addFavModal: AddFavoriteModalService, public favDetailsModal: FavoriteDetailsModalService, public renameFavModal: RenameFavoriteModalService,
     public deleteFavModal: DeleteFavoriteModalService, public toastService: ToastService, private favoriteApi: FavoriteRouteService, private favBus: FavoritesBusService,
     public schedDetailsModal: ScheduledDetailsModalService, public blockUserModal: BlockUserConfirmModalService, public blockedModal: AccountBlockedModalService,
@@ -233,5 +235,13 @@ export class App implements OnInit {
   confirmDriverActivity() {
     this.driverRuntimeState.toggleStatusWithBackend();
     this.driverActModal.close();
+  }
+
+  confirmGlobalPanic() {
+    const id = this.panicModalSvc.rideId();
+    if (id) {
+      this.rideService.activatePanicButton(id);
+    }
+    this.panicModalSvc.close();
   }
 }
