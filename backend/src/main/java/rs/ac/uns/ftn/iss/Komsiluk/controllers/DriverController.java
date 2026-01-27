@@ -80,6 +80,8 @@ public class DriverController {
         Collection<RideResponseDTO> history = rideService.getDriverRideHistory(driverId, from, to);
         return new ResponseEntity<>(history, HttpStatus.OK);
     }
+
+
     @GetMapping(value = "/basic", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Collection<DriverBasicDTO>> getDriversBasic() {
         return new ResponseEntity<>(driverService.getDriversBasic(), HttpStatus.OK);

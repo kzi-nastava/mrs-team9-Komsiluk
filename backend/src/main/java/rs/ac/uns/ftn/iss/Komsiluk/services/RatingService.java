@@ -79,26 +79,41 @@ public class RatingService implements IRatingService {
         rating.setCreatedAt(LocalDateTime.now());
 
         ratingRepository.save(rating);
-        return ratingMapper.toResponseDTO(rating);
+
+        // Mapiranje i popunjavanje email-a
+        RatingResponseDTO responseDTO = ratingMapper.toResponseDTO(rating);
+        responseDTO.setRaterMail(findRaterEmail(ride, dto.getRaterId()));
+
+        return responseDTO;
     }
 
     @Override
     public List<RatingResponseDTO> getRatingsForRide(Long rideId) {
-        rideRepository.findById(rideId).orElseThrow(NotFoundException::new);
+        Ride ride = rideRepository.findById(rideId).orElseThrow(NotFoundException::new);
 
-        return ratingRepository.findByRideId(rideId).stream()
-                .map(ratingMapper::toResponseDTO)
+        List<Rating> ratings = ratingRepository.findByRideId(rideId);
+
+        return ratings.stream()
+                .map(rating -> {
+                    RatingResponseDTO dto = ratingMapper.toResponseDTO(rating);
+                    // Popunjavamo email za svaki rating u listi
+                    dto.setRaterMail(findRaterEmail(ride, rating.getRaterId()));
+                    return dto;
+                })
                 .collect(Collectors.toList());
     }
 
     @Override
     public RatingResponseDTO getRatingForRideByRater(Long rideId, Long raterId) {
-        rideRepository.findById(rideId).orElseThrow(NotFoundException::new);
+        Ride ride = rideRepository.findById(rideId).orElseThrow(NotFoundException::new);
 
         Rating rating = ratingRepository.findByRideIdAndRaterId(rideId, raterId)
                 .orElseThrow(NotFoundException::new);
 
-        return ratingMapper.toResponseDTO(rating);
+        RatingResponseDTO dto = ratingMapper.toResponseDTO(rating);
+        dto.setRaterMail(findRaterEmail(ride, raterId));
+
+        return dto;
     }
 
     private void validateGrade(Integer grade) {
@@ -117,5 +132,20 @@ public class RatingService implements IRatingService {
             return true;
         }
         return false;
+    }
+
+    // Pomoćna metoda za pronalaženje emaila na osnovu raterId unutar vožnje
+    private String findRaterEmail(Ride ride, Long raterId) {
+        if (ride.getPassengers() != null) {
+            for (User u : ride.getPassengers()) {
+                if (u != null && Objects.equals(u.getId(), raterId)) {
+                    return u.getEmail();
+                }
+            }
+        }
+        if (ride.getCreatedBy() != null && Objects.equals(ride.getCreatedBy().getId(), raterId)) {
+            return ride.getCreatedBy().getEmail();
+        }
+        return null;
     }
 }

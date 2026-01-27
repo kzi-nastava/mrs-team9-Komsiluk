@@ -14,7 +14,7 @@ export class DriverLocationService {
     return this.http.get<DriverLocation[]>(`${this.API}/locations`);
   }
 
-  // refresh svake sekunde
+  // refresh time 1s = 1000ms
   pollLocations(): Observable<DriverLocation[]> {
     return timer(0, 1000).pipe(
       switchMap(() => this.getLocationsOnce()),
@@ -23,6 +23,10 @@ export class DriverLocationService {
   }
   getDriversBasic() {
   return this.http.get<DriverBasicDto[]>('http://localhost:8081/api/drivers/basic');
+}
+
+updateLocation(driverId: number, lat: number, lng: number) {
+  return this.http.put<void>(`${this.API}/${driverId}/location`, { lat, lng });
 }
 
 }

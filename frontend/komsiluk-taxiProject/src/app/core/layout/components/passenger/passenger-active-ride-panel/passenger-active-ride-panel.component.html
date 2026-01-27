@@ -1,0 +1,53 @@
+<div class="cr">
+  <div class="cr-field">
+    <div class="cr-label text-regular">Driver</div>
+    <div class="cr-input text-medium" style="display:flex; align-items:center;">
+        {{ ride().driverFirstName }} {{ ride().driverLastName }}
+    </div>
+  </div>
+
+  <div class="cr-field eta-box">
+    <div class="cr-label text-regular">Estimated Arrival</div>
+    <div class="cr-input text-medium eta-display">
+      <span class="material-symbols-outlined" style="font-size: 18px; margin-right: 8px;">schedule</span>
+      @if (remainingMinutes() !== null) {
+        Arriving in <strong>{{ remainingMinutes() }} min</strong>
+      } @else {
+        Calculating...
+      }
+    </div>
+  </div>
+
+  <div class="cr-field">
+    <div class="cr-label text-regular">Pickup location</div>
+    <div class="cr-input text-medium">{{ ride().startAddress }}</div>
+  </div>
+
+ <div class="stations-list">
+  @for (stop of stations(); track $index) {
+    <div class="station-item">
+      <span class="dot"></span>
+      {{ stop }}
+    </div>
+  }
+</div>
+
+
+  <div class="cr-field">
+    <div class="cr-label text-regular">Destination</div>
+    <div class="cr-input text-medium">{{ ride().endAddress }}</div>
+  </div>
+
+  <div class="cr-actions cr-actions--active">
+    <button type="button" class="btn-sm btn--ghost text-semibold btn-scale cr-full-width" (click)="reportInconsistency()">
+      Report Inconsistency
+    </button>
+    <button type="button" class="btn-sm btn--danger text-semibold btn-scale cr-full-width" (click)="panic()">
+      PANIC
+    </button>
+  </div>
+</div>
+
+@if (showReportModal()) {
+  <app-inconsistency-report-modal [rideId]="ride().rideId" (close)="showReportModal.set(false)" />
+}

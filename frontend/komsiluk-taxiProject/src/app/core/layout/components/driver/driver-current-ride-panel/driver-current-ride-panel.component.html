@@ -46,23 +46,34 @@
       </div>
     }
 
-    @if (isActive()) {
+   @if (isActive()) {
       <div class="cr-actions cr-actions--active">
-        <button type="button" class="btn btn--primary text-semibold btn-scale cr-finish" (click)="finish()">
+        <button type="button" class="btn btn--primary text-semibold btn-scale cr-full-width" (click)="finish()">
           Finish
         </button>
 
         <div class="cr-row">
-          <button type="button" class="btn-sm btn--ghost text-semibold btn-scale" (click)="stop()">
+          <button type="button" class="btn-sm btn--ghost text-semibold btn-scale cr-flex-1" (click)="stop()">
             Stop
           </button>
 
-          <button type="button" class="btn-sm btn--danger text-semibold btn-scale" (click)="panic()">
-            Panic
+          <button type="button" class="btn-sm btn--ghost text-semibold btn-scale cr-flex-1" (click)="reportInconsistency()">
+            Report
           </button>
         </div>
+
+        <button type="button" class="btn-sm btn--danger text-semibold btn-scale cr-full-width" (click)="panic()">
+          Panic
+        </button>
       </div>
     }
   }
 
 </div>
+@if (showReportModal()) {
+  <app-inconsistency-report-modal
+    [rideId]="ride()!.id"
+    (close)="showReportModal.set(false)"
+    (submitted)="showReportModal.set(false)">
+  </app-inconsistency-report-modal>
+}

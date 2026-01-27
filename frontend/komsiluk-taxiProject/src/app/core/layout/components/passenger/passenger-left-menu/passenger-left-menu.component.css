@@ -59,3 +59,18 @@
   color: var(--color-secondary);
   font-size: var(--fs-md)
 }
+
+.p-item--active-ride {
+  background: rgba(255, 68, 68, 0.15) !important;
+  border: 1px solid var(--color-danger);
+  margin-bottom: 5px;
+}
+
+.p-item--active-ride .p-text {
+  color: var(--color-danger);
+}
+
+:host {
+  /* Ovo osigurava da sama komponenta ne pravi barijeru za modal */
+  display: contents; 
+}

@@ -9,6 +9,7 @@ import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.DriverStatus;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.UserRole;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.driver.DriverBasicDTO;
 
+import java.util.Collection;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -33,7 +34,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
             @Param("role") UserRole role,
             @Param("driverStatus") DriverStatus driverStatus
     );
-    
+
 	@Query(value = """
 	        SELECT u.*
 	        FROM users u
@@ -72,5 +73,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
      AND u.blocked = false
 """)
     List<DriverBasicDTO> findDriverBasics();
+
+    List<User> findByIdIn(Collection<Long> ids);
 }
 

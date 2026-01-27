@@ -15,13 +15,13 @@ import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.RideStatus;
 @Repository
 public interface RideRepository extends JpaRepository<Ride, Long> {
 
-	@Query("""
-	        SELECT r
-	        FROM Ride r
-	        WHERE r.status = :status
-	          AND r.createdBy.id = :userId
-	        """)
-	Collection<Ride> findScheduledByUserId(@Param("userId") Long userId, @Param("status") RideStatus status);
+    @Query("""
+        SELECT r
+        FROM Ride r
+        WHERE r.status = :status
+          AND (r.createdBy.id = :userId OR r.driver.id = :userId)
+        """)
+    Collection<Ride> findScheduledByUserId(@Param("userId") Long userId, @Param("status") RideStatus status);
 	
 	@Query(value = """
 		    SELECT CASE WHEN COUNT(*) > 0 THEN true ELSE false END
@@ -81,4 +81,11 @@ public interface RideRepository extends JpaRepository<Ride, Long> {
     
     Optional<Ride> findFirstByDriverIdAndStatusInOrderByCreatedAtDesc(Long driverId, Collection<RideStatus> statuses);
 
+    @Query("""
+    SELECT r FROM Ride r 
+    LEFT JOIN r.passengers p 
+    WHERE r.status = rs.ac.uns.ftn.iss.Komsiluk.beans.enums.RideStatus.ACTIVE 
+    AND (r.createdBy.id = :userId OR p.id = :userId)
+""")
+    Optional<Ride> findActiveRideForPassenger(@Param("userId") Long userId);
 }

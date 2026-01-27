@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, effect } from '@angular/core';
+import { ChangeDetectorRef, Component, effect, signal } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Subscription } from 'rxjs';
 
@@ -19,30 +19,27 @@ import {
 
 import { AuthService } from '../../../../core/auth/services/auth.service';
 
-// Backend DTO (prema JSON-u koji si poslao)
 type RideHistoryBackendDTO = {
+  cancellationReason: string | null | undefined;
+  cancellationSource: string | null | undefined;
   id: number;
   createdAt: string;
-
   startTime: string | null;
   endTime: string | null;
   scheduledAt: string | null;
-
   startAddress: string;
   endAddress: string;
-
-  status: string; // npr "FINISHED"
+  status: string;
   panicTriggered: boolean;
-
   passengerIds: number[];
-
   distanceKm: number;
   estimatedDurationMin: number;
-
   price: number;
-
   stops: string[];
   vehicleType: string;
+  creatorEmail: string | null;
+  passengerEmails: string[];
+
 };
 
 @Component({
@@ -66,24 +63,44 @@ export class DriverRideHistoryPageComponent {
   loading = false;
   error: string | null = null;
 
+  private readonly driverIdSig = signal<number | null>(null);
+
   constructor(
     private http: HttpClient,
     private filterSvc: RideHistoryFilterService,
-    private auth: AuthService
+    private auth: AuthService,
+    private cdr: ChangeDetectorRef,             
   ) {
+    this.bootstrapDriverId();
+
     effect((onCleanup) => {
+      const driverId = this.driverIdSig();
       const { from, to } = this.filterSvc.range();
 
-      const sub = this.loadHistory(from, to);
+      if (!driverId) return;
+
+      const sub = this.loadHistory(driverId, from, to);
       onCleanup(() => sub.unsubscribe());
     });
   }
 
-  // -------------------- BACKEND --------------------
+  private bootstrapDriverId() {
+    const trySet = () => {
+      const raw = this.auth.userId();
+      const id = raw ? Number(raw) : NaN;
 
-  private loadHistory(from: string, to: string): Subscription {
-    const driverId = Number(this.auth.userId());
+      if (!Number.isFinite(id) || id <= 0) {
+        setTimeout(trySet, 50);
+        return;
+      }
 
+      this.driverIdSig.set(id);
+    };
+
+    trySet();
+  }
+
+  private loadHistory(driverId: number, from: string, to: string): Subscription {
     this.loading = true;
     this.error = null;
 
@@ -94,13 +111,19 @@ export class DriverRideHistoryPageComponent {
     const url = `${this.API_BASE}/${driverId}/rides/history`;
 
     return this.http.get<RideHistoryBackendDTO[]>(url, { params }).subscribe({
-      next: (res) => this.applyBackendResult(res ?? []),
+      next: (res) => {
+        this.applyBackendResult(res ?? []);
+        queueMicrotask(() => this.cdr.detectChanges()); 
+      },
       error: (err) => {
         this.loading = false;
-        this.error = err?.error?.message ?? 'Greška pri učitavanju istorije vožnji.';
+        console.error('History load error:', err);
+        this.error = 'Greška pri učitavanju istorije vožnji.';
         this.rides = [];
         this.filteredRides = [];
         this.rawById.clear();
+
+        queueMicrotask(() => this.cdr.detectChanges()); 
       },
     });
   }
@@ -115,43 +138,52 @@ export class DriverRideHistoryPageComponent {
     });
 
     this.rides = mapped;
-    this.filteredRides = [...mapped]; // backend već filtrira by from/to
+    this.filteredRides = [...mapped];
     this.loading = false;
+
+    console.log('loaded rides=', this.rides.length, 'filtered=', this.filteredRides.length);
   }
 
   // -------------------- DETAILS --------------------
 
-  onDetails(id: string) {
-    const card = this.rides.find((r) => r.id === id);
-    const raw = this.rawById.get(id);
-    if (!card || !raw) return;
+onDetails(id: string) {
+  const card = this.rides.find((r) => r.id === id);
+  const raw = this.rawById.get(id);
+  if (!card || !raw) return;
 
-    const passengers = this.buildPassengers(raw.passengerIds);
+  const passengers =
+    raw.passengerEmails && raw.passengerEmails.length
+      ? raw.passengerEmails
+      : this.buildPassengers(raw.passengerIds);
 
-    const vm: RideHistoryDetailsVm = {
-      passengers,
-      ratings: this.buildRatings(passengers),
+  const vm: RideHistoryDetailsVm = {
+    id: raw.id,
+    passengers,
 
-      mapImageUrl: card.mapImageUrl,
-      pickupLocation: card.pickup,
-      station1: raw.stops?.[0] ?? '',
-      station2: raw.stops?.[1] ?? '',
-      destination: card.destination,
-      startTime: card.startTime,
-      endTime: card.endTime,
+    mapImageUrl: card.mapImageUrl,
+    pickupLocation: card.pickup,
+    
+    stops: raw.stops ?? [], 
+    
+    destination: card.destination,
+    startTime: card.startTime,
+    endTime: card.endTime,
 
-      kilometers: raw.distanceKm,
-      durationText: `${raw.estimatedDurationMin} min`,
-      price: raw.price,
+    kilometers: raw.distanceKm,
+    durationText: `${raw.estimatedDurationMin} min`,
+    price: raw.price,
 
-      panicPressed: !!raw.panicTriggered,
-      inconsistencyReport: null,
-    };
+    panicPressed: !!raw.panicTriggered,
+    inconsistencyReport: null,
 
-    this.detailsVm = vm;
-    this.detailsOpen = true;
-  }
+    statusText: raw.status,
+    cancellationSource: raw.cancellationSource,
+    cancellationReason: raw.cancellationReason,
+  };
 
+  this.detailsVm = vm;
+  this.detailsOpen = true;
+}
   closeDetails() {
     this.detailsOpen = false;
     this.detailsVm = null;
@@ -165,7 +197,6 @@ export class DriverRideHistoryPageComponent {
   }
 
   private buildRatings(passengers: string[]): PassengerRating[] {
-    // placeholder dok ne vežeš ratings endpoint
     return passengers.map((p) => ({
       email: p,
       driverRating: null,
@@ -180,21 +211,16 @@ export class DriverRideHistoryPageComponent {
 
     return {
       id: String(dto.id),
-
       date: this.formatDate(startIso),
       startTime: this.formatTime(startIso),
       endTime: this.formatTime(endIso),
-
       pickup: dto.startAddress ?? '—',
       destination: dto.endAddress ?? '—',
-
       status: this.mapStatus(dto.status),
-
       passengers: (dto.passengerIds ?? []).length,
       kilometers: Number(dto.distanceKm ?? 0),
       durationText: `${dto.estimatedDurationMin ?? 0} min`,
       price: Number(dto.price ?? 0),
-
       mapImageUrl: 'assets/taxi.png',
     };
   }
@@ -202,7 +228,7 @@ export class DriverRideHistoryPageComponent {
   private mapStatus(status: string): RideStatus {
     const s = (status ?? '').toUpperCase();
     if (s === 'FINISHED' || s === 'COMPLETED') return 'completed';
-    if (s === 'CANCELED' || s === 'CANCELLED') return 'canceled';
+    if (s === 'CANCELED' || s === 'CANCELLED' || s === 'REJECTED') return 'canceled';
     return 'in-progress';
   }
 

@@ -2,6 +2,7 @@ package rs.ac.uns.ftn.iss.Komsiluk.services.interfaces;
 
 import java.time.LocalDate;
 import java.util.Collection;
+import java.util.Optional;
 
 import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.AdminRideSortBy;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.ride.RideResponseDTO;
@@ -38,4 +39,6 @@ public interface IRideService {
     public AdminRideDetailsDTO getAdminRideDetails(Long rideId);
 
     public Collection<AdminRideHistoryDTO> getAdminRideHistoryForUser(Long userId, LocalDate from, LocalDate to, AdminRideSortBy sortBy);
+
+    Optional<RidePassengerActiveDTO> getActiveRideForPassenger(Long userId);
 }

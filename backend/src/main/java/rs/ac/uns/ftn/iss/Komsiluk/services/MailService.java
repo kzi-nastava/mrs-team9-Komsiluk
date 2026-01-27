@@ -79,5 +79,76 @@ public class MailService {
         mailSender.send(message);
     }
 
+    public void sendRideFinishedMail(String to, Long rideId) {
+        // Popravljen link (dodat /rate/ putanja)
+        String ratingLink = "http://localhost:4200/rate/" + rideId;
+
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(to);
+        message.setSubject("Komsiluk Taxi - Ride Completed");
+        message.setText(
+                "Your ride has just been completed.\n" +
+                        "You can rate the driver and the vehicle here:\n" +
+                        ratingLink + "\n\n" +
+                        "Thank you for using Komsiluk Taxi!"
+        );
+
+        try {
+            mailSender.send(message);
+        } catch (Exception e) {
+            System.err.println("Greška pri slanju mejla na " + to + ": " + e.getMessage());
+        }
+    }
+
+    public void sendRideFinishedMailLinkedPasengers(String to, Long rideId) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(to);
+        message.setSubject("Komsiluk Taxi - Ride Completed");
+        message.setText("Your ride has just been completed.\nThank you for using Komsiluk Taxi!");
+
+        try {
+            mailSender.send(message);
+        } catch (Exception e) {
+            System.err.println("Greška pri slanju mejla za povezanog putnika: " + e.getMessage());
+        }
+    }
+
+    public void sendAddedToRideMail(String to, Long rideId) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(to);
+        message.setSubject("You were added to a ride");
+        message.setText(
+                        "You have been added to a ride.\n\n" +
+                        "You will receive another email when the ride starts.\n\n" +
+                        "Thank you!\n" +
+                        "Komsiluk Taxi"
+        );
+
+        mailSender.send(message);
+    }
+
+    public void sendRideStartedMail(String to, Long rideId) {
+        // TODO: replace with real tracking link once the frontend route exists
+        String trackingLink = "http://localhost:4200/ride-live?rideId=" + rideId;
+
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(to);
+        message.setSubject("Your ride has started");
+        message.setText(
+                        "Your ride has just started.\n\n" +
+                        "If you want to track the ride in real time, open this link:\n" +
+                        trackingLink + "\n\n" +
+                        "Note: Ride tracking is available only for registered (logged-in) users.\n\n" +
+                        "Thank you!\n" +
+                        "Komsiluk Taxi"
+        );
+
+        mailSender.send(message);
+    }
+
+
+
+
+
 }
 

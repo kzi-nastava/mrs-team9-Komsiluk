@@ -1,0 +1,46 @@
+<div class="cr">
+  @if (loading()) {
+    <div class="cr-loading text-regular">Loading scheduled rides...</div>
+  }
+
+  @for (ride of scheduledRides(); track ride.id) {
+    <div class="scheduled-ride-block" style="border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; margin-bottom: 15px; margin-top: 10px;">
+      
+      <div class="cr-field">
+        <div class="cr-label text-regular">Pickup location</div>
+        <input class="cr-input text-medium" type="text" [value]="asText(ride.startAddress)" readonly />
+      </div>
+
+      @if (ride.stops && ride.stops.length > 0) {
+        <div class="cr-field">
+          <div class="cr-label text-regular">Stations</div>
+          <div class="cr-list">
+            @for (stop of ride.stops; track $index) {
+              <input class="cr-input cr-input--chip text-medium" type="text" [value]="asText(stop)" readonly />
+            }
+          </div>
+        </div>
+      }
+
+      <div class="cr-field">
+        <div class="cr-label text-regular">Destination</div>
+        <input class="cr-input text-medium" type="text" [value]="asText(ride.endAddress)" readonly />
+      </div>
+
+      <div class="cr-field">
+        <div class="cr-label text-regular" style="color: #ffff00; font-size: 0.75rem; text-transform: uppercase;">Scheduled for</div>
+        <div class="text-medium" style="color: white; font-weight: 600;">
+          {{ ride.scheduledAt | date:'dd.MM.yyyy HH:mm' }}
+        </div>
+      </div>
+    </div>
+  } 
+  
+  @empty {
+    @if (!loading()) {
+      <div class="cr-empty text-regular">
+        No upcoming rides found in your schedule.
+      </div>
+    }
+  }
+</div>

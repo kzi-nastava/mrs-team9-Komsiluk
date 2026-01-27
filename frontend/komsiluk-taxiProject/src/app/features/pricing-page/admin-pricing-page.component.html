@@ -1,0 +1,36 @@
+<div class="pricing-page app-bg-textured">
+  <div class="pricing-container">
+    <h1 class="page-title">Vehicle Pricing Management</h1>
+    
+    <div class="pricing-list-panel">
+      @if (isLoading) {
+        <div class="loading-text" style="color: white; text-align: center;">Loading pricing data...</div>
+      }
+
+      @for (item of pricingList; track item.vehicleType) {
+        <div class="pricing-card">
+          <div class="card-info">
+            <span class="vehicle-type">{{ item.vehicleType }}</span>
+          </div>
+
+          <div class="card-inputs">
+            <div class="input-group">
+              <label>Start Price (RSD)</label>
+              <input type="number" [(ngModel)]="item.startingPrice" [ngModelOptions]="{standalone: true}" />
+            </div>
+            <div class="input-group">
+              <label>Price per KM (RSD)</label>
+              <input type="number" [(ngModel)]="item.pricePerKm" [ngModelOptions]="{standalone: true}" />
+            </div>
+          </div>
+
+          <button class="btn-save" (click)="saveChanges(item)">
+            Update
+          </button>
+        </div>
+      } @empty {
+        <div style="color: white; text-align: center;">No pricing data found.</div>
+      }
+    </div>
+  </div>
+</div>

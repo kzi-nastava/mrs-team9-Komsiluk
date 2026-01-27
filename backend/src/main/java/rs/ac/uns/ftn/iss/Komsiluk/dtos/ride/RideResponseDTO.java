@@ -31,7 +31,10 @@ public class RideResponseDTO {
     private boolean petFriendly;
     private double distanceKm;
     private int estimatedDurationMin;
-    
+    private String creatorEmail;
+    private List<String> passengerEmails;
+
+
     public RideResponseDTO() {
 		super();
 	}
@@ -211,4 +214,11 @@ public class RideResponseDTO {
 	public void setEstimatedDurationMin(int estimatedDurationMin) {
 		this.estimatedDurationMin = estimatedDurationMin;
 	}
+
+    public String getCreatorEmail() { return creatorEmail; }
+    public void setCreatorEmail(String creatorEmail) { this.creatorEmail = creatorEmail; }
+
+    public List<String> getPassengerEmails() { return passengerEmails; }
+    public void setPassengerEmails(List<String> passengerEmails) { this.passengerEmails = passengerEmails; }
+
 }

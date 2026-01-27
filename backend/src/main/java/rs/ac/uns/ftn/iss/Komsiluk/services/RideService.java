@@ -2,32 +2,26 @@ package rs.ac.uns.ftn.iss.Komsiluk.services;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.time.Duration;
 import java.time.LocalDate;
-import java.util.Comparator;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import rs.ac.uns.ftn.iss.Komsiluk.beans.Ride;
-import rs.ac.uns.ftn.iss.Komsiluk.beans.Route;
-import rs.ac.uns.ftn.iss.Komsiluk.beans.User;
+import rs.ac.uns.ftn.iss.Komsiluk.beans.*;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.*;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.notification.NotificationCreateDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.ride.*;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.route.RouteCreateDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.route.RouteResponseDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.mappers.*;
+import rs.ac.uns.ftn.iss.Komsiluk.repositories.PricingRepository;
 import rs.ac.uns.ftn.iss.Komsiluk.repositories.RideRepository;
 import rs.ac.uns.ftn.iss.Komsiluk.repositories.UserRepository;
 import rs.ac.uns.ftn.iss.Komsiluk.services.exceptions.BadRequestException;
 import rs.ac.uns.ftn.iss.Komsiluk.services.exceptions.NotFoundException;
 import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.*;
-import rs.ac.uns.ftn.iss.Komsiluk.beans.DriverLocation;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.ride.RideLiveInfoDTO;
 
 @Service
@@ -59,6 +53,12 @@ public class RideService implements IRideService {
     private AdminRideHistoryMapper adminRideHistoryMapper;
     @Autowired
     private IDriverActivityService driverActivityService;
+    @Autowired
+    private MailService mailService;
+    @Autowired
+    private PricingRepository pricingRepository;
+    @Autowired
+    private RideDTOMapper  rideDTOMapper;
     
     private static final long MAX_MINUTES_LAST_24H = 480;
 
@@ -102,12 +102,14 @@ public class RideService implements IRideService {
         BigDecimal price = calculatePrice(dto.getVehicleType(), dto.getDistanceKm());
 		
         List<User> passengers = new ArrayList<>();
+        List<User> linkedPassengers = new ArrayList<>();
 
         if (dto.getPassengerEmails() != null) {
             for (String email : dto.getPassengerEmails()) {
                 User passenger= userService.findByEmail(email);
                 if (passenger != null) {
                     passengers.add(passenger);
+                    linkedPassengers.add(passenger);
 				}
                 
                 //send email
@@ -152,6 +154,12 @@ public class RideService implements IRideService {
         ride.setStatus(scheduled ? RideStatus.SCHEDULED : RideStatus.ASSIGNED);
 
         ride = rideRepository.save(ride);
+
+        for (User lp : linkedPassengers) {
+            if (lp.getEmail() != null) {
+                mailService.sendAddedToRideMail(lp.getEmail(), ride.getId());
+            }
+        }
 
         NotificationCreateDTO notificationDTODriver = new NotificationCreateDTO();
         notificationDTODriver.setUserId(driver.getId());
@@ -206,6 +214,9 @@ public class RideService implements IRideService {
     @Override
     public RideResponseDTO startRide(Long rideId) {
         Ride ride = rideRepository.findById(rideId).orElseThrow(NotFoundException::new);
+        User driver = ride.getDriver();
+        User createdBy = ride.getCreatedBy();
+        List<User> passengers = ride.getPassengers();
         if (ride == null) {
             throw new NotFoundException();
         }
@@ -214,7 +225,6 @@ public class RideService implements IRideService {
             throw new BadRequestException();
         }
         
-        User driver = ride.getDriver();
         driver.setDriverStatus(DriverStatus.IN_RIDE);
         userRepository.save(driver);
 
@@ -223,24 +233,78 @@ public class RideService implements IRideService {
 
         rideRepository.save(ride);
 
+        driver.setDriverStatus(DriverStatus.IN_RIDE);
+        userRepository.save(driver);
+
+        Set<String> emails = new HashSet<>();
+
+        if (createdBy != null && createdBy.getEmail() != null) {
+            emails.add(createdBy.getEmail());
+        }
+
+        if (passengers != null) {
+            for (User p : passengers) {
+                if (p != null && p.getEmail() != null) {
+                    emails.add(p.getEmail());
+                }
+            }
+        }
+
+        if (driver.getEmail() != null) {
+            emails.remove(driver.getEmail());
+        }
+
+        for (String email : emails) {
+            mailService.sendRideStartedMail(email, ride.getId());
+        }
+
+
         return rideMapper.toResponseDTO(ride);
     }
 
     @Override
     public RideResponseDTO finishRide(Long rideId) {
         Ride ride = rideRepository.findById(rideId).orElseThrow(NotFoundException::new);
-        if (ride == null) {
-            throw new NotFoundException();
-        }
 
         if (ride.getStatus() != RideStatus.ACTIVE) {
             throw new BadRequestException();
         }
 
+        User driver = ride.getDriver();
+        User createdBy = ride.getCreatedBy();
+        List<User> passengers = ride.getPassengers();
+
         ride.setStatus(RideStatus.FINISHED);
         ride.setEndTime(LocalDateTime.now());
 
         rideRepository.save(ride);
+
+        driver.setDriverStatus(DriverStatus.ACTIVE);
+
+        userRepository.save(driver);
+
+        Set<String> emails = new HashSet<>();
+
+        mailService.sendRideFinishedMail(createdBy.getEmail(), ride.getId() );
+
+        if (passengers != null) {
+            for (User p : passengers) {
+                if (p != null && p.getEmail() != null) {
+                    emails.add(p.getEmail());
+                }
+            }
+        }
+
+        if (driver.getEmail() != null) {
+            emails.remove(driver.getEmail());
+        }
+
+        for (String email : emails) {
+            mailService.sendRideFinishedMailLinkedPasengers(email, ride.getId());
+        }
+
+
+
 
         return rideMapper.toResponseDTO(ride);
     }
@@ -310,20 +374,70 @@ public class RideService implements IRideService {
                     driverId, RideStatus.FINISHED, fromDt, toDt);
         }
 
+        // --------- (1) all  userIds ----------
+        Set<Long> ids = new HashSet<>();
+
+        for (Ride r : rides) {
+            // creator
+            if (r.getCreatedBy() != null && r.getCreatedBy().getId() != null) {
+                ids.add(r.getCreatedBy().getId());
+            }
+
+            // passengers
+            if (r.getPassengers() != null) {
+                for (User p : r.getPassengers()) {
+                    if (p != null && p.getId() != null) ids.add(p.getId());
+                }
+            }
+        }
+
+        // --------- (2) batch fetch email map ----------
+        Map<Long, String> emailById = ids.isEmpty()
+                ? Map.of()
+                : userRepository.findByIdIn(ids).stream()
+                .collect(Collectors.toMap(User::getId, User::getEmail));
+
+        // --------- (3) filling  DTO ----------
         return rides.stream()
-                .map(rideMapper::toResponseDTO)
+                .map(ride -> {
+                    RideResponseDTO dto = rideMapper.toResponseDTO(ride);
+
+                    // creatorEmail
+                    Long creatorId = dto.getCreatorId();
+                    String creatorEmail = (creatorId == null) ? null : emailById.get(creatorId);
+                    dto.setCreatorEmail(creatorEmail);
+
+                    // passengerEmails
+                    List<Long> pids = dto.getPassengerIds();
+                    List<String> passengerEmails;
+
+                    if (pids == null || pids.isEmpty()) {
+                        passengerEmails = new java.util.ArrayList<>();
+                    } else {
+                        passengerEmails = pids.stream()
+                                .map(emailById::get)
+                                .filter(java.util.Objects::nonNull)
+                                .collect(java.util.stream.Collectors.toCollection(java.util.ArrayList::new));
+                    }
+
+                    if (creatorEmail != null && !passengerEmails.contains(creatorEmail)) {
+                        passengerEmails.add(0, creatorEmail);
+                    }
+
+                    dto.setPassengerEmails(passengerEmails);
+
+                    return dto;
+                })
                 .toList();
     }
 
     private BigDecimal calculatePrice(VehicleType type, double distanceKm) {
-        // Here should price logic go
-        BigDecimal base = switch (type) {
-            case STANDARD -> BigDecimal.valueOf(200);
-            case LUXURY -> BigDecimal.valueOf(300);
-            case VAN -> BigDecimal.valueOf(400);
-        };
+        Pricing pricing = pricingRepository.findByVehicleType(type)
+                .orElseThrow(BadRequestException::new);
 
-        BigDecimal perKm = BigDecimal.valueOf(120);
+        BigDecimal base = BigDecimal.valueOf(pricing.getStartingPrice());
+        BigDecimal perKm = BigDecimal.valueOf(pricing.getPricePerKm());
+
         return base.add(perKm.multiply(BigDecimal.valueOf(distanceKm)));
     }
 
@@ -654,6 +768,10 @@ public class RideService implements IRideService {
         );
     }
 
-
+    @Override
+    public Optional<RidePassengerActiveDTO> getActiveRideForPassenger(Long userId) {
+        return rideRepository.findActiveRideForPassenger(userId)
+                .map(rideDTOMapper::toActiveResponseDTO); // Samo pozoveš maper
+    }
 
 }

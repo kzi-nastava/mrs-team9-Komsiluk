@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 import rs.ac.uns.ftn.iss.Komsiluk.beans.Ride;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.User;
+import rs.ac.uns.ftn.iss.Komsiluk.dtos.ride.RidePassengerActiveDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.ride.RideResponseDTO;
 
 @Component
@@ -42,5 +43,24 @@ public class RideDTOMapper {
         );
 
         return dto;
+    }
+
+    public RidePassengerActiveDTO toActiveResponseDTO(Ride ride) {
+        String stopsStr = ride.getRoute().getStops();
+        List<String> stopsList = (stopsStr == null || stopsStr.isBlank())
+                ? List.of()
+                : Arrays.asList(stopsStr.split("\\|"));
+
+        return new RidePassengerActiveDTO(
+                ride.getId(),
+                ride.getDriver() != null ? ride.getDriver().getId() : null,
+                ride.getDriver() != null ? ride.getDriver().getFirstName() : "N/A",
+                ride.getDriver() != null ? ride.getDriver().getLastName() : "N/A",
+                ride.getDriver() != null ? ride.getDriver().getEmail() : "N/A",
+                ride.getRoute().getStartAddress(),
+                ride.getRoute().getEndAddress(),
+                stopsList,
+                ride.getStatus()
+        );
     }
 }

@@ -19,6 +19,7 @@ import { UserRole } from './core/auth/services/auth.service';
 import { AdminDriverChangeRequestsPageComponent } from './features/approve-edit/admin-driver-change-requests-page/admin-driver-change-requests-page.component';
 
 import { AdminDriverRegistrationPageComponent } from './features/add-driver/admin-driver-registration-page/admin-driver-registration-page.component';
+import { AdminPricingPageComponent } from './features/pricing-page/admin-pricing-page.component';
 
 export const routes: Routes = [
 
@@ -77,6 +78,13 @@ export const routes: Routes = [
   {
     path: 'admin/add-driver',
     component: AdminDriverRegistrationPageComponent,
+    canActivate: [authGuard, roleGuard],
+    data: { roles: [UserRole.ADMIN] }
+  },
+
+  { 
+    path: 'admin/pricing',
+    component: AdminPricingPageComponent,
     canActivate: [authGuard, roleGuard],
     data: { roles: [UserRole.ADMIN] }
   },

@@ -42,3 +42,15 @@ export interface RideResponseDTO {
   babyFriendly: boolean;
   petFriendly: boolean;
 }
+
+export interface RidePassengerActiveDTO {
+  driverId: number;
+  rideId: number;
+  driverFirstName: string;
+  driverLastName: string;
+  driverEmail: string;
+  startAddress: string;
+  endAddress: string;
+  stops: string[];
+  status: RideStatus;
+}

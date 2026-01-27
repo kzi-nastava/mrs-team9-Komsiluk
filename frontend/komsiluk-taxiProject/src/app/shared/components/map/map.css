@@ -37,13 +37,12 @@
   box-shadow: 0 6px 14px rgba(0,0,0,.35) !important;
 }
 
-/* boje */
 .km-driver--free {
-  background: #22c55e !important; /* zeleno */
+  background: #22c55e !important; 
 }
 
 .km-driver--busy {
-  background: #ef4444 !important; /* crveno */
+  background: #ef4444 !important; 
 }
 
 /* ikonica unutra */
@@ -53,8 +52,11 @@
   color: #111 !important;
 }
 
-/* Leaflet često doda border/pozadinu na divIcon */
 .leaflet-div-icon.km-driver {
   background: transparent !important;
   border: none !important;
+}
+
+.km-driver {
+  transition: all 0.1s linear !important;
 }

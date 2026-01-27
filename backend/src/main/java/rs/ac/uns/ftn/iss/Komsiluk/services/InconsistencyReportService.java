@@ -101,9 +101,7 @@ public class InconsistencyReportService implements IInconsistencyReportService {
 
     @Override
     public Collection<InconsistencyReportResponseDTO> getByRideId(Long rideId) {
-        rideRepository.findById(rideId).orElseThrow(NotFoundException::new);
-
-        return reportRepository.findByRide_IdOrderByCreatedAtDesc(rideId)
+        return reportRepository.findByRideIdWithReporter(rideId)
                 .stream()
                 .map(this::toResponseDTO)
                 .toList();
@@ -127,6 +125,7 @@ public class InconsistencyReportService implements IInconsistencyReportService {
         dto.setMessage(report.getMessage());
         dto.setCreatedAt(report.getCreatedAt());
         dto.setReporterRole(report.getReporterRole());
+        dto.setReporterEmail(report.getReporter().getEmail());
         return dto;
     }
 }

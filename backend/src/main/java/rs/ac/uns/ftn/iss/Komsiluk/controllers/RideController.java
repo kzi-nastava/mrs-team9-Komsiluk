@@ -9,8 +9,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import rs.ac.uns.ftn.iss.Komsiluk.beans.User;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.ride.*;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.ride.RideLiveInfoDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.ride.RideCreateDTO;
@@ -108,6 +110,17 @@ public class RideController {
     public ResponseEntity<RideLiveInfoDTO> getLiveInfo(@PathVariable Long id) {
         RideLiveInfoDTO dto = rideService.getLiveInfo(id);
         return new ResponseEntity<>(dto, HttpStatus.OK);
+    }
+
+    @PreAuthorize("hasRole('PASSENGER')")
+    @GetMapping("/passenger/active")
+    public ResponseEntity<RidePassengerActiveDTO> getActiveRide() {
+        // Uzimamo ID trenutno ulogovanog korisnika iz SecurityContext-a
+        User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        return rideService.getActiveRideForPassenger(currentUser.getId())
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.noContent().build()); // 204 No Content ako nema vožnje
     }
 }
 
