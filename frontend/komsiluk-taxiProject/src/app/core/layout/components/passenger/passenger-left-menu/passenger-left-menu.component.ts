@@ -13,6 +13,7 @@ import { LeftSidebarCommandService } from '../services/left-sidebar-command-serv
 import { RidePassengerActiveDTO } from '../../../../../shared/models/ride.models';
 import { AuthService } from '../../../../auth/services/auth.service';
 import { DriverRatingModalComponent } from '../../../../../features/ride/components/driver-rating-modal/driver-raitng-modal';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-passenger-left-menu',
@@ -33,6 +34,8 @@ export class PassengerLeftMenuComponent implements AfterViewInit, OnInit, OnDest
   favOpen = signal(false);
   schedOpen = signal(false);
   activeRide = signal<RidePassengerActiveDTO | null>(null);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
 
   @ViewChild('favPanel') favPanel?: FavoriteRidesPanelComponent;
   @ViewChild(PassengerBookRidePanelComponent) bookPanel?: PassengerBookRidePanelComponent;
@@ -63,9 +66,24 @@ export class PassengerLeftMenuComponent implements AfterViewInit, OnInit, OnDest
     });
   }
 
-  ngOnInit(): void {
-    this.startPolling();
-  }
+ngOnInit(): void {
+  this.route.queryParams.subscribe(params => {
+    const rideIdFromUrl = params['rateRideId'];
+    
+    if (rideIdFromUrl) {
+      this.lastFinishedRideId.set(Number(rideIdFromUrl));
+      this.showRatingModal.set(true);
+      
+      this.router.navigate([], {
+        queryParams: { rateRideId: null },
+        queryParamsHandling: 'merge',
+        replaceUrl: true 
+      });
+    }
+  });
+
+  this.startPolling();
+}
 
   private startPolling() {
     this.pollingSub = interval(2000).pipe(

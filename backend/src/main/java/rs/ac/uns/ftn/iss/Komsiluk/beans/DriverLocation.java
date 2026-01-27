@@ -8,7 +8,9 @@ public class DriverLocation {
     @Id
     @Column(name = "driver_id", nullable = false)
     private Long driverId;
+    @Column(name = "lat")
     private double lat;
+    @Column(name = "lng")
     private double lng;
     private LocalDateTime updatedAt;
 

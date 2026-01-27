@@ -61,7 +61,23 @@ private geocodingService = inject(GeocodingService);
       if (isLogged) {
         this.driversLayer.clearLayers();
         this.driverMarkers.clear();
-      }
+      }else {
+      this.driversLayer.clearLayers();
+      this.driverMarkers.clear();
+      this.selfMarker = null;
+      this.targetDriverId = null;
+
+      this.clearRoute();
+
+      this.clearLiveRideVisuals();
+      
+      this.activePassengerMarkers.clearLayers();
+
+      this.stopSelfAnimation();
+      this.clearPreRideVisuals();
+      
+      this.facade.activeDriverId.set(null);
+    }
     });
 
     this.destroyRef.onDestroy(() => {
