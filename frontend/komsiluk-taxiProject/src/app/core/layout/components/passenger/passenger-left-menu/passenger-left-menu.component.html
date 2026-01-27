@@ -8,17 +8,10 @@
 }
 <nav class="p-menu">
   @if (activeRide(); as active) {
-    <div class="p-item p-item--active-ride">
-      <span class="p-left">
-        <span class="material-symbols-outlined" style="color: var(--color-danger)">local_taxi</span>
-        <span class="p-text">Active Ride in Progress</span>
-      </span>
-    </div>
-
-    <div class="p-panel p-panel--active" style="display: block;">
+    <div class="p-panel p-panel--active" style="display: block; border: none; padding: 0;">
         <app-passenger-active-ride-panel [ride]="active" />
     </div>
-  } 
+  }
   @else {
     <button class="p-item" type="button" (click)="toggle('book')">
       <span class="p-left">

@@ -1,21 +1,24 @@
 <div class="cr">
-  <div class="cr-field">
-    <div class="cr-label text-regular">Driver</div>
-    <div class="cr-input text-medium" style="display:flex; align-items:center;">
-        {{ ride().driverFirstName }} {{ ride().driverLastName }}
-    </div>
+  <div class="cr-header">
+    <span class="material-symbols-outlined header-icon">directions_car</span>
+    <span class="header-title">Current ride</span>
   </div>
 
-  <div class="cr-field eta-box">
-    <div class="cr-label text-regular">Estimated Arrival</div>
-    <div class="cr-input text-medium eta-display">
-      <span class="material-symbols-outlined" style="font-size: 18px; margin-right: 8px;">schedule</span>
-      @if (remainingMinutes() !== null) {
-        Arriving in <strong>{{ remainingMinutes() }} min</strong>
-      } @else {
-        Calculating...
-      }
-    </div>
+  <div class="cr-main-info">
+    <h2 class="driver-info">
+      Driver name: <span class="highlight-yellow">{{ ride().driverFirstName }} {{ ride().driverLastName }}</span>
+    </h2>
+    
+    <p class="eta-info">
+      Estimated time remaining: 
+      <span class="highlight-yellow">
+        @if (remainingMinutes() !== null) {
+          {{ remainingMinutes() }}min
+        } @else {
+          Calculating...
+        }
+      </span>
+    </p>
   </div>
 
   <div class="cr-field">

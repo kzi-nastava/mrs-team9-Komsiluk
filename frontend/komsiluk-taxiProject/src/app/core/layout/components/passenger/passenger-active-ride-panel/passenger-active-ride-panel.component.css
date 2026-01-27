@@ -1,3 +1,37 @@
+.cr-header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 15px;
+  padding-top: 10px;
+}
+
+.header-icon {
+  color: #e2e212;
+  font-size: 28px !important;
+}
+
+.header-title {
+  color: #e2e212;
+  font-size: 18px;
+  font-weight: 500;
+  flex-grow: 1;
+}
+
+.header-arrow {
+  color: #e2e212;
+}
+
+.eta-info {
+  font-size: 16px;
+  margin: 5px 0;
+  color: white;
+}
+
+/* Žuta boja za vrednosti */
+.highlight-yellow {
+  color: #e2e212;
+}
 .cr{
   display: flex;
   flex-direction: column;
@@ -84,7 +118,7 @@
 .cr-row{
   display: flex;
   gap: 18px;
-  width: 100%; /* Osigurava da red zauzme sve */
+  width: 100%;
 }
 
 .cr-full-width {
@@ -96,7 +130,6 @@
 }
 
 :host {
-  /* Ovo osigurava da sama komponenta ne pravi barijeru za modal */
   display: contents; 
 }
 

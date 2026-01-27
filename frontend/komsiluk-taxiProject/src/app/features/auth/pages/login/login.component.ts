@@ -64,18 +64,18 @@ export class LoginComponent {
             next: () => {
               this.driverState.setStatus('ACTIVE');
               this.toast.show('Successful Log in!');
-              this.router.navigateByUrl('/');
+              this.router.navigate(['/'], { queryParamsHandling: 'preserve' });
             },
             error: () => {
               this.toast.show('Successful Log in!');
-              this.router.navigateByUrl('/');
+              this.router.navigate(['/'], { queryParamsHandling: 'preserve' });
             }
           });
           return;
         }
 
         this.toast.show('Successful Log in!');
-        this.router.navigateByUrl('/');
+        this.router.navigate(['/'], { queryParamsHandling: 'preserve' });
       },
       error: (err) => {
         if (err.status === 400 && err.error?.message) {

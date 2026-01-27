@@ -132,7 +132,7 @@
   font-family: 'Faster One', system-ui, sans-serif; /* ako ti već radi u projektu */
 }
 
-/* FILTER dugme */
+/* FILTER button */
 .app-navbar__filter-btn{
   height: 28px;
   padding: 0 14px;
@@ -143,20 +143,19 @@
   font-weight: 700;
   cursor: pointer;
   opacity: 0.95;
-  margin-right: 10px; /* razmak od avatara */
+  margin-right: 10px; 
 }
 
 .app-navbar__filter-btn:hover{
   opacity: 1;
 }
 
-/* (opciono) malo tanji izgled u driver history modu */
 .app-navbar--driver-history{
   box-shadow: none;
 }
 
 .app-navbar__slot--right {
-  position: relative; /* bitno da dropdown bude vezan za desni deo */
+  position: relative;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -176,7 +175,7 @@
 .app-navbar__kebab {
   font-size: 22px;
   line-height: 1;
-  color: var(--color-secondary); /* žuta */
+  color: var(--color-secondary);
 }
 
 .app-navbar__kebab-menu {
