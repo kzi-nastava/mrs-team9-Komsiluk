@@ -46,11 +46,9 @@ export class DriverScheduledRidesPanelComponent implements OnInit {
   }
 
   constructor() {
-    console.log('1. KOMPONENTA JE KREIRANA U MEMORIJI!');
   }
 
   ngOnInit() {
-    console.log('2. ngOnInit je pokrenut!');
     this.loadScheduledData();
 
     this.schedRidesService.refresh$.subscribe(() => {

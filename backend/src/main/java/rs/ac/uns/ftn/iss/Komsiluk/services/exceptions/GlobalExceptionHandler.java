@@ -1,6 +1,5 @@
 package rs.ac.uns.ftn.iss.Komsiluk.services.exceptions;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import jakarta.validation.ConstraintViolationException;
@@ -88,8 +87,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<String> handleMethodArgumentNotValid(
-            MethodArgumentNotValidException ex) {
+    public ResponseEntity<String> handleMethodArgumentNotValid(MethodArgumentNotValidException ex) {
 
         String message = ex.getBindingResult()
                 .getFieldErrors()
@@ -98,9 +96,7 @@ public class GlobalExceptionHandler {
                 .map(DefaultMessageSourceResolvable::getDefaultMessage)
                 .orElse("Validation error");
 
-        return ResponseEntity
-                .badRequest()
-                .body(message);
+        return ResponseEntity.badRequest().body(message);
     }
 
 

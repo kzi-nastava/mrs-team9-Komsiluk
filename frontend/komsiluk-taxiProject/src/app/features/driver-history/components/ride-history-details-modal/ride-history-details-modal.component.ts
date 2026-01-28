@@ -5,7 +5,7 @@ import { RideService } from '../../../../core/layout/components/passenger/book_r
 import { RatingResponseDTO, RatingService } from '../../services/rating.service';
 
 export interface PassengerRating {
-  email: string; // Backend trenutno ne vraca email, mapiracemo ID
+  email: string;
   driverRating?: number | null;
   vehicleRating?: number | null;
   comment?: string | null;
@@ -15,7 +15,6 @@ export interface RideHistoryDetailsVm {
   // Left
   id: number;
   passengers: string[];
-  // ratings: PassengerRating[]; // Ovo vise ne moramo uzimati iz inputa ako fetchujemo, ali neka stoji za svaki slucaj
 
   // Center
   mapImageUrl: string;
@@ -53,7 +52,7 @@ export class RideHistoryDetailsModalComponent implements OnInit {
   @Output() close = new EventEmitter<void>();
 
   private rideService = inject(RideService);
-  private ratingService = inject(RatingService); // Injektujemo novi servis
+  private ratingService = inject(RatingService);
 
   inconsistencyReports = signal<any[]>([]);
   ratings = signal<PassengerRating[]>([]);
@@ -119,7 +118,6 @@ export class RideHistoryDetailsModalComponent implements OnInit {
   this.ratingService.getRatingsForRide(this.data.id).subscribe({
     next: (dtos: RatingResponseDTO[]) => {
       const mapped: PassengerRating[] = (dtos ?? []).map(dto => ({
-        // dok backend ne šalje email, prikaži ID
         email: dto.raterMail || `Rater ID: ${dto.raterId}`,
         driverRating: dto.driverGrade,
         vehicleRating: dto.vehicleGrade,

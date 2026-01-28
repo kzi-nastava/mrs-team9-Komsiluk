@@ -6,21 +6,21 @@ export type RideStatus = 'completed' | 'canceled' | 'in-progress';
 export interface RideHistoryCard {
   id: string;
 
-  date: string;        // "20.01.2026"
-  startTime: string;   // "01:56"
-  endTime: string;     // "01:58"
+  date: string;       
+  startTime: string;   
+  endTime: string;     
 
   pickup: string;
   destination: string;
 
   status: RideStatus;
 
-  passengers: number;  // broj putnika
-  kilometers: number;  // npr 5
-  durationText: string; // "10 min"
-  price: number;       // npr 800
+  passengers: number;  
+  kilometers: number; 
+  durationText: string; 
+  price: number;       
 
-  mapImageUrl: string; // assets/taxi.png (placeholder)
+  mapImageUrl: string;
 }
 
 @Component({
@@ -34,7 +34,6 @@ export class RideHistoryCardComponent {
   @Input({ required: true }) ride!: RideHistoryCard;
   @Input() selected = false;
 
-  // Emituje rideId (kao i ranije)
   @Output() details = new EventEmitter<string>();
 
   onDetailsClick(e: MouseEvent) {

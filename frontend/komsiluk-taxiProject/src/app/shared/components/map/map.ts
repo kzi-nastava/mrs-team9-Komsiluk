@@ -1,7 +1,6 @@
 import {Component,AfterViewInit,effect,inject,Injector,runInInjectionContext,DestroyRef,ViewEncapsulation,} from '@angular/core';
 import * as L from 'leaflet';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-
 import { MapFacadeService } from './services/map-facade.service';
 import { DriverLocationService } from './services/driver-location.service';
 import { AuthService } from '../../../core/auth/services/auth.service';
@@ -34,14 +33,12 @@ export class MapComponent implements AfterViewInit {
   private selfMarker: L.Marker | null = null;
 
   private activePassengerMarkers = L.layerGroup();
-private targetDriverId: number | null = null;
+  private targetDriverId: number | null = null;
 
   private selfPos = L.latLng(45.2671, 19.8335);
 
   private animToken = 0;
   private animTimer: any = null;
-
-  private driverNames = new Map<number, string>();
 
   private driversLayer = L.layerGroup();
   private driverMarkers = new Map<number, L.Marker>();
@@ -64,7 +61,27 @@ private geocodingService = inject(GeocodingService);
       if (isLogged) {
         this.driversLayer.clearLayers();
         this.driverMarkers.clear();
+      }else {
+      this.driversLayer.clearLayers();
+      this.driverMarkers.clear();
+      this.selfMarker = null;
+      this.targetDriverId = null;
+
+      this.clearRoute();
+
+      this.clearLiveRideVisuals();
+      
+      this.activePassengerMarkers.clearLayers();
+
+      this.stopSelfAnimation();
+      this.clearPreRideVisuals();
+      
+      this.facade.activeDriverId.set(null);
+      if ((this.facade as any).clearDriveTo) {
+        (this.facade as any).clearDriveTo();
       }
+    
+    }
     });
 
     this.destroyRef.onDestroy(() => {
@@ -117,24 +134,24 @@ ngAfterViewInit(): void {
   setTimeout(() => this.map.invalidateSize(), 0);
 
   runInInjectionContext(this.injector, () => {
-    // EFEKAT 1: RUTA ZA PRETRAGU (Pre-book) - OSTAJE NETAKNUTA
+    //Search route
     effect(() => {
       const s = this.facade.state();
       if (!this.map) return;
       
-      // Ako nema pretrage, očisti sloj rute
+      // If there is no state, clear route
       if (!s) {
         this.clearRoute();
         return;
       }
       
-      // Dokle god nema targetDriverId-a, crtamo rutu pretrage
+      // When there is a target driver (active ride), do not render search route
       if (!this.targetDriverId) {
         this.renderRoute(s.points, s.geometry);
       }
     });
 
-    // EFEKAT 2: VOZAČ (Drive to pickup)
+    //Driver (Drive to pickup)
     effect(() => {
       const d = (this.facade as any).driveTo?.();
       if (!this.map || !d) return;
@@ -143,31 +160,30 @@ ngAfterViewInit(): void {
       this.driveSelfTo(d.target.lat, d.target.lon);
     });
 
-    // EFEKAT 3: SINHRONIZACIJA AKTIVNOG VOZAČA
+    //Synchronization of active driver
     effect(() => {
       const pts = (this.facade as any).ridePath?.();
       const activeDriverId = (this.facade as any).activeDriverId?.(); 
       const role = this.authService.userRole();
       if (role === 'DRIVER') {
-      // AKO JE VOZAČ: Pokreni animaciju kretanja
-      console.log('VOZAČ: Pokrećem live animaciju');
+      // Start animation if user is driver
       this.startLiveRide(pts);
     } 
     else if (role === 'PASSENGER' && activeDriverId) {
-      // AKO JE PUTNIK: Samo postavi ID da bi renderDrivers prikazao vozilo
+      // If user is passenger set ID so renderDrivers shows the vehicle
       this.targetDriverId = activeDriverId;
     }
     });
   });
 
-  // POLLING LOKACIJA (Za prikaz vozača na mapi)
+  // POLLING LOCATIONS (For displaying drivers on the map)
   this.driverLocService.pollLocations()
     .pipe(takeUntilDestroyed(this.destroyRef))
     .subscribe((locations) => {
       this.renderDrivers(locations);
     });
 
-  // POLLING ZA AKTIVNU VOŽNJU (Prelazak sa pretrage na vožnju)
+  // Polling for active ride (Transition from search to ride)
   
   if (this.authService.userRole() === 'PASSENGER') {
     interval(500)
@@ -177,14 +193,13 @@ ngAfterViewInit(): void {
       )
       .subscribe((ride) => {
         if (ride && ride.driverId) {
-          // 1. Postavljamo stanje u fasadi (ovo će okinuti Efekat 3)
           this.facade.activeDriverId.set(ride.driverId);
           this.targetDriverId = ride.driverId;
-
-          // 2. BRIŠEMO RUTU PRETRAGE (Search visuals) jer je vožnja postala aktivna
+         
+          //Delete previous visuals
           this.clearRoute();
 
-          // 3. GEODOKIRANJE I CRTANJE AKTIVNE RUTE
+          //Geocoding and drawing active route
           const addressQueries = [ride.startAddress, ...ride.stops, ride.endAddress];
           
           import('rxjs').then(({ forkJoin }) => {
@@ -192,16 +207,15 @@ ngAfterViewInit(): void {
               .subscribe(results => {
                 const validPoints = results.filter(res => res !== null) as any[];
                 if (validPoints.length >= 2) {
-                  // Crtamo "novu" rutu iz aktivne vožnje
+                  // Draw route from active ride
                   this.calculatePassengerPath(validPoints);
                 }
               });
           });
         }
         else {
-          // VOŽNJA JE ZAVRŠENA (ili je nema)
-          if (this.targetDriverId !== null) { // Provera da li je vožnja upravo bila aktivna
-            console.log("Vožnja završena - Čistim mapu");
+          // Ride is finished (or does not exist)
+          if (this.targetDriverId !== null) { // Check if the ride was just active
             this.handleRideFinish();
           }
         }
@@ -217,15 +231,14 @@ private handleRideFinish() {
   this.clearLiveRideVisuals();
   this.activePassengerMarkers.clearLayers();
   
-  // Ako je putnik, brišemo sve markere vozača sa mape
+  // If user is passenger, clear all driver markers from the map
   if (this.authService.userRole() === 'PASSENGER') {
     this.driversLayer.clearLayers();
     this.driverMarkers.clear();
   }
-  // Ako je vozač, NE brišemo driversLayer jer on treba da vidi sebe i dalje
+  // If user is driver, don't clear own marker
 }
 private calculatePassengerPath(points: any[]) {
-  // Ako linija već postoji, nemoj ponovo računati rutu (štedimo resurse)
   if (this.liveRideLine) return;
 
   (this.routing as any).route(points).subscribe({
@@ -436,7 +449,6 @@ private calculatePassengerPath(points: any[]) {
 private animateSelfAlongLiveRide(path: L.LatLng[], stepMs = 200) {
   if (!path.length) return;
   
-  // Koristimo postojeći selfMarker koji je već na mapi
   this.ensureSelfMarker(); 
   if (!this.selfMarker) return;
 
@@ -449,11 +461,9 @@ private animateSelfAlongLiveRide(path: L.LatLng[], stepMs = 200) {
     const p = path[i];
     if (!p) return;
 
-    // Direktno pomeranje postojećeg markera
     this.selfMarker!.setLatLng(p);
     this.selfPos = p;
 
-    // Slanje lokacije backendu (ostaje na 1s zbog provere u metodi)
     this.maybePushLocationToBackend(p);
 
     if (this.liveRideLine) {
@@ -466,7 +476,6 @@ private animateSelfAlongLiveRide(path: L.LatLng[], stepMs = 200) {
       this.animTimer = setTimeout(tick, stepMs);
     } else {
       this.animTimer = null;
-      // Ne brišemo marker na kraju, samo liniju
       if (this.liveRideLine) {
         this.map.removeLayer(this.liveRideLine);
         this.liveRideLine = null;
@@ -478,14 +487,12 @@ private animateSelfAlongLiveRide(path: L.LatLng[], stepMs = 200) {
 }
 
 private renderPassengerActiveRide(points: { lat: number; lon: number; label?: string }[]) {
-  // 1. Očisti prethodne markere
   this.activePassengerMarkers.clearLayers();
   
   if (!this.map.hasLayer(this.activePassengerMarkers)) {
     this.activePassengerMarkers.addTo(this.map);
   }
 
-  // 2. Iscrtaj Pickup, Stanice i Destination
   points.forEach((p, idx) => {
     const icon = idx === 0 ? this.startIcon : 
                  idx === points.length - 1 ? this.endIcon : 
@@ -494,7 +501,6 @@ private renderPassengerActiveRide(points: { lat: number; lon: number; label?: st
     L.marker([p.lat, p.lon], { icon }).addTo(this.activePassengerMarkers);
   });
 
-  // 3. Fokusiraj mapu
   const bounds = L.latLngBounds(points.map(p => [p.lat, p.lon]));
   if (bounds.isValid()) this.map.fitBounds(bounds.pad(0.3));
 
@@ -570,7 +576,6 @@ private renderDrivers(
   const role = this.authService.userRole();
   const myId = Number(this.authService.userId() ?? 0);
 
-  // 1. FILTRIRANJE (Ostaje isto)
   let filteredLocations = locations.filter(l => {
     if (role === 'GUEST') return true;
     if (role === 'DRIVER') return l.driverId === myId;
@@ -582,7 +587,6 @@ private renderDrivers(
 
   const incomingIds = new Set(filteredLocations.map(l => l.driverId));
 
-  // 2. BRISANJE MARKERA (Ostaje isto)
   for (const [id, marker] of this.driverMarkers.entries()) {
     if (!incomingIds.has(id)) {
       this.driversLayer.removeLayer(marker);
@@ -591,9 +595,7 @@ private renderDrivers(
     }
   }
 
-  // 3. CRTANJE / AŽURIRANJE
   for (const loc of filteredLocations) {
-    // Ako smo mi vozač i u toku je animacija kretanja, ne diramo marker da ne bi "seckao"
     if (loc.driverId === myId && this.animTimer) continue; 
 
     let marker = this.driverMarkers.get(loc.driverId);
@@ -603,12 +605,9 @@ private renderDrivers(
       marker.setLatLng([loc.lat, loc.lng]);
       marker.setIcon(icon);
       
-      // --- KLJUČNI DEO ZA ETA ---
-      // Ako je ovo vozač kojeg putnik trenutno prati, šaljemo koordinate u fasadu
       if (loc.driverId === this.targetDriverId) {
         this.facade.setDriveTo(loc.driverId, loc.lat, loc.lng);
       }
-      // --------------------------
 
       if (loc.driverId === myId && !this.animTimer) {
         this.selfPos = marker.getLatLng();

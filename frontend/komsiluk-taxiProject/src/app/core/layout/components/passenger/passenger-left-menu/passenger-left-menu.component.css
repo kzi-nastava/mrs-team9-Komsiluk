@@ -71,6 +71,5 @@
 }
 
 :host {
-  /* Ovo osigurava da sama komponenta ne pravi barijeru za modal */
   display: contents; 
 }

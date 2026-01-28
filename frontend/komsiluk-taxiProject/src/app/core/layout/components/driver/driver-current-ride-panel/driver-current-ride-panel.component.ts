@@ -154,7 +154,7 @@ export class DriverCurrentRidePanelComponent implements OnInit {
       const lon = Number(res.lon);
       if (!Number.isFinite(lat) || !Number.isFinite(lon)) return;
 
-      // ✅ cache za startRide (da ne ponavlja geocoding pickup-a)
+      /*<-- cache for pickup coords(pre-ride live and start ride) -->*/
       this.pickupCoordCache = { rideId: dto.id, lat, lon };
 
       this.mapFacade.setDriveTo(driverId, lat, lon);
@@ -247,7 +247,6 @@ export class DriverCurrentRidePanelComponent implements OnInit {
     this.toast.show('Not implemented.');
   }
 
-// driver-current-ride-panel.component.ts
 
 finish() {
   const currentRide = this.ride();
@@ -260,18 +259,12 @@ finish() {
   ).subscribe({
     next: (updatedRide) => {
       this.toast.show('Ride finished successfully.');
-      console.log("Vozač uspešno završio vožnju na backendu", updatedRide);
 
-      // 1. Ažuriraj lokalni status
       this.ride.set(updatedRide); 
       this.fillForm(updatedRide);
 
-      // 2. KLJUČNO: Pozovi čišćenje fasade
-      // Ovo će setovati signale na null, što će trigerovati Effect u mapi 
-      // da obriše sve Layer-e (markere i linije) povezane sa tom vožnjom.
       this.mapFacade.clearFocusRide();
       
-      // Opciono: ako tvoja mapa koristi odvojenu metodu za putanju:
       this.mapFacade.clearRidePath?.();
 
       setTimeout(() => this.refresh(), 2000);

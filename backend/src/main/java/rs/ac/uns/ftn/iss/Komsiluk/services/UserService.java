@@ -44,7 +44,7 @@ public class UserService implements IUserService {
 
     @Override
     public User findById(Long id) {
-    	return userRepository.findById(id).orElseThrow(NotFoundException::new);
+    	return userRepository.findById(id).orElseThrow(() -> new NotFoundException("User not found"));
     }
 
     @Override
@@ -60,14 +60,14 @@ public class UserService implements IUserService {
     @Override
     public void delete(Long id) {
     	if (!userRepository.existsById(id)) {
-            throw new NotFoundException();
+            throw new NotFoundException("User not found");
         }
         userRepository.deleteById(id);
 	}
     
     @Override
     public UserProfileResponseDTO getProfile(Long id) {
-    	User user = userRepository.findById(id).orElseThrow(NotFoundException::new);
+    	User user = userRepository.findById(id).orElseThrow(() -> new NotFoundException("User not found"));
 
         UserProfileResponseDTO userResponseDTO = userMapper.toResponseDTO(user);
 
@@ -80,7 +80,7 @@ public class UserService implements IUserService {
     
     @Override
     public UserProfileResponseDTO updateProfile(Long id, UserProfileUpdateDTO profileDTO) {
-		User user = userRepository.findById(id).orElseThrow(NotFoundException::new);
+		User user = userRepository.findById(id).orElseThrow(() -> new NotFoundException("User not found"));
 
 		userMapper.fromUpdateDTO(profileDTO, user);
 		
@@ -91,10 +91,10 @@ public class UserService implements IUserService {
 
 	@Override
 	public void changePassword(Long id, UserChangePasswordDTO dto) {
-		User user = userRepository.findById(id).orElseThrow(NotFoundException::new);
+		User user = userRepository.findById(id).orElseThrow(() -> new NotFoundException("User not found"));
 		
 		if (!passwordEncoder.matches(dto.getOldPassword(), user.getPasswordHash())) {
-            throw new InvalidPasswordException();
+            throw new InvalidPasswordException("Old password is incorrect");
         }
 		
 		user.setPasswordHash(passwordEncoder.encode(dto.getNewPassword()));
@@ -103,7 +103,7 @@ public class UserService implements IUserService {
 	}
 
     public void resetPassword(Long userId, String newPassword) {
-        User user = userRepository.findById(userId).orElseThrow(NotFoundException::new);
+        User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User not found"));
 
         user.setPasswordHash(passwordEncoder.encode(newPassword));
         
@@ -134,13 +134,13 @@ public class UserService implements IUserService {
     
     @Override
     public boolean isBlocked(Long userId) {
-        User user = userRepository.findById(userId).orElseThrow(NotFoundException::new);
+        User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User not found"));
         return user.isBlocked();
     }
     
     @Override
     public UserProfileResponseDTO updateProfileImage(Long id, MultipartFile image) {
-        User user = userRepository.findById(id).orElseThrow(NotFoundException::new);
+        User user = userRepository.findById(id).orElseThrow(() -> new NotFoundException("User not found"));
 
         String fileName = "user-" + id + ".png";
         String userDir = uploadDir + "/users";

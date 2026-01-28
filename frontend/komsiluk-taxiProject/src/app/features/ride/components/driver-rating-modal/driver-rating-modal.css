@@ -1,29 +1,16 @@
-/* driver-rating-modal.css */
-
 .rating-modal {
-  /* Fiksno pozicioniranje u odnosu na prozor browsera */
   position: fixed !important;
   top: 0 !important;
   left: 0 !important;
   right: 0 !important;
   bottom: 0 !important;
-  
-  /* Garantuje punu širinu i visinu bez obzira na roditelja */
   width: 100vw !important;
   height: 100vh !important;
-  
-  /* Ogroman z-index da prekrije mapu i sidebar */
   z-index: 999999 !important;
-  
-  /* Centriranje */
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  
   background: rgba(0, 0, 0, 0.8) !important;
-  
-  /* RESET za stacking context: 
-     Ovo osigurava da modal ne nasleđuje transformacije sidebara */
   transform: translate(0, 0) !important;
 }
 
@@ -55,7 +42,7 @@
   font-weight: 600;
 }
 
-/* Stilovi za zvezdice i ostalo ostaju isti, samo dodajemo bolji razmak */
+/* Starts */
 .stars {
   display: flex;
   justify-content: center;
@@ -64,7 +51,7 @@
 }
 
 .star {
-  font-size: 40px; /* Veće zvezdice za lakši klik */
+  font-size: 40px;
   cursor: pointer;
   color: #444;
   transition: transform 0.1s;

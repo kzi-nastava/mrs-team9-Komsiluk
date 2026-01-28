@@ -1,6 +1,6 @@
 import { Injectable, signal } from '@angular/core';
 
-export type RideHistoryRange = { from: string; to: string }; // "YYYY-MM-DD" iz <input type="date">
+export type RideHistoryRange = { from: string; to: string }; // "YYYY-MM-DD"
 
 @Injectable({ providedIn: 'root' })
 export class RideHistoryFilterService {

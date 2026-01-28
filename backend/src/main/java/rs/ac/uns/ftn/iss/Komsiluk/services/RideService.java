@@ -7,8 +7,6 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.util.stream.Collectors;
 
-import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.*;
@@ -17,7 +15,10 @@ import rs.ac.uns.ftn.iss.Komsiluk.dtos.notification.NotificationCreateDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.ride.*;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.route.RouteCreateDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.route.RouteResponseDTO;
-import rs.ac.uns.ftn.iss.Komsiluk.mappers.*;
+import rs.ac.uns.ftn.iss.Komsiluk.mappers.AdminRideDetailsMapper;
+import rs.ac.uns.ftn.iss.Komsiluk.mappers.AdminRideHistoryMapper;
+import rs.ac.uns.ftn.iss.Komsiluk.mappers.RideDTOMapper;
+import rs.ac.uns.ftn.iss.Komsiluk.mappers.RouteDTOMapper;
 import rs.ac.uns.ftn.iss.Komsiluk.repositories.PricingRepository;
 import rs.ac.uns.ftn.iss.Komsiluk.repositories.RideRepository;
 import rs.ac.uns.ftn.iss.Komsiluk.repositories.RouteRepository;
@@ -25,9 +26,7 @@ import rs.ac.uns.ftn.iss.Komsiluk.repositories.UserRepository;
 import rs.ac.uns.ftn.iss.Komsiluk.services.exceptions.BadRequestException;
 import rs.ac.uns.ftn.iss.Komsiluk.services.exceptions.NotFoundException;
 import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.*;
-import rs.ac.uns.ftn.iss.Komsiluk.dtos.ride.RideLiveInfoDTO;
 
-@Slf4j
 @Service
 public class RideService implements IRideService {
 
@@ -89,7 +88,7 @@ public class RideService implements IRideService {
             notificationDTOFail.setMessage("You already have a ride scheduled/active in that time window.");
             notificationService.createNotification(notificationDTOFail);
 
-            throw new BadRequestException();
+            throw new BadRequestException("You already have a ride scheduled/active in that time window.");
         }
 
         String stopsString = String.join("|",dto.getStops() == null ? List.<String>of() : dto.getStops());
@@ -200,7 +199,7 @@ public class RideService implements IRideService {
         User u = userService.findById(driverId);
 
         if (u.getRole() != UserRole.DRIVER) {
-            throw new NotFoundException();
+            throw new NotFoundException("Driver not found");
         }
 
         return rideRepository.findFirstByDriverIdAndStatusInOrderByCreatedAtDesc(driverId,List.of(RideStatus.ASSIGNED, RideStatus.ACTIVE)).map(rideMapper::toResponseDTO).orElse(null);
@@ -209,7 +208,7 @@ public class RideService implements IRideService {
     @Override
     public Collection<RideResponseDTO> getScheduledRidesForUser(Long userId) {
         if (userService.findById(userId) == null) {
-            throw new NotFoundException();
+            throw new NotFoundException("User not found");
         }
 
         Collection<Ride> rides = rideRepository.findScheduledByUserId(userId,RideStatus.SCHEDULED);
@@ -219,16 +218,13 @@ public class RideService implements IRideService {
     
     @Override
     public RideResponseDTO startRide(Long rideId) {
-        Ride ride = rideRepository.findById(rideId).orElseThrow(NotFoundException::new);
+        Ride ride = rideRepository.findById(rideId).orElseThrow(()-> new NotFoundException("Ride not found"));
         User driver = ride.getDriver();
         User createdBy = ride.getCreatedBy();
         List<User> passengers = ride.getPassengers();
-        if (ride == null) {
-            throw new NotFoundException();
-        }
 
         if (ride.getStatus() != RideStatus.ASSIGNED && ride.getStatus() != RideStatus.SCHEDULED) {
-            throw new BadRequestException();
+            throw new BadRequestException("Ride cannot be started");
         }
         
         driver.setDriverStatus(DriverStatus.IN_RIDE);
@@ -270,10 +266,10 @@ public class RideService implements IRideService {
 
     @Override
     public RideResponseDTO finishRide(Long rideId) {
-        Ride ride = rideRepository.findById(rideId).orElseThrow(NotFoundException::new);
+        Ride ride = rideRepository.findById(rideId).orElseThrow(()-> new NotFoundException("Ride not found"));
 
         if (ride.getStatus() != RideStatus.ACTIVE) {
-            throw new BadRequestException();
+            throw new BadRequestException("Ride is not active");
         }
 
         User driver = ride.getDriver();
@@ -306,7 +302,7 @@ public class RideService implements IRideService {
         }
 
         for (String email : emails) {
-            mailService.sendRideFinishedMailLinkedPasengers(email, ride.getId());
+            mailService.sendRideFinishedMail(email, ride.getId());
         }
 
 
@@ -317,13 +313,13 @@ public class RideService implements IRideService {
 
     @Override
     public RideLiveInfoDTO getLiveInfo(Long rideId) {
-        Ride ride = rideRepository.findById(rideId).orElseThrow(NotFoundException::new);
+        Ride ride = rideRepository.findById(rideId).orElseThrow(()-> new NotFoundException("Ride not found"));
 
         if (ride.getStatus() != RideStatus.ACTIVE) {
-            throw new BadRequestException();
+            throw new BadRequestException("Ride is not active");
         }
         if (ride.getDriver() == null) {
-            throw new BadRequestException();
+            throw new BadRequestException("Ride has no assigned driver");
         }
 
         RideLiveInfoDTO dto = new RideLiveInfoDTO();
@@ -359,7 +355,7 @@ public class RideService implements IRideService {
 
         userService.findById(driverId);
         if (from != null && to != null && from.isAfter(to)) {
-            throw new BadRequestException();
+            throw new BadRequestException("Invalid date range");
         }
 
         LocalDateTime fromDt = (from == null) ? null : from.atStartOfDay();
@@ -439,7 +435,7 @@ public class RideService implements IRideService {
 
     private BigDecimal calculatePrice(VehicleType type, double distanceKm) {
         Pricing pricing = pricingRepository.findByVehicleType(type)
-                .orElseThrow(BadRequestException::new);
+                .orElseThrow(() -> new NotFoundException("Pricing not found for vehicle type " + type.name()));
 
         BigDecimal base = BigDecimal.valueOf(pricing.getStartingPrice());
         BigDecimal perKm = BigDecimal.valueOf(pricing.getPricePerKm());
@@ -491,15 +487,15 @@ public class RideService implements IRideService {
     public void cancelByDriver(Long rideId, DriverCancelRideDTO dto) {
 
         Ride ride = rideRepository.findById(rideId)
-                .orElseThrow(NotFoundException::new);
+                .orElseThrow(()-> new NotFoundException("Ride not found"));
 
         if (ride.getStatus() != RideStatus.ASSIGNED &&
                 ride.getStatus() != RideStatus.SCHEDULED) {
-            throw new BadRequestException();
+            throw new BadRequestException("Ride cannot be cancelled");
         }
 
         if (ride.getScheduledAt() == null) {
-            throw new BadRequestException();
+            throw new BadRequestException("Ride cannot be cancelled");
         }
 
 
@@ -522,20 +518,20 @@ public class RideService implements IRideService {
     public void cancelByPassenger(Long rideId, PassengerCancelRideDTO dto) {
 
         Ride ride = rideRepository.findById(rideId)
-                .orElseThrow(NotFoundException::new);
+                .orElseThrow(()-> new NotFoundException("Ride not found"));
 
         if (ride.getStatus() != RideStatus.ASSIGNED &&
                 ride.getStatus() != RideStatus.SCHEDULED) {
-            throw new BadRequestException();
+            throw new BadRequestException("Ride cannot be cancelled");
         }
 
         if (ride.getScheduledAt() == null) {
-            throw new BadRequestException();
+            throw new BadRequestException("Ride cannot be cancelled");
         }
 
         if (LocalDateTime.now().isAfter(
                 ride.getScheduledAt().minusMinutes(10))) {
-            throw new BadRequestException();
+            throw new BadRequestException("Ride cannot be cancelled less than 10 minutes before scheduled time");
         }
 
 
@@ -559,9 +555,10 @@ public class RideService implements IRideService {
 
     public RideResponseDTO stopRide(Long rideId, StopRideRequestDTO dto) {
         Ride ride = rideRepository.findById(rideId)
-                .orElseThrow(NotFoundException::new);
+                .orElseThrow(()-> new NotFoundException("Ride not found"));
+
         if (ride.getStatus() != RideStatus.ACTIVE) {
-            throw new BadRequestException();
+            throw new BadRequestException("Ride is not active");
         }
 
 
@@ -603,10 +600,10 @@ public class RideService implements IRideService {
 
     public void handlePanicButton(Long rideId, PanicRequestDTO initiator) {
         Ride ride = rideRepository.findById(rideId)
-                .orElseThrow(NotFoundException::new);
+                .orElseThrow(()-> new NotFoundException("Ride not found"));
 
         if (ride.getStatus() != RideStatus.ACTIVE) {
-            throw new BadRequestException();
+            throw new BadRequestException("Ride is not active");
         }
 
         ride.setPanicTriggered(true);
@@ -639,7 +636,7 @@ public class RideService implements IRideService {
                 message = "PANIC button pressed!";
                 break;
             default:
-                throw new BadRequestException();
+                throw new BadRequestException("Invalid notification type");
         }
 
         NotificationCreateDTO notificationDTOCreator = new NotificationCreateDTO();
@@ -689,7 +686,7 @@ public class RideService implements IRideService {
     public AdminRideDetailsDTO getAdminRideDetails(Long rideId) {
 
         Ride ride = rideRepository.findById(rideId)
-                .orElseThrow(NotFoundException::new);
+                .orElseThrow(()-> new NotFoundException("Ride not found"));
 
         var ratings = ratingService.getRatingsForRide(rideId);
         var reports = inconsistencyReportService.getByRideId(rideId);
