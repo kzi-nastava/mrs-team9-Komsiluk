@@ -42,7 +42,7 @@ export const jwtInterceptor: HttpInterceptorFn = (
   const router = inject(Router);
 
   const token = auth.getToken();
-
+  
   const authReq = token
     ? req.clone({
       setHeaders: {

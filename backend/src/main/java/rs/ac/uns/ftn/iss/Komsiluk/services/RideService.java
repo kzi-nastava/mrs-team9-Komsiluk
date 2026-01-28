@@ -7,6 +7,8 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.util.stream.Collectors;
 
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.*;
@@ -18,17 +20,21 @@ import rs.ac.uns.ftn.iss.Komsiluk.dtos.route.RouteResponseDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.mappers.*;
 import rs.ac.uns.ftn.iss.Komsiluk.repositories.PricingRepository;
 import rs.ac.uns.ftn.iss.Komsiluk.repositories.RideRepository;
+import rs.ac.uns.ftn.iss.Komsiluk.repositories.RouteRepository;
 import rs.ac.uns.ftn.iss.Komsiluk.repositories.UserRepository;
 import rs.ac.uns.ftn.iss.Komsiluk.services.exceptions.BadRequestException;
 import rs.ac.uns.ftn.iss.Komsiluk.services.exceptions.NotFoundException;
 import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.*;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.ride.RideLiveInfoDTO;
 
+@Slf4j
 @Service
 public class RideService implements IRideService {
 
 	@Autowired
     private RideRepository rideRepository;
+    @Autowired
+    private RouteRepository routeRepository;
 	@Autowired
 	private UserRepository userRepository;
 	@Autowired
@@ -551,11 +557,9 @@ public class RideService implements IRideService {
 
 
 
-    public StopRideResponseDTO stopRide(Long rideId, StopRideRequestDTO dto) {
-
+    public RideResponseDTO stopRide(Long rideId, StopRideRequestDTO dto) {
         Ride ride = rideRepository.findById(rideId)
                 .orElseThrow(NotFoundException::new);
-
         if (ride.getStatus() != RideStatus.ACTIVE) {
             throw new BadRequestException();
         }
@@ -565,13 +569,20 @@ public class RideService implements IRideService {
         ride.setEndTime(endTime);
 
         long durationMinutes = java.time.Duration.between(ride.getStartTime(), endTime).toMinutes();
+        ride.setEstimatedDurationMin((int) durationMinutes);
+        ride.setDistanceKm(dto.getDistanceTravelledKm());
 
         Route route = ride.getRoute();
         route.setEndAddress(dto.getStopAddress());
-        route.setStops(dto.getVisitedStops());
+        String visitedStopsString = (dto.getVisitedStops() == null) ? "" :
+                dto.getVisitedStops().stream()
+                        .skip(1)
+                        .filter(s -> s != null && !s.trim().isEmpty())
+                        .collect(Collectors.joining("|"));
+        route.setStops(visitedStopsString);
         route.setDistanceKm(dto.getDistanceTravelledKm());
         route.setEstimatedDurationMin((int) durationMinutes);
-        ride.setRoute(route);
+        routeRepository.save(route);
 
         ride.setStatus(RideStatus.FINISHED);
 
@@ -581,14 +592,13 @@ public class RideService implements IRideService {
 
         rideRepository.save(ride);
 
-        StopRideResponseDTO response = new StopRideResponseDTO();
-        response.setFinalAddress(dto.getStopAddress());
-        response.setDurationMinutes(ride.getRoute().getEstimatedDurationMin());
-        response.setPrice(price.doubleValue());
-
-
+        NotificationCreateDTO notificationDTODriver = new NotificationCreateDTO();
+        notificationDTODriver.setUserId(ride.getDriver().getId());
+        notificationDTODriver.setType(NotificationType.RIDE_STOPPED);
+        notificationDTODriver.setTitle("Ride Stopped");
+        notificationDTODriver.setMessage("Your ride from has stopped at " + dto.getStopAddress() + ".");
         notifyRideParticipants(ride, NotificationType.RIDE_STOPPED);
-        return response;
+        return rideMapper.toResponseDTO(ride);
     }
 
     public void handlePanicButton(Long rideId, PanicRequestDTO initiator) {

@@ -54,3 +54,9 @@ export interface RidePassengerActiveDTO {
   stops: string[];
   status: RideStatus;
 }
+
+export interface StopRideRequestDTO {
+  stopAddress: string;
+  visitedStops: string[];
+  distanceTravelledKm: number;
+}

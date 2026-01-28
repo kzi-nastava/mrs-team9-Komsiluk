@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { catchError, EMPTY, map, Observable, of, switchMap, tap, throwError } from 'rxjs';
-import { RideCreateDTO, RidePassengerActiveDTO, RideResponseDTO } from '../../../../../../shared/models/ride.models';
+import { RideCreateDTO, RidePassengerActiveDTO, RideResponseDTO, StopRideRequestDTO } from '../../../../../../shared/models/ride.models';
 import { ToastService } from '../../../../../../shared/components/toast/toast.service';
 import { NotificationService } from '../../../../../../features/menu/services/notification.service';
 import { AuthService } from '../../../../../../core/auth/services/auth.service';
@@ -144,6 +144,16 @@ export class RideService {
         })
       )
       .subscribe();
+  }
+
+  stopRide(rideId: number, dto: StopRideRequestDTO): Observable<RideResponseDTO> {
+    return this.http.post<RideResponseDTO>(`${this.API}/${rideId}/stop`, dto).pipe(
+      tap(() => this.toast.show('Ride stopped and recorded.')),
+      catchError(err => {
+        this.toast.show('Failed to stop ride properly.');
+        return throwError(() => err);
+      })
+    );
   }
 
   getScheduledRides(userId: number): Observable<RideResponseDTO[]> {

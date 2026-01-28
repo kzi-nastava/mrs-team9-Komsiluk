@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { GeoPoint } from './map-facade.service';
 import { GeocodingService } from './geocoding.service';
+import { lastValueFrom, timeout } from 'rxjs';
 
 export interface LabeledPoint {
   lat: number;
@@ -25,20 +26,29 @@ export class RideProgressService {
   /**
    * Pronalazi indeks tačke na ruti koja je najbliža trenutnoj poziciji vozila
    */
-  findClosestRouteIndex(route: GeoPoint[], current: GeoPoint): number {
-    let minDist = Infinity;
-    let closestIndex = 0;
+  findClosestRouteIndex(route: GeoPoint[], current: GeoPoint, lastKnownIndex: number = 0): number {
+  let minDist = Infinity;
+  let closestIndex = lastKnownIndex;
 
-    route.forEach((p, i) => {
-      const d = this.haversineDistance(p, current);
-      if (d < minDist) {
-        minDist = d;
-        closestIndex = i;
-      }
-    });
-
-    return closestIndex;
+  // Optimizacija: Ne pretražuj celu rutu od 1000 tačaka svaki put.
+  // Pretražuj od poslednjeg poznatog indeksa + mali prozor unazad (za svaki slučaj)
+  const searchStart = Math.max(0, lastKnownIndex - 10);
+  
+  for (let i = searchStart; i < route.length; i++) {
+    const d = this.haversineDistance(route[i], current);
+    if (d < minDist) {
+      minDist = d;
+      closestIndex = i;
+    }
+    // Ako distanca krene naglo da raste, znači da smo prošli najbližu tačku
+    // i nema potrebe da proveravamo preostalih 500 tačaka rute (Early Exit)
+    else if (d > minDist + 100 && i > lastKnownIndex + 5) {
+      break; 
+    }
   }
+
+  return closestIndex;
+}
 
   /**
    * Izračunava pređenu kilometražu do endIndex-a
@@ -57,20 +67,25 @@ export class RideProgressService {
    * Filtrira koje stanice su zaista posjećene do trenutne tačke
    */
   filterVisitedStops(
-    route: GeoPoint[],
-    endIndex: number,
-    stops: Array<LabeledPoint | null>
-  ): Array<LabeledPoint | null> {
-    const visitedRoute = route.slice(0, endIndex + 1);
+  route: GeoPoint[],
+  endIndex: number,
+  stops: Array<LabeledPoint | null>
+): Array<LabeledPoint | null> {
+  const visitedRoute = route.slice(0, endIndex + 1);
+  const TOLERANCE_METERS = 70; // Povećano na 70m zbog preciznosti GPS-a u gradu
 
-    return stops.filter((stop) => {
-      if (!stop) return false;
+  return stops.filter((stop) => {
+    if (!stop) return false;
 
-      return visitedRoute.some((p) =>
-        this.haversineDistance(p, stop) < 50 // tolerance 50m
-      );
-    });
-  }
+    // Umesto "some", koristimo prostiji loop koji možemo prekinuti
+    for (const point of visitedRoute) {
+      if (this.haversineDistance(point, stop) < TOLERANCE_METERS) {
+        return true; // Stanica je "zakačena" na ruti
+      }
+    }
+    return false;
+  });
+}
 
   /**
    * Haversine formula za rastojanje između dve geokoordinate
@@ -97,47 +112,51 @@ export class RideProgressService {
   /**
    * Glavna metoda koja vraća rezultat za zaustavljanje vožnje
    */
+
   async stopRide(
     currentPoint: GeoPoint,
     route: GeoPoint[],
-    stationPoints: Array<LabeledPoint | null>
+    stationPoints: LabeledPoint[]
   ): Promise<RouteProgressResult> {
+    // 1. Pronađi dokle je vozač stigao na isplaniranoj ruti
     const endIndex = this.findClosestRouteIndex(route, currentPoint);
 
+
+    // 2. Izračunaj stvarnu pređenu distancu po putanji rute
     const distanceTravelledKm = this.calculateTravelledDistanceKm(route, endIndex);
 
+    // 3. Odredi koje su stanice posećene (unutar 50m od putanje)
     const visitedStops = this.filterVisitedStops(route, endIndex, stationPoints);
 
-    const rawEndPoint = route[endIndex];
+    // 4. Odredi labelu za STOP adresu (prioritet: stanica blizu -> reverse geocode -> fallback)
+    let finalLabel = '';
+    const nearbyStation = stationPoints.find(s => this.haversineDistance(s, currentPoint) < 40);
 
-    let label = rawEndPoint.label;
-    if (!label || label.trim() === '') {
-
-      label = await this.geocodingService.reverseGeocode(rawEndPoint.lat, rawEndPoint.lon).toPromise();
+    if (nearbyStation) {
+      finalLabel = nearbyStation.label;
+    } else {
+      try {
+        // Koristimo lastValueFrom jer je Nominatim asinhron
+        finalLabel = await lastValueFrom(this.geocodingService.reverseGeocode(currentPoint.lat, currentPoint.lon).pipe(timeout(2000)));
+      } catch {
+        finalLabel = `Stop near ${stationPoints[endIndex].label || 'current location'}`;
+      }
     }
 
-    const endPoint: LabeledPoint = {
-      lat: rawEndPoint.lat,
-      lon: rawEndPoint.lon,
-      label: label ?? 'Unknown address',
-    };
-
     return {
-      endPoint,
+      endPoint: { lat: currentPoint.lat, lon: currentPoint.lon, label: this.trimLabel(finalLabel) },
       distanceTravelledKm,
-      visitedStops,
+      visitedStops
     };
+  }
+   private trimLabel(fullLabel: string): string {
+    if (!fullLabel) return '';
+    const parts = fullLabel.split(',');
+    // Uzimamo prva 3 dela adrese (npr. "Spens, Sutjeska 2, Novi Sad")
+    // To eliminiše "Južnobatčki okrug, Vojvodina, 21000, Srbija"
+    return parts.slice(0, 3).map(p => p.trim()).join(', ');
   }
 
 }
 
-
-// ovako treba da ga mapiram u json da bih ga poslao serveru
-// {
-// stopAddress: result.endPoint.label,
-//   visitedStops: result.visitedStops
-//     .map(s => s?.label)
-//     .join(','),
-//     distanceTravelledKm: result.distanceTravelledKm
-// }
 

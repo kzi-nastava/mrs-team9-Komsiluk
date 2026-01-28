@@ -40,12 +40,14 @@ import { LoginRequiredDialogComponent } from './core/layout/components/guest/log
 import { DriverStartRideConfirmModalService } from './shared/components/modal-shell/services/driver-start-ride-confirm-modal.service';
 import { DriverStartRideConfirmDialogComponent } from './core/layout/components/driver/driver-start-ride-confirm-dialog/driver-start-ride-confirm-dialog.component';
 import { RideService } from './core/layout/components/passenger/book_ride/services/ride.service';
-import { RideResponseDTO } from './shared/models/ride.models';
+import { RideResponseDTO, StopRideRequestDTO } from './shared/models/ride.models';
 import { CancelRideDialogComponent } from './core/layout/components/passenger/cancel_ride/cancel-ride-dialog.component';
 import { CancelRideModalService } from './shared/components/modal-shell/services/confirm-ride-modal-service';
 import { ScheduledRidesService } from './shared/components/modal-shell/services/scheduled-rides-service';
 import { PanicModalService } from './shared/components/modal-shell/services/panic-modal-service';
 import { PanicDialogComponent } from './shared/components/panic-dialog/panic-dialog.component';
+import { StopRideDialog } from './core/layout/components/driver/stop-ride-dialog/stop-ride-dialog';
+import { StopRideService } from './shared/components/modal-shell/services/stop-ride-service';
 
 
 @Component({
@@ -71,7 +73,8 @@ import { PanicDialogComponent } from './shared/components/panic-dialog/panic-dia
     DriverActivityConfirmDialogComponent,
     DriverStartRideConfirmDialogComponent,
     CancelRideDialogComponent,
-    PanicDialogComponent
+    PanicDialogComponent,
+    StopRideDialog,
   ],
   templateUrl: './app.html',
   styleUrl: './app.css'
@@ -85,7 +88,7 @@ export class App implements OnInit {
   rightMode: 'profile' | 'admin' = 'profile';
 
 
-  constructor(public panicModalSvc: PanicModalService,private schedRides: ScheduledRidesService, public filterSvc: RideHistoryFilterService, private router: Router, public confirmModal: ConfirmBookingModalService,
+  constructor(public stopRideSvc: StopRideService, public panicModalSvc: PanicModalService,private schedRides: ScheduledRidesService, public filterSvc: RideHistoryFilterService, private router: Router, public confirmModal: ConfirmBookingModalService,
     public addFavModal: AddFavoriteModalService, public favDetailsModal: FavoriteDetailsModalService, public renameFavModal: RenameFavoriteModalService,
     public deleteFavModal: DeleteFavoriteModalService, public toastService: ToastService, private favoriteApi: FavoriteRouteService, private favBus: FavoritesBusService,
     public schedDetailsModal: ScheduledDetailsModalService, public blockUserModal: BlockUserConfirmModalService, public blockedModal: AccountBlockedModalService,
@@ -243,5 +246,29 @@ export class App implements OnInit {
       this.rideService.activatePanicButton(id);
     }
     this.panicModalSvc.close();
+  }
+
+  async confirmStopRide() {
+    const ride = this.stopRideSvc.ride();
+    if (!ride) return;
+
+      try {
+
+        // Pokreni "magiju" računanja
+        const dto : StopRideRequestDTO = await this.stopRideSvc.prepareStopData(ride);
+        
+        console.log("Zaustavljanje vožnje sa podacima:", dto);
+
+        // Pošalji na backend
+        this.rideService.stopRide(ride.id, dto).subscribe({
+          next: (updatedRide: RideResponseDTO) => {
+    this.stopRideSvc.notifyRideStopped(updatedRide);
+    this.stopRideSvc.close();
+  }
+        });
+      } catch (error) {
+        console.error("Greška pri zaustavljanju:", error);
+        // this.toast.show("Could not calculate stop data.");
+      }
   }
 }

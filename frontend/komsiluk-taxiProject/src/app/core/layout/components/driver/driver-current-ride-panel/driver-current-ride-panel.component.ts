@@ -1,4 +1,4 @@
-import { Component, signal, computed, OnInit, inject } from '@angular/core';
+import { Component, signal, computed, OnInit, inject, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { catchError, finalize, of, from, map, concatMap, toArray } from 'rxjs';
@@ -12,6 +12,7 @@ import { GeocodingService } from '../../../../../shared/components/map/services/
 import { MapFacadeService } from '../../../../../shared/components/map/services/map-facade.service';
 import { InconsistencyReportModalComponent } from '../../../../../features/ride/components/inconsistency-report-modal/inconsistency-report-modal.component';
 import { PanicModalService } from '../../../../../shared/components/modal-shell/services/panic-modal-service';
+import { StopRideService } from '../../../../../shared/components/modal-shell/services/stop-ride-service';
 
 type Waypoint = { lat: number; lon: number; label?: string };
 
@@ -28,6 +29,7 @@ export class DriverCurrentRidePanelComponent implements OnInit {
   ride = signal<RideResponseDTO | null>(null);
 
   private panicModalSvc = inject(PanicModalService);
+  private stopRideSvc = inject(StopRideService);
 
   form: FormGroup;
 
@@ -59,6 +61,13 @@ export class DriverCurrentRidePanelComponent implements OnInit {
       stations: this.fb.array([]),
       destination: [{ value: '', disabled: true }],
     });
+
+    effect(() => {
+    const stoppedRide = this.stopRideSvc.rideStoppedTrigger();
+    if (stoppedRide) {
+      this.cleanupAfterRideEnd(stoppedRide);
+    }
+  });
   }
 
   get stationsArr(): FormArray {
@@ -273,12 +282,18 @@ finish() {
   });
 }
   stop() {
-    this.toast.show('Not implemented.');
+    const currentRide = this.ride();
+  if (currentRide != null && currentRide.status === 'ACTIVE') {
+    this.stopRideSvc.openModal(currentRide);
+
+  } else {
+    this.toast.show('No active ride found to initiate STOP.');
   }
+}
 
   panic() {
   const currentRide = this.ride();
-  if (currentRide) {
+  if (currentRide != null && currentRide.status === 'ACTIVE') {
     this.panicModalSvc.openModal(currentRide.id);
   } else {
     this.toast.show('No active ride found to initiate PANIC.');
@@ -286,5 +301,18 @@ finish() {
 }
   reportInconsistency() {
   this.showReportModal.set(true);
+}
+
+private cleanupAfterRideEnd(stoppedRide: RideResponseDTO) {
+  this.ride.set(stoppedRide);
+  this.fillForm(stoppedRide);
+  this.mapFacade.clearFocusRide?.();
+  this.mapFacade.clearRidePath?.();
+  
+  setTimeout(() => {
+    this.refresh();
+    // Resetujemo okidač u servisu da ne bi ponovo opalio pri sledećem otvaranju panela
+    this.stopRideSvc.rideStoppedTrigger.set(null); 
+  }, 2000);
 }
 }

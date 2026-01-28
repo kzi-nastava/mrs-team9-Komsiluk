@@ -110,3 +110,9 @@
   (cancel)="panicModalSvc.close()"
   (confirm)="confirmGlobalPanic()">
 </app-panic-dialog>
+
+<app-stop-ride-dialog
+  [open]="stopRideSvc.open()"
+  (cancel)="stopRideSvc.close()"
+  (confirm)="confirmStopRide()">
+</app-stop-ride-dialog>
