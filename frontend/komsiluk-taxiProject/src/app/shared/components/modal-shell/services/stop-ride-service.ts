@@ -54,7 +54,7 @@ export class StopRideService {
       visitedStops: result.visitedStops
         .map(s => s?.label)
         .filter(Boolean) as string[],
-      distanceTravelledKm: result.distanceTravelledKm
+      distanceTravelledKm: result.distanceTravelledKm === 0 ? 0.1 : result.distanceTravelledKm
   };
   }
 

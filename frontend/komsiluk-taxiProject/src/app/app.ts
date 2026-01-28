@@ -303,8 +303,6 @@ export class App implements OnInit {
 
       const dto: StopRideRequestDTO = await this.stopRideSvc.prepareStopData(ride);
 
-      console.log("Zaustavljanje vožnje sa podacima:", dto);
-
       this.rideService.stopRide(ride.id, dto).subscribe({
         next: (updatedRide: RideResponseDTO) => {
           this.stopRideSvc.notifyRideStopped(updatedRide);
