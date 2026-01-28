@@ -1,6 +1,7 @@
 package rs.ac.uns.ftn.iss.Komsiluk.services;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,5 +59,12 @@ public class NotificationService implements INotificationService {
         n.setRead(read);
         Notification saved = repository.save(n);
         return mapper.toResponseDTO(saved);
+    }
+
+    public Collection<NotificationResponseDTO> getUnreadPanics() {
+        List<Notification> panics = repository.findAllUnreadPanics();
+        return panics.stream()
+                .map(mapper::toResponseDTO)
+                .collect(Collectors.toList());
     }
 }

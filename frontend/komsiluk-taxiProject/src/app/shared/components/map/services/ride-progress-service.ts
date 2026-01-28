@@ -23,15 +23,11 @@ export class RideProgressService {
 
   constructor(private geocodingService: GeocodingService) {}
 
-  /**
-   * Pronalazi indeks tačke na ruti koja je najbliža trenutnoj poziciji vozila
-   */
+
   findClosestRouteIndex(route: GeoPoint[], current: GeoPoint, lastKnownIndex: number = 0): number {
   let minDist = Infinity;
   let closestIndex = lastKnownIndex;
 
-  // Optimizacija: Ne pretražuj celu rutu od 1000 tačaka svaki put.
-  // Pretražuj od poslednjeg poznatog indeksa + mali prozor unazad (za svaki slučaj)
   const searchStart = Math.max(0, lastKnownIndex - 10);
   
   for (let i = searchStart; i < route.length; i++) {
@@ -40,8 +36,6 @@ export class RideProgressService {
       minDist = d;
       closestIndex = i;
     }
-    // Ako distanca krene naglo da raste, znači da smo prošli najbližu tačku
-    // i nema potrebe da proveravamo preostalih 500 tačaka rute (Early Exit)
     else if (d > minDist + 100 && i > lastKnownIndex + 5) {
       break; 
     }
@@ -50,9 +44,6 @@ export class RideProgressService {
   return closestIndex;
 }
 
-  /**
-   * Izračunava pređenu kilometražu do endIndex-a
-   */
   calculateTravelledDistanceKm(route: GeoPoint[], endIndex: number): number {
     let meters = 0;
 
@@ -63,33 +54,28 @@ export class RideProgressService {
     return +(meters / 1000).toFixed(2);
   }
 
-  /**
-   * Filtrira koje stanice su zaista posjećene do trenutne tačke
-   */
+
   filterVisitedStops(
   route: GeoPoint[],
   endIndex: number,
   stops: Array<LabeledPoint | null>
 ): Array<LabeledPoint | null> {
   const visitedRoute = route.slice(0, endIndex + 1);
-  const TOLERANCE_METERS = 70; // Povećano na 70m zbog preciznosti GPS-a u gradu
+  const TOLERANCE_METERS = 70;
 
   return stops.filter((stop) => {
     if (!stop) return false;
 
-    // Umesto "some", koristimo prostiji loop koji možemo prekinuti
     for (const point of visitedRoute) {
       if (this.haversineDistance(point, stop) < TOLERANCE_METERS) {
-        return true; // Stanica je "zakačena" na ruti
+        return true;
       }
     }
     return false;
   });
 }
 
-  /**
-   * Haversine formula za rastojanje između dve geokoordinate
-   */
+
   private haversineDistance(a: GeoPoint, b: GeoPoint): number {
     const dLat = this.toRad(b.lat - a.lat);
     const dLon = this.toRad(b.lon - a.lon);
@@ -109,26 +95,19 @@ export class RideProgressService {
     return (v * Math.PI) / 180;
   }
 
-  /**
-   * Glavna metoda koja vraća rezultat za zaustavljanje vožnje
-   */
 
   async stopRide(
     currentPoint: GeoPoint,
     route: GeoPoint[],
     stationPoints: LabeledPoint[]
   ): Promise<RouteProgressResult> {
-    // 1. Pronađi dokle je vozač stigao na isplaniranoj ruti
     const endIndex = this.findClosestRouteIndex(route, currentPoint);
 
 
-    // 2. Izračunaj stvarnu pređenu distancu po putanji rute
     const distanceTravelledKm = this.calculateTravelledDistanceKm(route, endIndex);
 
-    // 3. Odredi koje su stanice posećene (unutar 50m od putanje)
     const visitedStops = this.filterVisitedStops(route, endIndex, stationPoints);
 
-    // 4. Odredi labelu za STOP adresu (prioritet: stanica blizu -> reverse geocode -> fallback)
     let finalLabel = '';
     const nearbyStation = stationPoints.find(s => this.haversineDistance(s, currentPoint) < 40);
 
@@ -136,7 +115,6 @@ export class RideProgressService {
       finalLabel = nearbyStation.label;
     } else {
       try {
-        // Koristimo lastValueFrom jer je Nominatim asinhron
         finalLabel = await lastValueFrom(this.geocodingService.reverseGeocode(currentPoint.lat, currentPoint.lon).pipe(timeout(2000)));
       } catch {
         finalLabel = `Stop near ${stationPoints[endIndex].label || 'current location'}`;
@@ -152,8 +130,6 @@ export class RideProgressService {
    private trimLabel(fullLabel: string): string {
     if (!fullLabel) return '';
     const parts = fullLabel.split(',');
-    // Uzimamo prva 3 dela adrese (npr. "Spens, Sutjeska 2, Novi Sad")
-    // To eliminiše "Južnobatčki okrug, Vojvodina, 21000, Srbija"
     return parts.slice(0, 3).map(p => p.trim()).join(', ');
   }
 

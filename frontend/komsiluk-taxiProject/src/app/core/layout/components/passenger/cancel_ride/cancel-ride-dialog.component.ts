@@ -20,7 +20,7 @@ export class CancelRideDialogComponent {
 
   onConfirm() {
     const value = this.reason().trim();
-    if (!value) return; // možeš dodati toast kasnije
+    if (!value) return;
     this.confirm.emit({ rideId: this.rideId, reason: value });
   }
 }

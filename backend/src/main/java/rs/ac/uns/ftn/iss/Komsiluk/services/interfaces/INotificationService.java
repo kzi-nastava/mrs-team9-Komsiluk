@@ -16,4 +16,6 @@ public interface INotificationService {
     Collection<NotificationResponseDTO> getUnreadUserNotifications(Long userId);
 
     NotificationResponseDTO markAsRead(Long id, boolean read);
+
+    public Collection<NotificationResponseDTO> getUnreadPanics();
 }

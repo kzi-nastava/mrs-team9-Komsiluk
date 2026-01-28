@@ -133,10 +133,8 @@ export class RideService {
 
     this.http.post<void>(`${this.API}/${rideId}/panic`, { initiatorId: userId })
       .pipe(
-        switchMap(() => this.notification.getUnread(userId)),
-        tap((notifs) => {
-          const panicNotifs = notifs.filter(n => n.type === 'PANIC');
-          this.showToastsForInitiator(panicNotifs);
+        tap(() => {
+          this.toast.show('PANIC button activated. Authorities have been notified.');
         }),
         catchError((err) => {
           this.toast.show('Failed to activate PANIC button.');
