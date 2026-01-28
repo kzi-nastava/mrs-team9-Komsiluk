@@ -81,12 +81,12 @@ public class RideController {
 
 	@PreAuthorize("hasRole('DRIVER')")
     @PostMapping("/{id}/stop")
-    public ResponseEntity<Void> stopRide(
+    public ResponseEntity<RideResponseDTO> stopRide(
             @PathVariable @Positive Long id,
             @Valid @RequestBody StopRideRequestDTO dto) {
 
-        rideService.stopRide(id, dto);
-        return ResponseEntity.ok().build();
+        RideResponseDTO responseDTO = rideService.stopRide(id, dto);
+        return new ResponseEntity<>(responseDTO, HttpStatus.OK);
     }
 
 	@PreAuthorize("hasAnyRole('PASSENGER', 'DRIVER')")

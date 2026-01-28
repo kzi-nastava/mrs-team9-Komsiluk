@@ -1,0 +1,29 @@
+<app-modal-shell [open]="open" (closed)="cancel.emit()">
+
+  <div class="cb-title text-regular">Cancel ride</div>
+  <div class="cb-sub text-regular">Reason for cancelling</div>
+
+  <textarea
+    class="cb-textarea"
+    rows="4"
+    placeholder="e.g. Illness, change of plans..."
+    (input)="reason.set($any($event.target).value)">
+  </textarea>
+
+  <div class="cb-actions">
+    <button
+      type="button"
+      class="btn btn--ghost text-semibold btn-scale"
+      (click)="cancel.emit()">
+      Cancel
+    </button>
+
+    <button
+      type="button"
+      class="btn btn--primary text-semibold btn-scale"
+      (click)="onConfirm()">
+      Confirm
+    </button>
+  </div>
+
+</app-modal-shell>

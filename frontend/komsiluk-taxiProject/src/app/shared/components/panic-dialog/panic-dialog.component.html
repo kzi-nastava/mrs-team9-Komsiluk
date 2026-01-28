@@ -1,0 +1,17 @@
+<app-modal-shell [open]="open" (closed)="cancel.emit()">
+    <div class="panic-title text-semibold">PANIC</div>
+    
+    <div class="panic-msg text-regular">
+      Are you sure you want to initiate this action?
+    </div>
+
+    <div class="panic-actions">
+      <button type="button" class="btn-panic btn-panic--cancel text-semibold" (click)="cancel.emit()">
+        Cancel
+      </button>
+
+      <button type="button" class="btn-panic btn-panic--confirm text-semibold" (click)="confirm.emit()">
+        Confirm
+      </button>
+    </div>
+</app-modal-shell>

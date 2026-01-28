@@ -1,0 +1,52 @@
+/* Kontejner unutar modala */
+.panic-container {
+  background-color: #1a1a1a; /* Tamna pozadina kao na slici */
+  padding: 30px;
+  border-radius: 4px;
+  text-align: center;
+  color: white;
+}
+
+.panic-title {
+  font-size: 24px;
+  letter-spacing: 2px;
+  margin-bottom: 30px;
+  text-transform: uppercase;
+}
+
+.panic-msg {
+  font-size: 16px;
+  margin-bottom: 40px;
+  opacity: 0.9;
+}
+
+.panic-actions {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+/* Stilovi za dugmad sa slike */
+.btn-panic {
+  padding: 12px 35px;
+  border-radius: 25px; /* Zaobljena dugmad */
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  transition: transform 0.1s ease;
+  min-width: 120px;
+}
+
+.btn-panic:active {
+  transform: scale(0.95);
+}
+
+.btn-panic--cancel {
+  background-color: white;
+  color: #1a1a1a;
+}
+
+.btn-panic--confirm {
+  background-color: #ffeb00; /* Jaka žuta boja sa slike */
+  color: #1a1a1a;
+}

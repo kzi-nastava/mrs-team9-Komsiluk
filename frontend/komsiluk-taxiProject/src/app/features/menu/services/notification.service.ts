@@ -26,4 +26,8 @@ export class NotificationService {
   markRead(id: number, read = true): Observable<NotificationResponseDTO> {
     return this.http.post<NotificationResponseDTO>(`${this.API}/${id}/read?read=${read}`, {});
   }
+
+  getUnreadPanicNotifications(): Observable<NotificationResponseDTO[]> {
+  return this.http.get<NotificationResponseDTO[]>(`${this.API}/unread-panic`);
+}
 }

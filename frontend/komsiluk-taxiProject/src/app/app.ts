@@ -1,4 +1,4 @@
-import { Component, signal, OnInit } from '@angular/core';
+import { Component, signal, OnInit, effect } from '@angular/core';
 import { RouterOutlet, Router, NavigationStart } from '@angular/router';
 import { CommonModule, Location } from '@angular/common';
 
@@ -10,7 +10,7 @@ import { RightsidebarComponent } from './core/layout/rightsidebar.component/righ
 import { RideHistoryFilterPanelComponent } from './features/driver-history/components/ride-history-filter-panel/ride-history-filter-panel';
 
 import { RideHistoryFilterService } from './features/driver-history/services/driver-history-filter.service';
-import { filter } from 'rxjs';
+import { catchError, filter, interval, of, Subscription, switchMap } from 'rxjs';
 
 import { ConfirmBookingDialogComponent } from './core/layout/components/passenger/book_ride/confirm-booking-dialog/confirm-booking-dialog.component';
 import { ConfirmBookingModalService } from './shared/components/modal-shell/services/confirm-booking-modal.service';
@@ -39,6 +39,17 @@ import { DriverRuntimeStateService } from './core/layout/components/driver/servi
 import { LoginRequiredDialogComponent } from './core/layout/components/guest/login-required-dialog/login-required-dialog.component';
 import { DriverStartRideConfirmModalService } from './shared/components/modal-shell/services/driver-start-ride-confirm-modal.service';
 import { DriverStartRideConfirmDialogComponent } from './core/layout/components/driver/driver-start-ride-confirm-dialog/driver-start-ride-confirm-dialog.component';
+import { RideService } from './core/layout/components/passenger/book_ride/services/ride.service';
+import { RideResponseDTO, StopRideRequestDTO } from './shared/models/ride.models';
+import { CancelRideDialogComponent } from './core/layout/components/passenger/cancel_ride/cancel-ride-dialog.component';
+import { CancelRideModalService } from './shared/components/modal-shell/services/confirm-ride-modal-service';
+import { ScheduledRidesService } from './shared/components/modal-shell/services/scheduled-rides-service';
+import { PanicModalService } from './shared/components/modal-shell/services/panic-modal-service';
+import { PanicDialogComponent } from './shared/components/panic-dialog/panic-dialog.component';
+import { StopRideDialog } from './core/layout/components/driver/stop-ride-dialog/stop-ride-dialog';
+import { StopRideService } from './shared/components/modal-shell/services/stop-ride-service';
+import { AuthService, UserRole } from './core/auth/services/auth.service';
+import { NotificationService } from './features/menu/services/notification.service';
 
 
 @Component({
@@ -62,7 +73,10 @@ import { DriverStartRideConfirmDialogComponent } from './core/layout/components/
     AccountBlockedDialogComponent,
     LoginRequiredDialogComponent,
     DriverActivityConfirmDialogComponent,
-    DriverStartRideConfirmDialogComponent
+    DriverStartRideConfirmDialogComponent,
+    CancelRideDialogComponent,
+    PanicDialogComponent,
+    StopRideDialog,
   ],
   templateUrl: './app.html',
   styleUrl: './app.css'
@@ -75,16 +89,56 @@ export class App implements OnInit {
 
   rightMode: 'profile' | 'admin' = 'profile';
 
+  private panicSubscription?: Subscription;
+  private seenPanicRideIds = new Set<number>();
 
-  constructor(public filterSvc: RideHistoryFilterService, private router: Router, public confirmModal: ConfirmBookingModalService,
+
+  constructor(private notificationService: NotificationService, private authService: AuthService, public stopRideSvc: StopRideService, public panicModalSvc: PanicModalService, private schedRides: ScheduledRidesService, public filterSvc: RideHistoryFilterService, private router: Router, public confirmModal: ConfirmBookingModalService,
     public addFavModal: AddFavoriteModalService, public favDetailsModal: FavoriteDetailsModalService, public renameFavModal: RenameFavoriteModalService,
     public deleteFavModal: DeleteFavoriteModalService, public toastService: ToastService, private favoriteApi: FavoriteRouteService, private favBus: FavoritesBusService,
     public schedDetailsModal: ScheduledDetailsModalService, public blockUserModal: BlockUserConfirmModalService, public blockedModal: AccountBlockedModalService,
     private leftCmd: LeftSidebarCommandService, private route: ActivatedRoute, private location: Location, public modal: DriverActivityConfirmModalService,
-    public driverActModal: DriverActivityConfirmModalService, private driverRuntimeState: DriverRuntimeStateService, public startRideModal: DriverStartRideConfirmModalService) {}
+    public driverActModal: DriverActivityConfirmModalService, private driverRuntimeState: DriverRuntimeStateService, public startRideModal: DriverStartRideConfirmModalService, public rideService: RideService, public cancelModalSvc: CancelRideModalService) {
+    effect(() => {
+      const role = this.authService.userRole();
 
-    ngOnInit(): void {
-    
+      if (role === UserRole.ADMIN) {
+        this.startPanicMonitoring();
+      } else {
+        this.stopPanicMonitoring();
+      }
+    });
+  }
+  private startPanicMonitoring() {
+    if (this.panicSubscription) return; // Da ne pokrećemo dupli interval
+
+    // Provera svakih 10-15 sekundi
+    this.panicSubscription = interval(10000).pipe(
+      switchMap(() => this.notificationService.getUnreadPanicNotifications().pipe(
+        catchError(() => of([])) // Ako pukne API, nastavi dalje
+      ))
+    ).subscribe((notifications: any[]) => {
+      this.processPanics(notifications);
+    });
+  }
+
+  private processPanics(notifications: any[]) {
+    for (const notification of notifications) {
+      this.toastService.show(`Recieved ${notification.title} notification. ${notification.message}`);
+    }
+  }
+
+  private stopPanicMonitoring() {
+    this.panicSubscription?.unsubscribe();
+    this.panicSubscription = undefined;
+  }
+
+  ngOnDestroy() {
+    this.stopPanicMonitoring();
+  }
+
+  ngOnInit(): void {
+
     this.driverRuntimeState.initIfDriver();
 
     this.router.events
@@ -118,13 +172,18 @@ export class App implements OnInit {
           this.leftCmd.emit({ section, scrollId: scroll ?? undefined });
 
           const cleanPath = this.router.url.split('?')[0];
-            this.location.replaceState(cleanPath);
-          }
+          this.location.replaceState(cleanPath);
+        }
       });
+
   }
 
+
+
+
+
   toggleLeftSidebar() { this.isLeftSidebarOpen = !this.isLeftSidebarOpen; }
-    toggleRightSidebar(mode: 'profile' | 'admin') {
+  toggleRightSidebar(mode: 'profile' | 'admin') {
     if (this.rightOpen && this.rightMode === mode) {
       this.rightOpen = false;
       return;
@@ -153,7 +212,7 @@ export class App implements OnInit {
   }
 
   closeRightSidebar(): void {
-  this.rightOpen = false;
+    this.rightOpen = false;
   }
 
   onFavoriteDelete(f: FavoriteRouteResponseDTO) {
@@ -200,10 +259,22 @@ export class App implements OnInit {
     });
   }
 
-  onScheduledCancelRide(r: any) {
-    console.log('CANCEL SCHEDULED (GUI ONLY):', r);
+  confirmGlobalCancel(e: { rideId: number; reason: string }) {
+    const role = this.cancelModalSvc.userRole();
+
+    if (role === 'driver') {
+      this.rideService.cancelRideDriver(e.rideId, e.reason);
+    } else {
+      this.rideService.cancelRidePassenger(e.rideId, e.reason);
+    }
+
+    this.toastService.show('Ride successfully cancelled.');
+
     this.schedDetailsModal.close();
+    this.cancelModalSvc.close();
+    setTimeout(() => this.schedRides.triggerRefresh(), 300);
   }
+
 
   openAdminSidebar() {
     this.rightMode = 'admin';
@@ -214,5 +285,34 @@ export class App implements OnInit {
   confirmDriverActivity() {
     this.driverRuntimeState.toggleStatusWithBackend();
     this.driverActModal.close();
+  }
+
+  confirmGlobalPanic() {
+    const id = this.panicModalSvc.rideId();
+    if (id) {
+      this.rideService.activatePanicButton(id);
+    }
+    this.panicModalSvc.close();
+  }
+
+  async confirmStopRide() {
+    const ride = this.stopRideSvc.ride();
+    if (!ride) return;
+
+    try {
+
+      const dto: StopRideRequestDTO = await this.stopRideSvc.prepareStopData(ride);
+
+      console.log("Zaustavljanje vožnje sa podacima:", dto);
+
+      this.rideService.stopRide(ride.id, dto).subscribe({
+        next: (updatedRide: RideResponseDTO) => {
+          this.stopRideSvc.notifyRideStopped(updatedRide);
+          this.stopRideSvc.close();
+        }
+      });
+    } catch (error) {
+      console.error("Greška pri zaustavljanju:", error);
+    }
   }
 }

@@ -33,7 +33,18 @@
           {{ ride.scheduledAt | date:'dd.MM.yyyy HH:mm' }}
         </div>
       </div>
+
+      <div style="display: flex; justify-content: flex-end; margin-top: 10px;">
+        <button 
+          class="btn btn--danger text-semibold" 
+          style="padding: 5px 15px; font-size: 0.8rem;"
+          (click)="onCancelRide(ride)">
+          Cancel Ride
+        </button>
+      </div>
     </div>
+
+    
   } 
   
   @empty {

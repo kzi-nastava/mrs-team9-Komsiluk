@@ -21,6 +21,7 @@ import rs.ac.uns.ftn.iss.Komsiluk.mappers.RideDTOMapper;
 import rs.ac.uns.ftn.iss.Komsiluk.mappers.RouteDTOMapper;
 import rs.ac.uns.ftn.iss.Komsiluk.repositories.PricingRepository;
 import rs.ac.uns.ftn.iss.Komsiluk.repositories.RideRepository;
+import rs.ac.uns.ftn.iss.Komsiluk.repositories.RouteRepository;
 import rs.ac.uns.ftn.iss.Komsiluk.repositories.UserRepository;
 import rs.ac.uns.ftn.iss.Komsiluk.services.exceptions.BadRequestException;
 import rs.ac.uns.ftn.iss.Komsiluk.services.exceptions.NotFoundException;
@@ -31,6 +32,8 @@ public class RideService implements IRideService {
 
 	@Autowired
     private RideRepository rideRepository;
+    @Autowired
+    private RouteRepository routeRepository;
 	@Autowired
 	private UserRepository userRepository;
 	@Autowired
@@ -502,6 +505,13 @@ public class RideService implements IRideService {
 
         rideRepository.save(ride);
 
+        NotificationCreateDTO notificationDTODriver = new NotificationCreateDTO();
+        notificationDTODriver.setUserId(ride.getDriver().getId());
+        notificationDTODriver.setType(NotificationType.RIDE_CANCELLED);
+        notificationDTODriver.setTitle("Ride Cancelled");
+        notificationDTODriver.setMessage("Your ride from " + ride.getRoute().getStartAddress() +
+                "to " + ride.getRoute().getEndAddress() + " has been cancelled.");
+        notificationService.createNotification(notificationDTODriver);
         notifyRideParticipants(ride, NotificationType.RIDE_CANCELLED);
     }
 
@@ -531,13 +541,19 @@ public class RideService implements IRideService {
 
         rideRepository.save(ride);
 
+        NotificationCreateDTO notificationDTODriver = new NotificationCreateDTO();
+        notificationDTODriver.setUserId(ride.getDriver().getId());
+        notificationDTODriver.setType(NotificationType.RIDE_CANCELLED);
+        notificationDTODriver.setTitle("Ride Cancelled");
+        notificationDTODriver.setMessage("Your ride from " + ride.getRoute().getStartAddress() +
+                "to " + ride.getRoute().getEndAddress() + " has been cancelled.");
+        notificationService.createNotification(notificationDTODriver);
         notifyRideParticipants(ride, NotificationType.RIDE_CANCELLED);
     }
 
 
 
-    public StopRideResponseDTO stopRide(Long rideId, StopRideRequestDTO dto) {
-
+    public RideResponseDTO stopRide(Long rideId, StopRideRequestDTO dto) {
         Ride ride = rideRepository.findById(rideId)
                 .orElseThrow(()-> new NotFoundException("Ride not found"));
 
@@ -550,13 +566,20 @@ public class RideService implements IRideService {
         ride.setEndTime(endTime);
 
         long durationMinutes = java.time.Duration.between(ride.getStartTime(), endTime).toMinutes();
+        ride.setEstimatedDurationMin((int) durationMinutes);
+        ride.setDistanceKm(dto.getDistanceTravelledKm());
 
         Route route = ride.getRoute();
         route.setEndAddress(dto.getStopAddress());
-        route.setStops(dto.getVisitedStops());
+        String visitedStopsString = (dto.getVisitedStops() == null) ? "" :
+                dto.getVisitedStops().stream()
+                        .skip(1)
+                        .filter(s -> s != null && !s.trim().isEmpty())
+                        .collect(Collectors.joining("|"));
+        route.setStops(visitedStopsString);
         route.setDistanceKm(dto.getDistanceTravelledKm());
         route.setEstimatedDurationMin((int) durationMinutes);
-        ride.setRoute(route);
+        routeRepository.save(route);
 
         ride.setStatus(RideStatus.FINISHED);
 
@@ -566,14 +589,13 @@ public class RideService implements IRideService {
 
         rideRepository.save(ride);
 
-        StopRideResponseDTO response = new StopRideResponseDTO();
-        response.setFinalAddress(dto.getStopAddress());
-        response.setDurationMinutes(ride.getRoute().getEstimatedDurationMin());
-        response.setPrice(price.doubleValue());
-
-
+        NotificationCreateDTO notificationDTODriver = new NotificationCreateDTO();
+        notificationDTODriver.setUserId(ride.getDriver().getId());
+        notificationDTODriver.setType(NotificationType.RIDE_STOPPED);
+        notificationDTODriver.setTitle("Ride Stopped");
+        notificationDTODriver.setMessage("Your ride from has stopped at " + dto.getStopAddress() + ".");
         notifyRideParticipants(ride, NotificationType.RIDE_STOPPED);
-        return response;
+        return rideMapper.toResponseDTO(ride);
     }
 
     public void handlePanicButton(Long rideId, PanicRequestDTO initiator) {

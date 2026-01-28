@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -54,5 +55,12 @@ public class NotificationController {
     @PostMapping("/{id}/read")
     public ResponseEntity<NotificationResponseDTO> markRead(@PathVariable Long id, @RequestParam(defaultValue = "true") boolean read) {
         return ResponseEntity.ok(notificationService.markAsRead(id, read));
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/unread-panic")
+    public ResponseEntity<Collection<NotificationResponseDTO>> getUnreadPanicNotifications() {
+        Collection<NotificationResponseDTO> panics = notificationService.getUnreadPanics();
+        return ResponseEntity.ok(panics);
     }
 }

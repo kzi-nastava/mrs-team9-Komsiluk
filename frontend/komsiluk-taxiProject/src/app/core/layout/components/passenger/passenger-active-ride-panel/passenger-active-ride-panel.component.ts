@@ -9,6 +9,8 @@ import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { MapFacadeService } from "../../../../../shared/components/map/services/map-facade.service";
 import { RoutingService } from "../../../../../shared/components/map/services/routing.service";
 import { RideProgressService } from "../../../../../shared/components/map/services/ride-progress-service";
+import { PanicDialogComponent } from "../../../../../shared/components/panic-dialog/panic-dialog.component";
+import { PanicModalService } from "../../../../../shared/components/modal-shell/services/panic-modal-service";
 
 @Component({
   selector: 'app-passenger-active-ride-panel',
@@ -25,6 +27,7 @@ export class PassengerActiveRidePanelComponent implements OnInit {
   private routing = inject(RoutingService);
   private progress = inject(RideProgressService);
   private destroyRef = inject(DestroyRef);
+  private panicModalSvc = inject(PanicModalService);
   
   showReportModal = signal(false);
   remainingMinutes = signal<number | null>(null);
@@ -84,9 +87,7 @@ ngOnInit() {
   });
 }
   panic() {
-    if (confirm('Are you sure you want to activate PANIC mode?')) {
-      this.rideService.activatePanicButton(this.ride().rideId);
-    }
+    this.panicModalSvc.openModal(this.ride().rideId);
   }
 
   reportInconsistency() {

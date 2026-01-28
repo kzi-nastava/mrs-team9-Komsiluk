@@ -26,7 +26,7 @@ public interface IRideService {
 
     public void cancelByPassenger(Long rideId, PassengerCancelRideDTO dto);
 
-    public StopRideResponseDTO stopRide(Long id,StopRideRequestDTO dto);
+    public RideResponseDTO stopRide(Long id,StopRideRequestDTO dto);
 
     public RideLiveInfoDTO getLiveInfo(Long rideId);
 

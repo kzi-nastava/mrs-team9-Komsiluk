@@ -2,13 +2,17 @@ package rs.ac.uns.ftn.iss.Komsiluk.dtos.ride;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
+
+import java.util.List;
 
 public class StopRideRequestDTO {
 
     @NotBlank(message = "Stop address is required")
     private String stopAddress;
 
-    private String visitedStops;
+    @Size(max = 10)
+    private List<@NotBlank @Size(min = 2, max = 150) String> visitedStops;
 
     @Positive(message = "Travelled distance must be greater than zero")
     private double distanceTravelledKm;
@@ -24,12 +28,12 @@ public class StopRideRequestDTO {
         this.stopAddress = stopAddress;
     }
 
-    public String getVisitedStops() {
+    public List<String> getVisitedStops() {
         return visitedStops;
     }
 
-    public void setVisitedStops(String visitedStops) {
-        this.visitedStops = visitedStops;
+    public void setVisitedStops(List<String> stops) {
+        this.visitedStops = stops;
     }
 
     public double getDistanceTravelledKm() {

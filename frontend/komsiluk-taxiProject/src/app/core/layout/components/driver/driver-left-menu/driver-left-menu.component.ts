@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DriverActivityConfirmModalService } from '../../../../../shared/components/modal-shell/services/driver-activity-confirm-modal.service';
 import { DriverRuntimeStateService } from '../services/driver-runtime-state.service';
@@ -15,6 +15,7 @@ import { DriverScheduledRidesPanelComponent } from '../driver-scheduled-rides-pa
 export class DriverLeftMenuComponent {
   currentOpen = signal(true);
   scheduledOpen = signal(false);
+
 
   constructor(
     public modal: DriverActivityConfirmModalService,
