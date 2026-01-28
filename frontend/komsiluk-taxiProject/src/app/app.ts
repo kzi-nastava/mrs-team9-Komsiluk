@@ -125,6 +125,7 @@ export class App implements OnInit {
   private processPanics(notifications: any[]) {
     for (const notification of notifications) {
       this.toastService.show(`Recieved ${notification.title} notification. ${notification.message}`);
+      this.notificationService.markRead(notification.id).subscribe();
     }
   }
 
