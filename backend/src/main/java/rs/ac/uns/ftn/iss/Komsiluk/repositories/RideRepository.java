@@ -67,7 +67,7 @@ public interface RideRepository extends JpaRepository<Ride, Long> {
     FROM Ride r
     LEFT JOIN r.passengers p
     WHERE
-        (r.driver.id = :userId OR p.id = :userId)
+        (r.driver.id = :userId OR r.createdBy.id = :userId OR p.id = :userId)
         AND r.status IN :statuses
         AND r.createdAt >= :from
         AND r.createdAt <= :to

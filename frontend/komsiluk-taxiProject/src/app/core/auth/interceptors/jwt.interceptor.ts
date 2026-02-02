@@ -53,14 +53,33 @@ export const jwtInterceptor: HttpInterceptorFn = (
 
   return next(authReq).pipe(
     catchError((error: HttpErrorResponse) => {
+      console.error('HTTP Error in interceptor:', error.status, error.url);
 
       if (error.status === 401) {
+        console.warn('401 Unauthorized - logging out');
         auth.logout();
         router.navigate(['/login']);
       }
 
       if (error.status === 403) {
-        router.navigate(['/login']);
+        // Token might be invalid or user doesn't have permission
+        // Only logout if it's an auth-related 403, not a permission issue
+        const token = auth.getToken();
+        if (token) {
+          // Check if token is expired or invalid
+          try {
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            const exp = payload.exp * 1000; // Convert to milliseconds
+            if (Date.now() > exp) {
+              auth.logout();
+              router.navigate(['/login']);
+            }
+          } catch {
+            // Invalid token format, logout
+            auth.logout();
+            router.navigate(['/login']);
+          }
+        }
       }
 
       return throwError(() => error);

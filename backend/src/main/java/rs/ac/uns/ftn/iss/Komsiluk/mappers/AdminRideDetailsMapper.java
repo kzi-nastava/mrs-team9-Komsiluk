@@ -31,7 +31,10 @@ public class AdminRideDetailsMapper {
         AdminRideDetailsDTO dto = new AdminRideDetailsDTO();
 
         dto.setRideId(ride.getId());
+        dto.setStatus(ride.getStatus());
         dto.setRoute(routeMapper.toResponseDTO(ride.getRoute()));
+        dto.setCreatedAt(ride.getCreatedAt());
+        dto.setScheduledAt(ride.getScheduledAt());
         dto.setStartTime(ride.getStartTime());
         dto.setEndTime(ride.getEndTime());
         dto.setCanceled(ride.getStatus() == RideStatus.CANCELLED);
@@ -40,8 +43,19 @@ public class AdminRideDetailsMapper {
         dto.setPrice(ride.getPrice());
         dto.setPanicTriggered(ride.isPanicTriggered());
 
+        dto.setVehicleType(ride.getVehicleType());
+        dto.setBabyFriendly(ride.isBabyFriendly());
+        dto.setPetFriendly(ride.isPetFriendly());
+        dto.setDistanceKm(ride.getDistanceKm());
+        dto.setEstimatedDurationMin(ride.getEstimatedDurationMin());
+
         if (ride.getDriver() != null) {
             dto.setDriver(driverMapper.toResponseDTO(ride.getDriver()));
+        }
+
+        if (ride.getCreatedBy() != null) {
+            dto.setCreatorId(ride.getCreatedBy().getId());
+            dto.setCreatorEmail(ride.getCreatedBy().getEmail());
         }
 
         dto.setPassengerIds(
@@ -51,10 +65,16 @@ public class AdminRideDetailsMapper {
                         .toList()
         );
 
+        dto.setPassengerEmails(
+                ride.getPassengers()
+                        .stream()
+                        .map(User::getEmail)
+                        .toList()
+        );
+
         dto.setRatings(ratings);
         dto.setInconsistencyReports(reports);
 
         return dto;
     }
 }
-

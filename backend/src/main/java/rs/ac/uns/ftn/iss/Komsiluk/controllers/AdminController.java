@@ -19,7 +19,6 @@ import java.time.LocalDate;
 import java.util.Collection;
 
 @RestController
-@PreAuthorize("hasRole('ADMIN')")
 @RequestMapping("/api/admin")
 @Validated
 public class AdminController {
@@ -46,6 +45,7 @@ public class AdminController {
 //    }
 
     @GetMapping(value = "/users/{userId}/rides", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('ADMIN') or (hasRole('PASSENGER') and #userId == authentication.principal.id)")
     @ValidDateRange
     public ResponseEntity<Collection<AdminRideHistoryDTO>> getUserRides(
             @PathVariable @Positive Long userId,
@@ -69,6 +69,7 @@ public class AdminController {
 
 
     @GetMapping(value = "/rides/{rideId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasAnyRole('ADMIN', 'PASSENGER')")
     public ResponseEntity<AdminRideDetailsDTO> getRideDetails(
             @PathVariable @Positive(message = "Ride ID must be positive") Long rideId
     ) {
