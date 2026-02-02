@@ -13,6 +13,7 @@ import { AboutUsPageComponent } from './features/about-us/about-us-page/about-us
 import { MessagePageComponent } from './shared/components/message-page/message-page.component';
 import { DriverRideHistoryPageComponent } from './features/driver-history/pages/driver-ride-history-page/driver-ride-history-page.component';
 import { PassengerRideHistoryPageComponent } from './features/passenger-history/pages/passenger-ride-history-page/passenger-ride-history-page.component';
+import { AdminRideHistoryPageComponent } from './features/admin-history/pages/admin-ride-history-page/admin-ride-history-page.component';
 
 import { authGuard } from './core/auth/guards/auth.guard';
 import { roleGuard } from './core/auth/guards/role.guard';
@@ -94,6 +95,12 @@ export const routes: Routes = [
   { 
     path: 'admin/pricing',
     component: AdminPricingPageComponent,
+    canActivate: [authGuard, roleGuard],
+    data: { roles: [UserRole.ADMIN] }
+  },
+  {
+    path: 'admin/ride-history',
+    component: AdminRideHistoryPageComponent,
     canActivate: [authGuard, roleGuard],
     data: { roles: [UserRole.ADMIN] }
   },
