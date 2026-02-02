@@ -12,6 +12,7 @@ import { AboutUsPageComponent } from './features/about-us/about-us-page/about-us
 
 import { MessagePageComponent } from './shared/components/message-page/message-page.component';
 import { DriverRideHistoryPageComponent } from './features/driver-history/pages/driver-ride-history-page/driver-ride-history-page.component';
+import { PassengerRideHistoryPageComponent } from './features/passenger-history/pages/passenger-ride-history-page/passenger-ride-history-page.component';
 
 import { authGuard } from './core/auth/guards/auth.guard';
 import { roleGuard } from './core/auth/guards/role.guard';
@@ -33,6 +34,14 @@ export const routes: Routes = [
     component: DriverRideHistoryPageComponent,
     canActivate: [authGuard, roleGuard],
     data: { roles: [UserRole.DRIVER] }
+  },
+
+  // ===== PASSENGER =====
+  {
+    path: 'passenger-history',
+    component: PassengerRideHistoryPageComponent,
+    canActivate: [authGuard, roleGuard],
+    data: { roles: [UserRole.PASSENGER] }
   },
 
   // ===== PROFILE (ulogovan korisnik) =====
