@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, HostListener, inject, Input, OnInit, Output, signal } from '@angular/core';
-import { RideDetailsMapComponent } from '../ride-details-map/ride-details-map.component';
+import { RideDetailsMapComponent } from '../../../../shared/components/ride-details-map/ride-details-map.component';
 import { RideService } from '../../../../core/layout/components/passenger/book_ride/services/ride.service';
 import { RatingResponseDTO, RatingService } from '../../services/rating.service';
 

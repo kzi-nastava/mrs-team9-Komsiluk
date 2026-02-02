@@ -684,14 +684,27 @@ public class RideService implements IRideService {
 //    }
 
     public AdminRideDetailsDTO getAdminRideDetails(Long rideId) {
-
         Ride ride = rideRepository.findById(rideId)
-                .orElseThrow(()-> new NotFoundException("Ride not found"));
+                .orElseThrow(() -> new NotFoundException("Ride not found"));
+
 
         var ratings = ratingService.getRatingsForRide(rideId);
         var reports = inconsistencyReportService.getByRideId(rideId);
 
         return adminRideDetailsMapper.toDto(ride, ratings, reports);
+    }
+
+    private boolean isUserOnRide(Ride ride, Long userId) {
+        if (ride.getCreatedBy() != null && ride.getCreatedBy().getId().equals(userId)) {
+            return true;
+        }
+
+        if (ride.getPassengers() != null) {
+            return ride.getPassengers().stream()
+                    .anyMatch(p -> p != null && p.getId().equals(userId));
+        }
+
+        return false;
     }
 
 
@@ -703,8 +716,8 @@ public class RideService implements IRideService {
     ) {
         var statuses = List.of(RideStatus.FINISHED, RideStatus.CANCELLED);
 
-        LocalDateTime fromDateTime = from != null ? from.atStartOfDay() : LocalDateTime.MIN;
-        LocalDateTime toDateTime = to != null ? to.atTime(23, 59, 59) : LocalDateTime.MAX;
+        LocalDateTime fromDateTime = from != null ? from.atStartOfDay() : LocalDateTime.of(1970, 1, 1, 0, 0);
+        LocalDateTime toDateTime = to != null ? to.atTime(23, 59, 59) : LocalDateTime.of(9999, 12, 31, 23, 59, 59);
 
         return rideRepository
                 .findAdminRideHistoryForUser(userId, statuses, fromDateTime, toDateTime)
@@ -716,21 +729,17 @@ public class RideService implements IRideService {
 
 
 
-//    private boolean isUserOnRide(Ride ride, Long userId) {
-//        // ako je vozač
-//        if (ride.getDriver() != null &&
-//                ride.getDriver().getId().equals(userId)) {
-//            return true;
-//        }
-//
-//        // ako je putnik
-//        if (ride.getPassengers() != null) {
-//            return ride.getPassengers().stream()
-//                    .anyMatch(p -> p != null && p.getId().equals(userId));
-//        }
-//
-//        return false;
-//    }
+    @Override
+    public Collection<AdminRideHistoryDTO> getAdminRideHistoryByEmail(
+            String email, LocalDate from, LocalDate to, AdminRideSortBy sortBy) {
+
+        User user = userRepository.findByEmailIgnoreCase(email);
+        if (user == null) {
+            throw new NotFoundException("User not found with email: " + email);
+        }
+
+        return getAdminRideHistoryForUser(user.getId(), from, to, sortBy);
+    }
 
 
 

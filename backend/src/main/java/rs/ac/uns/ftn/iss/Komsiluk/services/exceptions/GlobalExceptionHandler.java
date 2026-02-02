@@ -99,5 +99,11 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(message);
     }
 
+    @ExceptionHandler(UnauthorizedAccessException.class)
+    public ResponseEntity<?> handleUnauthorizedAccess(UnauthorizedAccessException ex) {
+        String msg = (ex.getMessage() != null && !ex.getMessage().isBlank()) ? ex.getMessage() : "Unauthorized access";
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message", msg));
+    }
+
 
 }

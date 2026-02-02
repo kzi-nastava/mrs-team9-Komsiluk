@@ -1,0 +1,171 @@
+<div class="modal-backdrop" (click)="onBackdropClick()">
+  <div class="modal-dialog" (click)="onDialogClick($event)">
+    
+    @if (loading) {
+      <div class="modal-loading">
+        <span class="loading-spinner"></span>
+        Loading details...
+      </div>
+    } @else if (details) {
+      <div class="modal-content">
+        
+        <!-- Left section: Driver info & Ratings -->
+        <section class="modal-left">
+          <h3 class="section-title">Driver</h3>
+          <div class="driver-card">
+            <div class="driver-avatar">
+              @if (driverProfilePicture) {
+                <img [src]="driverProfilePicture" alt="Driver" />
+              } @else {
+                <span class="avatar-placeholder">👤</span>
+              }
+            </div>
+            <div class="driver-info">
+              <div class="driver-name">{{ driverFullName }}</div>
+              <div class="driver-rating">{{ driverRating }}</div>
+            </div>
+          </div>
+
+          <h3 class="section-title section-title--spaced">Ratings</h3>
+          @if (details.ratings && details.ratings.length > 0) {
+            <div class="ratings-list">
+              @for (rating of details.ratings; track rating.id) {
+                <div class="rating-item">
+                  <div class="rating-email">{{ rating.raterMail }}</div>
+                  <div class="rating-row">
+                    <span class="rating-label">Driver:</span>
+                    <span class="rating-value">{{ fmtRating(rating.driverGrade) }}</span>
+                  </div>
+                  <div class="rating-row">
+                    <span class="rating-label">Vehicle:</span>
+                    <span class="rating-value">{{ fmtRating(rating.vehicleGrade) }}</span>
+                  </div>
+                  @if (rating.comment) {
+                    <div class="rating-comment">"{{ rating.comment }}"</div>
+                  }
+                </div>
+              }
+            </div>
+          } @else {
+            <p class="empty-text">No ratings yet.</p>
+          }
+
+          <h3 class="section-title section-title--spaced">Inconsistency Reports</h3>
+          @if (details.inconsistencyReports && details.inconsistencyReports.length > 0) {
+            <div class="reports-list">
+              @for (report of details.inconsistencyReports; track report.id) {
+                <div class="report-item">
+                  <div class="report-header">
+                    <span class="report-email">{{ report.reporterEmail }}</span>
+                    <span class="report-date">{{ formatDateTime(report.createdAt) }}</span>
+                  </div>
+                  <div class="report-message">{{ report.message }}</div>
+                </div>
+              }
+            </div>
+          } @else {
+            <p class="empty-text">None.</p>
+          }
+        </section>
+
+        <!-- Center section: Map -->
+        <section class="modal-center">
+          <app-ride-details-map [locations]="allLocations"></app-ride-details-map>
+        </section>
+
+        <!-- Right section: Route details -->
+        <section class="modal-right">
+          <div class="route-details">
+            <div class="detail-row">
+              <span class="detail-label">Pickup:</span>
+              <span class="detail-value">{{ details.route.startAddress }}</span>
+            </div>
+            @for (stop of stopsArray; track $index) {
+              <div class="detail-row">
+                <span class="detail-label">Stop {{ $index + 1 }}:</span>
+                <span class="detail-value">{{ stop }}</span>
+              </div>
+            }
+            <div class="detail-row">
+              <span class="detail-label">Destination:</span>
+              <span class="detail-value">{{ details.route.endAddress }}</span>
+            </div>
+            
+            <div class="detail-divider"></div>
+            
+            <div class="detail-row">
+              <span class="detail-label">Start time:</span>
+              <span class="detail-value">{{ formatDateTime(details.startTime) }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">End time:</span>
+              <span class="detail-value">{{ formatDateTime(details.endTime) }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Created by:</span>
+              <span class="detail-value">{{ details.creatorEmail }}</span>
+            </div>
+
+            @if (isCanceled()) {
+              <div class="detail-divider"></div>
+              <div class="detail-row canceled-row">
+                <span class="detail-label">Status:</span>
+                <span class="detail-value status-canceled">CANCELED</span>
+              </div>
+              @if (details.cancellationSource) {
+                <div class="detail-row">
+                  <span class="detail-label">Canceled by:</span>
+                  <span class="detail-value">{{ details.cancellationSource }}</span>
+                </div>
+              }
+              @if (details.cancellationReason) {
+                <div class="detail-row">
+                  <span class="detail-label">Reason:</span>
+                  <span class="detail-value">{{ details.cancellationReason }}</span>
+                </div>
+              }
+            }
+          </div>
+
+          <div class="stats-row">
+            <div class="stat-item">
+              <img class="stat-icon" src="assets/icons/taxi.png" alt="" />
+              <span class="stat-value">{{ details.distanceKm | number:'1.1-1' }} km</span>
+            </div>
+            <div class="stat-item">
+              <img class="stat-icon" src="assets/icons/clock.png" alt="" />
+              <span class="stat-value">{{ details.estimatedDurationMin }} min</span>
+            </div>
+            <div class="stat-item">
+              <img class="stat-icon" src="assets/icons/dollar.png" alt="" />
+              <span class="stat-value">{{ details.price | number:'1.0-2' }} RSD</span>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- Bottom row: Panic status -->
+      <div class="modal-bottom">
+        <div class="panic-status">
+          <span class="panic-label">Panic button pressed:</span>
+          <span class="panic-value" [class.panic-yes]="details.panicTriggered">
+            {{ details.panicTriggered ? 'YES' : 'NO' }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="modal-actions">
+        <button class="btn btn--secondary" (click)="onSaveAsFavorite()">
+          Save as Favorite
+        </button>
+        <button class="btn btn--primary" (click)="onOrderAgain()">
+          Order Again
+        </button>
+        <button class="btn btn--close" (click)="close.emit()">
+          Close
+        </button>
+      </div>
+    }
+  </div>
+</div>
