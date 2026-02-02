@@ -2,6 +2,7 @@ package com.komsiluk.taxi.data.remote.profile;
 
 import okhttp3.MultipartBody;
 import retrofit2.Call;
+import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.Headers;
 import retrofit2.http.Multipart;
@@ -24,4 +25,11 @@ public interface UserService {
             @Path("id") Long id,
             @Part MultipartBody.Part image
     );
+
+    @Headers({
+            "User-Agent: Mobile-Android",
+            "Content-Type:application/json"
+    })
+    @PUT("users/{id}/password")
+    Call<Void> changePassword(@Path("id") Long id, @Body UserChangePasswordRequest dto);
 }

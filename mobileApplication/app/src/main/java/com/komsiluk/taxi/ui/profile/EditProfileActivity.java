@@ -18,8 +18,7 @@ public class EditProfileActivity extends BaseNavDrawerActivity {
         super.onCreate(savedInstanceState);
 
         boolean isDriver = getIntent().getBooleanExtra(EXTRA_IS_DRIVER, false);
-        Fragment fragment = isDriver ? new EditDriverProfileFragment()
-                : new EditUserProfileFragment();
+        Fragment fragment = isDriver ? new EditDriverProfileFragment() : new EditUserProfileFragment();
 
         getSupportFragmentManager()
                 .beginTransaction()
