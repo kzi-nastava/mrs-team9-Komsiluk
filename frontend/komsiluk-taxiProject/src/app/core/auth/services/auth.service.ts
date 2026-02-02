@@ -49,6 +49,8 @@ export class AuthService {
 
   private readonly API = 'http://localhost:8081/api';
 
+  // Flag to prevent storage event from interfering with our own changes
+  private isUpdatingAuth = false;
 
   private tokenSig = signal<string | null>(null);
   private roleSig = signal<UserRole>(UserRole.GUEST);
@@ -62,12 +64,17 @@ export class AuthService {
   constructor(private http: HttpClient) {
     this.restoreAuthState();
 
+    // Storage event only fires from OTHER tabs, but we add a guard just in case
     window.addEventListener('storage', (event) => {
+      // Skip if we're currently updating auth state ourselves
+      if (this.isUpdatingAuth) {
+        return;
+      }
+
       if (event.key === 'auth_token' && event.newValue === null) {
         this.clearAuthState();
         location.href = '/login';
       }
-
 
       if (event.key === 'auth_token' && event.newValue) {
         const role = localStorage.getItem('auth_role');
@@ -98,25 +105,37 @@ export class AuthService {
   }
 
   private setAuthState(token: string, role: any, userId: number | null) {
-    const parsedRole = Object.values(UserRole).includes(role)
-      ? role
-      : UserRole.GUEST;
+    // Validate that role is a known non-GUEST role
+    const validRoles = [UserRole.PASSENGER, UserRole.DRIVER, UserRole.ADMIN];
+    
+    if (!token || !validRoles.includes(role) || userId === null) {
+      // Invalid auth state - don't save anything, clear instead
+      console.warn('Invalid auth state received, clearing...', { token: !!token, role, userId });
+      this.clearAuthState();
+      return;
+    }
+
+    // Set flag to prevent storage event listener from interfering
+    this.isUpdatingAuth = true;
 
     this.tokenSig.set(token);
-    this.roleSig.set(parsedRole);
+    this.roleSig.set(role);
     this.userIdSig.set(userId);
 
     localStorage.setItem('auth_token', token);
-    localStorage.setItem('auth_role', parsedRole);
-    if (userId !== null) {
-      localStorage.setItem('auth_user_id', userId.toString());
-    } else {
-      localStorage.removeItem('auth_user_id');
-    }
+    localStorage.setItem('auth_role', role);
+    localStorage.setItem('auth_user_id', userId.toString());
+
+    // Reset flag after a short delay to allow any pending storage events to be ignored
+    setTimeout(() => {
+      this.isUpdatingAuth = false;
+    }, 100);
   }
 
 
   private clearAuthState() {
+    this.isUpdatingAuth = true;
+    
     this.tokenSig.set(null);
     this.roleSig.set(UserRole.GUEST);
     this.userIdSig.set(null);
@@ -124,6 +143,10 @@ export class AuthService {
     localStorage.removeItem('auth_token');
     localStorage.removeItem('auth_role');
     localStorage.removeItem('auth_user_id');
+    
+    setTimeout(() => {
+      this.isUpdatingAuth = false;
+    }, 100);
   }
 
   private restoreAuthState() {
@@ -131,14 +154,21 @@ export class AuthService {
     const role = localStorage.getItem('auth_role') as UserRole | null;
     const userId = localStorage.getItem('auth_user_id');
 
-    if (token && role && Object.values(UserRole).includes(role)) {
+    // Valid roles are only non-GUEST roles
+    const validRoles = [UserRole.PASSENGER, UserRole.DRIVER, UserRole.ADMIN];
+
+    // ALL three must exist and role must be valid (not GUEST)
+    if (token && role && validRoles.includes(role) && userId) {
       this.tokenSig.set(token);
       this.roleSig.set(role);
-      this.userIdSig.set(userId ? +userId : null);
+      this.userIdSig.set(+userId);
+      
+      // Token will be validated on first API call via interceptor
+      // If invalid, interceptor will catch 401/403 and logout
     } else {
+      // Invalid or incomplete state - clear everything
       this.clearAuthState();
     }
-
   }
 
   registerPassenger(formData: FormData) {
