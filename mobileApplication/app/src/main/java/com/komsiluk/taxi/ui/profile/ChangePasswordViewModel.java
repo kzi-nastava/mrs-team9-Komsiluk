@@ -47,10 +47,8 @@ public class ChangePasswordViewModel extends ViewModel {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
                 if (response.isSuccessful()) {
-                    // backend vraca 204 NO_CONTENT => ovde je success
                     successEvent.setValue(new Event<>("Password changed successfully."));
                 } else if (response.code() == 400 || response.code() == 401) {
-                    // najcesce pogresan current password ili validation
                     errorEvent.setValue(new Event<>("Current password is incorrect."));
                 } else {
                     errorEvent.setValue(new Event<>("Failed to change password (" + response.code() + ")."));

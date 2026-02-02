@@ -104,4 +104,10 @@ public class ProfileActivity extends BaseNavDrawerActivity implements ProfileDet
     public void onBackFromCarProfile() {
         getSupportFragmentManager().popBackStack();
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        viewModel.fetchProfile();
+    }
 }

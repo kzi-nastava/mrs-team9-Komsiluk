@@ -6,6 +6,7 @@ import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.Headers;
 import retrofit2.http.Multipart;
+import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Part;
 import retrofit2.http.Path;
@@ -32,4 +33,16 @@ public interface UserService {
     })
     @PUT("users/{id}/password")
     Call<Void> changePassword(@Path("id") Long id, @Body UserChangePasswordRequest dto);
+
+    @PUT("users/{id}/profile")
+    Call<UserProfileResponse> updateProfile(
+            @Path("id") Long id,
+            @Body UserProfileUpdateRequest request
+    );
+
+    @POST("/api/driver-edit-requests/{driverId}")
+    Call<ProfileChangeRequestResponse> createDriverEditRequest(
+            @Path("driverId") Long driverId,
+            @Body ProfileChangeRequestCreate dto
+    );
 }

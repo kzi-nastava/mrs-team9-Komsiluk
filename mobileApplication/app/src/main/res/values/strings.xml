@@ -109,6 +109,11 @@
     <string name="err_seats_invalid">Number of seats must be at least 1.</string>
     <string name="err_model_short">Car model is too short.</string>
     <string name="err_licence_invalid">Licence plate format is invalid.</string>
+    <string name="err_firstname_too_long">First name is too long.</string>
+    <string name="err_lastname_too_long">Last name is too long.</string>
+    <string name="err_address_too_long">Address is too long.</string>
+    <string name="err_city_too_long">City is too long.</string>
+    <string name="err_model_too_long">Model is too long.</string>
 
     <string name="car_type_standard">Standard</string>
     <string name="car_type_luxury">Luxury</string>
