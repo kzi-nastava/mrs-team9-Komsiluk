@@ -56,38 +56,40 @@ public class ProfileSidebarTopFragment extends Fragment {
         viewModel = new ViewModelProvider(requireActivity()).get(ProfileViewModel.class);
 
         imagePickerLauncher = registerForActivityResult(
-                new ActivityResultContracts.GetContent(),
-                uri -> {
-                    if (uri == null) return;
+            new ActivityResultContracts.GetContent(),
+            uri -> {
 
-                    String type = requireContext().getContentResolver().getType(uri);
-                    if (type == null || !type.startsWith("image/")) {
-                        Toast.makeText(requireContext(), getString(R.string.select_image_error), Toast.LENGTH_SHORT).show();
-                        return;
-                    }
+                if (uri == null) return;
 
-                    File file;
-                    try {
-                        file = FileUtils.from(requireContext(), uri);
-                    } catch (Exception e) {
-                        Toast.makeText(requireContext(), "Unable to read image.", Toast.LENGTH_SHORT).show();
-                        return;
-                    }
-
-                    if (file.length() > MAX_IMAGE_BYTES) {
-                        Toast.makeText(requireContext(), getString(R.string.image_too_large), Toast.LENGTH_SHORT).show();
-                        return;
-                    }
-
-                    imgAvatar.setImageURI(uri);
-
-                    viewModel.updateProfileImage(file);
+                String type = requireContext().getContentResolver().getType(uri);
+                if (type == null || !type.startsWith("image/")) {
+                    Toast.makeText(requireContext(), getString(R.string.select_image_error), Toast.LENGTH_SHORT).show();
+                    return;
                 }
+
+                File file;
+                try {
+                    file = FileUtils.from(requireContext(), uri);
+                } catch (Exception e) {
+                    Toast.makeText(requireContext(), "Unable to read image.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                if (file.length() > MAX_IMAGE_BYTES) {
+                    Toast.makeText(requireContext(), getString(R.string.image_too_large), Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                imgAvatar.setImageURI(uri);
+
+                viewModel.updateProfileImage(file);
+            }
         );
 
         btnChangeImage.setOnClickListener(v -> imagePickerLauncher.launch("image/*"));
 
         viewModel.getProfile().observe(getViewLifecycleOwner(), dto -> {
+
             if (dto == null) return;
 
             String first = safe(dto.getFirstName());

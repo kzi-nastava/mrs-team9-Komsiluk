@@ -1,4 +1,4 @@
-package com.komsiluk.taxi.data.remote.profile;
+package com.komsiluk.taxi.data.remote.edit_requests;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;

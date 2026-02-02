@@ -4,8 +4,8 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.komsiluk.taxi.data.remote.profile.ProfileChangeRequestCreate;
-import com.komsiluk.taxi.data.remote.profile.ProfileChangeRequestResponse;
+import com.komsiluk.taxi.data.remote.edit_requests.ProfileChangeRequestCreate;
+import com.komsiluk.taxi.data.remote.edit_requests.ProfileChangeRequestResponse;
 import com.komsiluk.taxi.data.remote.profile.UserService;
 import com.komsiluk.taxi.data.remote.profile.UserProfileResponse;
 import com.komsiluk.taxi.data.session.SessionManager;

@@ -22,8 +22,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.komsiluk.taxi.R;
-import com.komsiluk.taxi.data.remote.profile.ProfileChangeRequestCreate;
-import com.komsiluk.taxi.data.remote.profile.UserProfileResponse;
+import com.komsiluk.taxi.data.remote.edit_requests.ProfileChangeRequestCreate;
 import com.komsiluk.taxi.ui.profile.DriverEditRequestViewModel;
 import com.komsiluk.taxi.ui.shared.InfoMessageActivity;
 
