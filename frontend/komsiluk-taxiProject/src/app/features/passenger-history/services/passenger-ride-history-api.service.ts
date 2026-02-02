@@ -101,14 +101,10 @@ export interface InconsistencyReportResponseDTO {
 
 @Injectable({ providedIn: 'root' })
 export class PassengerRideHistoryApiService {
-  private readonly API_BASE = 'http://localhost:8081/api/admin';
+  private readonly API_BASE = 'http://localhost:8081/api';
 
   constructor(private http: HttpClient) {}
 
-  /**
-   * Get list of rides for a user (passenger)
-   * Endpoint: GET /api/users/{userId}/rides
-   */
   getRides(
     userId: number,
     from?: string,
@@ -121,15 +117,11 @@ export class PassengerRideHistoryApiService {
     if (sortBy) params = params.set('sortBy', sortBy);
 
     return this.http.get<PassengerRideHistoryDTO[]>(
-      `${this.API_BASE}/users/${userId}/rides`,
+      `${this.API_BASE}/passengers/${userId}/rides`,
       { params }
     );
   }
 
-  /**
-   * Get detailed information about a specific ride
-   * Endpoint: GET /api/admin/rides/{rideId}
-   */
   getRideDetails(rideId: number): Observable<PassengerRideDetailsDTO> {
     return this.http.get<PassengerRideDetailsDTO>(
       `${this.API_BASE}/rides/${rideId}`
