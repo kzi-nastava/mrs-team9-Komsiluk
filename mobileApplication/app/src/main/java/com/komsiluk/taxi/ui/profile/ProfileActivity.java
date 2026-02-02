@@ -2,8 +2,10 @@ package com.komsiluk.taxi.ui.profile;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.komsiluk.taxi.R;
 import com.komsiluk.taxi.auth.AuthManager;
@@ -19,15 +21,16 @@ import javax.inject.Inject;
 import dagger.hilt.android.AndroidEntryPoint;
 
 @AndroidEntryPoint
-public class ProfileActivity extends BaseNavDrawerActivity
-        implements ProfileDetailsFragment.Host, CarProfileFragment.Host {
+public class ProfileActivity extends BaseNavDrawerActivity implements ProfileDetailsFragment.Host, CarProfileFragment.Host {
 
     private boolean isDriver = false;
     @Inject
     AuthManager authManager;
+
+    private ProfileViewModel viewModel;
+
     @Override
     protected int getContentLayoutId() {
-        // inserting activity layout
         return R.layout.activity_profile;
     }
 
@@ -47,20 +50,32 @@ public class ProfileActivity extends BaseNavDrawerActivity
 
         isDriver = authManager.getRole().equals(UserRole.DRIVER);
 
-        getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.details_panel, ProfileDetailsFragment.newInstance(isDriver))
-                .commit();
+        viewModel= new ViewModelProvider(this).get(ProfileViewModel.class);
 
-        getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.sidebar_top_container, ProfileSidebarTopFragment.newInstance())
-                .commit();
+        viewModel.getErrorMessage().observe(this, event -> {
+            String msg = event.getContentIfNotHandled();
+            if (msg == null) return;
+            Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+        });
 
-        getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.sidebar_bottom_container, ProfileSidebarBottomFragment.newInstance(isDriver))
-                .commit();
+        if (savedInstanceState == null) {
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.details_panel, ProfileDetailsFragment.newInstance(isDriver))
+                    .commit();
+
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.sidebar_top_container, ProfileSidebarTopFragment.newInstance())
+                    .commit();
+
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.sidebar_bottom_container, ProfileSidebarBottomFragment.newInstance(isDriver))
+                    .commit();
+        }
+
+        viewModel.fetchProfile();
     }
 
     @Override
