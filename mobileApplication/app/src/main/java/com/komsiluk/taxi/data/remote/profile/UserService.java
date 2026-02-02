@@ -1,5 +1,8 @@
 package com.komsiluk.taxi.data.remote.profile;
 
+import com.komsiluk.taxi.data.remote.edit_requests.ProfileChangeRequestCreate;
+import com.komsiluk.taxi.data.remote.edit_requests.ProfileChangeRequestResponse;
+
 import okhttp3.MultipartBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
