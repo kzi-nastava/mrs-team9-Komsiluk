@@ -6,11 +6,8 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
 import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.AdminRideSortBy;
-import rs.ac.uns.ftn.iss.Komsiluk.dtos.ride.AdminRideDetailsDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.ride.AdminRideHistoryDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.IRideService;
 import rs.ac.uns.ftn.iss.Komsiluk.util.validators.ValidDateRange;
@@ -19,17 +16,17 @@ import java.time.LocalDate;
 import java.util.Collection;
 
 @RestController
-@RequestMapping("/api/admin")
-@Validated
-public class AdminController {
+@RequestMapping("/api/passengers")
+@PreAuthorize("hasRole('PASSENGER')")
+public class PassengerController {
 
     @Autowired
     private IRideService rideService;
 
-    @GetMapping(value = "/rides/by-user-email", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{userId}/rides", produces = MediaType.APPLICATION_JSON_VALUE)
     @ValidDateRange
-    public ResponseEntity<Collection<AdminRideHistoryDTO>> getRidesByUserEmail(
-            @RequestParam String email,
+    public ResponseEntity<Collection<AdminRideHistoryDTO>> getUserRides(
+            @PathVariable @Positive Long userId,
 
             @RequestParam(required = false)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
@@ -43,8 +40,7 @@ public class AdminController {
             AdminRideSortBy sortBy
     ) {
         return ResponseEntity.ok(
-                rideService.getAdminRideHistoryByEmail(email, from, to, sortBy)
+                rideService.getAdminRideHistoryForUser(userId, from, to, sortBy)
         );
     }
-
 }

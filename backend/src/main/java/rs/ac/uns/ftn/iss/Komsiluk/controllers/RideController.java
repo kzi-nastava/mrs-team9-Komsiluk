@@ -121,5 +121,16 @@ public class RideController {
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.noContent().build());
     }
+
+    @GetMapping(value = "/{rideId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasAnyRole('ADMIN', 'PASSENGER')")
+    public ResponseEntity<AdminRideDetailsDTO> getRideDetails(
+            @PathVariable @Positive(message = "Ride ID must be positive") Long rideId
+    ) {
+        return ResponseEntity.ok(
+                rideService.getAdminRideDetails(rideId)
+        );
+    }
+
 }
 
