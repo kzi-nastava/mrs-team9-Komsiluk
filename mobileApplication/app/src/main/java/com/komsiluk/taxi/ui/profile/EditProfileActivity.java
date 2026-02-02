@@ -13,13 +13,14 @@ public class EditProfileActivity extends BaseNavDrawerActivity {
 
     public static final String EXTRA_IS_DRIVER = "extra_is_driver";
 
+    public static final int RESULT_PROFILE_UPDATED = 901;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         boolean isDriver = getIntent().getBooleanExtra(EXTRA_IS_DRIVER, false);
-        Fragment fragment = isDriver ? new EditDriverProfileFragment()
-                : new EditUserProfileFragment();
+        Fragment fragment = isDriver ? new EditDriverProfileFragment() : new EditUserProfileFragment();
 
         getSupportFragmentManager()
                 .beginTransaction()

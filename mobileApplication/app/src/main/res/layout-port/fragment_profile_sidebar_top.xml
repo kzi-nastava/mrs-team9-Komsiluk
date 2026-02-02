@@ -16,14 +16,15 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
-        <ImageView
+        <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/imgAvatar"
-            android:layout_width="120dp"
-            android:layout_height="120dp"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
             android:layout_gravity="center"
+            android:scaleType="centerCrop"
             android:contentDescription="@string/profile_avatar_content_description"
             android:src="@drawable/ic_launcher_foreground"
-            android:scaleType="centerInside" />
+            app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay" />
     </FrameLayout>
 
     <!-- name + email -->

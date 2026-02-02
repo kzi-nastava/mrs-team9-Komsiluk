@@ -56,6 +56,13 @@
     <string name="label_pet_friendly_full">Pet friendly: Yes</string>
     <string name="label_child_seat_full">Child seat available: No</string>
 
+    <string name="profile_yes">Yes</string>
+    <string name="profile_no">No</string>
+    <string name="profile_unknown">Unknown</string>
+    <string name="profile_pet_friendly_fmt">Pet friendly: %1$s</string>
+    <string name="profile_child_seat_fmt">Child seat available: %1$s</string>
+    <string name="profile_active_minutes_fmt">Active today: %1$d min</string>
+
     <string name="nav_left">Left action</string>
     <string name="nav_right">Right action</string>
 
@@ -71,6 +78,7 @@
     <string name="logout_button">Log out</string>
 
     <string name="change_password_title">Change password</string>
+    <string name="change_password_current_label">Current password</string>
     <string name="change_password_new_label">New password</string>
     <string name="change_password_repeat_label">Repeat password</string>
     <string name="change_password_cancel">Cancel</string>
@@ -101,6 +109,11 @@
     <string name="err_seats_invalid">Number of seats must be at least 1.</string>
     <string name="err_model_short">Car model is too short.</string>
     <string name="err_licence_invalid">Licence plate format is invalid.</string>
+    <string name="err_firstname_too_long">First name is too long.</string>
+    <string name="err_lastname_too_long">Last name is too long.</string>
+    <string name="err_address_too_long">Address is too long.</string>
+    <string name="err_city_too_long">City is too long.</string>
+    <string name="err_model_too_long">Model is too long.</string>
 
     <string name="car_type_standard">Standard</string>
     <string name="car_type_luxury">Luxury</string>
@@ -324,7 +337,7 @@
     <string name="admin_add_driver_vehicle_title">Vehicle details</string>
     <string name="admin_driver_created_title">Driver account created</string>
     <string name="admin_driver_created_message">An activation email has been sent to the driver</string>
-    <!-- TODO: Remove or change this placeholder text -->
+
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="forgot_password_message_title">Password Reset</string>
     <string name="forgot_password_message">If the email exists, a password reset link has been sent.\n        Please check your inbox and follow the instructions.</string>

@@ -1,5 +1,7 @@
 package com.komsiluk.taxi.ui.auth.login;
 
+import android.util.Log;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -69,8 +71,10 @@ public class LoginViewModel extends ViewModel {
 
             @Override
             public void onFailure(Call<LoginResponse> call, Throwable t) {
-                errorMessageEvent.postValue(new Event<>("Unable to connect. Please check your internet connection."));
+                Log.e("LOGIN", "Network fail", t);
+                errorMessageEvent.postValue(new Event<>("FAIL: " + t.getClass().getSimpleName() + " - " + t.getMessage()));
             }
+
         });
     }
 

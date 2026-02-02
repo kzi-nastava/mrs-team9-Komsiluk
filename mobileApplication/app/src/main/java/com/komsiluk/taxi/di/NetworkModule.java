@@ -6,6 +6,7 @@ import com.komsiluk.taxi.BuildConfig;
 import com.komsiluk.taxi.auth.AuthInterceptor;
 import com.komsiluk.taxi.auth.TokenAuthenticator;
 import com.komsiluk.taxi.data.remote.auth.AuthService;
+import com.komsiluk.taxi.data.remote.profile.UserService;
 
 import javax.inject.Singleton;
 
@@ -57,6 +58,12 @@ public class NetworkModule {
     @Singleton
     public static AuthService provideAuthService(Retrofit retrofit) {
         return retrofit.create(AuthService.class);
+    }
+
+    @Provides
+    @Singleton
+    public static UserService provideUserService(Retrofit retrofit) {
+        return retrofit.create(UserService.class);
     }
 }
 

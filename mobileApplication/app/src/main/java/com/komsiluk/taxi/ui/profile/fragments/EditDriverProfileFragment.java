@@ -7,6 +7,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -21,16 +22,27 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.komsiluk.taxi.R;
+import com.komsiluk.taxi.data.remote.profile.ProfileChangeRequestCreate;
+import com.komsiluk.taxi.data.remote.profile.UserProfileResponse;
+import com.komsiluk.taxi.ui.profile.DriverEditRequestViewModel;
 import com.komsiluk.taxi.ui.shared.InfoMessageActivity;
 
+import dagger.hilt.android.AndroidEntryPoint;
+
+@AndroidEntryPoint
 public class EditDriverProfileFragment extends Fragment {
 
     private EditText etFirstname, etLastname, etAddress, etCity, etPhone;
     private EditText etModel, etLicence, etSeats;
     private AutoCompleteTextView etType;
+
     private TextView errFirstname, errLastname, errAddress, errCity, errPhone;
     private TextView errModel, errType, errLicence, errSeats;
+
     private CheckBox cbPetFriendly, cbChildSeat;
+
+    private DriverEditRequestViewModel vm;
+    private boolean prefilled = false;
 
     @Nullable
     @Override
@@ -63,11 +75,59 @@ public class EditDriverProfileFragment extends Fragment {
         cbPetFriendly = v.findViewById(R.id.cbPetFriendly);
         cbChildSeat   = v.findViewById(R.id.cbChildSeat);
 
-        ArrayAdapter<CharSequence> typeAdapter = ArrayAdapter.createFromResource(requireContext(), R.array.car_types, android.R.layout.simple_list_item_1);
+        ArrayAdapter<CharSequence> typeAdapter =
+                ArrayAdapter.createFromResource(requireContext(), R.array.car_types, android.R.layout.simple_list_item_1);
         etType.setAdapter(typeAdapter);
         etType.setOnClickListener(view -> etType.showDropDown());
 
-        // watchers
+        vm = new ViewModelProvider(requireActivity()).get(DriverEditRequestViewModel.class);
+
+        // PREFILL
+        vm.getCurrentProfile().observe(getViewLifecycleOwner(), dto -> {
+            if (dto == null || prefilled) return;
+
+            etFirstname.setText(nullToEmpty(dto.getFirstName()));
+            etLastname.setText(nullToEmpty(dto.getLastName()));
+            etAddress.setText(nullToEmpty(dto.getAddress()));
+            etCity.setText(nullToEmpty(dto.getCity()));
+            etPhone.setText(nullToEmpty(dto.getPhoneNumber()));
+
+            if (dto.getVehicle() != null) {
+                etModel.setText(nullToEmpty(dto.getVehicle().getModel()));
+                etLicence.setText(nullToEmpty(dto.getVehicle().getLicencePlate()));
+                etSeats.setText(dto.getVehicle().getSeatCount() > 0 ? String.valueOf(dto.getVehicle().getSeatCount()) : "");
+
+                if (dto.getVehicle().getType() != null) {
+                    etType.setText(dto.getVehicle().getType().toString(), false);
+                }
+
+                cbChildSeat.setChecked(dto.getVehicle().getBabyFriendly());
+                cbPetFriendly.setChecked(dto.getVehicle().getPetFriendly());
+            }
+
+            prefilled = true;
+        });
+
+        vm.getErrorMessageEvent().observe(getViewLifecycleOwner(), event -> {
+            String msg = event.getContentIfNotHandled();
+            if (msg == null) return;
+            Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show();
+        });
+
+        vm.getSubmitSuccessEvent().observe(getViewLifecycleOwner(), event -> {
+            if (event.getContentIfNotHandled() == null) return;
+
+            Context ctx = requireContext();
+            Intent i = InfoMessageActivity.createIntent(
+                    ctx,
+                    getString(R.string.profile_update_submitted_title),
+                    getString(R.string.profile_update_submitted_body),
+                    getString(R.string.btn_done)
+            );
+            startActivity(i);
+            requireActivity().finish();
+        });
+
         addWatcher(etFirstname, errFirstname, this::validateFirstname);
         addWatcher(etLastname,  errLastname,  this::validateLastname);
         addWatcher(etAddress,   errAddress,   this::validateAddress);
@@ -82,20 +142,50 @@ public class EditDriverProfileFragment extends Fragment {
         v.findViewById(R.id.btnCancel).setOnClickListener(view -> requireActivity().finish());
 
         v.findViewById(R.id.btnConfirm).setOnClickListener(view -> {
-            if (validateAll()) {
-                Context ctx = requireContext();
-                Intent i = InfoMessageActivity.createIntent(ctx, getString(R.string.profile_update_submitted_title), getString(R.string.profile_update_submitted_body), getString(R.string.btn_done));
-                startActivity(i);
-                requireActivity().finish();
-            }
+            if (!validateAll()) return;
+
+            ProfileChangeRequestCreate req = new ProfileChangeRequestCreate();
+
+            req.newName = trimOrNull(etFirstname.getText().toString());
+            req.newSurname = trimOrNull(etLastname.getText().toString());
+            req.newAddress = trimOrNull(etAddress.getText().toString());
+            req.newCity = trimOrNull(etCity.getText().toString());
+            req.newPhoneNumber = trimOrNull(etPhone.getText().toString());
+
+            req.newModel = trimOrNull(etModel.getText().toString());
+            req.newType = mapTypeToEnum(etType.getText().toString());
+            req.newLicencePlate = trimOrNull(etLicence.getText().toString());
+
+            req.newSeatCount = parseIntOrNull(etSeats.getText().toString());
+
+            req.newPetFriendly = cbPetFriendly.isChecked();
+            req.newBabyFriendly = cbChildSeat.isChecked();
+
+            vm.submitRequest(req);
         });
+
+        vm.fetchProfile();
 
         return v;
     }
 
-    private interface Validator {
-        @Nullable String validate(String value);
+    private String nullToEmpty(String s) { return s == null ? "" : s; }
+    private String trimOrNull(String s) {
+        if (s == null) return null;
+        String t = s.trim();
+        return t.isEmpty() ? "" : t;
     }
+    private Integer parseIntOrNull(String s) {
+        try {
+            String t = s.trim();
+            if (t.isEmpty()) return null;
+            return Integer.parseInt(t);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private interface Validator { @Nullable String validate(String value); }
 
     private void addWatcher(EditText field, TextView errorView, Validator validator) {
         field.addTextChangedListener(new SimpleTextWatcher() {
@@ -108,73 +198,74 @@ public class EditDriverProfileFragment extends Fragment {
         });
     }
 
+    private String mapTypeToEnum(String uiValue) {
+        String t = uiValue.trim().toUpperCase();
+        if (t.equals("LUXURY")) return "LUXURY";
+        if (t.equals("STANDARD")) return "STANDARD";
+        if (t.equals("VAN")) return "VAN";
+        return t;
+    }
+
     private boolean validateAll() {
         boolean ok = true;
 
-        String f = etFirstname.getText().toString();
-        String l = etLastname.getText().toString();
-        String a = etAddress.getText().toString();
-        String c = etCity.getText().toString();
-        String p = etPhone.getText().toString();
-
-        String m = etModel.getText().toString();
-        String t = etType.getText().toString();
-        String li = etLicence.getText().toString();
-        String s = etSeats.getText().toString();
-
         String e;
 
-        e = validateFirstname(f);
+        e = validateFirstname(etFirstname.getText().toString());
         if (e != null) { showError(etFirstname, errFirstname, e); ok = false; }
 
-        e = validateLastname(l);
+        e = validateLastname(etLastname.getText().toString());
         if (e != null) { showError(etLastname, errLastname, e); ok = false; }
 
-        e = validateAddress(a);
+        e = validateAddress(etAddress.getText().toString());
         if (e != null) { showError(etAddress, errAddress, e); ok = false; }
 
-        e = validateCity(c);
+        e = validateCity(etCity.getText().toString());
         if (e != null) { showError(etCity, errCity, e); ok = false; }
 
-        e = validatePhone(p);
+        e = validatePhone(etPhone.getText().toString());
         if (e != null) { showError(etPhone, errPhone, e); ok = false; }
 
-        e = validateModel(m);
+        e = validateModel(etModel.getText().toString());
         if (e != null) { showError(etModel, errModel, e); ok = false; }
 
-        e = validateType(t);
+        e = validateType(etType.getText().toString());
         if (e != null) { showError(etType, errType, e); ok = false; }
 
-        e = validateLicence(li);
+        e = validateLicence(etLicence.getText().toString());
         if (e != null) { showError(etLicence, errLicence, e); ok = false; }
 
-        e = validateSeats(s);
+        e = validateSeats(etSeats.getText().toString());
         if (e != null) { showError(etSeats, errSeats, e); ok = false; }
 
         return ok;
     }
 
-    // user fields
-
     private @Nullable String validateFirstname(String s) {
-        if (s.trim().isEmpty()) return getString(R.string.err_firstname_required);
-        if (s.trim().length() < 2) return getString(R.string.err_firstname_short);
+        String t = s.trim();
+        if (t.isEmpty()) return getString(R.string.err_firstname_required);
+        if (t.length() > 30) return getString(R.string.err_firstname_too_long);
         return null;
     }
 
     private @Nullable String validateLastname(String s) {
-        if (s.trim().isEmpty()) return getString(R.string.err_lastname_required);
-        if (s.trim().length() < 2) return getString(R.string.err_lastname_short);
+        String t = s.trim();
+        if (t.isEmpty()) return getString(R.string.err_lastname_required);
+        if (t.length() > 30) return getString(R.string.err_lastname_too_long);
         return null;
     }
 
     private @Nullable String validateAddress(String s) {
-        if (s.trim().isEmpty()) return getString(R.string.err_address_required);
+        String t = s.trim();
+        if (t.isEmpty()) return getString(R.string.err_address_required);
+        if (t.length() > 100) return getString(R.string.err_address_too_long);
         return null;
     }
 
     private @Nullable String validateCity(String s) {
-        if (s.trim().isEmpty()) return getString(R.string.err_city_required);
+        String t = s.trim();
+        if (t.isEmpty()) return getString(R.string.err_city_required);
+        if (t.length() > 50) return getString(R.string.err_city_too_long);
         return null;
     }
 
@@ -183,27 +274,16 @@ public class EditDriverProfileFragment extends Fragment {
         if (t.isEmpty()) return getString(R.string.err_phone_required);
 
         String noSpaces = t.replace(" ", "");
-        if (noSpaces.startsWith("+")) {
-            noSpaces = noSpaces.substring(1);
-        }
-
-        if (!noSpaces.matches("\\d+")) {
+        if (!noSpaces.matches("^\\+?[0-9]{8,15}$")) {
             return getString(R.string.err_phone_invalid);
         }
-
-        if (noSpaces.length() < 6) {
-            return getString(R.string.err_phone_invalid);
-        }
-
         return null;
     }
-
-    // car fields
 
     private @Nullable String validateModel(String s) {
         String t = s.trim();
         if (t.isEmpty()) return getString(R.string.err_model_required);
-        if (t.length() < 3) return getString(R.string.err_model_short);
+        if (t.length() > 50) return getString(R.string.err_model_too_long);
         return null;
     }
 
@@ -214,11 +294,10 @@ public class EditDriverProfileFragment extends Fragment {
     }
 
     private @Nullable String validateLicence(String s) {
-        String t = s.trim();
+        String t = s.trim().replace(" ", "");
         if (t.isEmpty()) return getString(R.string.err_licence_required);
 
-        String normalized = t.replace(" ", "");
-        if (!normalized.matches("[A-Za-z0-9-]{4,}")) {
+        if (!t.matches("^[A-Z0-9\\-]{3,15}$")) {
             return getString(R.string.err_licence_invalid);
         }
         return null;
@@ -230,9 +309,7 @@ public class EditDriverProfileFragment extends Fragment {
 
         try {
             int n = Integer.parseInt(t);
-            if (n < 1 || n > 8) {
-                return getString(R.string.err_seats_invalid);
-            }
+            if (n < 1 || n > 8) return getString(R.string.err_seats_invalid);
         } catch (NumberFormatException ex) {
             return getString(R.string.err_seats_invalid);
         }
