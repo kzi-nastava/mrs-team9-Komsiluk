@@ -9,7 +9,7 @@
     } @else if (details) {
       <div class="modal-content">
         
-        <!-- Left section: Driver info & Ratings -->
+        <!-- Left section: Driver info, Passengers, Ratings -->
         <section class="modal-left">
           <h3 class="section-title">Driver</h3>
           <div class="driver-card">
@@ -25,6 +25,21 @@
               <div class="driver-rating">{{ driverRating }}</div>
             </div>
           </div>
+
+          <h3 class="section-title section-title--spaced">Passengers</h3>
+          <div class="created-by">
+            <span class="created-by-label">Created by:</span>
+            <span class="created-by-value">{{ details.creatorEmail }}</span>
+          </div>
+          @if (passengerEmailsList.length > 0) {
+            <ul class="passengers-list">
+              @for (email of passengerEmailsList; track email) {
+                <li class="passenger-item">{{ email }}</li>
+              }
+            </ul>
+          } @else {
+            <p class="empty-text">No passengers.</p>
+          }
 
           <h3 class="section-title section-title--spaced">Ratings</h3>
           @if (details.ratings && details.ratings.length > 0) {
@@ -100,10 +115,6 @@
             <div class="detail-row">
               <span class="detail-label">End time:</span>
               <span class="detail-value">{{ formatDateTime(details.endTime) }}</span>
-            </div>
-            <div class="detail-row">
-              <span class="detail-label">Created by:</span>
-              <span class="detail-value">{{ details.creatorEmail }}</span>
             </div>
 
             @if (isCanceled()) {

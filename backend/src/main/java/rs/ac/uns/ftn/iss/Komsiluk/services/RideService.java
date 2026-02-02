@@ -729,21 +729,17 @@ public class RideService implements IRideService {
 
 
 
-//    private boolean isUserOnRide(Ride ride, Long userId) {
-//        // ako je vozač
-//        if (ride.getDriver() != null &&
-//                ride.getDriver().getId().equals(userId)) {
-//            return true;
-//        }
-//
-//        // ako je putnik
-//        if (ride.getPassengers() != null) {
-//            return ride.getPassengers().stream()
-//                    .anyMatch(p -> p != null && p.getId().equals(userId));
-//        }
-//
-//        return false;
-//    }
+    @Override
+    public Collection<AdminRideHistoryDTO> getAdminRideHistoryByEmail(
+            String email, LocalDate from, LocalDate to, AdminRideSortBy sortBy) {
+
+        User user = userRepository.findByEmailIgnoreCase(email);
+        if (user == null) {
+            throw new NotFoundException("User not found with email: " + email);
+        }
+
+        return getAdminRideHistoryForUser(user.getId(), from, to, sortBy);
+    }
 
 
 

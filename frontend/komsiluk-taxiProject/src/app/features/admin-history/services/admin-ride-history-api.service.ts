@@ -2,8 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-// Matches backend AdminRideSortBy enum
-export type PassengerRideSortBy = 
+export type AdminRideSortBy = 
   | 'DATE' 
   | 'PRICE' 
   | 'ROUTE' 
@@ -15,21 +14,19 @@ export type PassengerRideSortBy =
   | 'CANCELLED_BY' 
   | 'PANIC';
 
-// Matches backend AdminRideHistoryDTO
-export interface PassengerRideHistoryDTO {
+export interface AdminRideHistoryDTO {
   rideId: number;
   startAddress: string;
   endAddress: string;
-  startTime: string;       // LocalDateTime as ISO string
-  endTime: string;         // LocalDateTime as ISO string
+  startTime: string;
+  endTime: string;
   canceled: boolean;
   cancellationSource: string | null;
   price: number;
   panicTriggered: boolean;
 }
 
-// Matches backend AdminRideDetailsDTO
-export interface PassengerRideDetailsDTO {
+export interface AdminRideDetailsDTO {
   rideId: number;
   status: string;
   route: RouteResponseDTO;
@@ -64,7 +61,7 @@ export interface RouteResponseDTO {
   id: number;
   startAddress: string;
   endAddress: string;
-  stops: string;  // pipe-separated string from backend
+  stops: string;
 }
 
 export interface DriverResponseDTO {
@@ -100,30 +97,38 @@ export interface InconsistencyReportResponseDTO {
 }
 
 @Injectable({ providedIn: 'root' })
-export class PassengerRideHistoryApiService {
+export class AdminRideHistoryApiService {
   private readonly API_BASE = 'http://localhost:8081/api';
 
   constructor(private http: HttpClient) {}
 
-  getRides(
-    userId: number,
+  /**
+   * Get rides for a user by their email
+   * Endpoint: GET /api/admin/rides/by-user-email?email=...
+   */
+  getRidesByEmail(
+    email: string,
     from?: string,
     to?: string,
-    sortBy?: PassengerRideSortBy
-  ): Observable<PassengerRideHistoryDTO[]> {
-    let params = new HttpParams();
+    sortBy?: AdminRideSortBy
+  ): Observable<AdminRideHistoryDTO[]> {
+    let params = new HttpParams().set('email', email);
     if (from?.trim()) params = params.set('from', from);
     if (to?.trim()) params = params.set('to', to);
     if (sortBy) params = params.set('sortBy', sortBy);
 
-    return this.http.get<PassengerRideHistoryDTO[]>(
-      `${this.API_BASE}/passengers/${userId}/rides`,
+    return this.http.get<AdminRideHistoryDTO[]>(
+      `${this.API_BASE}/admin/rides/by-user-email`,
       { params }
     );
   }
 
-  getRideDetails(rideId: number): Observable<PassengerRideDetailsDTO> {
-    return this.http.get<PassengerRideDetailsDTO>(
+  /**
+   * Get detailed information about a specific ride
+   * Endpoint: GET /api/rides/{rideId}
+   */
+  getRideDetails(rideId: number): Observable<AdminRideDetailsDTO> {
+    return this.http.get<AdminRideDetailsDTO>(
       `${this.API_BASE}/rides/${rideId}`
     );
   }

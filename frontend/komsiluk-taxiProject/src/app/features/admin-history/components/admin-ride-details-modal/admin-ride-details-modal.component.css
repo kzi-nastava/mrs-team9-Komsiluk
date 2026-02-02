@@ -166,6 +166,46 @@
   font-weight: 600;
 }
 
+/* Created by */
+.created-by {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding: 8px 12px;
+  background: rgba(255, 238, 2, 0.1);
+  border-radius: 6px;
+  border-left: 3px solid var(--color-secondary);
+}
+
+.created-by-label {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 13px;
+}
+
+.created-by-value {
+  color: var(--color-secondary);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* Passengers list */
+.passengers-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.passenger-item {
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 6px;
+  color: #fff;
+  font-size: 13px;
+}
+
 /* Ratings */
 .ratings-list,
 .reports-list {
