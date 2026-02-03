@@ -1,4 +1,4 @@
-package com.komsiluk.taxi.driver.history;
+package com.komsiluk.taxi.ui.driver_history;
 
 import android.text.SpannableString;
 import android.text.Spanned;

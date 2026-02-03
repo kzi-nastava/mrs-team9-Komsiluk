@@ -8,7 +8,6 @@
     android:padding="16dp"
     android:background="@drawable/bg_ride_card">
 
-    <!-- MAP -->
     <ImageView
         android:id="@+id/imgMap"
         android:layout_width="0dp"
@@ -22,7 +21,6 @@
         app:layout_constraintWidth_percent="0.66"
         app:layout_constraintDimensionRatio="1:1" />
 
-    <!-- Scroll -->
     <ScrollView
         android:id="@+id/scrollContent"
         android:layout_width="0dp"
@@ -65,27 +63,13 @@
                 android:text="Pickup location: ..."
                 android:textColor="@color/secondary"
                 android:fontFamily="@font/roboto_serif_medium"
-
                 android:layout_marginTop="6dp" />
 
-            <TextView
-                android:id="@+id/tvStation1"
+            <LinearLayout
+                android:id="@+id/containerStops"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Station 1: ..."
-                android:fontFamily="@font/roboto_serif_medium"
-
-                android:textColor="@color/secondary"
-                android:layout_marginTop="4dp" />
-
-            <TextView
-                android:id="@+id/tvStation2"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Station 2: ..."
-                android:textColor="@color/secondary"
-                android:fontFamily="@font/roboto_serif_medium"
-
+                android:orientation="vertical"
                 android:layout_marginTop="4dp" />
 
             <TextView
@@ -95,7 +79,6 @@
                 android:text="Destination: ..."
                 android:textColor="@color/secondary"
                 android:fontFamily="@font/roboto_serif_medium"
-
                 android:layout_marginTop="4dp" />
 
             <com.google.android.material.divider.MaterialDivider
@@ -104,7 +87,6 @@
                 android:layout_marginVertical="8dp"
                 app:dividerColor="@color/white"
                 app:dividerThickness="1dp" />
-
 
             <TextView
                 android:id="@+id/tvStart"
@@ -121,7 +103,6 @@
                 android:layout_height="wrap_content"
                 android:text="End time: ..."
                 android:fontFamily="@font/roboto_serif_medium"
-
                 android:textColor="@color/secondary"
                 android:layout_marginTop="4dp" />
 
@@ -132,14 +113,12 @@
                 app:dividerColor="@color/white"
                 app:dividerThickness="1dp" />
 
-
             <TextView
                 android:id="@+id/tvKm"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Kilometers: ..."
                 android:fontFamily="@font/roboto_serif_medium"
-
                 android:textColor="@color/secondary"
                 android:layout_marginTop="10dp" />
 
@@ -149,7 +128,6 @@
                 android:layout_height="wrap_content"
                 android:text="Time: ..."
                 android:fontFamily="@font/roboto_serif_medium"
-
                 android:textColor="@color/secondary"
                 android:layout_marginTop="4dp" />
 
@@ -160,7 +138,6 @@
                 android:text="Price: ..."
                 android:textColor="@color/white"
                 android:fontFamily="@font/roboto_serif_medium"
-
                 android:layout_marginTop="4dp" />
 
             <TextView
@@ -184,10 +161,9 @@
                 android:id="@+id/tvPassengers"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="user1@gmail.com&#10;user2@gmail.com&#10;user3@gmail.com"
+                android:text="..."
                 android:textColor="@color/secondary"
                 android:fontFamily="@font/roboto_serif_medium"
-
                 android:layout_marginTop="6dp" />
 
             <TextView
@@ -211,10 +187,35 @@
                 android:id="@+id/tvRatings"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="(ratings placeholder)"
+                android:text="Loading ratings..."
                 android:textColor="@color/white"
                 android:fontFamily="@font/roboto_serif_medium"
+                android:layout_marginTop="6dp" />
 
+            <TextView
+                android:id="@+id/tvInconsistencyTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Inconsistency Reports:"
+                android:textStyle="bold"
+                android:textColor="@color/white"
+                android:fontFamily="@font/roboto_serif_semibold"
+                android:layout_marginTop="14dp" />
+
+            <com.google.android.material.divider.MaterialDivider
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="8dp"
+                app:dividerColor="@color/white"
+                app:dividerThickness="1dp" />
+
+            <TextView
+                android:id="@+id/tvInconsistencyDetails"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Loading reports..."
+                android:textColor="@color/white"
+                android:fontFamily="@font/roboto_serif_medium"
                 android:layout_marginTop="6dp" />
 
             <com.google.android.material.divider.MaterialDivider
@@ -233,23 +234,9 @@
                 android:fontFamily="@font/roboto_serif_medium"
                 android:textSize="14sp" />
 
-            <Space
-                android:layout_width="18dp"
-                android:layout_height="0dp" />
-
-            <TextView
-                android:id="@+id/tvInconsistencyFlag"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Inconsistency report: N/A"
-                android:textColor="@color/secondary"
-                android:fontFamily="@font/roboto_serif_medium"
-                android:textSize="14sp" />
-
         </LinearLayout>
     </ScrollView>
 
-    <!-- CLOSE -->
     <Button
         android:id="@+id/btnClose"
         android:layout_width="140dp"
