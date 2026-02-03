@@ -93,7 +93,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".driver.history.DriverHistoryActivity" />
+        <activity android:name=".ui.driver_history.DriverHistoryActivity" />
     </application>
 
     <uses-permission android:name="android.permission.INTERNET" />

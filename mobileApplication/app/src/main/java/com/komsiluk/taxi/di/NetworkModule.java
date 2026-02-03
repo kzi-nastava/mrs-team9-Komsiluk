@@ -6,6 +6,7 @@ import com.komsiluk.taxi.BuildConfig;
 import com.komsiluk.taxi.auth.AuthInterceptor;
 import com.komsiluk.taxi.auth.TokenAuthenticator;
 import com.komsiluk.taxi.data.remote.auth.AuthService;
+import com.komsiluk.taxi.data.remote.driver_history.DriverService;
 import com.komsiluk.taxi.data.remote.edit_requests.EditRequestsService;
 import com.komsiluk.taxi.data.remote.profile.UserService;
 
@@ -72,5 +73,11 @@ public class NetworkModule {
     public static EditRequestsService provideEditRequestsService(Retrofit retrofit) {
         return retrofit.create(EditRequestsService.class);
     }
+    @Provides
+    @Singleton
+    public static DriverService provideDriverService(Retrofit retrofit) {
+        return retrofit.create(DriverService.class);
+    }
+
 }
 

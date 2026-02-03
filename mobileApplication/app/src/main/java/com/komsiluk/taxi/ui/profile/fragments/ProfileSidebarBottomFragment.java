@@ -12,12 +12,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.komsiluk.taxi.MainActivity;
 import com.komsiluk.taxi.R;
 import com.komsiluk.taxi.auth.AuthManager;
-import com.komsiluk.taxi.driver.history.DriverHistoryActivity;
+import com.komsiluk.taxi.ui.driver_history.DriverHistoryActivity;
 import com.komsiluk.taxi.ui.profile.ProfileViewModel;
 import com.komsiluk.taxi.ui.shared.InfoMessageActivity;
 

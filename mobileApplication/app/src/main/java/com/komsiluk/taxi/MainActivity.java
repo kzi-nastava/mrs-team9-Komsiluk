@@ -7,13 +7,10 @@ import android.view.View;
 import androidx.annotation.Nullable;
 
 import com.komsiluk.taxi.auth.AuthManager;
-import com.komsiluk.taxi.auth.UserRole;
 import com.komsiluk.taxi.databinding.ActivityMainBinding;
-import com.komsiluk.taxi.driver.history.DriverHistoryActivity;
 import com.komsiluk.taxi.ui.about.AboutUsActivity;
 import com.komsiluk.taxi.ui.auth.AuthActivity;
 import com.komsiluk.taxi.ui.menu.BaseNavDrawerActivity;
-import com.komsiluk.taxi.ui.profile.ProfileActivity;
 
 import javax.inject.Inject;
 
