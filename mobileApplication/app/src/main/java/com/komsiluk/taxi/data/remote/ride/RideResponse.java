@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
-public class RideResponseDTO {
+public class RideResponse {
 
     @SerializedName("id") @Expose
     private Long id;

@@ -10,6 +10,8 @@ import com.komsiluk.taxi.data.remote.auth.AuthService;
 import com.komsiluk.taxi.data.remote.driver_history.DriverService;
 import com.komsiluk.taxi.data.remote.edit_requests.EditRequestsService;
 import com.komsiluk.taxi.data.remote.profile.UserService;
+import com.komsiluk.taxi.data.remote.ride.RideRepository;
+import com.komsiluk.taxi.data.remote.ride.RideService;
 
 import javax.inject.Singleton;
 
@@ -80,6 +82,18 @@ public class NetworkModule {
     @Singleton
     public static UserTokenService provideUserTokenService(Retrofit retrofit) {
         return retrofit.create(UserTokenService.class);
+    }
+
+    @Provides
+    @Singleton
+    RideService provideRideApi(Retrofit retrofit) {
+        return retrofit.create(RideService.class);
+    }
+
+    @Provides
+    @Singleton
+    RideRepository provideRideRepository(RideService api) {
+        return new RideRepository(api);
     }
 }
 

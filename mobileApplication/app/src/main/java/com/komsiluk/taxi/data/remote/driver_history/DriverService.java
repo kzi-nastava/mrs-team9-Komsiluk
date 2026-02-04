@@ -2,7 +2,7 @@ package com.komsiluk.taxi.data.remote.driver_history;
 
 import com.komsiluk.taxi.data.remote.add_driver.DriverResponse;
 import com.komsiluk.taxi.data.remote.rating.RatingResponseDTO;
-import com.komsiluk.taxi.data.remote.ride.RideResponseDTO;
+import com.komsiluk.taxi.data.remote.ride.RideResponse;
 import com.komsiluk.taxi.data.remote.inconsistency_report.InconsistencyReportResponseDTO;
 
 import java.util.Collection;
@@ -21,7 +21,7 @@ import retrofit2.http.Query;
 public interface DriverService {
 
     @GET("drivers/{id}/rides/history")
-    Call<Collection<RideResponseDTO>> getDriverRideHistory(
+    Call<Collection<RideResponse>> getDriverRideHistory(
             @Path("id") Long driverId,
             @Query("from") String from,
             @Query("to") String to

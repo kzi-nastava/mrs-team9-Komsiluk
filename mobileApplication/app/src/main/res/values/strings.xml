@@ -201,6 +201,26 @@
     <string name="confirm_booking_title">Confirm booking</string>
     <string name="confirm_booking_message">Are you sure you want to book this ride?</string>
     <string name="estimated_values">Estimated values:</string>
+    <string name="error_location_required">Enter location.</string>
+    <string name="error_geocode_failed">Search failed.</string>
+    <string name="error_no_results">No results.</string>
+    <string name="error_route_failed">Route failed.</string>
+
+    <string name="pick_pickup_title">Pick pickup</string>
+    <string name="pick_destination_title">Pick destination</string>
+
+    <string name="cd_search_pickup">Search pickup</string>
+    <string name="cd_search_destination">Search destination</string>
+
+    <string name="placeholder_kilometers_empty">- km</string>
+    <string name="placeholder_drive_time_empty">- min</string>
+    <string name="error_pickup_not_selected">Please select a pickup location.</string>
+    <string name="error_destination_not_selected">Please select a destination location.</string>
+
+    <string name="add_station_title">Add station</string>
+    <string name="hint_station">Station location</string>
+    <string name="station_pick_hint">Type location and press search.</string>
+    <string name="cd_search">Search</string>
 
     <string name="booking_success_title">Ride booked</string>
     <string name="booking_success_message">Your ride request has been created.</string>
