@@ -78,9 +78,8 @@ public class ScheduledDialogs {
         tvPet.setText(ride.isPetFriendly() ? ctx.getString(R.string.yes) : ctx.getString(R.string.no));
         tvChild.setText(ride.isChildSeat() ? ctx.getString(R.string.yes) : ctx.getString(R.string.no));
 
-        // GUI-only placeholders (kao i favorites)
-        tvKm.setText(ctx.getString(R.string.placeholder_kilometers));
-        tvTime.setText(ctx.getString(R.string.placeholder_time));
+        tvKm.setText(ride.getKm() + " km");
+        tvTime.setText(ride.getTime()+" min");
         tvPrice.setText(ctx.getString(R.string.placeholder_price));
 
         tvScheduledTime.setText(ride.getScheduledTime());
@@ -91,7 +90,7 @@ public class ScheduledDialogs {
 
         btnClose.setOnClickListener(x -> dialog.dismiss());
         btnCancel.setOnClickListener(x -> {
-            // GUI-only: ti kasnije ubaci logiku
+
             if (onCancelRide != null) onCancelRide.run();
             dialog.dismiss();
         });

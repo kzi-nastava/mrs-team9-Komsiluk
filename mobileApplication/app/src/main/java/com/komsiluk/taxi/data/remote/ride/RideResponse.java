@@ -29,13 +29,13 @@ public class RideResponse {
     private String endAddress;
 
     @SerializedName("stops") @Expose
-    private List<String> stops; // Na backu je malo 's', ovde je bilo 'S'
+    private List<String> stops;
 
     @SerializedName("passengerIds") @Expose
     private List<Long> passengerIds;
 
     @SerializedName("passengerEmails") @Expose
-    private List<String> passengerEmails; // Ovo je falilo za listu putnika
+    private List<String> passengerEmails;
 
     @SerializedName("distanceKm") @Expose
     private Double distanceKm;
@@ -46,7 +46,22 @@ public class RideResponse {
     @SerializedName("panicTriggered") @Expose
     private boolean panicTriggered;
 
-    // Getteri
+    @SerializedName("vehicleType")
+    @Expose
+    private String vehicleType;
+
+    @SerializedName("babyFriendly")
+    @Expose
+    private boolean babyFriendly;
+
+    @SerializedName("petFriendly")
+    @Expose
+    private boolean petFriendly;
+
+    @SerializedName("scheduledAt")
+    @Expose
+    private String scheduledAt;
+
     public Long getId() { return id; }
     public String getStatus() { return status; }
     public String getStartTime() { return startTime; }
@@ -60,4 +75,9 @@ public class RideResponse {
     public Double getDistanceKm() { return distanceKm; }
     public Integer getEstimatedDurationMin() { return estimatedDurationMin; }
     public boolean isPanicTriggered() { return panicTriggered; }
+    public String getVehicleType() { return vehicleType; }
+    public boolean isBabyFriendly() { return babyFriendly; }
+    public boolean isPetFriendly() { return petFriendly; }
+    public String getScheduledAt() { return scheduledAt; }
+
 }

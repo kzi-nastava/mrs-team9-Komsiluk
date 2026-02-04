@@ -3,6 +3,7 @@ package com.komsiluk.taxi.data.remote.ride;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -58,5 +59,9 @@ public class RideRepository {
         public static <T> Result<T> success(T data) { return new Result<>(data, null); }
         public static <T> Result<T> error(String msg) { return new Result<>(null, msg); }
         public boolean isSuccess() { return data != null; }
+    }
+
+    public Call<List<RideResponse>> getScheduledRides(Long userId) {
+        return api.getScheduledRides(userId);
     }
 }
