@@ -347,4 +347,11 @@
     <string name="err_firstname_invalid">First name must be 2-50 characters.</string>
     <string name="err_lastname_invalid">Last name must be 2-50 characters.</string>
 
+    <string name="photo_selected">Photo selected</string>
+
+    <string name="driver_activation_title">Account activation</string>
+    <string name="driver_activation_password_label">Password</string>
+    <string name="driver_activation_repeat_label">Repeat password</string>
+    <string name="driver_activation_missing_token">Invalid activation link.</string>
+    <string name="driver_activation_success">Account activated. You can now log in.</string>
 </resources>

@@ -5,6 +5,7 @@ import java.util.concurrent.TimeUnit;
 import com.komsiluk.taxi.BuildConfig;
 import com.komsiluk.taxi.auth.AuthInterceptor;
 import com.komsiluk.taxi.auth.TokenAuthenticator;
+import com.komsiluk.taxi.data.remote.add_driver.UserTokenService;
 import com.komsiluk.taxi.data.remote.auth.AuthService;
 import com.komsiluk.taxi.data.remote.driver_history.DriverService;
 import com.komsiluk.taxi.data.remote.edit_requests.EditRequestsService;
@@ -30,11 +31,7 @@ public class NetworkModule {
     public static OkHttpClient provideOkHttpClient(AuthInterceptor authInterceptor, TokenAuthenticator tokenAuthenticator) {
 
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
-        logging.setLevel(
-                BuildConfig.DEBUG
-                        ? HttpLoggingInterceptor.Level.BODY
-                        : HttpLoggingInterceptor.Level.NONE
-        );
+        logging.setLevel(HttpLoggingInterceptor.Level.BODY);
 
         return new OkHttpClient.Builder()
                 .addInterceptor(authInterceptor)
@@ -79,5 +76,10 @@ public class NetworkModule {
         return retrofit.create(DriverService.class);
     }
 
+    @Provides
+    @Singleton
+    public static UserTokenService provideUserTokenService(Retrofit retrofit) {
+        return retrofit.create(UserTokenService.class);
+    }
 }
 
