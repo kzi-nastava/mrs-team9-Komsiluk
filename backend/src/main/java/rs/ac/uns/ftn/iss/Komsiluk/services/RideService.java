@@ -804,4 +804,13 @@ public class RideService implements IRideService {
                 .map(rideDTOMapper::toActiveResponseDTO); // Samo pozoveš maper
     }
 
+    @Override
+    public Collection<RideResponseDTO> getAllActiveRides() {
+        // Pozivamo tvoj novi repository metod za status ACTIVE
+        return rideRepository.findAllActiveRides()
+                .stream()
+                .map(rideDTOMapper::toResponseDTO) // Koristimo tvoj postojeći maper
+                .collect(Collectors.toList());
+    }
+
 }

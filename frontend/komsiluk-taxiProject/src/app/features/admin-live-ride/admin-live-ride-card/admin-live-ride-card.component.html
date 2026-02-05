@@ -1,0 +1,51 @@
+<div class="ride-card" (click)="onDetailsClick($event)">
+  
+  <div class="ride-card__col ride-card__col--driver">
+    <div class="ride-card__driver-label">DRIVER</div>
+    <div class="ride-card__driver-name">{{ ride().driverName }}</div>
+    <div class="ride-card__driver-label">{{ ride().date }}</div>
+    <div class="ride-card__driver-name">{{ ride().startTime }} - {{ ride().endTime }}</div>
+  </div>
+
+  <div class="ride-card__col ride-card__col--route">
+    <div class="route-step">
+      <div class="route-dot route-dot--start"></div>
+      <div class="route-text">
+        <span class="price-label">Pickup:</span>
+        <span class="price-value">{{ ride().pickup }}</span>
+      </div>
+    </div>
+    <div class="route-line"></div>
+    <div class="route-step">
+      <div class="route-dot route-dot--end"></div>
+      <div class="route-text">
+        <span class="price-label">Destination:</span>
+        <span class="price-value">{{ ride().destination }}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="ride-card__col ride-card__col--stats">
+    <div class="ride-info-list">
+      <div class="info-item">
+        <span class="price-label">Distance:</span>
+        <span class="price-value">{{ ride().kilometers }} km</span>
+      </div>
+      <div class="info-item">
+        <span class="price-label">Duration:</span>
+        <span class="price-value">{{ ride().durationText }}</span>
+      </div>
+      <div class="info-item info-item--price">
+        <span class="price-label">Price:</span>
+        <span class="price-value">{{ ride().price }} $</span>
+      </div>
+    </div>
+
+    
+    <button class="ride-card__details-btn" (click)="onDetailsClick($event)">
+      DETAILS
+    </button>
+
+
+  </div>
+</div>

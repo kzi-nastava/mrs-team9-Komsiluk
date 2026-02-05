@@ -1,0 +1,33 @@
+<div class="history-page app-bg-textured"> 
+  <div class="history-page__container">
+    <h2 style="color: white; margin-bottom: 25px; text-align: center;">Live Active Rides</h2>
+
+    <div class="search-box" style="margin-bottom: 20px;">
+      <input
+        type="text"
+        [(ngModel)]="searchTerm"
+        (input)="onSearch()"
+        placeholder="Search by driver name or ID..."
+      />
+    </div>
+
+    <div class="history-page__list">
+      @for (r of filteredRides; track r.id) {
+        <app-admin-live-ride-card
+          [ride]="r"
+          [selected]="r.id === selectedRideId"
+          (details)="onDetails($event)">
+        </app-admin-live-ride-card>
+      } @empty {
+        <div style="color: white; text-align: center; padding: 40px;">No active rides at the moment.</div>
+      }
+    </div>
+  </div>
+</div>
+
+@if (detailsOpen && detailsVm) {
+  <app-admin-live-ride-details-modal
+    [data]="detailsVm"
+    (close)="detailsOpen = false">
+  </app-admin-live-ride-details-modal>
+}

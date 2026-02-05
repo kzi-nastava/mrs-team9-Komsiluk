@@ -1,0 +1,62 @@
+.history-page {
+  min-height: calc(100vh - 64px); 
+  padding: 18px 22px 26px;
+  box-sizing: border-box;
+}
+
+.history-page__container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.search-box {
+  margin-bottom: 20px;
+}
+
+.search-box input {
+  width: 100%;
+  padding: 14px 20px;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.6);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  font-size: 16px;
+  transition: all 0.3s ease;
+}
+
+.search-box input:focus {
+  outline: none;
+  border-color: var(--color-secondary, #ffff00);
+  background: rgba(0, 0, 0, 0.8);
+  box-shadow: 0 0 10px rgba(255, 238, 2, 0.2);
+}
+
+.history-page__list {
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 10px;
+  min-height: 520px;
+  padding: 18px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: rgba(0, 0, 0, 0.35);
+}
+.ride-card__details-btn {
+  margin-top: auto; 
+  align-self: flex-end;
+  background: #ffff00;
+  color: #111;
+  border: none;
+  border-radius: 20px;
+  padding: 8px 20px;
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.ride-card__details-btn:hover {
+  transform: scale(1.05);
+  background: #ffffff;
+}

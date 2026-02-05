@@ -42,4 +42,6 @@ public interface IRideService {
     public Collection<AdminRideHistoryDTO> getAdminRideHistoryForUser(Long userId, LocalDate from, LocalDate to, AdminRideSortBy sortBy);
 
     Optional<RidePassengerActiveDTO> getActiveRideForPassenger(Long userId);
+
+    public Collection<RideResponseDTO> getAllActiveRides();
 }
