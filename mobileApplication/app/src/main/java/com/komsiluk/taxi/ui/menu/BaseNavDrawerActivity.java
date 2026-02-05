@@ -2,7 +2,6 @@ package com.komsiluk.taxi.ui.menu;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.Menu;
 import android.view.View;
 import android.view.Window;
 import android.widget.FrameLayout;
@@ -29,7 +28,7 @@ import com.komsiluk.taxi.UserActivity;
 import com.komsiluk.taxi.auth.AuthManager;
 import com.komsiluk.taxi.auth.UserRole;
 import com.komsiluk.taxi.databinding.ActivityBaseNavDrawerBinding;
-import com.komsiluk.taxi.driver.history.DriverHistoryActivity;
+import com.komsiluk.taxi.ui.driver_history.DriverHistoryActivity;
 import com.komsiluk.taxi.ui.about.AboutUsActivity;
 import com.komsiluk.taxi.ui.add_driver.AddDriverActivity;
 import com.komsiluk.taxi.ui.block.AdminBlockUserActivity;

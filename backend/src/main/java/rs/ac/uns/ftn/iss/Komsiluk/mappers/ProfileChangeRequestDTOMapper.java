@@ -38,7 +38,6 @@ public class ProfileChangeRequestDTOMapper {
 		user.setPhoneNumber(request.getNewPhoneNumber());
 		user.setAddress(request.getNewAddress());
 		user.setCity(request.getNewCity());
-		user.setProfileImageUrl(request.getNewProfileImageUrl());
 	}
 	
 	// ProfileChangeRequest -> Vehicle

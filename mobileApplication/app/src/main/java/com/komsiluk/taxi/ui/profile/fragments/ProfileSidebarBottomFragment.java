@@ -6,17 +6,17 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.komsiluk.taxi.MainActivity;
 import com.komsiluk.taxi.R;
 import com.komsiluk.taxi.auth.AuthManager;
-import com.komsiluk.taxi.driver.history.DriverHistoryActivity;
+import com.komsiluk.taxi.ui.driver_history.DriverHistoryActivity;
+import com.komsiluk.taxi.ui.profile.ProfileViewModel;
 import com.komsiluk.taxi.ui.shared.InfoMessageActivity;
 
 import javax.inject.Inject;
@@ -29,6 +29,7 @@ public class ProfileSidebarBottomFragment extends Fragment {
     private static final String ARG_IS_DRIVER = "is_driver";
     @Inject
     AuthManager authManager;
+
     public static ProfileSidebarBottomFragment newInstance(boolean isDriver) {
         ProfileSidebarBottomFragment f = new ProfileSidebarBottomFragment();
         Bundle args = new Bundle();
@@ -38,6 +39,7 @@ public class ProfileSidebarBottomFragment extends Fragment {
     }
 
     private boolean isDriver;
+    private ProfileViewModel viewModel;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -65,12 +67,12 @@ public class ProfileSidebarBottomFragment extends Fragment {
         }
 
         view.findViewById(R.id.btnRideHistory)
-                .setOnClickListener(v ->{
-                        Intent i = new Intent(getContext(), DriverHistoryActivity.class);
-                        startActivity(i);
+                .setOnClickListener(v -> {
+                    Intent i = new Intent(getContext(), DriverHistoryActivity.class);
+                    startActivity(i);
                 });
 
-        btnLogout.setOnClickListener(v ->{
+        btnLogout.setOnClickListener(v -> {
             Intent i = InfoMessageActivity.createLogoutIntent(
                     this.getContext(),
                     getString(R.string.logout_title),
@@ -78,6 +80,18 @@ public class ProfileSidebarBottomFragment extends Fragment {
                     getString(R.string.logout_button)
             );
             startActivity(i);
+        });
+
+        viewModel = new ViewModelProvider(requireActivity()).get(ProfileViewModel.class);
+
+        viewModel.getProfile().observe(getViewLifecycleOwner(), dto -> {
+            if (dto == null) return;
+            if (!isDriver) return;
+
+            Long mins = dto.getActiveMinutesLast24h();
+            if (mins == null) mins = 0L;
+
+            tvActiveToday.setText(getString(R.string.profile_active_minutes_fmt, mins));
         });
     }
 }

@@ -23,6 +23,7 @@ public class DriverVehicleFragment extends Fragment {
 
     private FragmentDriverVehicleBinding binding;
     private AddDriverViewModel vm;
+    private AddDriverSubmitViewModel submitVm;
 
     private Drawable normalBg;
     private Drawable errorBg;
@@ -40,6 +41,32 @@ public class DriverVehicleFragment extends Fragment {
 
         vm = new ViewModelProvider(requireActivity()).get(AddDriverViewModel.class);
 
+        binding.etModel.setText(nullToEmpty(vm.carModel));
+        binding.actType.setText(nullToEmpty(vm.carType), false);
+        binding.etLicence.setText(nullToEmpty(vm.licencePlate));
+        binding.etSeats.setText(vm.seats > 0 ? String.valueOf(vm.seats) : "");
+        binding.cbPetFriendly.setChecked(vm.petFriendly);
+        binding.cbChildSeat.setChecked(vm.childSeat);
+
+        submitVm = new ViewModelProvider(requireActivity()).get(AddDriverSubmitViewModel.class);
+
+        submitVm.getSuccess().observe(getViewLifecycleOwner(), e -> {
+            String msg = (e == null) ? null : e.getContentIfNotHandled();
+            if (msg == null) return;
+
+            Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show();
+
+            requireActivity().getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.addDriverFragmentContainer, DriverCreatedFragment.newInstance())
+                    .commit();
+        });
+
+        submitVm.getError().observe(getViewLifecycleOwner(), e -> {
+            String msg = (e == null) ? null : e.getContentIfNotHandled();
+            if (msg != null) Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show();
+        });
+
         normalBg = requireContext().getDrawable(R.drawable.bg_input_normal);
         errorBg  = requireContext().getDrawable(R.drawable.bg_input_error);
 
@@ -51,45 +78,68 @@ public class DriverVehicleFragment extends Fragment {
         binding.actType.setAdapter(typeAdapter);
         binding.actType.setOnClickListener(v -> binding.actType.showDropDown());
 
-        TextWatcher watcher = new SimpleTextWatcher() {
+        TextWatcher saveWatcher = new SimpleTextWatcher() {
             @Override public void afterTextChanged(Editable s) {
+                saveToVm();
                 validateAll();
             }
         };
-        binding.etModel.addTextChangedListener(watcher);
-        binding.actType.addTextChangedListener(watcher);
-        binding.etLicence.addTextChangedListener(watcher);
-        binding.etSeats.addTextChangedListener(watcher);
+        binding.etModel.addTextChangedListener(saveWatcher);
+        binding.actType.addTextChangedListener(saveWatcher);
+        binding.etLicence.addTextChangedListener(saveWatcher);
+        binding.etSeats.addTextChangedListener(saveWatcher);
 
-        binding.btnBack.setOnClickListener(v -> requireActivity().getSupportFragmentManager().popBackStack());
+        binding.cbPetFriendly.setOnCheckedChangeListener((btn, isChecked) -> vm.petFriendly = isChecked);
+        binding.cbChildSeat.setOnCheckedChangeListener((btn, isChecked) -> vm.childSeat = isChecked);
+
+        binding.btnBack.setOnClickListener(v ->
+                requireActivity().getSupportFragmentManager().popBackStack()
+        );
 
         binding.btnConfirm.setOnClickListener(v -> {
+            saveToVm();
+
             if (!validateAll()) return;
 
-            vm.carModel = binding.etModel.getText().toString().trim();
-            vm.carType = binding.actType.getText().toString().trim();
-            vm.licencePlate = binding.etLicence.getText().toString().trim();
-            vm.seats = Integer.parseInt(binding.etSeats.getText().toString().trim());
-            vm.petFriendly = binding.cbPetFriendly.isChecked();
-            vm.childSeat = binding.cbChildSeat.isChecked();
-
-            requireActivity().getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.addDriverFragmentContainer, DriverCreatedFragment.newInstance())
-                    .commit();
+            submitVm.submit(vm);
         });
+    }
+
+    private void saveToVm() {
+        if (vm == null || binding == null) return;
+
+        vm.carModel = binding.etModel.getText() == null ? "" : binding.etModel.getText().toString().trim();
+        vm.carType = binding.actType.getText() == null ? "" : binding.actType.getText().toString().trim();
+        vm.licencePlate = binding.etLicence.getText() == null ? "" : binding.etLicence.getText().toString().trim();
+
+        String seatsStr = binding.etSeats.getText() == null ? "" : binding.etSeats.getText().toString().trim();
+        try {
+            vm.seats = seatsStr.isEmpty() ? 0 : Integer.parseInt(seatsStr);
+        } catch (Exception e) {
+            vm.seats = 0;
+        }
+
+        vm.petFriendly = binding.cbPetFriendly.isChecked();
+        vm.childSeat = binding.cbChildSeat.isChecked();
+    }
+
+    private String nullToEmpty(String s) {
+        return s == null ? "" : s;
     }
 
     private boolean validateAll() {
         boolean ok = true;
 
-        ok &= validateText(binding.etModel, binding.tvErrorModel, binding.etModel.getText().toString().trim(),
+        ok &= validateText(binding.etModel, binding.tvErrorModel,
+                binding.etModel.getText().toString().trim(),
                 getString(R.string.err_model_required), 1);
 
-        ok &= validateText(binding.actType, binding.tvErrorType, binding.actType.getText().toString().trim(),
+        ok &= validateText(binding.actType, binding.tvErrorType,
+                binding.actType.getText().toString().trim(),
                 getString(R.string.err_type_required), 1);
 
-        ok &= validateText(binding.etLicence, binding.tvErrorLicence, binding.etLicence.getText().toString().trim(),
+        ok &= validateText(binding.etLicence, binding.tvErrorLicence,
+                binding.etLicence.getText().toString().trim(),
                 getString(R.string.err_licence_required), 1);
 
         String seatsStr = binding.etSeats.getText() == null ? "" : binding.etSeats.getText().toString().trim();

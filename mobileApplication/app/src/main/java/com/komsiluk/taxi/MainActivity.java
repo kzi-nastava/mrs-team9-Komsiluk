@@ -7,13 +7,17 @@ import android.view.View;
 import androidx.annotation.Nullable;
 
 import com.komsiluk.taxi.auth.AuthManager;
-import com.komsiluk.taxi.auth.UserRole;
 import com.komsiluk.taxi.databinding.ActivityMainBinding;
-import com.komsiluk.taxi.driver.history.DriverHistoryActivity;
 import com.komsiluk.taxi.ui.about.AboutUsActivity;
 import com.komsiluk.taxi.ui.auth.AuthActivity;
 import com.komsiluk.taxi.ui.menu.BaseNavDrawerActivity;
-import com.komsiluk.taxi.ui.profile.ProfileActivity;
+
+import org.osmdroid.config.Configuration;
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.util.BoundingBox;
+import org.osmdroid.util.GeoPoint;
+import org.osmdroid.views.CustomZoomButtonsController;
+import org.osmdroid.views.MapView;
 
 import javax.inject.Inject;
 
@@ -41,12 +45,45 @@ public class MainActivity extends BaseNavDrawerActivity {
         return false;
     }
 
+    private MapView map;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         View contentRoot = findViewById(R.id.main);
         mainBinding = ActivityMainBinding.bind(contentRoot);
+
+        Configuration.getInstance().load(this, getSharedPreferences("osmdroid", MODE_PRIVATE));
+
+        map = findViewById(R.id.map);
+
+        map.setTileSource(TileSourceFactory.MAPNIK);
+        map.getZoomController().setVisibility(CustomZoomButtonsController.Visibility.NEVER);
+        map.setMultiTouchControls(true);
+        map.getController().setZoom(13.5);
+        map.getController().setCenter(new GeoPoint(45.2671, 19.8335));
+
+        BoundingBox nsBox = new BoundingBox(
+                45.35, 19.95,
+                45.20, 19.75
+        );
+
+        map.setScrollableAreaLimitDouble(nsBox);
+        map.setMinZoomLevel(12.0);
+        map.setMaxZoomLevel(20.0);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (map != null) map.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        if (map != null) map.onPause();
+        super.onPause();
     }
 
     @Override

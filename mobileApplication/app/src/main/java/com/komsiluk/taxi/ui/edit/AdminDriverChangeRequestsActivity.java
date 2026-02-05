@@ -3,22 +3,45 @@ package com.komsiluk.taxi.ui.edit;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.komsiluk.taxi.R;
+import com.komsiluk.taxi.auth.AuthManager;
+import com.komsiluk.taxi.auth.UserRole;
 import com.komsiluk.taxi.ui.menu.BaseNavDrawerActivity;
 
 import java.util.ArrayList;
 
-public class AdminDriverChangeRequestsActivity extends BaseNavDrawerActivity
-        implements DriverChangeRequestsAdapter.Listener {
+import javax.inject.Inject;
+
+import dagger.hilt.android.AndroidEntryPoint;
+
+@AndroidEntryPoint
+public class AdminDriverChangeRequestsActivity extends BaseNavDrawerActivity implements DriverChangeRequestsAdapter.Listener {
+
+    @Inject
+    AuthManager authManager;
+
+    @Override
+    protected int getDrawerMenuResId() {
+        if (authManager.getRole().equals(UserRole.DRIVER)) {
+            return R.menu.menu_driver_drawer;
+        } else if (authManager.getRole().equals(UserRole.ADMIN)) {
+            return R.menu.menu_admin_drawer;
+        }
+        return R.menu.menu_app_drawer;
+    }
 
     private RecyclerView rv;
     private View emptyPanel;
-    private final ArrayList<DriverChangeRequest> mock = new ArrayList<>();
+
+    private DriverChangeRequestsAdapter adapter;
+    private AdminDriverChangeRequestsViewModel vm;
 
     @Override
     protected int getContentLayoutId() {
@@ -35,65 +58,44 @@ public class AdminDriverChangeRequestsActivity extends BaseNavDrawerActivity
         ((TextView)findViewById(R.id.tvAdminDcrTitle)).setText(R.string.admin_dcr_title);
 
         rv.setLayoutManager(new LinearLayoutManager(this));
+        adapter = new DriverChangeRequestsAdapter(new ArrayList<>(), this);
+        rv.setAdapter(adapter);
 
-        seedMock();
-        rv.setAdapter(new DriverChangeRequestsAdapter(mock, this));
+        vm = new ViewModelProvider(this).get(AdminDriverChangeRequestsViewModel.class);
 
-        updateEmpty();
+        vm.getItems().observe(this, list -> {
+            adapter.setItems(list); // dodaćemo metodu u adapter
+            updateEmpty(list == null || list.isEmpty());
+        });
+
+        vm.getToastEvent().observe(this, event -> {
+            String msg = event.getContentIfNotHandled();
+            if (msg == null) return;
+            Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+        });
+
+        vm.getOpenDialogEvent().observe(this, event -> {
+            DriverChangeRequest req = event.getContentIfNotHandled();
+            if (req == null) return;
+
+            AdminDialogs.showDriverChangeRequestDetails(
+                    this,
+                    req,
+                    () -> vm.reject(req.getId()),
+                    () -> vm.approve(req.getId())
+            );
+        });
+
+        vm.fetchPending();
     }
 
-    private void updateEmpty() {
-        boolean empty = mock.isEmpty();
+    private void updateEmpty(boolean empty) {
         emptyPanel.setVisibility(empty ? View.VISIBLE : View.GONE);
         rv.setVisibility(empty ? View.GONE : View.VISIBLE);
     }
 
-    private void seedMock() {
-
-        // Request #1
-        ArrayList<String> tags1 = new ArrayList<>();
-        tags1.add("Identity");
-
-        ArrayList<DriverChangeRequest.FieldChange> rows1 = new ArrayList<>();
-        rows1.add(new DriverChangeRequest.FieldChange("First name", "Test", "Nikola"));
-        rows1.add(new DriverChangeRequest.FieldChange("Last name", "DRIVER", "Savić"));
-
-        mock.add(new DriverChangeRequest(
-                1L,
-                "driver@test.com",
-                "Jan 12, 2026, 5:03:21 PM",
-                tags1,
-                rows1
-        ));
-
-        // Request #2
-        ArrayList<String> tags2 = new ArrayList<>();
-        tags2.add("Identity");
-        tags2.add("Address");
-
-        ArrayList<DriverChangeRequest.FieldChange> rows2 = new ArrayList<>();
-        rows2.add(new DriverChangeRequest.FieldChange("First name", "Test", "Nikola"));
-        rows2.add(new DriverChangeRequest.FieldChange("Last name", "DRIVER", "Savić"));
-        rows2.add(new DriverChangeRequest.FieldChange("Address", "Test Address", "Andrije Marića 105"));
-        rows2.add(new DriverChangeRequest.FieldChange("City", "Novi Sad", "Majur"));
-        rows2.add(new DriverChangeRequest.FieldChange("Phone number", "+381600000000", "0621061386"));
-
-        mock.add(new DriverChangeRequest(
-                2L,
-                "driver@test.com",
-                "Jan 12, 2026, 5:03:34 PM",
-                tags2,
-                rows2
-        ));
-    }
-
     @Override
     public void onRequestClicked(DriverChangeRequest req) {
-        AdminDialogs.showDriverChangeRequestDetails(
-                this,
-                req,
-                () -> { /* Reject GUI-only */ },
-                () -> { /* Approve GUI-only */ }
-        );
+        vm.onItemClicked(req);
     }
 }

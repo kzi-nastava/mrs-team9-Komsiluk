@@ -4,6 +4,8 @@ import android.net.Uri;
 
 import androidx.lifecycle.ViewModel;
 
+import java.io.File;
+
 import dagger.hilt.android.lifecycle.HiltViewModel;
 import javax.inject.Inject;
 
@@ -16,8 +18,7 @@ public class AddDriverViewModel extends ViewModel {
     public String city = "";
     public String phone = "";
     public String email = "";
-    public Uri profilePhotoUri = null;
-
+    public File profileImageFile = null;
     public String carModel = "";
     public String carType = "";
     public String licencePlate = "";

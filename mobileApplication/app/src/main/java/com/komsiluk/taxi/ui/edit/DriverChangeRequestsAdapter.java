@@ -83,4 +83,10 @@ public class DriverChangeRequestsAdapter extends RecyclerView.Adapter<DriverChan
             tvBadge = itemView.findViewById(R.id.tvReqBadge);
         }
     }
+
+    public void setItems(java.util.List<DriverChangeRequest> newItems) {
+        items.clear();
+        if (newItems != null) items.addAll(newItems);
+        notifyDataSetChanged();
+    }
 }

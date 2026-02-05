@@ -47,9 +47,25 @@ public class AddDriverActivity extends BaseNavDrawerActivity {
     }
 
     public void goToUserStepAndReset() {
+        AddDriverViewModel vm = new androidx.lifecycle.ViewModelProvider(this).get(AddDriverViewModel.class);
+        vm.firstName = "";
+        vm.lastName = "";
+        vm.address = "";
+        vm.city = "";
+        vm.phone = "";
+        vm.email = "";
+        vm.profileImageFile = null;
+        vm.carModel = "";
+        vm.carType = "";
+        vm.licencePlate = "";
+        vm.seats = 0;
+        vm.petFriendly = false;
+        vm.childSeat = false;
+
+        RiderRegistrationFragment f = RiderRegistrationFragment.newInstanceAdminAddDriver();
         getSupportFragmentManager()
                 .beginTransaction()
-                .replace(R.id.addDriverFragmentContainer, new RiderRegistrationFragment())
+                .replace(R.id.addDriverFragmentContainer, f)
                 .commit();
     }
 }

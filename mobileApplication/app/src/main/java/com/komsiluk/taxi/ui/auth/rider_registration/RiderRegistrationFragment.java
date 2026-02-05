@@ -2,6 +2,7 @@ package com.komsiluk.taxi.ui.auth.rider_registration;
 
 import android.annotation.SuppressLint;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -17,6 +18,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.bumptech.glide.Glide;
 import com.komsiluk.taxi.R;
 import com.komsiluk.taxi.databinding.FragmentRiderRegistrationBinding;
 import com.komsiluk.taxi.ui.add_driver.AddDriverViewModel;
@@ -65,6 +67,12 @@ public class RiderRegistrationFragment extends Fragment {
     }
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        isAdminAddDriver = getArguments() != null && getArguments().getBoolean(ARG_ADMIN_ADD_DRIVER, false);
+    }
+
+    @Override
     public View onCreateView(
             @NonNull LayoutInflater inflater,
             @Nullable ViewGroup container,
@@ -88,7 +96,13 @@ public class RiderRegistrationFragment extends Fragment {
                         return;
                     }
 
-                    File file = FileUtils.from(requireContext(), uri);
+                    File file;
+                    try {
+                        file = FileUtils.from(requireContext(), uri);
+                    } catch (Exception e) {
+                        Toast.makeText(requireContext(), "Unable to read image.", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
                     if (file.length() > 8 * 1024 * 1024) {
                         Toast.makeText(
                                 requireContext(),
@@ -98,8 +112,12 @@ public class RiderRegistrationFragment extends Fragment {
                         return;
                     }
 
-                    // sacuvaj u ViewModel
-                    prViewModel.profileImageFile = file;
+                    if (isAdminAddDriver) {
+                        vm.profileImageFile = file;
+                    } else {
+                        prViewModel.profileImageFile = file;
+                    }
+
 
                     // preview
                     binding.ivProfilePhoto.setImageURI(uri);
@@ -117,10 +135,25 @@ public class RiderRegistrationFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         isAdminAddDriver = getArguments() != null && getArguments().getBoolean(ARG_ADMIN_ADD_DRIVER, false);
+        vm = new ViewModelProvider(requireActivity()).get(AddDriverViewModel.class);
+        prViewModel = new ViewModelProvider(requireActivity()).get(PassengerRegistrationViewModel.class);
+
         if (isAdminAddDriver) {
-            vm = new ViewModelProvider(requireActivity()).get(AddDriverViewModel.class);
+            if (vm.profileImageFile != null && vm.profileImageFile.exists()) {
+                Glide.with(this)
+                        .load(vm.profileImageFile)
+                        .into(binding.ivProfilePhoto);
+
+                binding.tvChoosePhoto.setText(vm.profileImageFile.getName());
+            }
         } else {
-            prViewModel = new ViewModelProvider(requireActivity()).get(PassengerRegistrationViewModel.class);
+            if (prViewModel.profileImageFile != null && prViewModel.profileImageFile.exists()) {
+                Glide.with(this)
+                        .load(prViewModel.profileImageFile)
+                        .into(binding.ivProfilePhoto);
+
+                binding.tvChoosePhoto.setText(prViewModel.profileImageFile.getName());
+            }
         }
 
         normalBg = requireContext().getDrawable(R.drawable.bg_input_normal);
@@ -240,37 +273,28 @@ public class RiderRegistrationFragment extends Fragment {
             imagePickerLauncher.launch("image/*");
         });
 
+        if (!isAdminAddDriver) {
+            prViewModel.getSuccessMessageEvent().observe(getViewLifecycleOwner(), event -> {
+                String successMessage = event.getContentIfNotHandled();
+                if (successMessage == null) return;
 
-        prViewModel.getSuccessMessageEvent().observe(getViewLifecycleOwner(), event -> {
-            String successMessage = event.getContentIfNotHandled();
+                VerificationMessageFragment verificationFragment =
+                        VerificationMessageFragment.newInstance(binding.etEmail.getText().toString().trim());
 
-            if (successMessage == null) return;
+                getParentFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.authFragmentContainer, verificationFragment)
+                        .commit();
 
-            VerificationMessageFragment verificationFragment = VerificationMessageFragment.newInstance(binding.etEmail.getText().toString().trim());
-            getParentFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.authFragmentContainer, verificationFragment)
-                    .commit();
-            Toast.makeText(
-                    requireContext(),
-                    successMessage,
-                    Toast.LENGTH_SHORT
-            ).show();
-        });
+                Toast.makeText(requireContext(), successMessage, Toast.LENGTH_SHORT).show();
+            });
 
-        prViewModel.getErrorMessageEvent().observe(getViewLifecycleOwner(), event -> {
-            String message = event.getContentIfNotHandled();
-            if (message == null) return;
-
-            Toast.makeText(
-                    requireContext(),
-                    message,
-                    Toast.LENGTH_SHORT
-            ).show();
-        });
-
-
-
+            prViewModel.getErrorMessageEvent().observe(getViewLifecycleOwner(), event -> {
+                String message = event.getContentIfNotHandled();
+                if (message == null) return;
+                Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show();
+            });
+        }
 
         binding.btnSubmit.setOnClickListener(v -> {
             if (!validateAll()) return;

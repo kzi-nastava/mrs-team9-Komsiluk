@@ -5,8 +5,16 @@ import java.util.concurrent.TimeUnit;
 import com.komsiluk.taxi.BuildConfig;
 import com.komsiluk.taxi.auth.AuthInterceptor;
 import com.komsiluk.taxi.auth.TokenAuthenticator;
+import com.komsiluk.taxi.data.remote.add_driver.UserTokenService;
 import com.komsiluk.taxi.data.remote.auth.AuthService;
 import com.komsiluk.taxi.data.remote.passenger_ride_history.PassengerRideHistoryService;
+import com.komsiluk.taxi.data.remote.driver_history.DriverService;
+import com.komsiluk.taxi.data.remote.edit_requests.EditRequestsService;
+import com.komsiluk.taxi.data.remote.favorite.FavoriteService;
+import com.komsiluk.taxi.data.remote.profile.UserService;
+import com.komsiluk.taxi.data.remote.ride.RideRepository;
+import com.komsiluk.taxi.data.remote.ride.RideService;
+import com.komsiluk.taxi.data.remote.route.RouteService;
 
 import javax.inject.Singleton;
 
@@ -28,11 +36,7 @@ public class NetworkModule {
     public static OkHttpClient provideOkHttpClient(AuthInterceptor authInterceptor, TokenAuthenticator tokenAuthenticator) {
 
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
-        logging.setLevel(
-                BuildConfig.DEBUG
-                        ? HttpLoggingInterceptor.Level.BODY
-                        : HttpLoggingInterceptor.Level.NONE
-        );
+        logging.setLevel(HttpLoggingInterceptor.Level.BODY);
 
         return new OkHttpClient.Builder()
                 .addInterceptor(authInterceptor)
@@ -64,6 +68,53 @@ public class NetworkModule {
     @Singleton
     public static PassengerRideHistoryService providePassengerRideHistoryService(Retrofit retrofit) {
         return retrofit.create(PassengerRideHistoryService.class);
+    }
+
+    @Provides
+    @Singleton
+    public static UserService provideUserService(Retrofit retrofit) {
+        return retrofit.create(UserService.class);
+    }
+
+    @Provides
+    @Singleton
+    public static EditRequestsService provideEditRequestsService(Retrofit retrofit) {
+        return retrofit.create(EditRequestsService.class);
+    }
+    @Provides
+    @Singleton
+    public static DriverService provideDriverService(Retrofit retrofit) {
+        return retrofit.create(DriverService.class);
+    }
+
+    @Provides
+    @Singleton
+    public static UserTokenService provideUserTokenService(Retrofit retrofit) {
+        return retrofit.create(UserTokenService.class);
+    }
+
+    @Provides
+    @Singleton
+    public static RideService provideRideApi(Retrofit retrofit) {
+        return retrofit.create(RideService.class);
+    }
+
+    @Provides
+    @Singleton
+    public static RideRepository provideRideRepository(RideService api) {
+        return new RideRepository(api);
+    }
+
+    @Provides
+    @Singleton
+    public static FavoriteService provideFavoriteService(Retrofit retrofit) {
+        return retrofit.create(FavoriteService.class);
+    }
+
+    @Provides
+    @Singleton
+    public static RouteService provideRouteService(Retrofit retrofit) {
+        return retrofit.create(RouteService.class);
     }
 }
 

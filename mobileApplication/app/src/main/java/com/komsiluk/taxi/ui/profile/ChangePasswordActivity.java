@@ -10,6 +10,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.button.MaterialButton;
 import com.komsiluk.taxi.R;
@@ -17,13 +18,17 @@ import com.komsiluk.taxi.ui.menu.BaseNavDrawerActivity;
 
 public class ChangePasswordActivity extends BaseNavDrawerActivity {
 
+    private EditText etCurrent;
     private EditText etPassword;
     private EditText etRepeat;
+    private TextView tvCurrentError;
     private TextView tvPasswordError;
     private TextView tvRepeatError;
 
     private Drawable normalBg;
     private Drawable errorBg;
+
+    private ChangePasswordViewModel viewModel;
 
     @Override
     protected int getContentLayoutId() {
@@ -35,8 +40,10 @@ public class ChangePasswordActivity extends BaseNavDrawerActivity {
         super.onCreate(savedInstanceState);
 
         // fields
+        etCurrent = findViewById(R.id.etCurrent);
         etPassword = findViewById(R.id.etPassword);
         etRepeat = findViewById(R.id.etRepeat);
+        tvCurrentError = findViewById(R.id.tvCurrentError);
         tvPasswordError = findViewById(R.id.tvPasswordError);
         tvRepeatError = findViewById(R.id.tvRepeatError);
 
@@ -46,29 +53,70 @@ public class ChangePasswordActivity extends BaseNavDrawerActivity {
         MaterialButton btnCancel = findViewById(R.id.btnCancel);
         MaterialButton btnConfirm = findViewById(R.id.btnConfirm);
 
+        viewModel = new ViewModelProvider(this).get(ChangePasswordViewModel.class);
+
         TextWatcher watcher = new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
             @Override
             public void afterTextChanged(Editable s) {
+                validateCurrent();
                 validatePassword();
                 validateRepeat();
             }
         };
 
+        etCurrent.addTextChangedListener(watcher);
         etPassword.addTextChangedListener(watcher);
         etRepeat.addTextChangedListener(watcher);
 
         btnCancel.setOnClickListener(v -> finish());
 
-        btnConfirm.setOnClickListener(v -> {
-            boolean ok1 = validatePassword();
-            boolean ok2 = validateRepeat();
-            if (!ok1 || !ok2) return;
-
-            Toast.makeText(this, getString(R.string.change_password_success), Toast.LENGTH_SHORT).show();
+        viewModel.getSuccessEvent().observe(this, event -> {
+            String msg = event.getContentIfNotHandled();
+            if (msg == null) return;
+            Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
             finish();
         });
+
+        viewModel.getErrorEvent().observe(this, event -> {
+            String msg = event.getContentIfNotHandled();
+            if (msg == null) return;
+            Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+        });
+
+        btnConfirm.setOnClickListener(v -> {
+            boolean ok0 = validateCurrent();
+            boolean ok1 = validatePassword();
+            boolean ok2 = validateRepeat();
+            if (!ok0 || !ok1 || !ok2) return;
+
+            String oldPwd = etCurrent.getText().toString();
+            String newPwd = etPassword.getText().toString();
+
+            viewModel.changePassword(oldPwd, newPwd);
+        });
+    }
+
+    private boolean validateCurrent() {
+        String pwd = etCurrent.getText().toString();
+        String error = null;
+
+        if (pwd.isEmpty()) {
+            error = getString(R.string.error_password_required);
+        }
+
+        if (error != null) {
+            etCurrent.setBackground(errorBg);
+            tvCurrentError.setText(error);
+            tvCurrentError.setVisibility(View.VISIBLE);
+            return false;
+        } else {
+            etCurrent.setBackground(normalBg);
+            tvCurrentError.setText("");
+            tvCurrentError.setVisibility(View.GONE);
+            return true;
+        }
     }
 
     private boolean validatePassword() {

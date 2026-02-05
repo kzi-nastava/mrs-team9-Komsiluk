@@ -88,4 +88,7 @@ public interface RideRepository extends JpaRepository<Ride, Long> {
     AND (r.createdBy.id = :userId OR p.id = :userId)
 """)
     Optional<Ride> findActiveRideForPassenger(@Param("userId") Long userId);
+
+    @Query("SELECT r FROM Ride r WHERE r.status = rs.ac.uns.ftn.iss.Komsiluk.beans.enums.RideStatus.ACTIVE")
+    Collection<Ride> findAllActiveRides();
 }
