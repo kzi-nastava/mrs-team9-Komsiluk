@@ -4,3 +4,34 @@
   border-radius: 12px;
   overflow: hidden;
 }
+
+/* ride-details-map.component.css */
+
+/* 1. Resetuj Leafletov default za našu ikonu */
+::ng-deep .km-custom-taxi-icon {
+  background: transparent !important;
+  border: none !important;
+}
+
+/* 2. Naša klasa za autić */
+::ng-deep .km-driver {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  border: 2px solid #000000 !important;
+  box-shadow: 0 4px 10px rgba(0,0,0,0) !important;
+  transition: all 0.2s ease;
+}
+
+/* 3. FORSIRAJ CRVENU */
+::ng-deep .km-driver--busy {
+  background: #ef4444 !important; /* Jaka crvena */
+}
+
+::ng-deep .km-driver__icon {
+  font-size: 18px;
+  color: rgb(0, 0, 0) !important;
+}
+

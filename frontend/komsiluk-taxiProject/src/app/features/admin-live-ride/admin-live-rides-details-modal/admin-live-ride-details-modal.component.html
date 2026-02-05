@@ -1,0 +1,93 @@
+<div class="rh-modal" (click)="onClose()">
+  <div class="rh-modal__dialog" (click)="$event.stopPropagation()">
+    <div class="rh-modal__content">
+      
+      <section class="rh-left">
+        <h3 class="rh-title" style="color: white;">Driver:</h3>
+        <div class="driver-name-highlight" style="color: var(--color-secondary); font-weight: 800;">
+          {{ data.driverName }}
+        </div>
+
+        <h3 class="rh-title rh-title--spaced" style="color: white;">Passengers:</h3>
+        <ul class="rh-list">
+          @for (p of data.passengers; track p) {
+            <li style="color: var(--color-secondary); font-weight: 600;">{{ p }}</li>
+          } @empty {
+            <li style="color: rgba(255,255,255,0.5); font-style: italic;">No passengers for this ride.</li>
+          }
+        </ul>
+        
+      </section>
+
+      <section class="rh-center">
+        <app-ride-details-map 
+  [locations]="allLocations" 
+  [driverId]="data.driverId">
+</app-ride-details-map>
+        
+        <div class="details-bottom-container">
+          <div class="details-bottom-row">
+            <div class="details-bottom-item">
+              <span class="details-bottom-label" style="color: white;">Panic button pressed:</span>
+              <b class="details-bottom-value" [style.color]="data.panicPressed ? 'red' : 'var(--color-secondary)'">
+                {{ data.panicPressed ? 'YES' : 'NO' }}
+              </b>
+            </div>
+          </div>
+
+          <button class="close-btn-komsiluk" (click)="onClose()">CLOSE</button>
+        </div>
+      </section>
+
+     <section class="rh-right">
+  <h3 class="rh-title" style="color: white;">Route Details:</h3>
+  <div class="rh-info">
+    
+    <div class="rh-info__row">
+      <span class="rh-label" style="color: white;">Pickup location:</span>
+      <b class="rh-value" style="color: var(--color-secondary);">{{ data.pickupLocation }}</b>
+    </div>
+
+  @if (data.stops && data.stops.length > 0) {
+      @for (stop of data.stops; track $index) {
+        <div class="rh-info__row">
+          <span class="rh-label" style="color: white;">Stop {{ $index + 1 }}:</span>
+          <b class="rh-value" style="color: var(--color-secondary);">{{ stop }}</b>
+        </div>
+      }
+    }
+
+    <div class="rh-info__row">
+      <span class="rh-label" style="color: white;">Destination:</span>
+      <b class="rh-value" style="color: var(--color-secondary);">{{ data.destination }}</b>
+    </div>
+
+    <div class="rh-info__row" style="margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px;">
+      <span class="rh-label" style="color: white;">Start time:</span>
+      <b class="rh-value" style="color: var(--color-secondary);">{{ data.startTime }}</b>
+    </div>
+    <div class="rh-info__row">
+      <span class="rh-label" style="color: white;">Est. End time:</span>
+      <b class="rh-value" style="color: var(--color-secondary);">{{ data.endTime }}</b>
+    </div>
+  </div>
+
+  <div class="rh-stats" style="margin-top: 20px;">
+    <div class="stat-item-komsiluk">
+      <span class="rh-label" style="color: white;">Distance:</span>
+      <b class="rh-value" style="color: var(--color-secondary);">{{ data.kilometers }} km</b>
+    </div>
+    <div class="stat-item-komsiluk">
+      <span class="rh-label" style="color: white;">Duration:</span>
+      <b class="rh-value" style="color: var(--color-secondary);">{{ data.durationText }}</b>
+    </div>
+    <div class="stat-item-komsiluk">
+      <span class="rh-label" style="color: white;">Price:</span>
+      <b class="rh-value" style="color: var(--color-secondary);">{{ data.price }} $</b>
+    </div>
+  </div>
+</section>
+
+    </div>
+  </div>
+</div>
