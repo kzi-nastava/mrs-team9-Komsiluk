@@ -61,7 +61,7 @@
     <string name="profile_unknown">Unknown</string>
     <string name="profile_pet_friendly_fmt">Pet friendly: %1$s</string>
     <string name="profile_child_seat_fmt">Child seat available: %1$s</string>
-    <string name="profile_active_minutes_fmt">Active today: %1$d min</string>
+    <string name="profile_active_minutes_fmt">Active today: %1$s</string>
 
     <string name="nav_left">Left action</string>
     <string name="nav_right">Right action</string>
@@ -374,4 +374,9 @@
     <string name="driver_activation_repeat_label">Repeat password</string>
     <string name="driver_activation_missing_token">Invalid activation link.</string>
     <string name="driver_activation_success">Account activated. You can now log in.</string>
+    
+    <string name="dialog_blocked_title">Can\'t order a ride</string>
+    <string name="dialog_blocked_message">You are blocked and cannot order rides while blocked.</string>
+    <string name="dialog_blocked_reason_label">Reason:</string>
+    <string name="dialog_blocked_support_message">If you believe this is a mistake, please contact support.</string>
 </resources>

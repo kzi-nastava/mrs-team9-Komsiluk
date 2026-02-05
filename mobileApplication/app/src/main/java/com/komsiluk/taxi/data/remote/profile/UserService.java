@@ -57,4 +57,8 @@ public interface UserService {
             @Query("query") String query,
             @Query("limit") int limit
     );
+
+    @GET("users/{id}/blocked")
+    Call<UserBlockedResponse> isUserBlocked(@Path("id") Long id);
+
 }
