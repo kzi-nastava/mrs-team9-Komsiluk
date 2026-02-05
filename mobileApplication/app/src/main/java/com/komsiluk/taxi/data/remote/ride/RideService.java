@@ -14,4 +14,10 @@ public interface RideService {
 
     @GET("rides/user/{userId}/scheduled")
     Call<List<RideResponse>> getScheduledRides(@Path("userId") Long userId);
+
+    @GET("rides/driver/{driverId}/current")
+    Call<RideResponse> getDriverCurrentRide(@Path("driverId") Long driverId);
+
+    @POST("/api/rides/{id}/start")
+    Call<RideResponse> startRide(@Path("id") Long rideId);
 }
