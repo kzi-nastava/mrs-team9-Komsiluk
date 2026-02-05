@@ -90,4 +90,34 @@ public class Route {
 	public void setEstimatedDurationMin(Integer estimatedDurationMin) {
 		this.estimatedDurationMin = estimatedDurationMin;
 	}
+
+    public String toFormattedString() {
+        if (this.stops == null || this.stops.trim().isEmpty()) {
+            return "";
+        }
+
+        String[] stopSegments = this.stops.split("\\|");
+        StringBuilder formattedStops = new StringBuilder();
+
+        for (int i = 0; i < stopSegments.length; i++) {
+            String street = extractStreetAddress(stopSegments[i]);
+
+            if (!street.isEmpty()) {
+                formattedStops.append(street);
+
+                if (i < stopSegments.length - 1) {
+                    formattedStops.append(",");
+                }
+            }
+        }
+
+        return formattedStops.toString();
+    }
+
+    private String extractStreetAddress(String fullAddress) {
+        if (fullAddress == null || fullAddress.trim().isEmpty()) {
+            return "";
+        }
+        return fullAddress.split(",")[0].trim();
+    }
 }

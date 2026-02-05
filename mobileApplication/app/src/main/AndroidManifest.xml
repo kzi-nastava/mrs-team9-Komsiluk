@@ -94,6 +94,10 @@
             </intent-filter>
         </activity>
         <activity android:name=".driver.history.DriverHistoryActivity" />
+
+        <activity
+            android:name=".ui.passenger.ride_history.PassengerRideHistoryActivity"
+            android:exported="false"/>
     </application>
 
     <uses-permission android:name="android.permission.INTERNET" />

@@ -6,7 +6,7 @@ import { AdminBlockUserPanelComponent } from '../block/admin-block-user-panel/ad
 @Component({
   selector: 'app-admin-left-menu',
   standalone: true,
-  imports: [CommonModule, RouterLink, AdminBlockUserPanelComponent],
+  imports: [CommonModule, AdminBlockUserPanelComponent],
   templateUrl: './admin-left-menu.component.html',
   styleUrl: './admin-left-menu.component.css',
 })

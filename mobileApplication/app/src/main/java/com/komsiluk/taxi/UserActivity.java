@@ -1,6 +1,7 @@
 package com.komsiluk.taxi;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
@@ -18,6 +19,8 @@ import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.gson.Gson;
+import com.komsiluk.taxi.data.remote.passenger_ride_history.PassengerRideDetailsDTO;
 import com.komsiluk.taxi.ui.menu.BaseNavDrawerActivity;
 import com.komsiluk.taxi.ui.ride.FavoriteRide;
 import com.komsiluk.taxi.ui.ride.FavoritesActivity;
@@ -46,6 +49,17 @@ public class UserActivity extends BaseNavDrawerActivity {
     private View sheetHandle;
 
     private boolean isFavorite = false;
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+
+        String rideJson = intent.getStringExtra("ORDER_AGAIN_DTO");
+        if (rideJson != null) {
+            processOrderAgain(rideJson);
+        }
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -109,6 +123,87 @@ public class UserActivity extends BaseNavDrawerActivity {
             applyFavoriteToBookRide(ride);
         }
 
+        String rideJson = getIntent().getStringExtra("ORDER_AGAIN_DTO");
+        if (rideJson != null) {
+            processOrderAgain(rideJson);
+        }
+
+    }
+
+    private void processOrderAgain(String json) {
+        Gson gson = new Gson();
+        PassengerRideDetailsDTO details = gson.fromJson(json, PassengerRideDetailsDTO.class);
+
+        if (sheetBehavior != null) {
+            sheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+        }
+
+        applyRideDetailsToForm(details);
+    }
+
+
+    private void applyRideDetailsToForm(PassengerRideDetailsDTO details) {
+        if (details == null) return;
+
+        if (details.getRoute() != null) {
+            EditText etPickup = findViewById(R.id.etPickup);
+            EditText etDestination = findViewById(R.id.etDestination);
+            if (etPickup != null) etPickup.setText(extractStreetAddress(details.getRoute().getStartAddress()));
+            if (etDestination != null) etDestination.setText(extractStreetAddress(details.getRoute().getEndAddress()));
+
+            clearStations();
+            String stopsData = details.getRoute().getStops();
+            if (stopsData != null && !stopsData.isEmpty()) {
+                String[] stops = stopsData.split("\\|");
+                for (String stop : stops) {
+                    addStationChip(extractStreetAddress(stop));
+                }
+            }
+        }
+
+        clearUsers();
+        if (details.getPassengerEmails() != null) {
+            for (String email : details.getPassengerEmails()) {
+                addUserChip(email);
+            }
+        }
+
+        if (actCarType != null && details.getVehicleType() != null) {
+            actCarType.setText(details.getVehicleType().name(), false);
+        }
+
+        android.widget.CheckBox cbPet = findViewById(R.id.cbPetFriendly);
+        android.widget.CheckBox cbChild = findViewById(R.id.cbChildSeat);
+        if (cbPet != null) cbPet.setChecked(details.isPetFriendly());
+        if (cbChild != null) cbChild.setChecked(details.isBabyFriendly());
+
+        if (details.getScheduledAt() != null) {
+            rbScheduled.setChecked(true);
+            actTime.setVisibility(View.VISIBLE);
+
+            String timeOnly = extractTimeFromIso(details.getScheduledAt());
+            actTime.setText(timeOnly, false);
+        } else {
+            rbNow.setChecked(true);
+            actTime.setVisibility(View.GONE);
+        }
+    }
+
+    private String extractTimeFromIso(String isoDate) {
+        try {
+            if (isoDate.contains("T")) {
+                String timePart = isoDate.split("T")[1];
+                return timePart.substring(0, 5);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
+
+    private String extractStreetAddress(String fullAddress) {
+        if (fullAddress == null || fullAddress.trim().isEmpty()) return "";
+        return fullAddress.split(",")[0].trim();
     }
 
     private void applyFavoriteToBookRide(FavoriteRide r) {
