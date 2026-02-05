@@ -19,8 +19,8 @@ import androidx.fragment.app.DialogFragment;
 
 import com.komsiluk.taxi.R;
 import com.komsiluk.taxi.data.remote.driver_history.DriverService;
-import com.komsiluk.taxi.data.remote.inconsistency_report.InconsistencyReportResponseDTO;
-import com.komsiluk.taxi.data.remote.rating.RatingResponseDTO;
+import com.komsiluk.taxi.data.remote.inconsistency_report.InconsistencyReportResponse;
+import com.komsiluk.taxi.data.remote.rating.RatingResponse;
 import com.komsiluk.taxi.databinding.DialogRideDetailsBinding;
 
 import java.util.ArrayList;
@@ -131,12 +131,12 @@ public class RideDetailsDialogFragment extends DialogFragment {
         b.btnClose.setOnClickListener(v -> dismiss());
     }
     private void loadRatings(long rideId, int labelWhite, int valueYellow) {
-        driverService.getRideRatings(rideId).enqueue(new Callback<List<RatingResponseDTO>>() {
+        driverService.getRideRatings(rideId).enqueue(new Callback<List<RatingResponse>>() {
             @Override
-            public void onResponse(Call<List<RatingResponseDTO>> call, Response<List<RatingResponseDTO>> response) {
+            public void onResponse(Call<List<RatingResponse>> call, Response<List<RatingResponse>> response) {
                 if (isAdded() && response.isSuccessful() && response.body() != null) {
                     StringBuilder sb = new StringBuilder();
-                    for (RatingResponseDTO r : response.body()) {
+                    for (RatingResponse r : response.body()) {
                         sb.append(r.getRaterMail()).append("\n")
                                 .append("Driver rating: ").append(r.getDriverGrade()).append(" stars\n")
                                 .append("Vehicle rating: ").append(r.getVehicleGrade()).append(" stars\n")
@@ -152,22 +152,22 @@ public class RideDetailsDialogFragment extends DialogFragment {
             }
 
             @Override
-            public void onFailure(Call<List<RatingResponseDTO>> call, Throwable t) {
+            public void onFailure(Call<List<RatingResponse>> call, Throwable t) {
                 if (isAdded()) b.tvRatings.setText("Failed to load ratings.");
             }
         });
     }
 
     private void loadInconsistencies(long rideId, int labelWhite, int valueYellow) {
-        driverService.getRideInconsistencies(rideId).enqueue(new Callback<List<InconsistencyReportResponseDTO>>() {
+        driverService.getRideInconsistencies(rideId).enqueue(new Callback<List<InconsistencyReportResponse>>() {
             @Override
-            public void onResponse(Call<List<InconsistencyReportResponseDTO>> call, Response<List<InconsistencyReportResponseDTO>> response) {
+            public void onResponse(Call<List<InconsistencyReportResponse>> call, Response<List<InconsistencyReportResponse>> response) {
                 if (isAdded() && response.isSuccessful() && response.body() != null) {
                     if (response.body().isEmpty()) {
                         b.tvInconsistencyDetails.setText("No inconsistencies reported.");
                     } else {
                         StringBuilder sb = new StringBuilder();
-                        for (InconsistencyReportResponseDTO report : response.body()) {
+                        for (InconsistencyReportResponse report : response.body()) {
                             sb.append("Reporter: ").append(report.getReporterEmail()).append("\n")
                                     .append("Reason: ").append(report.getMessage()).append("\n\n");
                         }
@@ -178,7 +178,7 @@ public class RideDetailsDialogFragment extends DialogFragment {
             }
 
             @Override
-            public void onFailure(Call<List<InconsistencyReportResponseDTO>> call, Throwable t) {
+            public void onFailure(Call<List<InconsistencyReportResponse>> call, Throwable t) {
                 if (isAdded()) b.tvInconsistencyDetails.setText("Failed to load reports.");
             }
         });

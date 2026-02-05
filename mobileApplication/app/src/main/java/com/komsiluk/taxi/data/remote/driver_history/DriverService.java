@@ -1,9 +1,9 @@
 package com.komsiluk.taxi.data.remote.driver_history;
 
 import com.komsiluk.taxi.data.remote.add_driver.DriverResponse;
-import com.komsiluk.taxi.data.remote.rating.RatingResponseDTO;
+import com.komsiluk.taxi.data.remote.rating.RatingResponse;
 import com.komsiluk.taxi.data.remote.ride.RideResponse;
-import com.komsiluk.taxi.data.remote.inconsistency_report.InconsistencyReportResponseDTO;
+import com.komsiluk.taxi.data.remote.inconsistency_report.InconsistencyReportResponse;
 
 import java.util.Collection;
 import java.util.List;
@@ -28,10 +28,10 @@ public interface DriverService {
     );
 
     @GET("rides/{rideId}/ratings")
-    Call<List<RatingResponseDTO>> getRideRatings(@Path("rideId") Long rideId);
+    Call<List<RatingResponse>> getRideRatings(@Path("rideId") Long rideId);
 
     @GET("rides/{rideId}/inconsistencies")
-    Call<List<InconsistencyReportResponseDTO>> getRideInconsistencies(@Path("rideId") Long rideId);
+    Call<List<InconsistencyReportResponse>> getRideInconsistencies(@Path("rideId") Long rideId);
 
     @Multipart
     @POST("drivers")

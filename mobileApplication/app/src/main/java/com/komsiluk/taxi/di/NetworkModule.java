@@ -11,6 +11,7 @@ import com.komsiluk.taxi.data.remote.block.BlockService;
 import com.komsiluk.taxi.data.remote.driver_history.DriverService;
 import com.komsiluk.taxi.data.remote.edit_requests.EditRequestsService;
 import com.komsiluk.taxi.data.remote.favorite.FavoriteService;
+import com.komsiluk.taxi.data.remote.location.LocationService;
 import com.komsiluk.taxi.data.remote.profile.UserService;
 import com.komsiluk.taxi.data.remote.report.ReportService;
 import com.komsiluk.taxi.data.remote.ride.RideRepository;
@@ -122,6 +123,12 @@ public class NetworkModule {
     @Singleton
     public static BlockService provideBlockService(Retrofit retrofit) {
         return retrofit.create(BlockService.class);
+    }
+
+    @Provides
+    @Singleton
+    public static LocationService provideLocationService(Retrofit retrofit) {
+        return retrofit.create(LocationService.class);
     }
 }
 
