@@ -332,6 +332,10 @@ public class UserActivity extends BaseNavDrawerActivity {
             applyFavoriteToBookRide(ride);
         }
 
+
+        btnSearchPickup.setOnClickListener(v -> searchAndPickLocation(true));
+        btnSearchDestination.setOnClickListener(v -> searchAndPickLocation(false));
+
         String rideJson = getIntent().getStringExtra("ORDER_AGAIN_DTO");
         if (rideJson != null) {
             processOrderAgain(rideJson);
@@ -352,69 +356,32 @@ public class UserActivity extends BaseNavDrawerActivity {
 
 
     private void applyRideDetailsToForm(PassengerRideDetailsDTO details) {
-        if (details == null) return;
+        if (details == null || details.getRoute() == null) return;
 
-        if (details.getRoute() != null) {
-            EditText etPickup = findViewById(R.id.etPickup);
-            EditText etDestination = findViewById(R.id.etDestination);
-            if (etPickup != null) etPickup.setText(extractStreetAddress(details.getRoute().getStartAddress()));
-            if (etDestination != null) etDestination.setText(extractStreetAddress(details.getRoute().getEndAddress()));
+        String fullPickup = details.getRoute().getStartAddress();
+        String fullDest = details.getRoute().getEndAddress();
 
-            clearStations();
-            String stopsData = details.getRoute().getStops();
-            if (stopsData != null && !stopsData.isEmpty()) {
-                String[] stops = stopsData.split("\\|");
-                for (String stop : stops) {
-                    addStationChip(extractStreetAddress(stop));
-                }
+        if (etPickup != null) etPickup.setText(extractStreetAddress(fullPickup));
+        if (etDestination != null) etDestination.setText(extractStreetAddress(fullDest));
+
+        clearStations();
+        List<String> stopsList = new ArrayList<>();
+        String stopsData = details.getRoute().getStops();
+        if (stopsData != null && !stopsData.isEmpty()) {
+            String[] stopsArray = stopsData.split("\\|");
+            for (String s : stopsArray) {
+                String trimmed = s.trim();
+                stopsList.add(trimmed);
+                addStationChip(extractStreetAddress(trimmed));
             }
         }
-
-        clearUsers();
-        if (details.getPassengerEmails() != null) {
-            for (String email : details.getPassengerEmails()) {
-                addUserChip(email);
-            }
-        }
-
-        if (actCarType != null && details.getVehicleType() != null) {
-            actCarType.setText(details.getVehicleType().name(), false);
-        }
-
-        android.widget.CheckBox cbPet = findViewById(R.id.cbPetFriendly);
-        android.widget.CheckBox cbChild = findViewById(R.id.cbChildSeat);
-        if (cbPet != null) cbPet.setChecked(details.isPetFriendly());
-        if (cbChild != null) cbChild.setChecked(details.isBabyFriendly());
-
-        if (details.getScheduledAt() != null) {
-            rbScheduled.setChecked(true);
-            actTime.setVisibility(View.VISIBLE);
-
-            String timeOnly = extractTimeFromIso(details.getScheduledAt());
-            actTime.setText(timeOnly, false);
-        } else {
-            rbNow.setChecked(true);
-            actTime.setVisibility(View.GONE);
-        }
+        geocodeAndDrawRoute(fullPickup, fullDest, stopsList);
     }
 
-    private String extractTimeFromIso(String isoDate) {
-        try {
-            if (isoDate.contains("T")) {
-                String timePart = isoDate.split("T")[1];
-                return timePart.substring(0, 5);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return "";
-    }
 
     private String extractStreetAddress(String fullAddress) {
         if (fullAddress == null || fullAddress.trim().isEmpty()) return "";
         return fullAddress.split(",")[0].trim();
-        btnSearchPickup.setOnClickListener(v -> searchAndPickLocation(true));
-        btnSearchDestination.setOnClickListener(v -> searchAndPickLocation(false));
     }
 
     private void removeMarker(boolean isPickup) {
@@ -676,10 +643,67 @@ public class UserActivity extends BaseNavDrawerActivity {
         if (cbPet != null) cbPet.setChecked(r.isPetFriendly());
         if (cbChild != null) cbChild.setChecked(r.isChildSeat());
 
-        geocodeAndDrawFavorite(r);
+//        geocodeAndDrawFavorite(r);
+        geocodeAndDrawRoute(r.getPickup(), r.getDestination(), r.getStations());
     }
 
-    private void geocodeAndDrawFavorite(FavoriteRide fav) {
+//    private void geocodeAndDrawFavorite(FavoriteRide fav) {
+//        pickupSelected = false;
+//        destSelected = false;
+//        pickupPoint = null;
+//        destPoint = null;
+//        stationPoints.clear();
+//        stationMarkers.clear();
+//        clearRouteAndStats();
+//        removeMarker(true);
+//        removeMarker(false);
+//
+//        String pickupAddr = fav.getPickup();
+//        String destAddr = fav.getDestination();
+//        List<String> stopsAddr = fav.getStations() != null ? fav.getStations() : new ArrayList<>();
+//
+//        geoRepo.searchNoviSad(pickupAddr, NS_VIEWBOX).enqueue(new Callback<List<NominatimPlace>>() {
+//            @Override public void onResponse(Call<List<NominatimPlace>> call, Response<List<NominatimPlace>> res) {
+//                if (!res.isSuccessful() || res.body() == null || res.body().isEmpty()) {
+//                    Toast.makeText(UserActivity.this, "Could not locate pickup.", Toast.LENGTH_LONG).show();
+//                    return;
+//                }
+//                NominatimPlace p = res.body().get(0);
+//                pickupPoint = new GeoPoint(parseDouble(p.lat), parseDouble(p.lon));
+//                pickupSelected = true;
+//                setMarker(true, pickupPoint);
+//
+//                geocodeStopsSequential(stopsAddr, 0, () -> {
+//                    geoRepo.searchNoviSad(destAddr, NS_VIEWBOX).enqueue(new Callback<List<NominatimPlace>>() {
+//                        @Override public void onResponse(Call<List<NominatimPlace>> call2, Response<List<NominatimPlace>> res2) {
+//                            if (!res2.isSuccessful() || res2.body() == null || res2.body().isEmpty()) {
+//                                Toast.makeText(UserActivity.this, "Could not locate destination.", Toast.LENGTH_LONG).show();
+//                                return;
+//                            }
+//                            NominatimPlace d = res2.body().get(0);
+//                            destPoint = new GeoPoint(parseDouble(d.lat), parseDouble(d.lon));
+//                            destSelected = true;
+//                            setMarker(false, destPoint);
+//
+//                            zoomToAllPoints();
+//                            drawRouteAndStatsMulti();
+//                        }
+//
+//                        @Override public void onFailure(Call<List<NominatimPlace>> call2, Throwable t) {
+//                            Toast.makeText(UserActivity.this, "Destination geocode failed.", Toast.LENGTH_LONG).show();
+//                        }
+//                    });
+//                });
+//            }
+//
+//            @Override public void onFailure(Call<List<NominatimPlace>> call, Throwable t) {
+//                Toast.makeText(UserActivity.this, "Pickup geocode failed.", Toast.LENGTH_LONG).show();
+//            }
+//        });
+//    }
+
+    private void geocodeAndDrawRoute(String pickupAddr, String destAddr, List<String> stopsAddr) {
+        // Resetovanje stanja mape (tvoj postojeći kod)
         pickupSelected = false;
         destSelected = false;
         pickupPoint = null;
@@ -690,33 +714,35 @@ public class UserActivity extends BaseNavDrawerActivity {
         removeMarker(true);
         removeMarker(false);
 
-        String pickupAddr = fav.getPickup();
-        String destAddr = fav.getDestination();
-        List<String> stopsAddr = fav.getStations() != null ? fav.getStations() : new ArrayList<>();
+        if (pickupAddr == null || destAddr == null) return;
 
+        // Geokodiranje polazišta
         geoRepo.searchNoviSad(pickupAddr, NS_VIEWBOX).enqueue(new Callback<List<NominatimPlace>>() {
             @Override public void onResponse(Call<List<NominatimPlace>> call, Response<List<NominatimPlace>> res) {
                 if (!res.isSuccessful() || res.body() == null || res.body().isEmpty()) {
-                    Toast.makeText(UserActivity.this, "Could not locate pickup.", Toast.LENGTH_LONG).show();
+                    Toast.makeText(UserActivity.this, "Could not locate pickup: " + pickupAddr, Toast.LENGTH_LONG).show();
                     return;
                 }
                 NominatimPlace p = res.body().get(0);
-                pickupPoint = new GeoPoint(parseDouble(p.lat), parseDouble(p.lon));
+                pickupPoint = new GeoPoint(Double.parseDouble(p.lat), Double.parseDouble(p.lon));
                 pickupSelected = true;
                 setMarker(true, pickupPoint);
 
-                geocodeStopsSequential(stopsAddr, 0, () -> {
+                // Sekvencijalno geokodiranje stanica
+                geocodeStopsSequential(stopsAddr != null ? stopsAddr : new ArrayList<>(), 0, () -> {
+                    // Geokodiranje destinacije
                     geoRepo.searchNoviSad(destAddr, NS_VIEWBOX).enqueue(new Callback<List<NominatimPlace>>() {
                         @Override public void onResponse(Call<List<NominatimPlace>> call2, Response<List<NominatimPlace>> res2) {
                             if (!res2.isSuccessful() || res2.body() == null || res2.body().isEmpty()) {
-                                Toast.makeText(UserActivity.this, "Could not locate destination.", Toast.LENGTH_LONG).show();
+                                Toast.makeText(UserActivity.this, "Could not locate destination: " + destAddr, Toast.LENGTH_LONG).show();
                                 return;
                             }
                             NominatimPlace d = res2.body().get(0);
-                            destPoint = new GeoPoint(parseDouble(d.lat), parseDouble(d.lon));
+                            destPoint = new GeoPoint(Double.parseDouble(d.lat), Double.parseDouble(d.lon));
                             destSelected = true;
                             setMarker(false, destPoint);
 
+                            // Finalno iscrtavanje
                             zoomToAllPoints();
                             drawRouteAndStatsMulti();
                         }

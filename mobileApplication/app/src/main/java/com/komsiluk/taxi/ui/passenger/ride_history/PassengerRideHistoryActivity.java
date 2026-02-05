@@ -10,10 +10,13 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.komsiluk.taxi.R;
+import com.komsiluk.taxi.data.remote.passenger_ride_history.PassengerRideHistoryDTO;
 import com.komsiluk.taxi.data.remote.passenger_ride_history.PassengerRideSortBy;
 import com.komsiluk.taxi.data.session.SessionManager;
 import com.komsiluk.taxi.databinding.ActivityPassengerRideHistoryBinding;
 import com.komsiluk.taxi.ui.menu.BaseNavDrawerActivity;
+
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -179,21 +182,26 @@ public class PassengerRideHistoryActivity extends BaseNavDrawerActivity {
     private void observeViewModel() {
         viewModel.rides.observe(this, rides -> {
             adapter.setRides(rides);
-            
-            if (rides.isEmpty()) {
-                Toast.makeText(this, "No rides found", Toast.LENGTH_SHORT).show();
-            }
         });
 
         viewModel.rideDetails.observe(this, details -> {
             if (details != null) {
                 PassengerRideDetailsDialogFragment.newInstance(details)
                         .show(getSupportFragmentManager(), "ride_details");
+
+                viewModel.clearRideDetails();
             }
         });
 
         viewModel.loading.observe(this, isLoading -> {
             binding.progressBar.setVisibility(isLoading ? View.VISIBLE : View.GONE);
+
+            if (Boolean.FALSE.equals(isLoading)) {
+                List<PassengerRideHistoryDTO> currentRides = viewModel.rides.getValue();
+                if (currentRides == null || currentRides.isEmpty()) {
+                    Toast.makeText(this, "No rides found", Toast.LENGTH_SHORT).show();
+                }
+            }
         });
 
         viewModel.error.observe(this, error -> {

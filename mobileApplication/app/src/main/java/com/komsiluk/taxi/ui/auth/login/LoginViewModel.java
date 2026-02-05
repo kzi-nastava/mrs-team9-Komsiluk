@@ -71,8 +71,11 @@ public class LoginViewModel extends ViewModel {
 
             @Override
             public void onFailure(Call<LoginResponse> call, Throwable t) {
-                Log.e("LOGIN", "Network fail", t);
-                errorMessageEvent.postValue(new Event<>("FAIL: " + t.getClass().getSimpleName() + " - " + t.getMessage()));
+                Log.e("LOGIN_DETALJNO", "RAZLOG: ", t);
+
+                if (t.getMessage() != null && t.getMessage().contains("CLEARTEXT")) {
+                    Log.e("LOGIN_DETALJNO", "GRESKA: Pokušavaš HTTP, a dozvoljen je samo HTTPS!");
+                }
             }
 
         });

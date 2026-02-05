@@ -35,7 +35,7 @@ public class PassengerRideHistoryViewModel extends ViewModel {
     private final MutableLiveData<PassengerRideDetailsDTO> _rideDetails = new MutableLiveData<>();
     public final LiveData<PassengerRideDetailsDTO> rideDetails = _rideDetails;
 
-    private final MutableLiveData<Boolean> _loading = new MutableLiveData<>(false);
+    private final MutableLiveData<Boolean> _loading = new MutableLiveData<>();
     public final LiveData<Boolean> loading = _loading;
 
     private final MutableLiveData<String> _error = new MutableLiveData<>();
@@ -60,11 +60,15 @@ public class PassengerRideHistoryViewModel extends ViewModel {
                 .enqueue(new Callback<List<PassengerRideHistoryDTO>>() {
                     @Override
                     public void onResponse(Call<List<PassengerRideHistoryDTO>> call, Response<List<PassengerRideHistoryDTO>> response) {
-                        _loading.setValue(false);
+
                         if (response.isSuccessful() && response.body() != null) {
                             cachedRides = response.body();
                             applyLocalFilterAndSort();
+                        } else {
+                            cachedRides = new ArrayList<>();
+                            _rides.setValue(new ArrayList<>());
                         }
+                        _loading.setValue(false);
                     }
                     @Override
                     public void onFailure(Call<List<PassengerRideHistoryDTO>> call, Throwable t) {
@@ -72,6 +76,10 @@ public class PassengerRideHistoryViewModel extends ViewModel {
                         _error.setValue("Failed to fetch history");
                     }
                 });
+    }
+
+    public void clearRideDetails() {
+        _rideDetails.setValue(null);
     }
 
     private void applyLocalFilterAndSort() {
