@@ -2,14 +2,17 @@ package com.komsiluk.taxi.ui.report;
 
 import android.app.DatePickerDialog;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.XAxis;
@@ -22,6 +25,8 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.komsiluk.taxi.R;
 import com.komsiluk.taxi.auth.AuthManager;
 import com.komsiluk.taxi.auth.UserRole;
+import com.komsiluk.taxi.data.remote.report.DailyValueResponse;
+import com.komsiluk.taxi.data.session.SessionManager;
 import com.komsiluk.taxi.ui.menu.BaseNavDrawerActivity;
 
 import java.time.LocalDate;
@@ -45,6 +50,9 @@ public class UsageReportsActivity extends BaseNavDrawerActivity {
 
     @Inject
     AuthManager authManager;
+
+    @Inject
+    SessionManager sessionManager;
 
     @Override
     protected int getDrawerMenuResId() {
@@ -75,6 +83,10 @@ public class UsageReportsActivity extends BaseNavDrawerActivity {
     private ChartBlock moneyBlock, ridesBlock, kmBlock;
 
     private final String[] targets = new String[]{"All passengers", "All drivers", "Single user"};
+
+    private final Handler emailHandler = new android.os.Handler(android.os.Looper.getMainLooper());
+    private Runnable emailRunnable;
+    private UsageReportsViewModel vm;
 
     @Override
     protected int getContentLayoutId() {
@@ -116,6 +128,40 @@ public class UsageReportsActivity extends BaseNavDrawerActivity {
         etTo.setOnClickListener(v -> pickDateInto(etTo));
 
         setupAdminUiIfNeeded();
+
+        vm = new ViewModelProvider(this).get(UsageReportsViewModel.class);
+
+        ArrayAdapter<String> emailAdapter = new ArrayAdapter<>(this, R.layout.item_email_dropdown, new ArrayList<>());
+        actUser.setAdapter(emailAdapter);
+        actUser.setThreshold(3);
+
+        vm.getState().observe(this, st -> {
+            if (st == null) return;
+
+            if (st.loading) {
+                return;
+            }
+
+            if (st.error != null) {
+                showError(st.error);
+                return;
+            }
+
+            if (st.emailSuggestions != null) {
+                emailAdapter.clear();
+                emailAdapter.addAll(st.emailSuggestions);
+                emailAdapter.notifyDataSetChanged();
+                if (!suppressEmailAutocomplete && selectedTargetIndex == 2 && actUser.hasFocus() && !userSelectedFromDropdown && actUser.getText() != null && actUser.getText().length() >= 3 && !emailAdapter.isEmpty()) {
+                    actUser.showDropDown();
+                } else {
+                    actUser.dismissDropDown();
+                }
+            }
+
+            if (st.report != null) {
+                renderReport(st.report);
+            }
+        });
 
         btnInsert.setOnClickListener(v -> onInsert());
     }
@@ -167,27 +213,137 @@ public class UsageReportsActivity extends BaseNavDrawerActivity {
 
         actUser.setOnItemClickListener((parent, view, position, id) -> {
             String chosen = (String) parent.getItemAtPosition(position);
+
+            suppressAutocompleteFor(600);
+
             selectedUserEmail = chosen;
             userSelectedFromDropdown = true;
+
+            if (emailRunnable != null) emailHandler.removeCallbacks(emailRunnable);
+
             actUser.setText(chosen, false);
             actUser.setSelection(chosen.length());
+
+            actUser.dismissDropDown();
         });
+
 
         actUser.addTextChangedListener(new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
             @Override public void afterTextChanged(Editable s) {
+                if (suppressEmailAutocomplete) return;
+
                 String now = s == null ? "" : s.toString();
-                if (!now.equals(selectedUserEmail)) {
-                    userSelectedFromDropdown = false;
-                }
+
+                if (!now.equals(selectedUserEmail)) userSelectedFromDropdown = false;
+
+                if (selectedTargetIndex != 2) return;
+
+                if (emailRunnable != null) emailHandler.removeCallbacks(emailRunnable);
+
+                String q = now.trim();
+                emailRunnable = () -> {
+                    vm.autocompleteEmails(q, 10);
+                };
+                emailHandler.postDelayed(emailRunnable, 250);
             }
         });
 
         rowUser.setVisibility(View.GONE);
     }
 
+    private boolean suppressEmailAutocomplete = false;
+
+    private void suppressAutocompleteFor(int ms) {
+        suppressEmailAutocomplete = true;
+        emailHandler.removeCallbacksAndMessages(null);
+        emailHandler.postDelayed(() -> suppressEmailAutocomplete = false, ms);
+    }
+
+    private void renderReport(com.komsiluk.taxi.data.remote.report.RideReportResponse rep) {
+        clearCharts();
+
+        java.util.List<com.komsiluk.taxi.data.remote.report.DailyValueResponse> money = rep.getMoneyPerDay();
+        java.util.List<com.komsiluk.taxi.data.remote.report.DailyValueResponse> rides = rep.getRidesPerDay();
+        java.util.List<com.komsiluk.taxi.data.remote.report.DailyValueResponse> km = rep.getDistancePerDay();
+
+        setChartDataFromDaily(moneyBlock, money, "Money");
+        setChartDataFromDaily(ridesBlock, rides, "Rides");
+        setChartDataFromDaily(kmBlock, km, "Km");
+
+        float moneySum = rep.getTotalMoney() == null ? 0f : rep.getTotalMoney().floatValue();
+        float moneyAvg = rep.getAverageMoneyPerDay() == null ? 0f : rep.getAverageMoneyPerDay().floatValue();
+        moneyBlock.sum.setText(getString(R.string.sum_fmt, moneySum));
+        moneyBlock.avg.setText(getString(R.string.avg_fmt, moneyAvg));
+
+        ridesBlock.sum.setText(getString(R.string.sum_fmt, (float) rep.getTotalRides()));
+        ridesBlock.avg.setText(getString(R.string.avg_fmt, (float) rep.getAverageRidesPerDay()));
+
+        kmBlock.sum.setText(getString(R.string.sum_fmt, (float) rep.getTotalDistanceKm()));
+        kmBlock.avg.setText(getString(R.string.avg_fmt, (float) rep.getAverageDistanceKmPerDay()));
+    }
+
+    private void setChartDataFromDaily(ChartBlock block, List<DailyValueResponse> daily, String label) {
+
+        if (daily == null) daily = new ArrayList<>();
+
+        ArrayList<Entry> entries = new ArrayList<>();
+        final ArrayList<String> dayLabels = new ArrayList<>();
+
+        DateTimeFormatter iso = DateTimeFormatter.ISO_LOCAL_DATE;
+
+        for (int i = 0; i < daily.size(); i++) {
+            DailyValueResponse d = daily.get(i);
+            float v = (float) (d == null ? 0.0 : d.getValue());
+            entries.add(new Entry(i, v));
+
+            String dateStr = d == null ? "" : d.getDate();
+            try {
+                LocalDate ld = LocalDate.parse(dateStr, iso);
+                dayLabels.add(String.valueOf(ld.getDayOfMonth()));
+            } catch (Exception e) {
+                dayLabels.add("");
+            }
+        }
+
+        LineDataSet ds = new LineDataSet(entries, label);
+
+        ds.setColor(getResources().getColor(R.color.secondary, null));
+        ds.setCircleColor(getResources().getColor(R.color.secondary, null));
+        ds.setCircleRadius(3f);
+        ds.setLineWidth(2f);
+        ds.setValueTextSize(0f);
+
+        block.chart.setData(new LineData(ds));
+
+        block.chart.getXAxis().setValueFormatter(new ValueFormatter() {
+            @Override
+            public String getFormattedValue(float value) {
+                int idx = (int) value;
+                if (idx < 0 || idx >= dayLabels.size()) return "";
+                return dayLabels.get(idx);
+            }
+        });
+
+        block.chart.invalidate();
+    }
+
     private void onInsert() {
+        suppressAutocompleteFor(800);
+        if (emailRunnable != null) emailHandler.removeCallbacks(emailRunnable);
+
+        if (actUser != null) {
+            actUser.dismissDropDown();
+            actUser.clearFocus();
+        }
+
+        View root = getCurrentFocus();
+        if (root != null) {
+            InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+            if (imm != null) imm.hideSoftInputFromWindow(root.getWindowToken(), 0);
+        }
+
         tvValidation.setVisibility(View.GONE);
 
         LocalDate from = parseDate(etFrom);
@@ -210,29 +366,23 @@ public class UsageReportsActivity extends BaseNavDrawerActivity {
             }
         }
 
-        renderAllCharts(from, to);
-    }
+        String startIso = from.toString();
+        String endIso = to.toString();
 
-    private void renderAllCharts(LocalDate from, LocalDate to) {
-        List<LocalDate> days = enumerateDays(from, to);
-
-        int seed = 1337;
-        if (isAdmin) {
-            seed += (selectedTargetIndex * 1000);
-            if (selectedTargetIndex == 2) seed += selectedUserEmail.hashCode();
+        if (!isAdmin) {
+            Long id = sessionManager.getUserId();
+            vm.loadReportForUserId(id, startIso, endIso);
+            return;
         }
 
-        List<Float> money = generateSeries(days.size(), seed + 1, -10f, 25f);
-        List<Float> rides = generateSeries(days.size(), seed + 2, 0f, 6f);
-        List<Float> km = generateSeries(days.size(), seed + 3, 0f, 30f);
+        if (selectedTargetIndex == 0) {
+            vm.loadReportAllPassengers(startIso, endIso);
+        } else if (selectedTargetIndex == 1) {
+            vm.loadReportAllDrivers(startIso, endIso);
+        } else {
+            vm.loadReportByEmail(selectedUserEmail, startIso, endIso);
+        }
 
-        setChartData(moneyBlock, days, money, "Money");
-        setChartData(ridesBlock, days, rides, "Rides");
-        setChartData(kmBlock, days, km, "Km");
-
-        updateSumAvg(moneyBlock, money);
-        updateSumAvg(ridesBlock, rides);
-        updateSumAvg(kmBlock, km);
     }
 
     private void clearCharts() {
@@ -252,43 +402,6 @@ public class UsageReportsActivity extends BaseNavDrawerActivity {
         moneyBlock.chart.invalidate();
         ridesBlock.chart.invalidate();
         kmBlock.chart.invalidate();
-    }
-
-    private void setChartData(ChartBlock block, List<LocalDate> days, List<Float> values, String label) {
-        ArrayList<Entry> entries = new ArrayList<>();
-        for (int i = 0; i < values.size(); i++) {
-            entries.add(new Entry(i, values.get(i)));
-        }
-
-        LineDataSet ds = new LineDataSet(entries, label);
-        ds.setColor(getResources().getColor(R.color.secondary, null));
-        ds.setCircleColor(getResources().getColor(R.color.secondary, null));
-        ds.setCircleRadius(3f);
-        ds.setLineWidth(2f);
-        ds.setValueTextSize(0f);
-
-        LineData data = new LineData(ds);
-        block.chart.setData(data);
-
-        block.chart.getXAxis().setValueFormatter(new ValueFormatter() {
-            @Override
-            public String getFormattedValue(float value) {
-                int idx = (int) value;
-                if (idx < 0 || idx >= days.size()) return "";
-                return String.valueOf(days.get(idx).getDayOfMonth());
-            }
-        });
-
-        block.chart.invalidate();
-    }
-
-    private void updateSumAvg(ChartBlock block, List<Float> vals) {
-        float sum = 0f;
-        for (Float v : vals) sum += (v == null ? 0f : v);
-        float avg = vals.isEmpty() ? 0f : (sum / vals.size());
-
-        block.sum.setText(getString(R.string.sum_fmt, sum));
-        block.avg.setText(getString(R.string.avg_fmt, avg));
     }
 
     private void styleChart(LineChart chart) {
@@ -331,34 +444,6 @@ public class UsageReportsActivity extends BaseNavDrawerActivity {
         } catch (Exception ex) {
             return null;
         }
-    }
-
-    private List<LocalDate> enumerateDays(LocalDate from, LocalDate to) {
-        ArrayList<LocalDate> list = new ArrayList<>();
-        LocalDate d = from;
-        while (!d.isAfter(to)) {
-            list.add(d);
-            d = d.plusDays(1);
-        }
-        return list;
-    }
-
-    private List<Float> generateSeries(int n, int seed, float min, float max) {
-        ArrayList<Float> out = new ArrayList<>();
-        Random r = new Random(seed);
-        float range = (max - min);
-
-        for (int i = 0; i < n; i++) {
-            float base = (float) Math.sin(i * 0.9f) * (range * 0.25f);
-            float noise = (r.nextFloat() - 0.5f) * (range * 0.20f);
-            float v = min + (range * 0.55f) + base + noise;
-
-            if (v < min) v = min;
-            if (v > max) v = max;
-
-            out.add(v);
-        }
-        return out;
     }
 
     private void showError(String msg) {
