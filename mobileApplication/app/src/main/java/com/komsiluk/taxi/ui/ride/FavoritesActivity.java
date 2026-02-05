@@ -4,16 +4,25 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.komsiluk.taxi.R;
+import com.komsiluk.taxi.UserActivity;
+import com.komsiluk.taxi.data.remote.favorite.FavoriteRouteResponse;
+import com.komsiluk.taxi.data.session.SessionManager;
 import com.komsiluk.taxi.ui.menu.BaseNavDrawerActivity;
 
 import java.util.ArrayList;
 
+import dagger.hilt.android.AndroidEntryPoint;
+import jakarta.inject.Inject;
+
+@AndroidEntryPoint
 public class FavoritesActivity extends BaseNavDrawerActivity implements FavoritesAdapter.Listener {
 
     public static final String EXTRA_BOOK_FAVORITE = "extra_book_favorite";
@@ -21,7 +30,12 @@ public class FavoritesActivity extends BaseNavDrawerActivity implements Favorite
     private RecyclerView rv;
     private TextView tvEmpty;
 
-    private final ArrayList<FavoriteRide> mock = new ArrayList<>();
+    private FavoritesAdapter adapter;
+    private final ArrayList<FavoriteRide> items = new ArrayList<>();
+    private FavoritesViewModel vm;
+
+    @Inject
+    SessionManager sessionManager;
 
     @Override
     protected int getContentLayoutId() {
@@ -36,62 +50,125 @@ public class FavoritesActivity extends BaseNavDrawerActivity implements Favorite
         tvEmpty = findViewById(R.id.tvFavoritesEmpty);
 
         rv.setLayoutManager(new LinearLayoutManager(this));
-        seedMock();
-
-        FavoritesAdapter adapter = new FavoritesAdapter(mock, this);
+        adapter = new FavoritesAdapter(items, this);
         rv.setAdapter(adapter);
 
-        updateEmpty();
-    }
+        vm = new ViewModelProvider(this).get(FavoritesViewModel.class);
 
-    private void seedMock() {
-        // GUI-only mock
-        ArrayList<String> stations = new ArrayList<>();
-        stations.add("Station address 1");
-        stations.add("Station address 2");
+        vm.getState().observe(this, st -> {
+            if (st == null) return;
 
-        ArrayList<String> users = new ArrayList<>();
-        users.add("user1@gmail.com");
+            if (st.loading) {
+                return;
+            }
 
-        mock.add(new FavoriteRide(
-                "Favorite card 1",
-                "Start location 123",
-                "Finish location 123",
-                stations,
-                users,
-                "Luxury",
-                true,
-                true
-        ));
+            if (st.error != null) {
+                Toast.makeText(this, st.error, Toast.LENGTH_LONG).show();
+                items.clear();
+                adapter.notifyDataSetChanged();
+                updateEmpty();
+                return;
+            }
 
-        mock.add(new FavoriteRide(
-                "Favorite card 2",
-                "Start location 999",
-                "Finish location 999",
-                new ArrayList<>(),
-                new ArrayList<>(),
-                "Standard",
-                false,
-                false
-        ));
+            items.clear();
+            if (st.data != null) {
+                for (FavoriteRouteResponse r : st.data) {
+                    items.add(mapToUi(r));
+                }
+            }
+
+            adapter.notifyDataSetChanged();
+            updateEmpty();
+        });
+
+        Long userId = sessionManager != null ? sessionManager.getUserId() : null;
+        if (userId == null) {
+            Toast.makeText(this, "Not logged in.", Toast.LENGTH_LONG).show();
+            items.clear();
+            updateEmpty();
+            return;
+        }
+
+        vm.loadFavorites(userId);
     }
 
     private void updateEmpty() {
-        boolean empty = mock.isEmpty();
+        boolean empty = items.isEmpty();
         tvEmpty.setVisibility(empty ? View.VISIBLE : View.GONE);
         rv.setVisibility(empty ? View.GONE : View.VISIBLE);
+
+        if (empty) {
+            tvEmpty.setText("You have no favorite routes yet.");
+        }
+    }
+
+    private FavoriteRide mapToUi(FavoriteRouteResponse r) {
+        ArrayList<String> stations = new ArrayList<>();
+        if (r.getStops() != null) stations.addAll(r.getStops());
+
+        ArrayList<String> users = new ArrayList<>();
+
+        String carType = prettyVehicleType(r.getVehicleType());
+
+        String name = (r.getTitle() != null && !r.getTitle().trim().isEmpty())
+                ? r.getTitle()
+                : ("Favorite #" + (r.getId() != null ? r.getId() : ""));
+
+        FavoriteRide ui = new FavoriteRide(
+                r.getId(),
+                name,
+                r.getStartAddress(),
+                r.getEndAddress(),
+                stations,
+                users,
+                carType,
+                r.isPetFriendly(),
+                r.isBabyFriendly(),
+                r.getDistanceKm(),
+                r.getEstimatedDurationMin() != null ? r.getEstimatedDurationMin() : 0,
+                r.getRouteId()
+        );
+
+        return ui;
+    }
+
+    private String prettyVehicleType(String raw) {
+        if (raw == null) return "Standard";
+        String s = raw.trim().toUpperCase();
+        switch (s) {
+            case "LUXURY": return "Luxury";
+            case "VAN": return "Van";
+            default: return "Standard";
+        }
     }
 
     @Override
     public void onCardClicked(FavoriteRide ride) {
-        FavoriteDialogs.showFavoriteDetails(this, ride,
+        FavoriteDialogs.showFavoriteDetails(
+                this,
+                ride,
                 () -> {
-                    Intent i = new Intent(this, com.komsiluk.taxi.UserActivity.class);
+                    Intent i = new Intent(this, UserActivity.class);
                     i.putExtra(EXTRA_BOOK_FAVORITE, ride);
                     i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(i);
                 },
-                () -> { FavoriteDialogs.showRenameDialog(this, ride.getName(), newName -> { /* GUI-only */ }); },
-                () -> { FavoriteDialogs.showDeleteDialog(this, ride.getName(), () -> { /* GUI-only */ }); });
+                () -> FavoriteDialogs.showRenameDialog(this, ride.getName(), newName -> {
+                    if (newName == null || newName.trim().length() < 2) {
+                        Toast.makeText(this, "Name must be at least 2 characters.", Toast.LENGTH_LONG).show();
+                        return;
+                    }
+                    vm.renameFavorite(ride.getFavoriteId(), newName.trim(), () -> {
+                        Long uid = sessionManager.getUserId();
+                        if (uid != null) vm.loadFavorites(uid);
+                    });
+                }),
+                () -> FavoriteDialogs.showDeleteDialog(this, ride.getName(), () -> {
+                    vm.deleteFavorite(ride.getFavoriteId(), () -> {
+                        Long uid = sessionManager.getUserId();
+                        if (uid != null) vm.loadFavorites(uid);
+                    });
+                })
+        );
     }
 }

@@ -14,6 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
@@ -21,8 +22,14 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.komsiluk.taxi.auth.AuthManager;
+import com.komsiluk.taxi.data.remote.favorite.FavoriteRouteCreateRequest;
+import com.komsiluk.taxi.data.remote.favorite.FavoriteService;
 import com.komsiluk.taxi.data.remote.ride.RideCreateRequest;
+import com.komsiluk.taxi.data.remote.route.RouteCreateRequest;
+import com.komsiluk.taxi.data.remote.route.RouteResponse;
+import com.komsiluk.taxi.data.remote.route.RouteService;
 import com.komsiluk.taxi.data.session.SessionManager;
+import com.komsiluk.taxi.ui.ride.FavoritesViewModel;
 import com.komsiluk.taxi.ui.ride.OrderRideViewModel;
 import com.komsiluk.taxi.ui.ride.map.GeoRepository;
 import com.komsiluk.taxi.ui.ride.map.NominatimPlace;
@@ -113,6 +120,13 @@ public class UserActivity extends BaseNavDrawerActivity {
     private double lastDistanceKm = 0.0;
     private int lastDurationMin = 0;
 
+    private FavoritesViewModel favVm;
+
+    @Inject
+    FavoriteService favoriteApi;
+    @Inject
+    RouteService routeApi;
+
     private static class PlaceAdapter extends android.widget.BaseAdapter {
         private final android.content.Context ctx;
         private final List<NominatimPlace> items;
@@ -145,6 +159,13 @@ public class UserActivity extends BaseNavDrawerActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        favVm = new ViewModelProvider(this).get(FavoritesViewModel.class);
+
+        favVm.getState().observe(this, st -> {
+            if (st == null) return;
+            if (st.error != null) Toast.makeText(this, st.error, Toast.LENGTH_LONG).show();
+        });
 
         orderVm = new ViewModelProvider(this)
                 .get(OrderRideViewModel.class);
@@ -255,13 +276,6 @@ public class UserActivity extends BaseNavDrawerActivity {
         setupFavoriteButton();
         setupBookButton();
 
-        Object extra = getIntent().getSerializableExtra(FavoritesActivity.EXTRA_BOOK_FAVORITE);
-        if (extra instanceof FavoriteRide) {
-            FavoriteRide ride = (FavoriteRide) extra;
-            sheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-            applyFavoriteToBookRide(ride);
-        }
-
         Configuration.getInstance().load(this, getSharedPreferences("osmdroid", MODE_PRIVATE));
 
         map = findViewById(R.id.map);
@@ -294,6 +308,13 @@ public class UserActivity extends BaseNavDrawerActivity {
                 .build();
 
         geoRepo = new GeoRepository(geoClient);
+
+        Object extra = getIntent().getSerializableExtra(FavoritesActivity.EXTRA_BOOK_FAVORITE);
+        if (extra instanceof FavoriteRide) {
+            FavoriteRide ride = (FavoriteRide) extra;
+            sheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+            applyFavoriteToBookRide(ride);
+        }
 
         btnSearchPickup.setOnClickListener(v -> searchAndPickLocation(true));
         btnSearchDestination.setOnClickListener(v -> searchAndPickLocation(false));
@@ -557,7 +578,97 @@ public class UserActivity extends BaseNavDrawerActivity {
 
         if (cbPet != null) cbPet.setChecked(r.isPetFriendly());
         if (cbChild != null) cbChild.setChecked(r.isChildSeat());
+
+        geocodeAndDrawFavorite(r);
     }
+
+    private void geocodeAndDrawFavorite(FavoriteRide fav) {
+        pickupSelected = false;
+        destSelected = false;
+        pickupPoint = null;
+        destPoint = null;
+        stationPoints.clear();
+        stationMarkers.clear();
+        clearRouteAndStats();
+        removeMarker(true);
+        removeMarker(false);
+
+        String pickupAddr = fav.getPickup();
+        String destAddr = fav.getDestination();
+        List<String> stopsAddr = fav.getStations() != null ? fav.getStations() : new ArrayList<>();
+
+        geoRepo.searchNoviSad(pickupAddr, NS_VIEWBOX).enqueue(new Callback<List<NominatimPlace>>() {
+            @Override public void onResponse(Call<List<NominatimPlace>> call, Response<List<NominatimPlace>> res) {
+                if (!res.isSuccessful() || res.body() == null || res.body().isEmpty()) {
+                    Toast.makeText(UserActivity.this, "Could not locate pickup.", Toast.LENGTH_LONG).show();
+                    return;
+                }
+                NominatimPlace p = res.body().get(0);
+                pickupPoint = new GeoPoint(parseDouble(p.lat), parseDouble(p.lon));
+                pickupSelected = true;
+                setMarker(true, pickupPoint);
+
+                geocodeStopsSequential(stopsAddr, 0, () -> {
+                    geoRepo.searchNoviSad(destAddr, NS_VIEWBOX).enqueue(new Callback<List<NominatimPlace>>() {
+                        @Override public void onResponse(Call<List<NominatimPlace>> call2, Response<List<NominatimPlace>> res2) {
+                            if (!res2.isSuccessful() || res2.body() == null || res2.body().isEmpty()) {
+                                Toast.makeText(UserActivity.this, "Could not locate destination.", Toast.LENGTH_LONG).show();
+                                return;
+                            }
+                            NominatimPlace d = res2.body().get(0);
+                            destPoint = new GeoPoint(parseDouble(d.lat), parseDouble(d.lon));
+                            destSelected = true;
+                            setMarker(false, destPoint);
+
+                            zoomToAllPoints();
+                            drawRouteAndStatsMulti();
+                        }
+
+                        @Override public void onFailure(Call<List<NominatimPlace>> call2, Throwable t) {
+                            Toast.makeText(UserActivity.this, "Destination geocode failed.", Toast.LENGTH_LONG).show();
+                        }
+                    });
+                });
+            }
+
+            @Override public void onFailure(Call<List<NominatimPlace>> call, Throwable t) {
+                Toast.makeText(UserActivity.this, "Pickup geocode failed.", Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    private void geocodeStopsSequential(List<String> stops, int idx, Runnable done) {
+        if (stops == null || idx >= stops.size()) {
+            if (done != null) done.run();
+            return;
+        }
+
+        String addr = stops.get(idx);
+        geoRepo.searchNoviSad(addr, NS_VIEWBOX).enqueue(new Callback<List<NominatimPlace>>() {
+            @Override public void onResponse(Call<List<NominatimPlace>> call, Response<List<NominatimPlace>> res) {
+                if (res.isSuccessful() && res.body() != null && !res.body().isEmpty()) {
+                    NominatimPlace p = res.body().get(0);
+                    GeoPoint pt = new GeoPoint(parseDouble(p.lat), parseDouble(p.lon));
+                    stationPoints.add(pt);
+
+                    // marker za stanicu
+                    Marker m = new Marker(map);
+                    m.setPosition(pt);
+                    m.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+                    try { m.setIcon(getDrawable(R.drawable.station)); } catch (Throwable ignored) {}
+                    map.getOverlays().add(m);
+                    stationMarkers.add(m);
+                    map.invalidate();
+                }
+                geocodeStopsSequential(stops, idx + 1, done);
+            }
+
+            @Override public void onFailure(Call<List<NominatimPlace>> call, Throwable t) {
+                geocodeStopsSequential(stops, idx + 1, done);
+            }
+        });
+    }
+
 
     private void clearStations() {
         chipStations.removeAllViews();
@@ -801,8 +912,8 @@ public class UserActivity extends BaseNavDrawerActivity {
         MaterialButton btnCancel = view.findViewById(R.id.btnFavCancel);
         MaterialButton btnConfirm = view.findViewById(R.id.btnFavConfirm);
 
-        androidx.appcompat.app.AlertDialog dialog =
-                new androidx.appcompat.app.AlertDialog.Builder(this)
+        AlertDialog dialog =
+                new AlertDialog.Builder(this)
                         .setView(view)
                         .setCancelable(true)
                         .create();
@@ -812,10 +923,102 @@ public class UserActivity extends BaseNavDrawerActivity {
         }
 
         btnCancel.setOnClickListener(v -> dialog.dismiss());
-        btnConfirm.setOnClickListener(v -> dialog.dismiss());
+        btnConfirm.setOnClickListener(x -> {
+            android.widget.EditText etName = view.findViewById(R.id.etFavName);
+            String title = etName != null && etName.getText() != null ? etName.getText().toString().trim() : "";
+
+            if (title.length() < 2) {
+                Toast.makeText(this, "Name must be at least 2 characters.", Toast.LENGTH_LONG).show();
+                return;
+            }
+
+            Long userId = sessionManager != null ? sessionManager.getUserId() : null;
+            if (userId == null) {
+                Toast.makeText(this, "Not logged in.", Toast.LENGTH_LONG).show();
+                return;
+            }
+
+            if (!pickupSelected || pickupPoint == null || !destSelected || destPoint == null) {
+                Toast.makeText(this, "Select pickup and destination first.", Toast.LENGTH_LONG).show();
+                return;
+            }
+
+            if (lastDistanceKm <= 0.0 || lastDurationMin <= 0) {
+                Toast.makeText(this, "Route is not ready yet.", Toast.LENGTH_LONG).show();
+                return;
+            }
+
+            RouteCreateRequest rreq = new RouteCreateRequest();
+            rreq.setStartAddress(safeTrim(etPickup.getText()));
+            rreq.setEndAddress(safeTrim(etDestination.getText()));
+            rreq.setStops(buildStopsStringOrNull());
+            rreq.setDistanceKm(lastDistanceKm);
+            rreq.setEstimatedDurationMin(lastDurationMin);
+
+            routeApi.findOrCreate(rreq).enqueue(new retrofit2.Callback<RouteResponse>() {
+                @Override
+                public void onResponse(retrofit2.Call<RouteResponse> call, retrofit2.Response<RouteResponse> resp) {
+                    if (!resp.isSuccessful() || resp.body() == null || resp.body().getId() == null) {
+                        Toast.makeText(UserActivity.this, "Route create failed (" + resp.code() + ")", Toast.LENGTH_LONG).show();
+                        return;
+                    }
+
+                    Long routeId = resp.body().getId();
+
+                    FavoriteRouteCreateRequest freq = new FavoriteRouteCreateRequest();
+                    freq.setTitle(title);
+                    freq.setRouteId(routeId);
+                    freq.setVehicleType(mapVehicleType(actCarType.getText() == null ? "" : actCarType.getText().toString()));
+                    freq.setPetFriendly(((CheckBox) findViewById(R.id.cbPetFriendly)).isChecked());
+                    freq.setBabyFriendly(((CheckBox) findViewById(R.id.cbChildSeat)).isChecked());
+                    freq.setPassengersEmails(readPassengerEmails()); // može null
+
+                    favoriteApi.addFavorite(userId, freq).enqueue(new retrofit2.Callback<com.komsiluk.taxi.data.remote.favorite.FavoriteRouteResponse>() {
+                        @Override
+                        public void onResponse(retrofit2.Call<com.komsiluk.taxi.data.remote.favorite.FavoriteRouteResponse> call,
+                                               retrofit2.Response<com.komsiluk.taxi.data.remote.favorite.FavoriteRouteResponse> resp2) {
+                            if (!resp2.isSuccessful()) {
+                                Toast.makeText(UserActivity.this, "Add favorite failed (" + resp2.code() + ")", Toast.LENGTH_LONG).show();
+                                return;
+                            }
+                            Toast.makeText(UserActivity.this, "Added to favorites!", Toast.LENGTH_LONG).show();
+                            dialog.dismiss();
+                        }
+
+                        @Override
+                        public void onFailure(retrofit2.Call<com.komsiluk.taxi.data.remote.favorite.FavoriteRouteResponse> call, Throwable t) {
+                            Toast.makeText(UserActivity.this, "Network error: " + t.getMessage(), Toast.LENGTH_LONG).show();
+                        }
+                    });
+                }
+
+                @Override
+                public void onFailure(retrofit2.Call<RouteResponse> call, Throwable t) {
+                    Toast.makeText(UserActivity.this, "Network error: " + t.getMessage(), Toast.LENGTH_LONG).show();
+                }
+            });
+        });
 
         dialog.show();
     }
+
+    private String buildStopsStringOrNull() {
+        ArrayList<String> stops = new ArrayList<>();
+        for (int i = 0; i < chipStations.getChildCount(); i++) {
+            View c = chipStations.getChildAt(i);
+            if (c instanceof Chip) {
+                CharSequence t = ((Chip) c).getText();
+                if (t != null) {
+                    String s = t.toString().trim();
+                    if (!s.isEmpty()) stops.add(s);
+                }
+            }
+        }
+        if (stops.isEmpty()) return null;
+
+        return TextUtils.join("|", stops);
+    }
+
 
     private void setupBookButton() {
         btnBookRide.setOnClickListener(v -> {
