@@ -16,6 +16,8 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.komsiluk.taxi.R;
 
+import java.util.Locale;
+
 public class FavoriteDialogs {
 
     public interface VoidAction { void run(); }
@@ -25,8 +27,8 @@ public class FavoriteDialogs {
             Context ctx,
             FavoriteRide ride,
             Runnable onBook,
-            Runnable onRename,
-            Runnable onDelete
+            VoidAction onRename,
+            VoidAction onDelete
     ) {
         View v = LayoutInflater.from(ctx).inflate(R.layout.dialog_favorite_details, null, false);
 
@@ -86,8 +88,8 @@ public class FavoriteDialogs {
         tvPet.setText(ride.isPetFriendly() ? ctx.getString(R.string.yes) : ctx.getString(R.string.no));
         tvChild.setText(ride.isChildSeat() ? ctx.getString(R.string.yes) : ctx.getString(R.string.no));
 
-        tvKm.setText(ctx.getString(R.string.placeholder_kilometers));
-        tvTime.setText(ctx.getString(R.string.placeholder_time));
+        tvKm.setText(String.format(Locale.getDefault(), "%.1f km", ride.getDistanceKm()));
+        tvTime.setText(String.format(Locale.getDefault(), "%d min", ride.getEstimatedMin()));
         tvPrice.setText(ctx.getString(R.string.placeholder_price));
 
         AlertDialog dialog = new MaterialAlertDialogBuilder(ctx)
@@ -97,8 +99,16 @@ public class FavoriteDialogs {
         // ---- Buttons ----
         btnCancel.setOnClickListener(x -> dialog.dismiss());
 
-        btnChangeName.setOnClickListener(x -> onRename.run());
-        btnDel.setOnClickListener(x -> onDelete.run());
+        btnChangeName.setOnClickListener(x -> {
+            dialog.dismiss();
+            if (onRename != null) onRename.run();
+        });
+
+        btnDel.setOnClickListener(x -> {
+            dialog.dismiss();
+            if (onDelete != null) onDelete.run();
+        });
+
 
         btnBook.setOnClickListener(x -> {
             dialog.dismiss();
@@ -130,7 +140,6 @@ public class FavoriteDialogs {
     private static int dp(Context ctx, int dp) {
         return Math.round(dp * ctx.getResources().getDisplayMetrics().density);
     }
-
 
     public static void showRenameDialog(Context ctx, String oldName, StringAction onConfirm) {
         View v = View.inflate(ctx, R.layout.dialog_favorite_rename, null);

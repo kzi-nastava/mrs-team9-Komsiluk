@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.komsiluk.taxi.R;
 import com.komsiluk.taxi.data.remote.driver_history.DriverService;
-import com.komsiluk.taxi.data.remote.ride.RideResponseDTO;
+import com.komsiluk.taxi.data.remote.ride.RideResponse;
 import com.komsiluk.taxi.data.session.SessionManager;
 import com.komsiluk.taxi.ui.menu.BaseNavDrawerActivity;
 
@@ -80,12 +80,12 @@ public class DriverHistoryActivity extends BaseNavDrawerActivity {
         if (driverId == null) return;
 
         driverService.getDriverRideHistory(driverId, filterFrom, filterTo)
-                .enqueue(new Callback<Collection<RideResponseDTO>>() {
+                .enqueue(new Callback<Collection<RideResponse>>() {
                     @Override
-                    public void onResponse(Call<Collection<RideResponseDTO>> call, Response<Collection<RideResponseDTO>> response) {
+                    public void onResponse(Call<Collection<RideResponse>> call, Response<Collection<RideResponse>> response) {
                         if (response.isSuccessful() && response.body() != null) {
                             rideList.clear();
-                            for (RideResponseDTO dto : response.body()) {
+                            for (RideResponse dto : response.body()) {
                                 rideList.add(mapDtoToModel(dto));
                             }
                             adapter.notifyDataSetChanged();
@@ -93,7 +93,7 @@ public class DriverHistoryActivity extends BaseNavDrawerActivity {
                     }
 
                     @Override
-                    public void onFailure(Call<Collection<RideResponseDTO>> call, Throwable t) {
+                    public void onFailure(Call<Collection<RideResponse>> call, Throwable t) {
                         Toast.makeText(DriverHistoryActivity.this, "Network Error", Toast.LENGTH_SHORT).show();
                     }
                 });
@@ -124,7 +124,7 @@ public class DriverHistoryActivity extends BaseNavDrawerActivity {
             Toast.makeText(this, "Filteri su resetovani", Toast.LENGTH_SHORT).show();
         });
     }
-    private DriverRide mapDtoToModel(RideResponseDTO dto) {
+    private DriverRide mapDtoToModel(RideResponse dto) {
         // 1. Formatiranje vremena
         String startTime = dto.getStartTime() != null ? dto.getStartTime() : "";
         String datePart = startTime.contains("T") ? startTime.split("T")[0] : "N/A";

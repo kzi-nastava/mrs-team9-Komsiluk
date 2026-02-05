@@ -13,7 +13,8 @@ public class ScheduledRide implements Serializable {
     private final String carType;
     private final boolean petFriendly;
     private final boolean childSeat;
-
+    private final String km;
+    private final String time;
     private final String scheduledTime;
 
     public ScheduledRide(
@@ -25,6 +26,8 @@ public class ScheduledRide implements Serializable {
             String carType,
             boolean petFriendly,
             boolean childSeat,
+            String km,
+            String time,
             String scheduledTime
     ) {
         this.name = name;
@@ -35,6 +38,8 @@ public class ScheduledRide implements Serializable {
         this.carType = carType;
         this.petFriendly = petFriendly;
         this.childSeat = childSeat;
+        this.km = km;
+        this.time = time;
         this.scheduledTime = scheduledTime;
     }
 
@@ -46,5 +51,7 @@ public class ScheduledRide implements Serializable {
     public String getCarType() { return carType; }
     public boolean isPetFriendly() { return petFriendly; }
     public boolean isChildSeat() { return childSeat; }
+    public String getKm() { return km; }
+    public String getTime() { return time; }
     public String getScheduledTime() { return scheduledTime; }
 }

@@ -6,13 +6,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- MAP placeholder -->
-    <ImageView
-        android:id="@+id/imgMapPlaceholder"
+    <org.osmdroid.views.MapView
+        android:id="@+id/map"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scaleType="centerCrop"
-        android:src="@drawable/temp_map" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <!-- Bottom sheet -->
     <LinearLayout
@@ -28,7 +29,8 @@
         app:layout_behavior="@string/bottom_sheet_behavior"
         app:behavior_hideable="false"
         app:behavior_fitToContents="true"
-        app:behavior_peekHeight="72dp">
+        app:behavior_peekHeight="72dp"
+        android:layout_gravity="bottom">
 
         <!-- drag handle -->
         <View
@@ -91,19 +93,37 @@
                     android:textSize="16sp"
                     android:fontFamily="@font/roboto_serif_semibold" />
 
-                <EditText
-                    android:id="@+id/etPickup"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:minHeight="42dp"
-                    android:background="@drawable/bg_input_normal"
-                    android:paddingHorizontal="16dp"
-                    android:textColor="@color/text"
-                    android:textSize="16sp"
-                    android:fontFamily="@font/roboto_serif_medium"
-                    android:hint="@string/hint_pickup"
-                    android:textColorHint="@color/primary_dark"
-                    android:imeOptions="actionNext" />
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <EditText
+                        android:id="@+id/etPickup"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:minHeight="42dp"
+                        android:background="@drawable/bg_input_normal"
+                        android:paddingHorizontal="16dp"
+                        android:textColor="@color/text"
+                        android:textSize="16sp"
+                        android:fontFamily="@font/roboto_serif_medium"
+                        android:hint="@string/hint_pickup"
+                        android:textColorHint="@color/primary_dark"
+                        android:imeOptions="actionNext" />
+
+                    <ImageButton
+                        android:id="@+id/btnSearchPickup"
+                        android:layout_width="42dp"
+                        android:layout_height="42dp"
+                        android:layout_marginStart="10dp"
+                        android:background="@drawable/bg_icon_square"
+                        android:src="@drawable/search"
+                        app:tint="@color/primary"
+                        android:contentDescription="@string/cd_search_pickup"/>
+                </LinearLayout>
 
                 <!-- Stations header + add -->
                 <LinearLayout
@@ -149,19 +169,37 @@
                     android:textSize="16sp"
                     android:fontFamily="@font/roboto_serif_semibold" />
 
-                <EditText
-                    android:id="@+id/etDestination"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:minHeight="42dp"
-                    android:background="@drawable/bg_input_normal"
-                    android:paddingHorizontal="16dp"
-                    android:textColor="@color/text"
-                    android:textSize="16sp"
-                    android:fontFamily="@font/roboto_serif_medium"
-                    android:hint="@string/hint_destination"
-                    android:textColorHint="@color/primary_dark"
-                    android:imeOptions="actionNext" />
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <EditText
+                        android:id="@+id/etDestination"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:minHeight="42dp"
+                        android:background="@drawable/bg_input_normal"
+                        android:paddingHorizontal="16dp"
+                        android:textColor="@color/text"
+                        android:textSize="16sp"
+                        android:fontFamily="@font/roboto_serif_medium"
+                        android:hint="@string/hint_destination"
+                        android:textColorHint="@color/primary_dark"
+                        android:imeOptions="actionNext" />
+
+                    <ImageButton
+                        android:id="@+id/btnSearchDestination"
+                        android:layout_width="42dp"
+                        android:layout_height="42dp"
+                        android:layout_marginStart="10dp"
+                        android:background="@drawable/bg_icon_square"
+                        android:src="@drawable/search"
+                        app:tint="@color/primary"
+                        android:contentDescription="@string/cd_search_destination"/>
+                </LinearLayout>
 
                 <!-- Users header + add -->
                 <LinearLayout
@@ -206,7 +244,6 @@
                     android:textSize="16sp"
                     android:fontFamily="@font/roboto_serif_semibold" />
 
-                <!-- pravi dropdown: AutoComplete + arrow icon -->
                 <AutoCompleteTextView
                     android:id="@+id/actCarType"
                     android:layout_width="match_parent"
@@ -310,7 +347,6 @@
                     android:textColorHint="@color/primary_dark"
                     android:visibility="gone" />
 
-                <!-- Summary rows (ikonice iz drawable, bez emoji) -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -335,7 +371,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="10dp"
-                            android:text="@string/placeholder_kilometers"
+                            android:text="@string/placeholder_kilometers_empty"
                             android:textColor="@color/white"
                             android:textSize="@dimen/fs_md"
                             android:fontFamily="@font/roboto_serif_medium"/>
@@ -360,7 +396,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="10dp"
-                            android:text="@string/placeholder_drive_time"
+                            android:text="@string/placeholder_drive_time_empty"
                             android:textColor="@color/white"
                             android:textSize="@dimen/fs_md"
                             android:fontFamily="@font/roboto_serif_medium"/>

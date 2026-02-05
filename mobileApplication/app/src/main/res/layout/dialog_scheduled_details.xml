@@ -252,7 +252,7 @@
                     android:id="@+id/tvSchKm"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/placeholder_kilometers"
+                    android:text="@string/placeholder_kilometers_empty"
                     android:textColor="@color/white"
                     android:textSize="@dimen/fs_md"
                     android:fontFamily="@font/roboto_serif_medium" />
@@ -276,7 +276,7 @@
                     android:id="@+id/tvSchTime"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/placeholder_time"
+                    android:text="@string/placeholder_drive_time_empty"
                     android:textColor="@color/white"
                     android:textSize="@dimen/fs_md"
                     android:fontFamily="@font/roboto_serif_medium" />
