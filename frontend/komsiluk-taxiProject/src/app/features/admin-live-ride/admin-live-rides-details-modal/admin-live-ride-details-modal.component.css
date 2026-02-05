@@ -1,0 +1,110 @@
+.rh-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  background: rgba(0,0,0,0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+}
+
+.rh-modal__dialog {
+  width: min(1040px, 96vw);
+  background: rgba(0,0,0,0.92);
+  border: 3px solid var(--color-secondary);
+  border-radius: 10px;
+  box-shadow: 0 18px 60px rgba(0,0,0,0.7);
+  overflow: hidden;
+}
+
+.rh-modal__content {
+  display: grid;
+  grid-template-columns: 260px 1fr 320px;
+  gap: 18px;
+  padding: 20px;
+}
+
+.rh-title {
+  font-size: 14px;
+  font-weight: 800;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  padding-bottom: 5px;
+}
+
+.rh-title--spaced { margin-top: 25px; }
+
+.rh-list { list-style: none; padding: 0; }
+.rh-list li { padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+
+.rh-map-container {
+  width: 100%;
+  height: 400px;
+  overflow: hidden;
+  border-radius: 12px;
+}
+
+/* Pregazi fiksnu visinu iz ride-details-map.component.css */
+.rh-map-container ::ng-deep .ride-details-map {
+  height: 100% !important;
+}
+.details-bottom-row {
+  display: flex;
+  justify-content: center;
+  margin-top: 15px;
+}
+
+.rh-info__row { margin-bottom: 12px; display: flex; flex-direction: column; }
+.rh-label { font-size: 11px; text-transform: uppercase; opacity: 0.9; }
+.rh-value { font-size: 14px; }
+
+.rh-stats {
+  margin-top: 25px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.rh-stat { display: flex; align-items: center; gap: 10px; }
+
+.details-bottom-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  margin-top: 20px;
+  width: 100%;
+}
+
+.close-btn-komsiluk {
+  background: var(--color-secondary);
+  color: #111;
+  border: none;
+  border-radius: 999px;
+  padding: 10px 40px;
+  font-weight: 800;
+  font-size: 14px;
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: transform 0.2s ease;
+  width: fit-content; 
+}
+
+.close-btn-komsiluk:hover {
+  transform: scale(1.05);
+  background: #fff;
+}
+
+.stat-item-komsiluk {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 15px;
+}
+
+.rh-icon {
+  width: 22px;
+  height: 22px;
+  filter: invert(1);
+}

@@ -132,5 +132,12 @@ public class RideController {
         );
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/active/all")
+    public ResponseEntity<Collection<RideResponseDTO>> getAllActiveRides() {
+        Collection<RideResponseDTO> activeRides = rideService.getAllActiveRides();
+        return new ResponseEntity<>(activeRides, HttpStatus.OK);
+    }
+
 }
 

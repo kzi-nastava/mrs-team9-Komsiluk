@@ -1,0 +1,91 @@
+:host {
+  display: block;
+  margin-bottom: 12px;
+}
+
+.ride-card {
+  display: grid;
+  grid-template-columns: 200px 1fr 200px;
+  gap: 20px;
+  background: rgba(0, 0, 0, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 16px 20px;
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  align-items: stretch;
+}
+
+.ride-card:hover {
+  background: rgba(0, 0, 0, 0.8);
+  border-color: #ffff00;
+}
+
+.ride-card__col--driver {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.ride-card__driver-label {
+  font-size: 10px;
+  color: #ffff00;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+.ride-card__driver-name {
+  font-size: 16px;
+  font-weight: 700;
+  margin: 4px 0;
+}
+
+.ride-card__date { font-size: 12px; opacity: 0.6; }
+.ride-card__time-range { font-size: 14px; font-weight: 600; }
+
+/* RUTA */
+.ride-card__col--route {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.route-step { display: flex; align-items: center; gap: 10px; }
+.route-dot { width: 8px; height: 8px; border-radius: 50%; }
+.route-dot--start { background: #ffff00; }
+.route-dot--end { background: #ff4444; }
+.route-line { width: 1px; height: 15px; background: rgba(255,255,255,0.2); margin-left: 3.5px; }
+.route-label { font-size: 9px; opacity: 0.5; text-transform: uppercase; }
+.route-address { font-size: 13px; }
+
+/* TREĆA KOLONA */
+.ride-card__col--stats {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.ride-info-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: right;
+}
+
+.info-item { font-size: 12px; }
+.info-label { opacity: 0.6; margin-right: 5px; }
+.info-value { font-weight: 600; }
+.price-value { font-size: 17px; font-weight: 800; color: #ffff00; }
+
+.ride-card__details-btn {
+  background: #ffff00;
+  color: #111;
+  border: none;
+  border-radius: 20px;
+  padding: 6px 18px;
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+  margin-top: 10px;
+}

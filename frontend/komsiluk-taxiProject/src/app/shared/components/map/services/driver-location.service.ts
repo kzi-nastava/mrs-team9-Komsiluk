@@ -29,4 +29,8 @@ updateLocation(driverId: number, lat: number, lng: number) {
   return this.http.put<void>(`${this.API}/${driverId}/location`, { lat, lng });
 }
 
+getOneDriverLocation(driverId: number): Observable<any> {
+    return this.http.get<any>(`${this.API}/${driverId}/location`);
+  }
+
 }
