@@ -10,6 +10,8 @@ import com.komsiluk.taxi.auth.UserRole;
 import com.komsiluk.taxi.data.remote.auth.AuthService;
 import com.komsiluk.taxi.data.remote.auth.LoginRequest;
 import com.komsiluk.taxi.data.remote.auth.LoginResponse;
+import com.komsiluk.taxi.data.remote.location.DriverLocationUpdate;
+import com.komsiluk.taxi.data.remote.location.LocationService;
 import com.komsiluk.taxi.data.session.SessionManager;
 import com.komsiluk.taxi.util.Event;
 
@@ -42,13 +44,17 @@ public class LoginViewModel extends ViewModel {
 
     private SessionManager sessionManager;
 
+    private  LocationService locationService;
+
     @Inject
     public LoginViewModel(
             AuthService authService,
-            SessionManager sessionManager
+            SessionManager sessionManager,
+            LocationService locationService
     ) {
         this.authService = authService;
         this.sessionManager = sessionManager;
+        this.locationService = locationService;
     }
 
     public void login(String email, String password) {
@@ -78,4 +84,21 @@ public class LoginViewModel extends ViewModel {
         });
     }
 
+    public void sendInitialLocation(double lat, double lng) {
+        Long driverId = sessionManager.getUserId();
+        if (driverId == -1L) return;
+        DriverLocationUpdate dto = new DriverLocationUpdate(lat,lng);
+
+        locationService.updateLocation(driverId, dto).enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                Log.d("START_LOCATION", "Initial location sent to Uspenska St.");
+            }
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+                Log.e("START_LOCATION", "Failed to send initial location");
+            }
+        });
+    }
 }
