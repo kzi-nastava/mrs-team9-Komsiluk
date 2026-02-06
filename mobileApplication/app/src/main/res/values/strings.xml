@@ -61,7 +61,7 @@
     <string name="profile_unknown">Unknown</string>
     <string name="profile_pet_friendly_fmt">Pet friendly: %1$s</string>
     <string name="profile_child_seat_fmt">Child seat available: %1$s</string>
-    <string name="profile_active_minutes_fmt">Active today: %1$d min</string>
+    <string name="profile_active_minutes_fmt">Active today: %1$s</string>
 
     <string name="nav_left">Left action</string>
     <string name="nav_right">Right action</string>
