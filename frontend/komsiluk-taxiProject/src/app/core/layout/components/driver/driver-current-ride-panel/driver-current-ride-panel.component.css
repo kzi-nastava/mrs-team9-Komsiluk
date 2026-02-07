@@ -83,3 +83,57 @@
   display: contents; 
 }
 
+.cr-creator{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: 100%;
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+
+.cr-creator__avatar{
+  width: 50px;
+  height: 50px;
+  flex: 0 0 50px;
+  border-radius: 50%;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  background: var(--color-white);
+  border: 2px solid var(--color-secondary);
+}
+
+.cr-creator__img{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.cr-creator__icon{
+  width: 22px;
+  height: 22px;
+  fill: var(--color-secondary);
+}
+
+.cr-creator__info{
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow: hidden;
+}
+
+.cr-creator__name,
+.cr-creator__email{
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.cr-creator__email{
+  opacity: 0.9;
+  font-size: var(--fs-sm);
+}
