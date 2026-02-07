@@ -3,7 +3,7 @@ package com.komsiluk.taxi.data.remote.inconsistency_report;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class InconsistencyReportResponseDTO {
+public class InconsistencyReportResponse {
 
     @SerializedName("id") @Expose
     private Long id;
