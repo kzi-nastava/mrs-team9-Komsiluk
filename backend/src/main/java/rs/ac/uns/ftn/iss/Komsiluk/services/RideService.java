@@ -64,6 +64,8 @@ public class RideService implements IRideService {
     private PricingRepository pricingRepository;
     @Autowired
     private RideDTOMapper  rideDTOMapper;
+    @Autowired
+    private DriverService driverService;
     
     private static final long MAX_MINUTES_LAST_24H = 480;
 
@@ -589,6 +591,8 @@ public class RideService implements IRideService {
 
         rideRepository.save(ride);
 
+        driverService.updateDriverStatus(ride.getDriver().getId(), DriverStatus.ACTIVE);
+
         NotificationCreateDTO notificationDTODriver = new NotificationCreateDTO();
         notificationDTODriver.setUserId(ride.getDriver().getId());
         notificationDTODriver.setType(NotificationType.RIDE_STOPPED);
@@ -765,16 +769,15 @@ public class RideService implements IRideService {
                     Comparator.comparing(Ride::getEndTime,
                             Comparator.nullsLast(LocalDateTime::compareTo));
 
+            case ROUTE ->
+                    Comparator.comparing(this::buildRouteString, String.CASE_INSENSITIVE_ORDER);
+
             case START_ADDRESS ->
-                    Comparator.comparing(r -> r.getRoute().getStartAddress(),
-                            Comparator.nullsLast(String::compareToIgnoreCase));
+                    Comparator.comparing(r -> extractStreet(r.getRoute().getStartAddress()),
+                            String.CASE_INSENSITIVE_ORDER);
 
             case END_ADDRESS ->
-                    Comparator.comparing(r -> r.getRoute().getEndAddress(),
-                            Comparator.nullsLast(String::compareToIgnoreCase));
-
-            case ROUTE ->
-                    Comparator.comparing(this::buildRouteString,
+                    Comparator.comparing(r -> extractStreet(r.getRoute().getEndAddress()),
                             String.CASE_INSENSITIVE_ORDER);
 
             case CANCELLED ->
@@ -786,16 +789,30 @@ public class RideService implements IRideService {
 
             case PANIC ->
                     Comparator.comparing(Ride::isPanicTriggered);
+
+            default -> Comparator.comparing(Ride::getCreatedAt).reversed();
         };
     }
 
+
     private String buildRouteString(Ride ride) {
-        Route r = ride.getRoute();
-        return String.join(" | ",
-                r.getStartAddress(),
-                r.getStops() == null ? "" : r.getStops(),
-                r.getEndAddress()
-        );
+        Route route = ride.getRoute();
+        if (route == null) return "";
+
+        String start = extractStreet(route.getStartAddress());
+
+        String stops = route.toFormattedString();
+
+        String end = extractStreet(route.getEndAddress());
+
+        return start + stops + end;
+    }
+
+    private String extractStreet(String fullAddress) {
+        if (fullAddress == null || fullAddress.isBlank()) {
+            return "";
+        }
+        return fullAddress.split(",")[0].trim();
     }
 
     @Override

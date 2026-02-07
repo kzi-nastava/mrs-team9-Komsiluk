@@ -113,6 +113,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".driver.history.DriverHistoryActivity" />
+
+        <activity
+            android:name=".ui.passenger.ride_history.PassengerRideHistoryActivity"
+            android:exported="false"/>
         <activity android:name=".ui.driver_history.DriverHistoryActivity" />
     </application>
 
