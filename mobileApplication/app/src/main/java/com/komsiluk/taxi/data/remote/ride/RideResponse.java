@@ -62,6 +62,10 @@ public class RideResponse {
     @Expose
     private String scheduledAt;
 
+    @SerializedName("creatorId")
+    @Expose
+    private Long creatorId;
+
     public Long getId() { return id; }
     public String getStatus() { return status; }
     public String getStartTime() { return startTime; }
@@ -79,5 +83,5 @@ public class RideResponse {
     public boolean isBabyFriendly() { return babyFriendly; }
     public boolean isPetFriendly() { return petFriendly; }
     public String getScheduledAt() { return scheduledAt; }
-
+    public Long getCreatorId() { return creatorId; }
 }

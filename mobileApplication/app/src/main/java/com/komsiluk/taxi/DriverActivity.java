@@ -9,18 +9,22 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 
+import com.bumptech.glide.Glide;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.komsiluk.taxi.data.remote.location.DriverLocationResponse;
 import com.komsiluk.taxi.data.remote.location.DriverLocationUpdate;
 import com.komsiluk.taxi.data.remote.location.LocationService;
+import com.komsiluk.taxi.data.remote.profile.UserProfileResponse;
+import com.komsiluk.taxi.data.remote.profile.UserService;
 import com.komsiluk.taxi.data.remote.ride.RideResponse;
 import com.komsiluk.taxi.data.remote.ride.RideService;
 import com.komsiluk.taxi.data.session.SessionManager;
@@ -112,6 +116,13 @@ public class DriverActivity extends BaseNavDrawerActivity {
 
     @Inject
     OkHttpClient okHttpClient;
+    private View rowPassenger;
+    private ImageView ivPassenger;
+    private TextView tvPassengerName;
+    private TextView tvPassengerEmail;
+
+    @Inject
+    UserService userService;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -143,6 +154,11 @@ public class DriverActivity extends BaseNavDrawerActivity {
 
         tvPickupValue = findViewById(R.id.tvPickupValue);
         tvDestinationValue = findViewById(R.id.tvDestinationValue);
+
+        rowPassenger = findViewById(R.id.rowPassenger);
+        ivPassenger = findViewById(R.id.ivPassenger);
+        tvPassengerName = findViewById(R.id.tvPassengerName);
+        tvPassengerEmail = findViewById(R.id.tvPassengerEmail);
 
         rowStartCancel = findViewById(R.id.rowStartCancel);
         rowInRide = findViewById(R.id.rowInRide);
@@ -231,9 +247,9 @@ public class DriverActivity extends BaseNavDrawerActivity {
                 tvPickupValue.setText(pickup);
                 tvDestinationValue.setText(dest);
 
-                rideStartedUi = isRideActiveStatus(currentRide.getStatus());
-                applyRideButtonsUi();
+                bindCreatorProfile(currentRide.getCreatorId());
 
+                rideStartedUi = isRideActiveStatus(currentRide.getStatus());
                 applyRideButtonsUi();
 
                 sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
@@ -246,6 +262,55 @@ public class DriverActivity extends BaseNavDrawerActivity {
                 sheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
             }
         });
+    }
+
+    private void bindCreatorProfile(Long creatorId) {
+        if (rowPassenger != null) rowPassenger.setVisibility(View.GONE);
+
+        if (creatorId == null || userService == null) return;
+
+        userService.getProfile(creatorId).enqueue(new Callback<UserProfileResponse>() {
+            @Override
+            public void onResponse(Call<UserProfileResponse> call, Response<UserProfileResponse> resp) {
+                if (!resp.isSuccessful() || resp.body() == null) return;
+
+                UserProfileResponse p = resp.body();
+
+                String first = safe(p.getFirstName());
+                String last  = safe(p.getLastName());
+                String fullName = (first + " " + last).trim();
+                if (fullName.isEmpty()) fullName = "(Unknown passenger)";
+
+                if (tvPassengerName != null) tvPassengerName.setText(fullName);
+                if (tvPassengerEmail != null) tvPassengerEmail.setText(safe(p.getEmail()));
+
+                String rel = safe(p.getProfileImageUrl());
+                if (!rel.isEmpty() && ivPassenger != null) {
+                    String url = buildAbsoluteImageUrl(rel);
+
+                    Glide.with(DriverActivity.this)
+                            .load(url)
+                            .placeholder(R.drawable.ic_launcher_foreground)
+                            .error(R.drawable.ic_launcher_foreground)
+                            .circleCrop()
+                            .into(ivPassenger);
+                } else if (ivPassenger != null) {
+                    ivPassenger.setImageResource(R.drawable.ic_launcher_foreground);
+                }
+
+                if (rowPassenger != null) rowPassenger.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onFailure(Call<UserProfileResponse> call, Throwable t) {
+            }
+        });
+    }
+
+    private String buildAbsoluteImageUrl(String relativePath) {
+        String rel = relativePath.startsWith("/") ? relativePath.substring(1) : relativePath;
+        String base = "http://"+ BuildConfig.IP_ADDR +":8081/";
+        return base + rel;
     }
 
     private boolean isRideActiveStatus(String statusRaw) {

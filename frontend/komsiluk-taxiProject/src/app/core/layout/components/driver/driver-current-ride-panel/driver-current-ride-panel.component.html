@@ -12,6 +12,28 @@
   }
 
   @if (hasRide() && !loading()) {
+
+    <div class="cr-creator">
+      <div class="cr-creator__avatar" aria-hidden="true">
+        @if (creatorAvatarSrc()) {
+          <img class="cr-creator__img" [src]="creatorAvatarSrc()!" alt="Passenger" />
+        } @else {
+          <svg viewBox="0 0 24 24" class="cr-creator__icon">
+            <path d="M12 12c2.21 0 4-1.79 4-4S14.21 4 12 4 8 5.79 8 8s1.79 4 4 4zm0 2c-3.33 0-8 1.67-8 5v1h16v-1c0-3.33-4.67-5-8-5z"></path>
+          </svg>
+        }
+      </div>
+
+      <div class="cr-creator__info">
+        <div class="cr-creator__name text-semibold">
+          {{ creatorLoading() ? 'Loading...' : creatorName() }}
+        </div>
+        <div class="cr-creator__email text-regular">
+          {{ creatorLoading() ? '' : creatorEmail() }}
+        </div>
+      </div>
+    </div>
+
     <div class="cr-field">
       <div class="cr-label text-regular">Pickup location</div>
       <input class="cr-input text-medium" type="text" formControlName="pickup" />

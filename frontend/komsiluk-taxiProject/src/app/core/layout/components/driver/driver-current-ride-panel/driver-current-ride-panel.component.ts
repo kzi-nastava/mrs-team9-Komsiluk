@@ -13,6 +13,8 @@ import { MapFacadeService } from '../../../../../shared/components/map/services/
 import { InconsistencyReportModalComponent } from '../../../../../features/ride/components/inconsistency-report-modal/inconsistency-report-modal.component';
 import { PanicModalService } from '../../../../../shared/components/modal-shell/services/panic-modal-service';
 import { StopRideService } from '../../../../../shared/components/modal-shell/services/stop-ride-service';
+import { ProfileService } from '../../../../../features/profile/services/profile.service';
+import { UserProfileResponseDTO } from '../../../../../shared/models/profile.models';
 
 type Waypoint = { lat: number; lon: number; label?: string };
 
@@ -44,7 +46,26 @@ export class DriverCurrentRidePanelComponent implements OnInit {
 
   private pickupCoordCache: { rideId: number; lat: number; lon: number } | null = null;
 
-  
+  creator = signal<UserProfileResponseDTO | null>(null);
+  creatorLoading = signal(false);
+
+  creatorName = computed(() => {
+    const p = this.creator();
+    return p ? `${p.firstName} ${p.lastName}` : '—';
+  });
+
+  creatorEmail = computed(() => this.creator()?.email ?? '—');
+
+  creatorAvatarSrc = computed(() => {
+    const url = this.creator()?.profileImageUrl;
+    if (!url) return null;
+
+    if (url.startsWith('http://') || url.startsWith('https://')) return url;
+
+    const base = 'http://localhost:8081/';
+    const cleaned = url.startsWith('/') ? url.slice(1) : url;
+    return base + cleaned;
+  });
 
   constructor(
     private fb: FormBuilder,
@@ -55,6 +76,7 @@ export class DriverCurrentRidePanelComponent implements OnInit {
     private cdr: ChangeDetectorRef,
     private geo: GeocodingService,
     private mapFacade: MapFacadeService,
+    private profileService: ProfileService
   ) {
     this.form = this.fb.group({
       pickup: [{ value: '', disabled: true }],
@@ -91,6 +113,7 @@ export class DriverCurrentRidePanelComponent implements OnInit {
       if (!resp || resp.status === 204) {
         this.ride.set(null);
         this.fillForm(null);
+        this.creator.set(null);
 
         this.lastRideIdForDriveTo = null;
         this.pickupCoordCache = null;
@@ -105,8 +128,26 @@ export class DriverCurrentRidePanelComponent implements OnInit {
       const dto = resp.body as RideResponseDTO;
       this.ride.set(dto);
       this.fillForm(dto);
+      this.loadCreator(dto.creatorId);
 
       this.maybeDriveToPickup(dto);
+    });
+  }
+
+  private loadCreator(creatorId: number) {
+    if (!creatorId) {
+      this.creator.set(null);
+      return;
+    }
+
+    this.creatorLoading.set(true);
+
+    this.profileService.getProfileById(creatorId).pipe(
+      catchError(() => of(null)),
+      finalize(() => this.creatorLoading.set(false))
+    ).subscribe((p) => {
+      this.creator.set(p);
+      queueMicrotask(() => this.cdr.detectChanges());
     });
   }
 
@@ -304,7 +345,6 @@ private cleanupAfterRideEnd(stoppedRide: RideResponseDTO) {
   
   setTimeout(() => {
     this.refresh();
-    // Resetujemo okidač u servisu da ne bi ponovo opalio pri sledećem otvaranju panela
     this.stopRideSvc.rideStoppedTrigger.set(null); 
   }, 2000);
 }
