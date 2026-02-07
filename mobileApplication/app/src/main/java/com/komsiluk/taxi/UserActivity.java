@@ -4,6 +4,8 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,6 +14,8 @@ import android.widget.AutoCompleteTextView;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -27,6 +31,7 @@ import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.gson.Gson;
+import com.komsiluk.taxi.data.remote.location.DriverLocationResponse;
 import com.komsiluk.taxi.data.remote.passenger_ride_history.PassengerRideDetailsDTO;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.komsiluk.taxi.auth.AuthManager;
@@ -36,7 +41,10 @@ import com.komsiluk.taxi.data.remote.favorite.FavoriteRouteCreateRequest;
 import com.komsiluk.taxi.data.remote.favorite.FavoriteService;
 import com.komsiluk.taxi.data.remote.profile.UserBlockedResponse;
 import com.komsiluk.taxi.data.remote.profile.UserService;
+import com.komsiluk.taxi.data.remote.ride.AdminRideDetails;
 import com.komsiluk.taxi.data.remote.ride.RideCreateRequest;
+import com.komsiluk.taxi.data.remote.ride.RidePassengerActive;
+import com.komsiluk.taxi.data.remote.ride.RideService;
 import com.komsiluk.taxi.data.remote.route.RouteCreateRequest;
 import com.komsiluk.taxi.data.remote.route.RouteResponse;
 import com.komsiluk.taxi.data.remote.route.RouteService;
@@ -114,6 +122,11 @@ public class UserActivity extends BaseNavDrawerActivity {
     private GeoPoint pickupPoint;
     private GeoPoint destPoint;
 
+    private View layoutOrderForm, layoutActiveRide;
+    private TextView tvActiveDriverName, tvActiveDriverEmail, tvActivePickup, tvActiveDestination;
+    private LinearLayout layoutActiveStops;
+    private ImageView ivActiveDriver;
+
     private static final GeoPoint NOVI_SAD_CENTER = new GeoPoint(45.2671, 19.8335);
 
     private static final BoundingBox NS_BOX = new BoundingBox(
@@ -134,6 +147,12 @@ public class UserActivity extends BaseNavDrawerActivity {
 
     private FavoritesViewModel favVm;
 
+    private Handler activeRideHandler = new Handler(Looper.getMainLooper());
+    private Runnable activeRideRunnable;
+    private Marker driverMarker;
+    private Long activeRideId = null;
+    private Long assignedDriverId = null;
+
     @Inject
     FavoriteService favoriteApi;
     @Inject
@@ -142,6 +161,12 @@ public class UserActivity extends BaseNavDrawerActivity {
     BlockService blockApi;
     @Inject
     UserService userApi;
+
+    @Inject
+    RideService rideApi;
+
+    @Inject
+    com.komsiluk.taxi.data.remote.location.LocationService locationApi;
 
     private static class PlaceAdapter extends android.widget.BaseAdapter {
         private final Context ctx;
@@ -258,6 +283,15 @@ public class UserActivity extends BaseNavDrawerActivity {
 
         rbNow = findViewById(R.id.rbNow);
         rbScheduled = findViewById(R.id.rbScheduled);
+
+        layoutOrderForm = findViewById(R.id.layoutOrderForm);
+        layoutActiveRide = findViewById(R.id.layoutActiveRide);
+        tvActiveDriverName = findViewById(R.id.tvActiveDriverName);
+        tvActiveDriverEmail = findViewById(R.id.tvActiveDriverEmail);
+        tvActivePickup = findViewById(R.id.tvActivePickup);
+        tvActiveDestination = findViewById(R.id.tvActiveDestination);
+        layoutActiveStops = findViewById(R.id.layoutActiveStops);
+        ivActiveDriver = findViewById(R.id.ivActiveDriver);
 
         btnFavorite = findViewById(R.id.btnFavorite);
 
@@ -1511,6 +1545,201 @@ public class UserActivity extends BaseNavDrawerActivity {
             t.add(Calendar.MINUTE, stepMin);
         }
         return slots;
+    }
+
+    private void checkForActiveRide() {
+        // Ako već imamo aktivnu vožnju, ne pokrećemo proveru ponovo
+        if (activeRideId != null) return;
+
+        rideApi.getPassengerActiveRide().enqueue(new Callback<RidePassengerActive>() {
+            @Override
+            public void onResponse(Call<RidePassengerActive> call, Response<RidePassengerActive> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    // VOŽNJA JE DETEKTOVANA
+                    activeRideId = response.body().getRideId();
+                    assignedDriverId = response.body().getDriverId();
+
+                    loadRideDetailsAndDraw(activeRideId);
+                    startDriverTracking();
+
+                    sheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+                } else {
+                    activeRideHandler.postDelayed(() -> checkForActiveRide(), 2000);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<RidePassengerActive> call, Throwable t) {
+                // Greška u mreži, pokušaj ponovo za 5 sekundi
+                activeRideHandler.postDelayed(() -> checkForActiveRide(), 2000);
+            }
+        });
+    }
+    private void loadRideDetailsAndDraw(Long rideId) {
+        rideApi.getRideDetails(rideId).enqueue(new Callback<AdminRideDetails>() {
+            @Override
+            public void onResponse(Call<AdminRideDetails> call, Response<AdminRideDetails> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    AdminRideDetails details = response.body();
+
+                    tvActiveDriverName.setText(details.getDriver().getFirstName() + " " + details.getDriver().getLastName());
+                    tvActiveDriverEmail.setText(details.getDriver().getEmail());
+                    tvActivePickup.setText(details.getRoute().getStartAddress());
+                    tvActiveDestination.setText(details.getRoute().getEndAddress());
+
+                    // 1. Izvlačenje stanica iz stringa "Adresa1|Adresa2"
+                    List<String> stopsList = new ArrayList<>();
+                    if (details.getRoute() != null && details.getRoute().getStops() != null
+                            && !details.getRoute().getStops().isEmpty()) {
+
+                        String[] stopsArray = details.getRoute().getStops().split("\\|");
+                        for (String s : stopsArray) {
+                            stopsList.add(s.trim());
+                            addStopToActivePanel(s.trim());
+                        }
+                    }
+
+                    // 2. Crtanje rute koja sada UKLJUČUJE stanice
+                    geocodeAndDrawRoute(
+                            details.getRoute().getStartAddress(),
+                            details.getRoute().getEndAddress(),
+                            stopsList
+                    );
+
+                    layoutOrderForm.setVisibility(View.GONE);
+                    layoutActiveRide.setVisibility(View.VISIBLE);
+                }
+            }
+            @Override public void onFailure(Call<AdminRideDetails> call, Throwable t) {}
+        });
+    }
+    private void addStopToActivePanel(String address) {
+        TextView label = new TextView(this);
+        label.setText("Stanica");
+        label.setTextColor(android.graphics.Color.WHITE);
+        label.setPadding(0, 10, 0, 0);
+
+        TextView value = new TextView(this);
+        value.setText(address);
+        value.setBackgroundResource(R.drawable.bg_input_normal);
+        value.setPadding(32, 24, 32, 24);
+        value.setTextColor(getResources().getColor(R.color.text));
+
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        params.setMargins(0, 0, 0, 20);
+
+        layoutActiveStops.addView(label);
+        layoutActiveStops.addView(value, params);
+    }
+
+
+    private void startDriverTracking() {
+        activeRideRunnable = new Runnable() {
+            @Override
+            public void run() {
+                if (assignedDriverId == null) return;
+
+                // KORAK 1: Proveri da li je vožnja i dalje aktivna za mene (putnika)
+                rideApi.getPassengerActiveRide().enqueue(new Callback<RidePassengerActive>() {
+                    @Override
+                    public void onResponse(Call<RidePassengerActive> call, Response<RidePassengerActive> rideResp) {
+
+                        // Ako backend vrati 204 (No Content) ili response nije successful, vožnja je gotova
+                        if (rideResp.code() == 204 || !rideResp.isSuccessful() || rideResp.body() == null) {
+                            stopRideAndCleanup();
+                            return;
+                        }
+
+                        // KORAK 2: Ako je vožnja još aktivna, tek onda crtaj lokaciju vozača
+                        locationApi.getSpecificDriverLocation(assignedDriverId).enqueue(new Callback<DriverLocationResponse>() {
+                            @Override
+                            public void onResponse(Call<DriverLocationResponse> call, Response<DriverLocationResponse> locResp) {
+                                if (locResp.isSuccessful() && locResp.body() != null) {
+                                    updateDriverMarker(new GeoPoint(locResp.body().getLat(), locResp.body().getLng()));
+
+                                    // Zakazujemo sledeći krug za 3 sekunde
+                                    activeRideHandler.postDelayed(activeRideRunnable, 3000);
+                                }
+                            }
+                            @Override public void onFailure(Call<DriverLocationResponse> call, Throwable t) {
+                                activeRideHandler.postDelayed(activeRideRunnable, 3000);
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onFailure(Call<RidePassengerActive> call, Throwable t) {
+                        activeRideHandler.postDelayed(activeRideRunnable, 3000);
+                    }
+                });
+            }
+        };
+        activeRideHandler.post(activeRideRunnable);
+    }
+    private void updateDriverMarker(GeoPoint position) {
+        if (driverMarker == null) {
+            driverMarker = new Marker(map);
+            driverMarker.setIcon(getDrawable(R.drawable.taxi_busy)); // Plava/zauzeta ikonica
+            driverMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+            driverMarker.setTitle("Vaš vozač");
+            map.getOverlays().add(driverMarker);
+        }
+        driverMarker.setPosition(position);
+        map.invalidate();
+    }
+
+    private void stopRideAndCleanup() {
+        // 1. Zaustavi polling lokacije vozača
+        if (activeRideHandler != null && activeRideRunnable != null) {
+            activeRideHandler.removeCallbacks(activeRideRunnable);
+        }
+
+        // 2. Ukloni marker vozača
+        if (driverMarker != null) {
+            map.getOverlays().remove(driverMarker);
+            driverMarker = null;
+        }
+
+        // 3. Očisti rutu (plavu liniju) i ostale markere ako želiš
+        clearRouteAndStats();
+        removeMarker(true);
+        removeMarker(false);
+
+        for (Marker m : stationMarkers) {
+            map.getOverlays().remove(m);
+        }
+        stationMarkers.clear();
+        stationPoints.clear();
+
+        // 4. Resetuj ID-eve
+        activeRideId = null;
+        assignedDriverId = null;
+
+        // 5. Ponovo prikaži panel za naručivanje i pokreni proveru za nove vožnje
+        layoutOrderForm.setVisibility(View.VISIBLE);
+        layoutActiveRide.setVisibility(View.GONE);
+        sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+        map.invalidate();
+
+        Toast.makeText(this, "Ride has finished successfully.", Toast.LENGTH_LONG).show();
+
+
+        checkForActiveRide();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        checkForActiveRide();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (activeRideHandler != null) {
+            activeRideHandler.removeCallbacksAndMessages(null);
+        }
     }
 
     interface OnValueAdded {

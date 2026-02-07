@@ -23,4 +23,10 @@ public interface RideService {
 
     @POST("rides/{id}/finish")
     Call<RideResponse> finishRide(@Path("id") Long rideId);
+
+    @GET("rides/passenger/active")
+    Call<RidePassengerActive> getPassengerActiveRide();
+
+    @GET("rides/{rideId}")
+    Call<AdminRideDetails> getRideDetails(@Path("rideId") Long rideId);
 }

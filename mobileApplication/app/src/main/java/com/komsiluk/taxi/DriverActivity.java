@@ -227,14 +227,12 @@ public class DriverActivity extends BaseNavDrawerActivity {
 
                 if (currentRide != null && !isRideActiveStatus(currentRide.getStatus())) {
                     if (myLocationMarker != null) {
-                        Log.d("SIMULATION", "Pokrećem animaciju ka pickup-u");
                         double myLat = myLocationMarker.getPosition().getLatitude();
                         double myLng = myLocationMarker.getPosition().getLongitude();
                         String pickupAddress = currentRide.getStartAddress();
 
                         getCoordinatesAndAnimate(pickupAddress, myLat, myLng);
                     } else {
-                        Log.e("SIMULATION", "Marker lokacije je NULL, odlažem animaciju");
                         new Handler(Looper.getMainLooper()).postDelayed(DriverActivity.this::fetchCurrentRideAndUpdateUi, 1000);
                     }
                 }
@@ -390,7 +388,7 @@ public class DriverActivity extends BaseNavDrawerActivity {
 
                         // 3. OBAVEZNO zatvori dijalog ovde
                         dialog.dismiss();
-                        Toast.makeText(this, "Vožnja je uspešno počela!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "Ride started successfully!", Toast.LENGTH_SHORT).show();
                     },
                     (errMsg) -> {
                         startInFlight = false;
@@ -544,7 +542,6 @@ public class DriverActivity extends BaseNavDrawerActivity {
                     if (rideStartedUi && isDriverCloseEnough(lat, lon, destLat, destLng)) {
                         btnFinish.setEnabled(true);
                         btnFinish.setAlpha(1.0f);
-                        Log.d("SIMULATION", "Destinacija dostignuta. Finish otključan.");
                     }
 
                     currentPointIndex[0]++;
@@ -738,18 +735,18 @@ public class DriverActivity extends BaseNavDrawerActivity {
             @Override
             public void onResponse(Call<RideResponse> call, Response<RideResponse> response) {
                 if (response.isSuccessful()) {
-                    Toast.makeText(DriverActivity.this, "Vožnja uspešno završena!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(DriverActivity.this, "Ride finished successfully!", Toast.LENGTH_SHORT).show();
                     rideStartedUi = false;
                     currentRide = null;
                     cleanupAnimation();
                     sheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
                     if (myLocationMarker != null) myLocationMarker.setIcon(iconFree);
                 } else {
-                    Toast.makeText(DriverActivity.this, "Greška pri završavanju vožnje.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(DriverActivity.this, "Error.", Toast.LENGTH_SHORT).show();
                 }
             }
             @Override public void onFailure(Call<RideResponse> call, Throwable t) {
-                Log.e("FINISH_RIDE", "Greška: " + t.getMessage());
+                Log.e("FINISH_RIDE", "Error: " + t.getMessage());
             }
         });
     }
