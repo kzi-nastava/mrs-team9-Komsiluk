@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -20,6 +21,8 @@ import com.bumptech.glide.Glide;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.komsiluk.taxi.data.remote.inconsistency_report.InconsistencyReportCreate;
+import com.komsiluk.taxi.data.remote.inconsistency_report.InconsistencyService;
 import com.komsiluk.taxi.data.remote.location.DriverLocationResponse;
 import com.komsiluk.taxi.data.remote.location.DriverLocationUpdate;
 import com.komsiluk.taxi.data.remote.location.LocationService;
@@ -46,6 +49,7 @@ import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
 import okhttp3.OkHttpClient;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -124,6 +128,9 @@ public class DriverActivity extends BaseNavDrawerActivity {
     @Inject
     UserService userService;
 
+    @Inject
+    InconsistencyService inconsistencyService;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -180,7 +187,7 @@ public class DriverActivity extends BaseNavDrawerActivity {
         // U onCreate metodi
         btnFinish.setOnClickListener(v -> finishRideOnBackend());
         btnStop.setOnClickListener(v -> Toast.makeText(this, "Stop not implemented yet.", Toast.LENGTH_SHORT).show());
-        btnReport.setOnClickListener(v -> Toast.makeText(this, "Report not implemented yet.", Toast.LENGTH_SHORT).show());
+        btnReport.setOnClickListener(v -> showReportInconsistencyDialog());
         btnPanic.setOnClickListener(v -> Toast.makeText(this, "Panic not implemented yet.", Toast.LENGTH_SHORT).show());
 
         geoRepository = new GeoRepository(okHttpClient);
@@ -751,6 +758,68 @@ public class DriverActivity extends BaseNavDrawerActivity {
         });
     }
 
+    private void showReportInconsistencyDialog() {
+        // Provera ID-a vožnje pomoću tvoje postojeće pomoćne metode
+        Long rideId = getCurrentRideId();
+        if (rideId == null) {
+            Toast.makeText(this, "No active ride found.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_report_inconsistency, null);
+        EditText etMessage = dialogView.findViewById(R.id.etReportMessage);
+        MaterialButton btnCancel = dialogView.findViewById(R.id.btnCancelReport);
+        MaterialButton btnSend = dialogView.findViewById(R.id.btnSendReport);
+
+        AlertDialog dialog = new MaterialAlertDialogBuilder(this)
+                .setView(dialogView)
+                .setCancelable(true)
+                .create();
+
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        }
+
+        btnCancel.setOnClickListener(v -> dialog.dismiss());
+
+        btnSend.setOnClickListener(v -> {
+            String message = etMessage.getText().toString().trim();
+
+            if (message.isEmpty()) {
+                Toast.makeText(this, "Message cannot be empty", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if (message.length() > 200) {
+                Toast.makeText(this, "Message too long (max 200 chars)", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            sendInconsistencyReport(message, dialog, rideId);
+        });
+
+        dialog.show();
+    }
+    private void sendInconsistencyReport(String message, AlertDialog dialog, Long rideId) {
+        InconsistencyReportCreate dto = new InconsistencyReportCreate();
+        dto.setMessage(message);
+
+        inconsistencyService.reportInconsistency(rideId, dto).enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (response.isSuccessful()) {
+                    Toast.makeText(DriverActivity.this, "Report sent successfully", Toast.LENGTH_SHORT).show();
+                    dialog.dismiss();
+                } else {
+                    Toast.makeText(DriverActivity.this, "Failed to send report: " + response.code(), Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                Toast.makeText(DriverActivity.this, "Network error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
     private String safe(String s) {
         if (s == null) return "";
         String t = s.trim();

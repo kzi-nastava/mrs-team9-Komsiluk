@@ -31,6 +31,8 @@ import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.gson.Gson;
+import com.komsiluk.taxi.data.remote.inconsistency_report.InconsistencyReportCreate;
+import com.komsiluk.taxi.data.remote.inconsistency_report.InconsistencyService;
 import com.komsiluk.taxi.data.remote.location.DriverLocationResponse;
 import com.komsiluk.taxi.data.remote.passenger_ride_history.PassengerRideDetailsDTO;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -82,6 +84,7 @@ import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
 import okhttp3.OkHttpClient;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -106,6 +109,8 @@ public class UserActivity extends BaseNavDrawerActivity {
     private ImageButton btnFavorite;
     private View headerRow;
     private View sheetHandle;
+
+    private com.google.android.material.button.MaterialButton btnActiveReport;
 
     private MapView map;
     private EditText etPickup, etDestination;
@@ -167,6 +172,8 @@ public class UserActivity extends BaseNavDrawerActivity {
 
     @Inject
     com.komsiluk.taxi.data.remote.location.LocationService locationApi;
+    @Inject
+    InconsistencyService inconsistencyService;
 
     private static class PlaceAdapter extends android.widget.BaseAdapter {
         private final Context ctx;
@@ -292,8 +299,18 @@ public class UserActivity extends BaseNavDrawerActivity {
         tvActiveDestination = findViewById(R.id.tvActiveDestination);
         layoutActiveStops = findViewById(R.id.layoutActiveStops);
         ivActiveDriver = findViewById(R.id.ivActiveDriver);
+        layoutOrderForm = findViewById(R.id.layoutOrderForm);
+        layoutActiveRide = findViewById(R.id.layoutActiveRide);
+        tvActiveDriverName = findViewById(R.id.tvActiveDriverName);
+        tvActiveDriverEmail = findViewById(R.id.tvActiveDriverEmail);
+        tvActivePickup = findViewById(R.id.tvActivePickup);
+        tvActiveDestination = findViewById(R.id.tvActiveDestination);
+        layoutActiveStops = findViewById(R.id.layoutActiveStops);
+        ivActiveDriver = findViewById(R.id.ivActiveDriver);
+        btnActiveReport = findViewById(R.id.btnActiveReport);
 
         btnFavorite = findViewById(R.id.btnFavorite);
+        btnActiveReport.setOnClickListener(v -> showReportInconsistencyDialog());
 
         etPickup = findViewById(R.id.etPickup);
         etDestination = findViewById(R.id.etDestination);
@@ -1608,6 +1625,10 @@ public class UserActivity extends BaseNavDrawerActivity {
 
                     layoutOrderForm.setVisibility(View.GONE);
                     layoutActiveRide.setVisibility(View.VISIBLE);
+
+                    sheetBehavior.setDraggable(true);
+                    sheetBehavior.setHideable(false);
+                    sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
                 }
             }
             @Override public void onFailure(Call<AdminRideDetails> call, Throwable t) {}
@@ -1726,6 +1747,66 @@ public class UserActivity extends BaseNavDrawerActivity {
 
 
         checkForActiveRide();
+    }
+
+    private void showReportInconsistencyDialog() {
+        if (activeRideId == null) return;
+
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_report_inconsistency, null);
+        EditText etMessage = dialogView.findViewById(R.id.etReportMessage);
+        MaterialButton btnCancel = dialogView.findViewById(R.id.btnCancelReport);
+        MaterialButton btnSend = dialogView.findViewById(R.id.btnSendReport);
+
+        AlertDialog dialog = new MaterialAlertDialogBuilder(this)
+                .setView(dialogView)
+                .setCancelable(true)
+                .create();
+
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        }
+
+        btnCancel.setOnClickListener(v -> dialog.dismiss());
+
+        btnSend.setOnClickListener(v -> {
+            String message = etMessage.getText().toString().trim();
+
+            // Validacija prema DTO ograničenjima
+            if (message.isEmpty()) {
+                Toast.makeText(this, "Message cannot be empty", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if (message.length() > 200) {
+                Toast.makeText(this, "Message too long (max 200 chars)", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            sendInconsistencyReport(message, dialog);
+        });
+
+        dialog.show();
+    }
+
+    private void sendInconsistencyReport(String message, AlertDialog dialog) {
+        InconsistencyReportCreate dto = new InconsistencyReportCreate();
+        dto.setMessage(message);
+
+        inconsistencyService.reportInconsistency(activeRideId, dto).enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (response.isSuccessful()) {
+                    Toast.makeText(UserActivity.this, "Report sent successfully", Toast.LENGTH_SHORT).show();
+                    dialog.dismiss();
+                } else {
+                    Toast.makeText(UserActivity.this, "Failed to send report", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                Toast.makeText(UserActivity.this, "Network error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @Override
