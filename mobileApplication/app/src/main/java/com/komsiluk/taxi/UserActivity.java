@@ -375,6 +375,18 @@ public class UserActivity extends BaseNavDrawerActivity {
                 addStationChip(extractStreetAddress(trimmed));
             }
         }
+        clearUsers();
+        for(String passenger : details.getPassengerEmails()) addUserChip(passenger);
+
+        AutoCompleteTextView etCarType = findViewById(R.id.actCarType);
+        if (etCarType != null) etCarType.setText(details.getVehicleType().toString(), false);
+
+        android.widget.CheckBox cbPet = findViewById(R.id.cbPetFriendly);
+        android.widget.CheckBox cbChild = findViewById(R.id.cbChildSeat);
+
+        if (cbPet != null) cbPet.setChecked(details.isPetFriendly());
+        if (cbChild != null) cbChild.setChecked(details.isBabyFriendly());
+
         geocodeAndDrawRoute(fullPickup, fullDest, stopsList);
     }
 
@@ -703,7 +715,6 @@ public class UserActivity extends BaseNavDrawerActivity {
 //    }
 
     private void geocodeAndDrawRoute(String pickupAddr, String destAddr, List<String> stopsAddr) {
-        // Resetovanje stanja mape (tvoj postojeći kod)
         pickupSelected = false;
         destSelected = false;
         pickupPoint = null;
@@ -716,7 +727,6 @@ public class UserActivity extends BaseNavDrawerActivity {
 
         if (pickupAddr == null || destAddr == null) return;
 
-        // Geokodiranje polazišta
         geoRepo.searchNoviSad(pickupAddr, NS_VIEWBOX).enqueue(new Callback<List<NominatimPlace>>() {
             @Override public void onResponse(Call<List<NominatimPlace>> call, Response<List<NominatimPlace>> res) {
                 if (!res.isSuccessful() || res.body() == null || res.body().isEmpty()) {
@@ -728,9 +738,7 @@ public class UserActivity extends BaseNavDrawerActivity {
                 pickupSelected = true;
                 setMarker(true, pickupPoint);
 
-                // Sekvencijalno geokodiranje stanica
                 geocodeStopsSequential(stopsAddr != null ? stopsAddr : new ArrayList<>(), 0, () -> {
-                    // Geokodiranje destinacije
                     geoRepo.searchNoviSad(destAddr, NS_VIEWBOX).enqueue(new Callback<List<NominatimPlace>>() {
                         @Override public void onResponse(Call<List<NominatimPlace>> call2, Response<List<NominatimPlace>> res2) {
                             if (!res2.isSuccessful() || res2.body() == null || res2.body().isEmpty()) {
@@ -742,7 +750,6 @@ public class UserActivity extends BaseNavDrawerActivity {
                             destSelected = true;
                             setMarker(false, destPoint);
 
-                            // Finalno iscrtavanje
                             zoomToAllPoints();
                             drawRouteAndStatsMulti();
                         }

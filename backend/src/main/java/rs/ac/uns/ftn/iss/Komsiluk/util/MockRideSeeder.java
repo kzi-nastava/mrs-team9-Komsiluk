@@ -112,7 +112,7 @@ public class MockRideSeeder implements CommandLineRunner {
         ride2.setRoute(route2);
         ride2.setDriver(driver3);
         ride2.setCreatedBy(passenger1);
-        ride2.setPassengers(List.of(passenger1, passenger2, passenger3));
+        ride2.setPassengers(List.of(passenger2, passenger3));
         ride2.setVehicleType(driver3.getVehicle().getType());
         ride2.setBabyFriendly(driver3.getVehicle().isBabyFriendly());
         ride2.setPetFriendly(driver3.getVehicle().isPetFriendly());
