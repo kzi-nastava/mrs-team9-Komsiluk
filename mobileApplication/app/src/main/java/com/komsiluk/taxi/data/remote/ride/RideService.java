@@ -20,4 +20,7 @@ public interface RideService {
 
     @POST("/api/rides/{id}/start")
     Call<RideResponse> startRide(@Path("id") Long rideId);
+
+    @POST("rides/{id}/finish")
+    Call<RideResponse> finishRide(@Path("id") Long rideId);
 }

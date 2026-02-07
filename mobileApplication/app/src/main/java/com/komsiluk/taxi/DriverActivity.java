@@ -161,7 +161,8 @@ public class DriverActivity extends BaseNavDrawerActivity {
 
         btnStart.setOnClickListener(v -> showConfirmStartDialog());
 
-        btnFinish.setOnClickListener(v -> Toast.makeText(this, "Finish not implemented yet.", Toast.LENGTH_SHORT).show());
+        // U onCreate metodi
+        btnFinish.setOnClickListener(v -> finishRideOnBackend());
         btnStop.setOnClickListener(v -> Toast.makeText(this, "Stop not implemented yet.", Toast.LENGTH_SHORT).show());
         btnReport.setOnClickListener(v -> Toast.makeText(this, "Report not implemented yet.", Toast.LENGTH_SHORT).show());
         btnPanic.setOnClickListener(v -> Toast.makeText(this, "Panic not implemented yet.", Toast.LENGTH_SHORT).show());
@@ -210,12 +211,14 @@ public class DriverActivity extends BaseNavDrawerActivity {
 
                 if (currentRide != null && !isRideActiveStatus(currentRide.getStatus())) {
                     if (myLocationMarker != null) {
+                        Log.d("SIMULATION", "Pokrećem animaciju ka pickup-u");
                         double myLat = myLocationMarker.getPosition().getLatitude();
                         double myLng = myLocationMarker.getPosition().getLongitude();
                         String pickupAddress = currentRide.getStartAddress();
 
                         getCoordinatesAndAnimate(pickupAddress, myLat, myLng);
                     } else {
+                        Log.e("SIMULATION", "Marker lokacije je NULL, odlažem animaciju");
                         new Handler(Looper.getMainLooper()).postDelayed(DriverActivity.this::fetchCurrentRideAndUpdateUi, 1000);
                     }
                 }
@@ -257,6 +260,8 @@ public class DriverActivity extends BaseNavDrawerActivity {
         if (rideStartedUi) {
             rowStartCancel.setVisibility(View.GONE);
             rowInRide.setVisibility(View.VISIBLE);
+            btnFinish.setEnabled(false);
+            btnFinish.setAlpha(0.5f);
         } else {
             rowStartCancel.setVisibility(View.VISIBLE);
             rowInRide.setVisibility(View.GONE);
@@ -471,6 +476,12 @@ public class DriverActivity extends BaseNavDrawerActivity {
                         btnStart.setAlpha(1.0f);
                     }
 
+                    if (rideStartedUi && isDriverCloseEnough(lat, lon, destLat, destLng)) {
+                        btnFinish.setEnabled(true);
+                        btnFinish.setAlpha(1.0f);
+                        Log.d("SIMULATION", "Destinacija dostignuta. Finish otključan.");
+                    }
+
                     currentPointIndex[0]++;
                     animationHandler.postDelayed(this, 1000);
                 } else {
@@ -490,9 +501,7 @@ public class DriverActivity extends BaseNavDrawerActivity {
         routePolyline = new org.osmdroid.views.overlay.Polyline();
 
         for (int i = currentIndex; i < allPoints.size(); i++) {
-            double lon = allPoints.get(i).get(0);
-            double lat = allPoints.get(i).get(1);
-            routePolyline.addPoint(new GeoPoint(lat, lon));
+            routePolyline.addPoint(new GeoPoint(allPoints.get(i).get(1), allPoints.get(i).get(0)));
         }
 
         routePolyline.getOutlinePaint().setColor(android.graphics.Color.BLUE);
@@ -510,7 +519,6 @@ public class DriverActivity extends BaseNavDrawerActivity {
         locationService.updateLocation(driverId, dto).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
-                Log.d("SIMULATION", "Step sent: " + lat + ", " + lng);
             }
             @Override public void onFailure(Call<Void> call, Throwable t) {}
         });
@@ -626,7 +634,7 @@ public class DriverActivity extends BaseNavDrawerActivity {
                 public void onResponse(Call<List<com.komsiluk.taxi.ui.ride.map.NominatimPlace>> call, Response<List<com.komsiluk.taxi.ui.ride.map.NominatimPlace>> resp) {
                     if (resp.isSuccessful() && resp.body() != null && !resp.body().isEmpty()) {
                         waypoints.add(new GeoPoint(Double.parseDouble(resp.body().get(0).lat), Double.parseDouble(resp.body().get(0).lon)));
-                        
+
                         executeMultiRoute(waypoints);
                     }
                 }
@@ -653,6 +661,30 @@ public class DriverActivity extends BaseNavDrawerActivity {
             @Override
             public void onFailure(Call<OsrmRouteResponse> call, Throwable t) {
                 Log.e("MULTI_ROUTE", "Greška pri pravljenju rute");
+            }
+        });
+    }
+
+    private void finishRideOnBackend() {
+        Long rideId = getCurrentRideId();
+        if (rideId == null) return;
+
+        rideService.finishRide(rideId).enqueue(new Callback<RideResponse>() {
+            @Override
+            public void onResponse(Call<RideResponse> call, Response<RideResponse> response) {
+                if (response.isSuccessful()) {
+                    Toast.makeText(DriverActivity.this, "Vožnja uspešno završena!", Toast.LENGTH_SHORT).show();
+                    rideStartedUi = false;
+                    currentRide = null;
+                    cleanupAnimation();
+                    sheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+                    if (myLocationMarker != null) myLocationMarker.setIcon(iconFree);
+                } else {
+                    Toast.makeText(DriverActivity.this, "Greška pri završavanju vožnje.", Toast.LENGTH_SHORT).show();
+                }
+            }
+            @Override public void onFailure(Call<RideResponse> call, Throwable t) {
+                Log.e("FINISH_RIDE", "Greška: " + t.getMessage());
             }
         });
     }
