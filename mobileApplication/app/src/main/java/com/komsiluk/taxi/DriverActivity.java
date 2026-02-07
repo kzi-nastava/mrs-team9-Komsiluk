@@ -312,7 +312,15 @@ public class DriverActivity extends BaseNavDrawerActivity {
                         rideStartedUi = true;
                         applyRideButtonsUi();
 
+                        // 1. Prvo ugasi staru animaciju (ka pickup-u)
+                        if (animationHandler != null) animationHandler.removeCallbacks(animationRunnable);
+
+                        // 2. Pokreni novu simulaciju ka destinaciji
+                        prepareAndStartMainRideSimulation();
+
+                        // 3. OBAVEZNO zatvori dijalog ovde
                         dialog.dismiss();
+                        Toast.makeText(this, "Vožnja je uspešno počela!", Toast.LENGTH_SHORT).show();
                     },
                     (errMsg) -> {
                         startInFlight = false;
@@ -566,7 +574,87 @@ public class DriverActivity extends BaseNavDrawerActivity {
             routePolyline = null;
         }
         map.invalidate();
-        Toast.makeText(this, "Stigli ste na lokaciju putnika!", Toast.LENGTH_SHORT).show();
+    }
+
+    private void prepareAndStartMainRideSimulation() {
+        if (currentRide == null) return;
+
+        String startAddr = currentRide.getStartAddress();
+
+        String endAddr = currentRide.getEndAddress();
+
+        List<String> stops = currentRide.getStops();
+
+        geocodeAndSimulateFullRoute(startAddr, stops, endAddr);
+    }
+    private void geocodeAndSimulateFullRoute(String start, List<String> stops, String end) {
+        List<GeoPoint> allWaypoints = new java.util.ArrayList<>();
+
+        geoRepository.searchNoviSad(start, "19.75,45.20,19.95,45.35").enqueue(new Callback<List<com.komsiluk.taxi.ui.ride.map.NominatimPlace>>() {
+            @Override
+            public void onResponse(Call<List<com.komsiluk.taxi.ui.ride.map.NominatimPlace>> call, Response<List<com.komsiluk.taxi.ui.ride.map.NominatimPlace>> resp) {
+                if (resp.isSuccessful() && resp.body() != null && !resp.body().isEmpty()) {
+                    allWaypoints.add(new GeoPoint(Double.parseDouble(resp.body().get(0).lat), Double.parseDouble(resp.body().get(0).lon)));
+
+                    geocodeStopsRecursive(allWaypoints, stops, 0, end);
+                }
+            }
+            @Override public void onFailure(Call<List<com.komsiluk.taxi.ui.ride.map.NominatimPlace>> call, Throwable t) {}
+        });
+    }
+
+    private void geocodeStopsRecursive(List<GeoPoint> waypoints, List<String> stops, int index, String end) {
+        if (stops != null && index < stops.size()) {
+
+            geoRepository.searchNoviSad(stops.get(index), "19.75,45.20,19.95,45.35").enqueue(new Callback<List<com.komsiluk.taxi.ui.ride.map.NominatimPlace>>() {
+                @Override
+                public void onResponse(Call<List<com.komsiluk.taxi.ui.ride.map.NominatimPlace>> call, Response<List<com.komsiluk.taxi.ui.ride.map.NominatimPlace>> resp) {
+                    if (resp.isSuccessful() && resp.body() != null && !resp.body().isEmpty()) {
+                        waypoints.add(new GeoPoint(Double.parseDouble(resp.body().get(0).lat), Double.parseDouble(resp.body().get(0).lon)));
+                    }
+
+                    geocodeStopsRecursive(waypoints, stops, index + 1, end);
+                }
+                @Override public void onFailure(Call<List<com.komsiluk.taxi.ui.ride.map.NominatimPlace>> call, Throwable t) {
+                    geocodeStopsRecursive(waypoints, stops, index + 1, end); // Nastavi čak i ako jedna stanica fail-uje
+                }
+            });
+        } else {
+
+            geoRepository.searchNoviSad(end, "19.75,45.20,19.95,45.35").enqueue(new Callback<List<com.komsiluk.taxi.ui.ride.map.NominatimPlace>>() {
+                @Override
+                public void onResponse(Call<List<com.komsiluk.taxi.ui.ride.map.NominatimPlace>> call, Response<List<com.komsiluk.taxi.ui.ride.map.NominatimPlace>> resp) {
+                    if (resp.isSuccessful() && resp.body() != null && !resp.body().isEmpty()) {
+                        waypoints.add(new GeoPoint(Double.parseDouble(resp.body().get(0).lat), Double.parseDouble(resp.body().get(0).lon)));
+                        
+                        executeMultiRoute(waypoints);
+                    }
+                }
+                @Override public void onFailure(Call<List<com.komsiluk.taxi.ui.ride.map.NominatimPlace>> call, Throwable t) {}
+            });
+        }
+    }
+    private void executeMultiRoute(List<GeoPoint> allWaypoints) {
+        geoRepository.routeMulti(allWaypoints).enqueue(new Callback<OsrmRouteResponse>() {
+            @Override
+            public void onResponse(Call<OsrmRouteResponse> call, Response<OsrmRouteResponse> response) {
+                if (response.isSuccessful() && response.body() != null && !response.body().routes.isEmpty()) {
+                    List<List<Double>> fullPath = response.body().routes.get(0).geometry.coordinates;
+
+                    double finalLat = allWaypoints.get(allWaypoints.size() - 1).getLatitude();
+                    double finalLng = allWaypoints.get(allWaypoints.size() - 1).getLongitude();
+
+                    if (animationHandler != null) animationHandler.removeCallbacks(animationRunnable);
+
+                    animateStepByStep(fullPath, finalLat, finalLng);
+                    drawRoutePolyline(fullPath);
+                }
+            }
+            @Override
+            public void onFailure(Call<OsrmRouteResponse> call, Throwable t) {
+                Log.e("MULTI_ROUTE", "Greška pri pravljenju rute");
+            }
+        });
     }
 
     private String safe(String s) {
