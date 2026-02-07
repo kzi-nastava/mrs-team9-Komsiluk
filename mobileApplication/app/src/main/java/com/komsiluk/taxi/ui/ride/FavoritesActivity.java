@@ -2,6 +2,7 @@ package com.komsiluk.taxi.ui.ride;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -14,6 +15,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.komsiluk.taxi.R;
 import com.komsiluk.taxi.UserActivity;
 import com.komsiluk.taxi.data.remote.favorite.FavoriteRouteResponse;
+import com.komsiluk.taxi.data.remote.profile.UserProfileResponse;
+import com.komsiluk.taxi.data.remote.profile.UserService;
 import com.komsiluk.taxi.data.session.SessionManager;
 import com.komsiluk.taxi.ui.menu.BaseNavDrawerActivity;
 
@@ -21,6 +24,9 @@ import java.util.ArrayList;
 
 import dagger.hilt.android.AndroidEntryPoint;
 import jakarta.inject.Inject;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 @AndroidEntryPoint
 public class FavoritesActivity extends BaseNavDrawerActivity implements FavoritesAdapter.Listener {
@@ -36,6 +42,9 @@ public class FavoritesActivity extends BaseNavDrawerActivity implements Favorite
 
     @Inject
     SessionManager sessionManager;
+
+    @Inject
+    UserService userApi;
 
     @Override
     protected int getContentLayoutId() {
@@ -79,6 +88,7 @@ public class FavoritesActivity extends BaseNavDrawerActivity implements Favorite
 
             adapter.notifyDataSetChanged();
             updateEmpty();
+            loadEmailsForAllFavorites(st.data);
         });
 
         Long userId = sessionManager != null ? sessionManager.getUserId() : null;
@@ -140,6 +150,51 @@ public class FavoritesActivity extends BaseNavDrawerActivity implements Favorite
             case "VAN": return "Van";
             default: return "Standard";
         }
+    }
+
+    private void loadEmailsForAllFavorites(java.util.List<FavoriteRouteResponse> data) {
+        if (data == null || data.isEmpty()) return;
+        if (userApi == null) return;
+        
+        for (int pos = 0; pos < data.size() && pos < items.size(); pos++) {
+            FavoriteRouteResponse r = data.get(pos);
+            FavoriteRide ui = items.get(pos);
+
+            java.util.List<Long> ids = r.getPassengerIds();
+            if (ids == null || ids.isEmpty()) continue;
+
+            ui.getUsers().clear();
+
+            for (Long uid : ids) {
+                if (uid == null) continue;
+                loadSingleUserEmailIntoFavorite(uid, ui, pos);
+            }
+        }
+    }
+
+    private void loadSingleUserEmailIntoFavorite(Long uid, FavoriteRide ui, int pos) {
+        userApi.getProfile(uid).enqueue(new Callback<UserProfileResponse>() {
+            @Override
+            public void onResponse(Call<UserProfileResponse> call, Response<UserProfileResponse> resp) {
+
+                if (!resp.isSuccessful() || resp.body() == null) return;
+
+                String email = resp.body().getEmail();
+                if (email == null) return;
+
+                String e = email.trim();
+                if (e.isEmpty()) return;
+
+                if (!ui.getUsers().contains(e)) {
+                    ui.getUsers().add(e);
+                    adapter.notifyItemChanged(pos);
+                }
+            }
+
+            @Override
+            public void onFailure(retrofit2.Call<UserProfileResponse> call, Throwable t) {
+            }
+        });
     }
 
     @Override
