@@ -1,12 +1,18 @@
 package com.komsiluk.taxi;
 
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.View;
 
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 
 import com.komsiluk.taxi.auth.AuthManager;
+import com.komsiluk.taxi.data.remote.location.DriverLocationResponse;
+import com.komsiluk.taxi.data.remote.location.LocationService;
 import com.komsiluk.taxi.databinding.ActivityMainBinding;
 import com.komsiluk.taxi.ui.about.AboutUsActivity;
 import com.komsiluk.taxi.ui.auth.AuthActivity;
@@ -18,17 +24,27 @@ import org.osmdroid.util.BoundingBox;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.CustomZoomButtonsController;
 import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.Marker;
+
+import java.util.Collection;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 @AndroidEntryPoint
 public class MainActivity extends BaseNavDrawerActivity {
 
     @Inject AuthManager authManager;
+    @Inject LocationService locationService;
 
     private ActivityMainBinding mainBinding;
+    private Timer refreshTimer;
 
     @Override
     protected int getContentLayoutId() {
@@ -46,6 +62,9 @@ public class MainActivity extends BaseNavDrawerActivity {
     }
 
     private MapView map;
+
+    private Handler locationHandler = new Handler(Looper.getMainLooper());
+    private Runnable locationRunnable;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -72,6 +91,7 @@ public class MainActivity extends BaseNavDrawerActivity {
         map.setScrollableAreaLimitDouble(nsBox);
         map.setMinZoomLevel(12.0);
         map.setMaxZoomLevel(20.0);
+        startLocationRefresh();
     }
 
     @Override
@@ -98,6 +118,61 @@ public class MainActivity extends BaseNavDrawerActivity {
             startActivity(i);
         } else if (itemId == R.id.nav_about) {
             startActivity(new Intent(this, AboutUsActivity.class));
+        }
+    }
+
+    private void startLocationRefresh() {
+        locationRunnable = new Runnable() {
+            @Override
+            public void run() {
+                fetchDriverLocations();
+                locationHandler.postDelayed(this, 1000);
+            }
+        };
+        locationHandler.post(locationRunnable);
+    }
+
+    private void fetchDriverLocations() {
+        locationService.getAllActiveDriverLocations().enqueue(new Callback<Collection<DriverLocationResponse>>() {
+            @Override
+            public void onResponse(Call<Collection<DriverLocationResponse>> call, Response<Collection<DriverLocationResponse>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    runOnUiThread(() -> updateMapMarkers(response.body()));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Collection<DriverLocationResponse>> call, Throwable t) {
+                // Tiho neuspeh da ne smeta korisniku
+            }
+        });
+    }
+
+    private void updateMapMarkers(Collection<DriverLocationResponse> locations) {
+        if (map == null) return;
+
+        map.getOverlays().clear();
+
+        for (DriverLocationResponse loc : locations) {
+            Marker startMarker = new Marker(map);
+            startMarker.setPosition(new GeoPoint(loc.getLat(), loc.getLng()));
+            startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+
+            Drawable icon = loc.isBusy() ?
+                    ContextCompat.getDrawable(this, R.drawable.taxi_busy) :
+                    ContextCompat.getDrawable(this, R.drawable.taxi_free);
+
+            startMarker.setIcon(icon);
+            startMarker.setTitle(loc.isBusy() ? "Zauzeto" : "Slobodno");
+            map.getOverlays().add(startMarker);
+        }
+        map.invalidate();
+    }
+
+    protected void onDestroy() {
+        super.onDestroy();
+        if (locationHandler != null && locationRunnable != null) {
+            locationHandler.removeCallbacks(locationRunnable);
         }
     }
 }

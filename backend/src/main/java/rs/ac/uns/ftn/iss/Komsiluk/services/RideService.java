@@ -64,6 +64,8 @@ public class RideService implements IRideService {
     private PricingRepository pricingRepository;
     @Autowired
     private RideDTOMapper  rideDTOMapper;
+    @Autowired
+    private DriverService driverService;
     
     private static final long MAX_MINUTES_LAST_24H = 480;
 
@@ -588,6 +590,8 @@ public class RideService implements IRideService {
         ride.setPrice(price);
 
         rideRepository.save(ride);
+
+        driverService.updateDriverStatus(ride.getDriver().getId(), DriverStatus.ACTIVE);
 
         NotificationCreateDTO notificationDTODriver = new NotificationCreateDTO();
         notificationDTODriver.setUserId(ride.getDriver().getId());

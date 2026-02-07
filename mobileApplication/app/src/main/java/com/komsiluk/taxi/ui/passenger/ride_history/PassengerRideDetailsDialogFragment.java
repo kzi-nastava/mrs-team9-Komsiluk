@@ -387,6 +387,7 @@ public class PassengerRideDetailsDialogFragment extends DialogFragment {
         geoRepo.routeMulti(points).enqueue(new Callback<OsrmRouteResponse>() {
             @Override
             public void onResponse(Call<OsrmRouteResponse> call, Response<OsrmRouteResponse> response) {
+                if (!isAdded() || getContext() == null) return;
                 if (response.isSuccessful() && response.body() != null && !response.body().routes.isEmpty()) {
 
                     List<List<Double>> coords = response.body().routes.get(0).geometry.coordinates;
@@ -429,6 +430,8 @@ public class PassengerRideDetailsDialogFragment extends DialogFragment {
     }
 
     private void zoomToPoints(List<GeoPoint> points) {
+
+        if (!isAdded() || getContext() == null) return;
         if (points.isEmpty()) return;
 
         double minLat = Double.MAX_VALUE, maxLat = -Double.MAX_VALUE;

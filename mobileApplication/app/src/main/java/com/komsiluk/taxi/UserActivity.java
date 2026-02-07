@@ -2,8 +2,10 @@ package com.komsiluk.taxi;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.Context;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -26,9 +28,14 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.gson.Gson;
 import com.komsiluk.taxi.data.remote.passenger_ride_history.PassengerRideDetailsDTO;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.komsiluk.taxi.auth.AuthManager;
+import com.komsiluk.taxi.data.remote.block.BlockNoteResponse;
+import com.komsiluk.taxi.data.remote.block.BlockService;
 import com.komsiluk.taxi.data.remote.favorite.FavoriteRouteCreateRequest;
 import com.komsiluk.taxi.data.remote.favorite.FavoriteService;
+import com.komsiluk.taxi.data.remote.profile.UserBlockedResponse;
+import com.komsiluk.taxi.data.remote.profile.UserService;
 import com.komsiluk.taxi.data.remote.ride.RideCreateRequest;
 import com.komsiluk.taxi.data.remote.route.RouteCreateRequest;
 import com.komsiluk.taxi.data.remote.route.RouteResponse;
@@ -131,12 +138,16 @@ public class UserActivity extends BaseNavDrawerActivity {
     FavoriteService favoriteApi;
     @Inject
     RouteService routeApi;
+    @Inject
+    BlockService blockApi;
+    @Inject
+    UserService userApi;
 
     private static class PlaceAdapter extends android.widget.BaseAdapter {
-        private final android.content.Context ctx;
+        private final Context ctx;
         private final List<NominatimPlace> items;
 
-        PlaceAdapter(android.content.Context ctx, List<NominatimPlace> items) {
+        PlaceAdapter(Context ctx, List<NominatimPlace> items) {
             this.ctx = ctx;
             this.items = items;
         }
@@ -149,7 +160,7 @@ public class UserActivity extends BaseNavDrawerActivity {
         public View getView(int position, View convertView, android.view.ViewGroup parent) {
             View v = convertView;
             if (v == null) {
-                v = android.view.LayoutInflater.from(ctx).inflate(R.layout.item_place_result, parent, false);
+                v = LayoutInflater.from(ctx).inflate(R.layout.item_place_result, parent, false);
             }
             TextView tvMain = v.findViewById(R.id.tvMain);
 
@@ -361,8 +372,8 @@ public class UserActivity extends BaseNavDrawerActivity {
         String fullPickup = details.getRoute().getStartAddress();
         String fullDest = details.getRoute().getEndAddress();
 
-        if (etPickup != null) etPickup.setText(extractStreetAddress(fullPickup));
-        if (etDestination != null) etDestination.setText(extractStreetAddress(fullDest));
+        if (etPickup != null) etPickup.setText(fullPickup);
+        if (etDestination != null) etDestination.setText(fullDest);
 
         clearStations();
         List<String> stopsList = new ArrayList<>();
@@ -372,7 +383,7 @@ public class UserActivity extends BaseNavDrawerActivity {
             for (String s : stopsArray) {
                 String trimmed = s.trim();
                 stopsList.add(trimmed);
-                addStationChip(extractStreetAddress(trimmed));
+                addStationChip(trimmed);
             }
         }
         clearUsers();
@@ -1149,7 +1160,6 @@ public class UserActivity extends BaseNavDrawerActivity {
         return TextUtils.join("|", stops);
     }
 
-
     private void setupBookButton() {
         btnBookRide.setOnClickListener(v -> {
             if (!pickupSelected || pickupPoint == null) {
@@ -1160,8 +1170,100 @@ public class UserActivity extends BaseNavDrawerActivity {
                 Toast.makeText(this, getString(R.string.error_destination_not_selected), Toast.LENGTH_SHORT).show();
                 return;
             }
-            showConfirmBookingDialog();
+
+            Long userId = sessionManager != null ? sessionManager.getUserId() : null;
+            if (userId == null) {
+                Toast.makeText(this, "Not logged in.", Toast.LENGTH_LONG).show();
+                return;
+            }
+
+            checkBlockedThenProceed(userId);
         });
+    }
+
+    private void checkBlockedThenProceed(Long userId) {
+        if (userApi == null) {
+            showConfirmBookingDialog();
+            return;
+        }
+
+        userApi.isUserBlocked(userId).enqueue(new Callback<UserBlockedResponse>() {
+            @Override
+            public void onResponse(Call<UserBlockedResponse> call, Response<UserBlockedResponse> resp) {
+
+                if (!resp.isSuccessful() || resp.body() == null) {
+                    showConfirmBookingDialog();
+                    return;
+                }
+
+                boolean blocked = resp.body().isBlocked();
+                if (!blocked) {
+                    showConfirmBookingDialog();
+                    return;
+                }
+
+                fetchBlockReasonAndShowDialog(sessionManager.getUserId());
+            }
+
+            @Override
+            public void onFailure(Call<com.komsiluk.taxi.data.remote.profile.UserBlockedResponse> call, Throwable t) {
+                showConfirmBookingDialog();
+            }
+        });
+    }
+
+    private void fetchBlockReasonAndShowDialog(Long userId) {
+        if (blockApi == null) {
+            showBlockedDialog("(Reason unavailable)");
+            return;
+        }
+
+        blockApi.getForUser(userId).enqueue(new Callback<BlockNoteResponse>() {
+            @Override
+            public void onResponse(Call<BlockNoteResponse> call,
+                                   Response<BlockNoteResponse> resp) {
+
+                if (!resp.isSuccessful() || resp.body() == null) {
+                    showBlockedDialog("(Reason unavailable)");
+                    return;
+                }
+
+                String reason = resp.body().getReason();
+                if (reason == null || reason.trim().isEmpty()) reason = "(No reason provided)";
+                showBlockedDialog(reason);
+            }
+
+            @Override
+            public void onFailure(Call<com.komsiluk.taxi.data.remote.block.BlockNoteResponse> call, Throwable t) {
+                showBlockedDialog("(Reason unavailable)");
+            }
+        });
+    }
+
+    private void showBlockedDialog(String reason) {
+        View v = getLayoutInflater().inflate(R.layout.dialog_user_blocked, null, false);
+
+        ImageButton btnClose = v.findViewById(R.id.btnBlockedClose);
+        TextView tvReason = v.findViewById(R.id.tvBlockedReason);
+        MaterialButton btnOk = v.findViewById(R.id.btnBlockedOk);
+
+        tvReason.setText(reason);
+
+        AlertDialog dialog = new MaterialAlertDialogBuilder(this)
+                .setView(v)
+                .setCancelable(true)
+                .create();
+
+        dialog.show();
+
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+            int width = (int) (getResources().getDisplayMetrics().widthPixels * 0.92f);
+            dialog.getWindow().setLayout(width, android.view.ViewGroup.LayoutParams.WRAP_CONTENT);
+        }
+
+        btnClose.setOnClickListener(x -> dialog.dismiss());
+        btnOk.setOnClickListener(x -> dialog.dismiss());
     }
 
     private void showConfirmBookingDialog() {

@@ -3,6 +3,8 @@ package com.komsiluk.taxi.data.remote.profile;
 import com.komsiluk.taxi.data.remote.edit_requests.ProfileChangeRequestCreate;
 import com.komsiluk.taxi.data.remote.edit_requests.ProfileChangeRequestResponse;
 
+import java.util.List;
+
 import okhttp3.MultipartBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -13,6 +15,7 @@ import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Part;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 public interface UserService {
 
@@ -48,4 +51,14 @@ public interface UserService {
             @Path("driverId") Long driverId,
             @Body ProfileChangeRequestCreate dto
     );
+
+    @GET("users/emails/autocomplete")
+    Call<List<String>> autocompleteEmails(
+            @Query("query") String query,
+            @Query("limit") int limit
+    );
+
+    @GET("users/{id}/blocked")
+    Call<UserBlockedResponse> isUserBlocked(@Path("id") Long id);
+
 }
