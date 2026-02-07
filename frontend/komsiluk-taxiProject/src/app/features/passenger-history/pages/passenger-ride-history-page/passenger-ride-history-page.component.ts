@@ -122,16 +122,10 @@ export class PassengerRideHistoryPageComponent implements OnInit {
           return dir * (new Date(a.startTime).getTime() - new Date(b.startTime).getTime());
         case 'END_TIME':
           return dir * (new Date(a.endTime).getTime() - new Date(b.endTime).getTime());
-        case 'PRICE':
-          return dir * (a.price - b.price);
         case 'START_ADDRESS':
           return dir * a.startAddress.localeCompare(b.startAddress);
         case 'END_ADDRESS':
           return dir * a.endAddress.localeCompare(b.endAddress);
-        case 'CANCELLED':
-          return dir * (Number(a.canceled) - Number(b.canceled));
-        case 'PANIC':
-          return dir * (Number(a.panicTriggered) - Number(b.panicTriggered));
         default:
           return 0;
       }
@@ -212,21 +206,5 @@ export class PassengerRideHistoryPageComponent implements OnInit {
     const min = String(d.getMinutes()).padStart(2, '0');
     
     return `${dd}.${mm}.${yyyy} ${hh}:${min}`;
-  }
-
-  formatPrice(price: number): string {
-    return `${price.toFixed(2)} RSD`;
-  }
-
-  formatStatus(ride: PassengerRideHistoryDTO): string {
-    if (ride.canceled) {
-      return ride.cancellationSource ? `Canceled (${ride.cancellationSource})` : 'Canceled';
-    }
-    return 'Completed';
-  }
-
-  getStatusClass(ride: PassengerRideHistoryDTO): string {
-    if (ride.canceled) return 'status--canceled';
-    return 'status--completed';
   }
 }

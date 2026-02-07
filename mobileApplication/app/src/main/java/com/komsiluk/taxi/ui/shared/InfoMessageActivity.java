@@ -3,16 +3,28 @@ package com.komsiluk.taxi.ui.shared;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.TextView;
 
 import com.google.android.material.button.MaterialButton;
 import com.komsiluk.taxi.MainActivity;
 import com.komsiluk.taxi.R;
 import com.komsiluk.taxi.auth.AuthManager;
+import com.komsiluk.taxi.auth.UserRole;
+import com.komsiluk.taxi.data.remote.add_driver.DriverResponse;
+import com.komsiluk.taxi.data.remote.change_driver_status.DriverStatus;
+import com.komsiluk.taxi.data.remote.change_driver_status.DriverStatusUpdate;
+import com.komsiluk.taxi.data.remote.driver_history.DriverService;
+import com.komsiluk.taxi.data.remote.favorite.FavoriteService;
+import com.komsiluk.taxi.data.session.SessionManager;
 import com.komsiluk.taxi.ui.menu.BaseNavDrawerActivity;
+import com.komsiluk.taxi.ui.ride.map.GeoRepository;
 
 import dagger.hilt.android.AndroidEntryPoint;
 import jakarta.inject.Inject;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 @AndroidEntryPoint
 public class InfoMessageActivity extends BaseNavDrawerActivity {
@@ -24,6 +36,13 @@ public class InfoMessageActivity extends BaseNavDrawerActivity {
     public static final String EXTRA_MESSAGE = "extra_message";
     public static final String EXTRA_BUTTON = "extra_button";
     public static final String EXTRA_IS_LOGOUT = "extra_is_logout";
+
+    @Inject
+    DriverService driverAPI;
+
+
+    @Inject
+    SessionManager sessionManager;
 
 
     public static Intent createIntent(Context ctx, String title, String message, String buttonText) {
@@ -59,20 +78,45 @@ public class InfoMessageActivity extends BaseNavDrawerActivity {
 
         btnDone.setOnClickListener(v -> {
             if (isLogout) {
-                authManager.logout();
+                UserRole currentRole = authManager.getRole();
+                Long userId = sessionManager.getUserId();
 
-                Intent i = new Intent(this, MainActivity.class);
-                i.addFlags(
-                        Intent.FLAG_ACTIVITY_CLEAR_TOP |
-                                Intent.FLAG_ACTIVITY_NEW_TASK |
-                                Intent.FLAG_ACTIVITY_CLEAR_TASK
-                );
-                startActivity(i);
-                finish();
+
+                if (currentRole == UserRole.DRIVER && userId != null) {
+                    DriverStatusUpdate update = new DriverStatusUpdate(DriverStatus.INACTIVE);
+                    driverAPI.changeDriverStatus(userId, update).enqueue(new Callback<DriverResponse>() {
+                        @Override
+                        public void onResponse(Call<DriverResponse> call, Response<DriverResponse> response) {
+                            performLogout();
+                        }
+
+                        @Override
+                        public void onFailure(Call<DriverResponse> call, Throwable t) {
+                            performLogout();
+                        }
+                    });
+                } else {
+                    performLogout();
+                }
             } else {
                 finish();
             }
         });
+
+
+    }
+
+    private void performLogout() {
+        authManager.logout();
+
+        Intent i = new Intent(this, MainActivity.class);
+        i.addFlags(
+                Intent.FLAG_ACTIVITY_CLEAR_TOP |
+                        Intent.FLAG_ACTIVITY_NEW_TASK |
+                        Intent.FLAG_ACTIVITY_CLEAR_TASK
+        );
+        startActivity(i);
+        finish();
     }
 
     public static Intent createLogoutIntent(Context ctx, String title, String message, String buttonText) {

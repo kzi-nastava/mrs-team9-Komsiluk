@@ -19,6 +19,7 @@ public class TokenAuthenticator implements Authenticator {
 
     @Override
     public Request authenticate(Route route, Response response) {
+//        sessionManager.clear();
         return null;
     }
 }

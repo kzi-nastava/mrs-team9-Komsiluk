@@ -1,5 +1,6 @@
 package rs.ac.uns.ftn.iss.Komsiluk.dtos.ride;
 
+import rs.ac.uns.ftn.iss.Komsiluk.beans.Route;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.CancellationSource;
 
 import java.math.BigDecimal;
@@ -15,11 +16,7 @@ public class AdminRideHistoryDTO {
     private LocalDateTime startTime;
     private LocalDateTime endTime;
 
-    private boolean canceled;
-    private CancellationSource cancellationSource;
-
-    private BigDecimal price;
-    private boolean panicTriggered;
+    private String route;
 
 
     public AdminRideHistoryDTO() { }
@@ -54,28 +51,11 @@ public class AdminRideHistoryDTO {
     public void setEndTime(LocalDateTime endTime) {
         this.endTime = endTime;
     }
-    public boolean isCanceled() {
-        return canceled;
+
+    public String getRoute() {
+        return route;
     }
-    public void setCanceled(boolean canceled) {
-        this.canceled = canceled;
-    }
-    public CancellationSource getCancellationSource() {
-        return cancellationSource;
-    }
-    public void setCancellationSource(CancellationSource cancellationSource) {
-        this.cancellationSource = cancellationSource;
-    }
-    public BigDecimal getPrice() {
-        return price;
-    }
-    public void setPrice(BigDecimal price) {
-        this.price = price;
-    }
-    public boolean isPanicTriggered() {
-        return panicTriggered;
-    }
-    public void setPanicTriggered(boolean panicTriggered) {
-        this.panicTriggered = panicTriggered;
+    public void setRoute(String route) {
+        this.route = route;
     }
 }

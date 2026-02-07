@@ -4,16 +4,12 @@ import { Observable } from 'rxjs';
 
 // Matches backend AdminRideSortBy enum
 export type PassengerRideSortBy = 
-  | 'DATE' 
-  | 'PRICE' 
+  | 'DATE'
   | 'ROUTE' 
   | 'START_TIME' 
   | 'END_TIME' 
   | 'START_ADDRESS' 
-  | 'END_ADDRESS' 
-  | 'CANCELLED' 
-  | 'CANCELLED_BY' 
-  | 'PANIC';
+  | 'END_ADDRESS';
 
 // Matches backend AdminRideHistoryDTO
 export interface PassengerRideHistoryDTO {
@@ -22,10 +18,7 @@ export interface PassengerRideHistoryDTO {
   endAddress: string;
   startTime: string;       // LocalDateTime as ISO string
   endTime: string;         // LocalDateTime as ISO string
-  canceled: boolean;
-  cancellationSource: string | null;
-  price: number;
-  panicTriggered: boolean;
+  route: string;
 }
 
 // Matches backend AdminRideDetailsDTO
