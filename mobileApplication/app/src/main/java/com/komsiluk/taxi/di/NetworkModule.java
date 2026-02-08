@@ -7,6 +7,7 @@ import com.komsiluk.taxi.auth.AuthInterceptor;
 import com.komsiluk.taxi.auth.TokenAuthenticator;
 import com.komsiluk.taxi.data.remote.add_driver.UserTokenService;
 import com.komsiluk.taxi.data.remote.auth.AuthService;
+import com.komsiluk.taxi.data.remote.inconsistency_report.InconsistencyService;
 import com.komsiluk.taxi.data.remote.passenger_ride_history.PassengerRideHistoryService;
 import com.komsiluk.taxi.data.remote.block.BlockService;
 import com.komsiluk.taxi.data.remote.driver_history.DriverService;
@@ -14,6 +15,7 @@ import com.komsiluk.taxi.data.remote.edit_requests.EditRequestsService;
 import com.komsiluk.taxi.data.remote.favorite.FavoriteService;
 import com.komsiluk.taxi.data.remote.location.LocationService;
 import com.komsiluk.taxi.data.remote.profile.UserService;
+import com.komsiluk.taxi.data.remote.rating.RatingService;
 import com.komsiluk.taxi.data.remote.report.ReportService;
 import com.komsiluk.taxi.data.remote.ride.RideRepository;
 import com.komsiluk.taxi.data.remote.ride.RideService;
@@ -26,6 +28,7 @@ import dagger.Provides;
 import dagger.hilt.InstallIn;
 import dagger.hilt.components.SingletonComponent;
 import okhttp3.OkHttpClient;
+import okhttp3.Request;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -44,6 +47,14 @@ public class NetworkModule {
         return new OkHttpClient.Builder()
                 .addInterceptor(authInterceptor)
                 .addInterceptor(logging)
+
+                .addInterceptor(chain -> {
+                    okhttp3.Request request = chain.request().newBuilder()
+                            .header("User-Agent", "KomsilukTaxiApp/1.0 (u.milinovic@gmail.com)")
+                            .build();
+                    return chain.proceed(request);
+                })
+
                 .authenticator(tokenAuthenticator)
                 .connectTimeout(10, TimeUnit.SECONDS)
                 .readTimeout(15, TimeUnit.SECONDS)
@@ -136,6 +147,18 @@ public class NetworkModule {
     @Singleton
     public static LocationService provideLocationService(Retrofit retrofit) {
         return retrofit.create(LocationService.class);
+    }
+
+    @Provides
+    @Singleton
+    public static InconsistencyService provideInconsistencyService(Retrofit retrofit) {
+        return retrofit.create(InconsistencyService.class);
+    }
+
+    @Provides
+    @Singleton
+    public static RatingService provideRatingService(Retrofit retrofit) {
+        return retrofit.create(RatingService.class);
     }
 }
 

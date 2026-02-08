@@ -11,11 +11,14 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.User;
+import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.DriverStatus;
+import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.UserRole;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.auth.LoginRequestDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.auth.LoginResponseDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.auth.RegisterPassengerRequestDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.userToken.UserTokenResponseDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.mappers.RegisterPassengerMapper;
+import rs.ac.uns.ftn.iss.Komsiluk.repositories.UserRepository;
 import rs.ac.uns.ftn.iss.Komsiluk.security.jwt.JwtService;
 import rs.ac.uns.ftn.iss.Komsiluk.services.exceptions.AccountNotActivatedException;
 import rs.ac.uns.ftn.iss.Komsiluk.services.exceptions.EmailAlreadyExistsException;
@@ -23,6 +26,8 @@ import rs.ac.uns.ftn.iss.Komsiluk.services.exceptions.PasswordsDoNotMatchExcepti
 import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.IAuthService;
 import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.IUserService;
 import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.IUserTokenService;
+
+import javax.management.relation.Role;
 
 @Service
 public class AuthService implements IAuthService {
@@ -34,6 +39,8 @@ public class AuthService implements IAuthService {
     private final MailService mailService;
     private final RegisterPassengerMapper registerPassengerMapper;
     private final AuthenticationManager authenticationManager;
+    private final DriverActivityService driverActivityService;
+    private final UserRepository userRepository;
 
     @Value("${app.user.default-profile-image}")
     private String defaultProfileImageUrl;
@@ -45,7 +52,7 @@ public class AuthService implements IAuthService {
             JwtService jwtService,
             MailService mailService,
             RegisterPassengerMapper registerPassengerMapper,
-            AuthenticationManager authenticationManager) {
+            AuthenticationManager authenticationManager, DriverActivityService driverActivityService, UserRepository userRepository) {
         this.userService = userService;
         this.userTokenService = userTokenService;
         this.passwordEncoder = passwordEncoder;
@@ -53,6 +60,8 @@ public class AuthService implements IAuthService {
         this.mailService = mailService;
         this.registerPassengerMapper = registerPassengerMapper;
         this.authenticationManager = authenticationManager;
+        this.driverActivityService = driverActivityService;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -121,6 +130,18 @@ public class AuthService implements IAuthService {
 
             String token = jwtService.generateAccessToken(user);
 
+            if (user.getRole() == UserRole.DRIVER) {
+
+                long workedMinutes = driverActivityService
+                        .getWorkedMinutesLast24h(user);
+
+                if (workedMinutes >= 480) {
+                    user.setDriverStatus(DriverStatus.INACTIVE);
+                } else {
+                    user.setDriverStatus(DriverStatus.ACTIVE);
+                }
+            }
+            userRepository.save(user);
             return new LoginResponseDTO(
                     token,
                     user.getId(),
@@ -128,6 +149,7 @@ public class AuthService implements IAuthService {
                     user.getRole(),
                     user.getDriverStatus()
             );
+
         }
         catch (AuthenticationException ex) {
             throw ex;

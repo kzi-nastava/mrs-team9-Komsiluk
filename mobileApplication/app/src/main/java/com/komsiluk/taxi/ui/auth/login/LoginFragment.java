@@ -90,6 +90,11 @@ public class LoginFragment extends Fragment {
         viewModel.getLoginSuccess().observe(getViewLifecycleOwner(), event -> {
             UserRole role = event.getContentIfNotHandled();
             if (role == null) return;
+
+            if (role == UserRole.DRIVER) {
+                viewModel.sendInitialLocation(45.2556, 19.8407);
+            }
+
             Toast.makeText(
                     requireContext(),
                     getString(R.string.auth_login_success),
