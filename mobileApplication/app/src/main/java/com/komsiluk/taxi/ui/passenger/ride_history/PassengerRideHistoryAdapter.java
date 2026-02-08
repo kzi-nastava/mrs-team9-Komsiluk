@@ -3,6 +3,7 @@ package com.komsiluk.taxi.ui.passenger.ride_history;
 
 import android.content.res.ColorStateList;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
@@ -95,10 +96,11 @@ public class PassengerRideHistoryAdapter extends RecyclerView.Adapter<PassengerR
 
             StringBuilder routeBuilder = new StringBuilder();
 
-            routeBuilder.append("Pickup: ").append(ride.getStartAddress()).append("\n\n");
+            routeBuilder.append("Pickup: ").append(ride.getStartAddress()).append("\n");;
 
             String routeData = ride.getRoute();
             if (routeData != null && !routeData.isEmpty()) {
+                routeBuilder.append("\n");
                 String[] stops = routeData.split(",");
                 for (int i = 0; i < stops.length; i++) {
                     routeBuilder.append("Station ")
@@ -107,15 +109,21 @@ public class PassengerRideHistoryAdapter extends RecyclerView.Adapter<PassengerR
                             .append(stops[i].trim())
                             .append("\n");
                 }
+                routeBuilder.append("\n");
             }
 
-            routeBuilder.append("\nDestination: ").append(ride.getEndAddress());
+            routeBuilder.append("Destination: ").append(ride.getEndAddress());
 
             binding.tvRoute.setText(routeBuilder.toString());
 
 
             String dateTime = formatDateTime(ride.getStartTime(), ride.getEndTime());
-            binding.tvDateTime.setText(dateTime);
+            if (dateTime.isEmpty()) {
+                binding.tvDateTime.setVisibility(View.GONE);
+            } else {
+                binding.tvDateTime.setVisibility(View.VISIBLE);
+                binding.tvDateTime.setText(dateTime);
+            }
 
             binding.btnDetails.setOnClickListener(v -> {
                 if (listener != null) listener.onRideClick(ride);
@@ -124,13 +132,17 @@ public class PassengerRideHistoryAdapter extends RecyclerView.Adapter<PassengerR
         }
 
         private String formatDateTime(String startTime, String endTime) {
+            SimpleDateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault());
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());
+            SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
             try {
-                SimpleDateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault());
-                SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());
-                SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
+                Date startDate = (startTime != null && !startTime.isEmpty()) ? isoFormat.parse(startTime) : null;
 
-                Date startDate = isoFormat.parse(startTime);
-                Date endDate = endTime != null ? isoFormat.parse(endTime) : null;
+                Date endDate = (endTime != null && !endTime.isEmpty()) ? isoFormat.parse(endTime) : null;
+
+                if (startDate == null) {
+                    return "";
+                }
 
                 String formattedStartDate = dateFormat.format(startDate);
                 String formattedStartTime = timeFormat.format(startDate);
@@ -156,7 +168,7 @@ public class PassengerRideHistoryAdapter extends RecyclerView.Adapter<PassengerR
                     return formattedStartDate + " " + formattedStartTime + " - " + formattedEndDate + " " + formattedEndTime;
                 }
 
-            } catch (ParseException e) {
+            } catch (ParseException | NullPointerException e) {
                 return startTime + " - " + (endTime != null ? endTime : "N/A");
             }
         }

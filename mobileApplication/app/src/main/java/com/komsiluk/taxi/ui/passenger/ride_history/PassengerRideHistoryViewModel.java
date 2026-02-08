@@ -98,16 +98,14 @@ public class PassengerRideHistoryViewModel extends ViewModel {
                 int result;
                 switch (currentSortBy) {
                     case ROUTE:
-                        String fullRoute1 = (r1.getStartAddress() + r1.getRoute() + r1.getEndAddress()).toLowerCase();
-                        String fullRoute2 = (r2.getStartAddress() + r2.getRoute() + r2.getEndAddress()).toLowerCase();
-                        result = fullRoute1.compareTo(fullRoute2);
+                        result = compareStringsSafe(buildRouteString(r1), buildRouteString(r2));
                         break;
                     case DATE:
                     case START_TIME:
-                        result = r1.getStartTime().compareTo(r2.getStartTime());
+                        result = compareStringsSafe(r1.getStartTime(), r2.getStartTime());
                         break;
                     case END_TIME:
-                        result = r1.getEndTime().compareTo(r2.getEndTime());
+                        result = compareStringsSafe(r1.getEndTime(), r2.getEndTime());
                         break;
                     default:
                         result = 0;
@@ -117,6 +115,20 @@ public class PassengerRideHistoryViewModel extends ViewModel {
         }
 
         _rides.setValue(sortedList);
+    }
+
+    private int compareStringsSafe(String s1, String s2) {
+        if (s1 == s2) return 0;
+        if (s1 == null) return 1;
+        if (s2 == null) return -1;
+        return s1.compareTo(s2);
+    }
+
+    private String buildRouteString(PassengerRideHistoryDTO r) {
+        String start = r.getStartAddress() != null ? r.getStartAddress() : "";
+        String route = r.getRoute() != null ? r.getRoute() : "";
+        String end = r.getEndAddress() != null ? r.getEndAddress() : "";
+        return (start + route + end).toLowerCase();
     }
 
     private boolean isRideInRange(PassengerRideHistoryDTO ride) {
