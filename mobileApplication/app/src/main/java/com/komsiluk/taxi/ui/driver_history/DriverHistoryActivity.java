@@ -12,6 +12,7 @@ import com.komsiluk.taxi.data.remote.driver_history.DriverService;
 import com.komsiluk.taxi.data.remote.ride.RideResponse;
 import com.komsiluk.taxi.data.session.SessionManager;
 import com.komsiluk.taxi.ui.menu.BaseNavDrawerActivity;
+import com.komsiluk.taxi.ui.ride.map.GeoRepository; // DODATO
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -19,6 +20,7 @@ import java.util.List;
 
 import dagger.hilt.android.AndroidEntryPoint;
 import javax.inject.Inject;
+import okhttp3.OkHttpClient; // DODATO
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -31,8 +33,12 @@ public class DriverHistoryActivity extends BaseNavDrawerActivity {
     @Inject
     SessionManager sessionManager;
 
+    @Inject
+    OkHttpClient okHttpClient; // DODATO za ručnu inicijalizaciju mape
+
     private DriverHistoryAdapter adapter;
     private List<DriverRide> rideList = new ArrayList<>();
+    private GeoRepository geoRepository; // DODATO
 
     private String filterFrom = null;
     private String filterTo = null;
@@ -45,13 +51,14 @@ public class DriverHistoryActivity extends BaseNavDrawerActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // 0. Inicijalizacija mape (GeoRepository)
+        geoRepository = new GeoRepository(okHttpClient); // Inicijalizovano ovde
+
         View btnFilter = findViewById(R.id.btnFilter);
 
         if (btnFilter != null) {
-            // Pokaži ga samo na ovom ekranu
             btnFilter.setVisibility(View.VISIBLE);
-
-            // Postavi klik
             btnFilter.setOnClickListener(v -> showDateRangePicker());
         }
 
@@ -60,20 +67,16 @@ public class DriverHistoryActivity extends BaseNavDrawerActivity {
         rv.setLayoutManager(new LinearLayoutManager(this));
 
         adapter = new DriverHistoryAdapter(rideList, ride -> {
-            RideDetailsDialogFragment.newInstance(ride)
+            // PROSLEĐUJEMO geoRepository u newInstance metodu
+            RideDetailsDialogFragment.newInstance(ride, geoRepository)
                     .show(getSupportFragmentManager(), "ride_details");
         });
         rv.setAdapter(adapter);
 
-        // 2. Povezivanje filter dugmeta iz navbara
-        if (btnFilter != null) {
-            // Pozivamo već napisanu funkciju showDateRangePicker()
-            btnFilter.setOnClickListener(v -> showDateRangePicker());
-        }
-
-        // 3. Prvo učitavanje istorije (bez filtera)
         loadHistory();
     }
+
+    // ... ostatak koda (loadHistory, showDateRangePicker, mapDtoToModel) ostaje nepromenjen ...
 
     private void loadHistory() {
         Long driverId = sessionManager.getUserId();
@@ -103,12 +106,11 @@ public class DriverHistoryActivity extends BaseNavDrawerActivity {
         com.google.android.material.datepicker.MaterialDatePicker<androidx.core.util.Pair<Long, Long>> picker =
                 com.google.android.material.datepicker.MaterialDatePicker.Builder.dateRangePicker()
                         .setTitleText("Izaberi period")
-                        .setNegativeButtonText("Resetuj") // Menjamo "Cancel" u "Resetuj"
+                        .setNegativeButtonText("Resetuj")
                         .build();
 
         picker.show(getSupportFragmentManager(), "DATE_PICKER");
 
-        // KLIK NA "SAČUVAJ" (OK)
         picker.addOnPositiveButtonClickListener(selection -> {
             java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault());
             filterFrom = sdf.format(new java.util.Date(selection.first));
@@ -116,7 +118,6 @@ public class DriverHistoryActivity extends BaseNavDrawerActivity {
             loadHistory();
         });
 
-        // KLIK NA "RESETUJ" (Umesto Cancel)
         picker.addOnNegativeButtonClickListener(v -> {
             filterFrom = null;
             filterTo = null;
@@ -124,8 +125,8 @@ public class DriverHistoryActivity extends BaseNavDrawerActivity {
             Toast.makeText(this, "Filteri su resetovani", Toast.LENGTH_SHORT).show();
         });
     }
+
     private DriverRide mapDtoToModel(RideResponse dto) {
-        // 1. Formatiranje vremena
         String startTime = dto.getStartTime() != null ? dto.getStartTime() : "";
         String datePart = startTime.contains("T") ? startTime.split("T")[0] : "N/A";
         String startPart = startTime.contains("T") ? startTime.split("T")[1].substring(0, 5) : "--:--";
@@ -136,13 +137,8 @@ public class DriverHistoryActivity extends BaseNavDrawerActivity {
         }
 
         List<String> emails = (dto.getPassengerEmails() != null) ? dto.getPassengerEmails() : new ArrayList<>();
-
-        // 3. Cena
         String priceFormatted = dto.getPrice() != null ? dto.getPrice().toString() + " $" : "0 $";
 
-        // 4. Kreiranje modela
-        // PAŽNJA: Proveri redosled parametara u DriverRide klasi da se ne crveni.
-        // Ako se crveni, proveri da li stopsList ide ovde ili se setuje naknadno.
         DriverRide ride = new DriverRide(
                 dto.getId(),
                 datePart,
@@ -152,7 +148,7 @@ public class DriverHistoryActivity extends BaseNavDrawerActivity {
                 dto.getStops(),
                 dto.getEndAddress(),
                 dto.getStatus() != null ? dto.getStatus() : "UNKNOWN",
-                emails.size(), // Broj putnika
+                emails.size(),
                 dto.getDistanceKm() != null ? dto.getDistanceKm() : 0.0,
                 dto.getEstimatedDurationMin() + " min",
                 priceFormatted
