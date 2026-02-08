@@ -14,14 +14,17 @@ export type AdminRideSortBy =
   | 'CANCELLED_BY' 
   | 'PANIC';
 
+
+export type CancellationSource = 'PASSENGER' | 'DRIVER';
+
 export interface AdminRideHistoryDTO {
   rideId: number;
   startAddress: string;
   endAddress: string;
   startTime: string;
   endTime: string;
-  canceled: boolean;
-  cancellationSource: string | null;
+  cancellationSource: CancellationSource | null;
+  cancellationReason: string | null;
   price: number;
   panicTriggered: boolean;
 }

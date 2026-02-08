@@ -27,6 +27,10 @@ public class AdminRideHistoryMapper {
         } else {
             dto.setRoute("");
         }
+        dto.setPrice(ride.getPrice());
+        dto.setPanicTriggered(ride.isPanicTriggered());
+        dto.setCancellationSource(ride.getCancellationSource());
+        dto.setCancellationReason(ride.getCancellationReason());
 
         return dto;
     }

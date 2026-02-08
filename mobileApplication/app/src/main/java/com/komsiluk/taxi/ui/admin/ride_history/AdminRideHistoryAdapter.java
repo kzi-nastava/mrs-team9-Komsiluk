@@ -1,5 +1,4 @@
-package com.komsiluk.taxi.ui.passenger.ride_history;
-
+package com.komsiluk.taxi.ui.admin.ride_history;
 
 import android.content.res.ColorStateList;
 import android.view.LayoutInflater;
@@ -11,8 +10,8 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.komsiluk.taxi.R;
-import com.komsiluk.taxi.databinding.ItemPassengerRideBinding;
-import com.komsiluk.taxi.data.remote.passenger_ride_history.PassengerRideHistoryDTO;
+import com.komsiluk.taxi.data.remote.admin_ride_history.AdminRideHistoryDTO;
+import com.komsiluk.taxi.databinding.ItemAdminRideBinding;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -22,20 +21,20 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-public class PassengerRideHistoryAdapter extends RecyclerView.Adapter<PassengerRideHistoryAdapter.ViewHolder> {
+public class AdminRideHistoryAdapter extends RecyclerView.Adapter<AdminRideHistoryAdapter.ViewHolder> {
 
     public interface OnRideClickListener {
-        void onRideClick(PassengerRideHistoryDTO ride);
+        void onRideClick(AdminRideHistoryDTO ride);
     }
 
-    private List<PassengerRideHistoryDTO> rides = new ArrayList<>();
+    private List<AdminRideHistoryDTO> rides = new ArrayList<>();
     private final OnRideClickListener listener;
 
-    public PassengerRideHistoryAdapter(OnRideClickListener listener) {
+    public AdminRideHistoryAdapter(OnRideClickListener listener) {
         this.listener = listener;
     }
 
-    public void setRides(List<PassengerRideHistoryDTO> rides) {
+    public void setRides(List<AdminRideHistoryDTO> rides) {
         this.rides = rides != null ? rides : new ArrayList<>();
         notifyDataSetChanged();
     }
@@ -43,7 +42,7 @@ public class PassengerRideHistoryAdapter extends RecyclerView.Adapter<PassengerR
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        ItemPassengerRideBinding binding = ItemPassengerRideBinding.inflate(
+        ItemAdminRideBinding binding = ItemAdminRideBinding.inflate(
                 LayoutInflater.from(parent.getContext()), parent, false);
         return new ViewHolder(binding);
     }
@@ -59,16 +58,15 @@ public class PassengerRideHistoryAdapter extends RecyclerView.Adapter<PassengerR
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
-        private final ItemPassengerRideBinding binding;
+        private final ItemAdminRideBinding binding;
 
-        ViewHolder(ItemPassengerRideBinding binding) {
+        ViewHolder(ItemAdminRideBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
         }
 
-        void bind(PassengerRideHistoryDTO ride, OnRideClickListener listener, int position) {
+        void bind(AdminRideHistoryDTO ride, OnRideClickListener listener, int position) {
             boolean isEven = position % 2 == 0;
-
 
             int backgroundRes = isEven ? R.drawable.bg_ride_card_small : R.drawable.bg_ride_card;
             binding.getRoot().setBackgroundResource(backgroundRes);
@@ -84,6 +82,7 @@ public class PassengerRideHistoryAdapter extends RecyclerView.Adapter<PassengerR
 
             binding.tvDateTime.setTextColor(secondaryTextColor);
             binding.tvRoute.setTextColor(textColor);
+            binding.tvPrice.setTextColor(textColor);
             binding.divider.setBackgroundColor(secondaryTextColor);
 
             if (isEven) {
@@ -95,8 +94,7 @@ public class PassengerRideHistoryAdapter extends RecyclerView.Adapter<PassengerR
             }
 
             StringBuilder routeBuilder = new StringBuilder();
-
-            routeBuilder.append("Pickup: ").append(ride.getStartAddress()).append("\n");;
+            routeBuilder.append("Pickup: ").append(ride.getStartAddress()).append("\n");
 
             String routeData = ride.getRoute();
             if (routeData != null && !routeData.isEmpty()) {
@@ -113,9 +111,7 @@ public class PassengerRideHistoryAdapter extends RecyclerView.Adapter<PassengerR
             }
 
             routeBuilder.append("Destination: ").append(ride.getEndAddress());
-
             binding.tvRoute.setText(routeBuilder.toString());
-
 
             String dateTime = formatDateTime(ride.getStartTime(), ride.getEndTime());
             if (dateTime.isEmpty()) {
@@ -125,10 +121,31 @@ public class PassengerRideHistoryAdapter extends RecyclerView.Adapter<PassengerR
                 binding.tvDateTime.setText(dateTime);
             }
 
+            String priceText = ride.getPrice() != null ? ride.getPrice().toString() + " $" : "N/A";
+            binding.tvPrice.setText("Price: " + priceText);
+
+            binding.tvCanceled.setVisibility(View.VISIBLE);
+            if (ride.isCanceled()) {
+                String canceledBy = ride.getCancellationSource() != null
+                        ? ride.getCancellationSource().name() : "Unknown";
+                binding.tvCanceled.setText("Canceled by: " + canceledBy);
+            } else {
+                binding.tvCanceled.setText("Canceled: No");
+            }
+            binding.tvCanceled.setTextColor(textColor);
+
+            binding.tvPanic.setVisibility(View.VISIBLE);
+            if (ride.isPanicTriggered()) {
+                binding.tvPanic.setText("⚠ PANIC TRIGGERED");
+                binding.tvPanic.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.error));
+            } else {
+                binding.tvPanic.setText("Panic: No");
+                binding.tvPanic.setTextColor(textColor);
+            }
+
             binding.btnDetails.setOnClickListener(v -> {
                 if (listener != null) listener.onRideClick(ride);
             });
-
         }
 
         private String formatDateTime(String startTime, String endTime) {

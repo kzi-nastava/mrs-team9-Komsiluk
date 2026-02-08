@@ -118,6 +118,9 @@
         <activity
             android:name=".ui.passenger.ride_history.PassengerRideHistoryActivity"
             android:exported="false"/>
+        <activity
+            android:name=".ui.admin.ride_history.AdminRideHistoryActivity"
+            android:exported="false"/>
         <activity android:name=".ui.driver_history.DriverHistoryActivity" />
     </application>
 
