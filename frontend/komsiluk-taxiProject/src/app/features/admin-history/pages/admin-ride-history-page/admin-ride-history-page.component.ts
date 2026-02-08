@@ -227,7 +227,7 @@ export class AdminRideHistoryPageComponent {
   }
 
   formatCanceled(ride: AdminRideHistoryDTO): string {
-    if (!ride.canceled) return '—';
+    if (!ride.cancellationSource) return '—';
     return ride.cancellationSource || 'Yes';
   }
 

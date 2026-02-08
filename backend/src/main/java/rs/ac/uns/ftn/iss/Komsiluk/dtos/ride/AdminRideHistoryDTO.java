@@ -18,6 +18,14 @@ public class AdminRideHistoryDTO {
 
     private String route;
 
+    private boolean panicTriggered;
+
+    private CancellationSource cancellationSource;
+
+    private String cancellationReason;
+
+    private BigDecimal price;
+
 
     public AdminRideHistoryDTO() { }
 
@@ -50,6 +58,30 @@ public class AdminRideHistoryDTO {
     }
     public void setEndTime(LocalDateTime endTime) {
         this.endTime = endTime;
+    }
+    public void setPanicTriggered(boolean panicTriggered) {
+        this.panicTriggered = panicTriggered;
+    }
+    public boolean isPanicTriggered() {
+        return panicTriggered;
+    }
+    public CancellationSource getCancellationSource() {
+        return cancellationSource;
+    }
+    public void setCancellationSource(CancellationSource cancellationSource) {
+        this.cancellationSource = cancellationSource;
+    }
+    public String getCancellationReason() {
+        return cancellationReason;
+    }
+    public void setCancellationReason(String cancellationReason) {
+        this.cancellationReason = cancellationReason;
+    }
+    public BigDecimal getPrice() {
+        return price;
+    }
+    public void setPrice(BigDecimal price) {
+        this.price = price;
     }
 
     public String getRoute() {
