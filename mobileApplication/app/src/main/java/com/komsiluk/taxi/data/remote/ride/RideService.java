@@ -29,4 +29,7 @@ public interface RideService {
 
     @GET("rides/{rideId}")
     Call<AdminRideDetails> getRideDetails(@Path("rideId") Long rideId);
+
+    @GET("rides/user/{userId}/scheduled")
+    Call<List<RideResponse>> getScheduledRidesForUser(@Path("userId") Long userId);
 }

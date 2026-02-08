@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -132,6 +133,8 @@ public class DriverActivity extends BaseNavDrawerActivity {
     private TextView tvPassengerName;
     private TextView tvPassengerEmail;
 
+    private LinearLayout layoutActiveStops;
+
     @Inject
     UserService userService;
 
@@ -184,6 +187,7 @@ public class DriverActivity extends BaseNavDrawerActivity {
         btnStop = findViewById(R.id.btnStopRide);
         btnReport = findViewById(R.id.btnReportRide);
         btnPanic = findViewById(R.id.btnPanicRide);
+        layoutActiveStops = findViewById(R.id.layoutActiveStops);
 
         btnCancel.setOnClickListener(v -> {
             Toast.makeText(this, "Cancel not implemented yet.", Toast.LENGTH_SHORT).show();
@@ -263,6 +267,17 @@ public class DriverActivity extends BaseNavDrawerActivity {
                     // Popuni UI
                     tvPickupValue.setText(safe(currentRide.getStartAddress()));
                     tvDestinationValue.setText(safe(currentRide.getEndAddress()));
+
+                    if (layoutActiveStops != null) {
+                        layoutActiveStops.removeAllViews();
+                        List<String> stops = newRide.getStops();
+                        if (stops != null) {
+                            // Dodajemo brojač za oznake
+                            for (int i = 0; i < stops.size(); i++) {
+                                addStopToActivePanel(stops.get(i), i + 1); // Prosleđujemo redni broj
+                            }
+                        }
+                    }
                     bindCreatorProfile(currentRide.getCreatorId());
                     applyRideButtonsUi();
                     sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
@@ -284,6 +299,33 @@ public class DriverActivity extends BaseNavDrawerActivity {
         });
     }
 
+    private void addStopToActivePanel(String address, int stopNumber) {
+        if (layoutActiveStops == null) {
+            Log.e("STOPS_DEBUG", "layoutActiveStops je NULL!");
+            return;
+        }
+
+        TextView label = new TextView(this);
+        // Postavljamo dinamički tekst: Stop 1, Stop 2...
+        label.setText("Stop " + stopNumber);
+        label.setTextColor(android.graphics.Color.WHITE);
+        label.setPadding(0, 10, 0, 0);
+
+        TextView value = new TextView(this);
+        value.setText(address);
+        value.setBackgroundResource(R.drawable.bg_input_normal);
+        value.setPadding(32, 24, 32, 24);
+
+        value.setTextColor(getResources().getColor(R.color.text));
+
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        params.setMargins(0, 0, 0, 20);
+
+        layoutActiveStops.addView(label);
+        layoutActiveStops.addView(value, params);
+        layoutActiveStops.requestLayout();
+    }
     private void initializeMapPosition() {
         Long myId = sessionManager.getUserId();
         if (myId == null) return;
@@ -710,6 +752,10 @@ public class DriverActivity extends BaseNavDrawerActivity {
 
         for (Marker m : rideMarkers) {
             map.getOverlays().remove(m);
+        }
+
+        if (layoutActiveStops != null) {
+            layoutActiveStops.removeAllViews();
         }
         map.invalidate();
     }

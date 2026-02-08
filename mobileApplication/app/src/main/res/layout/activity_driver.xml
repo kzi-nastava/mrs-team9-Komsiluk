@@ -153,6 +153,12 @@
                     android:fontFamily="@font/roboto_serif_medium"
                     android:text="" />
 
+                <LinearLayout
+                    android:id="@+id/layoutActiveStops"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" />
+
                 <!-- Destination -->
                 <TextView
                     android:layout_width="match_parent"
