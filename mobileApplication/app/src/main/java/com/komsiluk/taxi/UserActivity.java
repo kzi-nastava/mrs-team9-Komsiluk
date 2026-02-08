@@ -17,6 +17,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
+import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -43,6 +44,8 @@ import com.komsiluk.taxi.data.remote.favorite.FavoriteRouteCreateRequest;
 import com.komsiluk.taxi.data.remote.favorite.FavoriteService;
 import com.komsiluk.taxi.data.remote.profile.UserBlockedResponse;
 import com.komsiluk.taxi.data.remote.profile.UserService;
+import com.komsiluk.taxi.data.remote.rating.RatingCreate;
+import com.komsiluk.taxi.data.remote.rating.RatingService;
 import com.komsiluk.taxi.data.remote.ride.AdminRideDetails;
 import com.komsiluk.taxi.data.remote.ride.RideCreateRequest;
 import com.komsiluk.taxi.data.remote.ride.RidePassengerActive;
@@ -131,6 +134,7 @@ public class UserActivity extends BaseNavDrawerActivity {
     private TextView tvActiveDriverName, tvActiveDriverEmail, tvActivePickup, tvActiveDestination;
     private LinearLayout layoutActiveStops;
     private ImageView ivActiveDriver;
+    private TextView tvActiveEstimatedTime;
 
     private static final GeoPoint NOVI_SAD_CENTER = new GeoPoint(45.2671, 19.8335);
 
@@ -174,6 +178,8 @@ public class UserActivity extends BaseNavDrawerActivity {
     com.komsiluk.taxi.data.remote.location.LocationService locationApi;
     @Inject
     InconsistencyService inconsistencyService;
+    @Inject
+    RatingService ratingService;
 
     private static class PlaceAdapter extends android.widget.BaseAdapter {
         private final Context ctx;
@@ -308,6 +314,7 @@ public class UserActivity extends BaseNavDrawerActivity {
         layoutActiveStops = findViewById(R.id.layoutActiveStops);
         ivActiveDriver = findViewById(R.id.ivActiveDriver);
         btnActiveReport = findViewById(R.id.btnActiveReport);
+        tvActiveEstimatedTime = findViewById(R.id.tvActiveEstimatedTime);
 
         btnFavorite = findViewById(R.id.btnFavorite);
         btnActiveReport.setOnClickListener(v -> showReportInconsistencyDialog());
@@ -1677,9 +1684,12 @@ public class UserActivity extends BaseNavDrawerActivity {
                             @Override
                             public void onResponse(Call<DriverLocationResponse> call, Response<DriverLocationResponse> locResp) {
                                 if (locResp.isSuccessful() && locResp.body() != null) {
-                                    updateDriverMarker(new GeoPoint(locResp.body().getLat(), locResp.body().getLng()));
+                                    GeoPoint currentDriverPos = new GeoPoint(locResp.body().getLat(), locResp.body().getLng());
 
-                                    // Zakazujemo sledeći krug za 3 sekunde
+                                    updateDriverMarker(currentDriverPos);
+
+                                    updateDriverEstimatedTime(currentDriverPos);
+
                                     activeRideHandler.postDelayed(activeRideRunnable, 3000);
                                 }
                             }
@@ -1711,18 +1721,21 @@ public class UserActivity extends BaseNavDrawerActivity {
     }
 
     private void stopRideAndCleanup() {
-        // 1. Zaustavi polling lokacije vozača
+        // 1. Prvo sačuvaj ID pre nego što ga obrišeš!
+        Long rideIdForRating = activeRideId;
+
+        // 2. Zaustavi polling lokacije vozača
         if (activeRideHandler != null && activeRideRunnable != null) {
             activeRideHandler.removeCallbacks(activeRideRunnable);
         }
 
-        // 2. Ukloni marker vozača
+        // 3. Ukloni marker vozača
         if (driverMarker != null) {
             map.getOverlays().remove(driverMarker);
             driverMarker = null;
         }
 
-        // 3. Očisti rutu (plavu liniju) i ostale markere ako želiš
+        // 4. Očisti rutu i ostale markere
         clearRouteAndStats();
         removeMarker(true);
         removeMarker(false);
@@ -1732,23 +1745,32 @@ public class UserActivity extends BaseNavDrawerActivity {
         }
         stationMarkers.clear();
         stationPoints.clear();
+        layoutActiveStops.removeAllViews(); // Očisti dinamičke stanice iz panela
 
-        // 4. Resetuj ID-eve
+        // 5. Resetuj ID-eve (tek nakon što si sačuvao ID za rating gore)
         activeRideId = null;
         assignedDriverId = null;
 
-        // 5. Ponovo prikaži panel za naručivanje i pokreni proveru za nove vožnje
+        // 6. Ponovo prikaži panel za naručivanje
         layoutOrderForm.setVisibility(View.VISIBLE);
         layoutActiveRide.setVisibility(View.GONE);
+
+        // Onemogući ponovo draggables dok ne bude nove vožnje
+        sheetBehavior.setDraggable(false);
         sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+
         map.invalidate();
 
         Toast.makeText(this, "Ride has finished successfully.", Toast.LENGTH_LONG).show();
 
+        // 7. Prikaži dijalog samo ako smo imali ID (sada će rideIdForRating imati vrednost)
+        if (rideIdForRating != null) {
+            showRatingDialog(rideIdForRating);
+        }
 
+        // 8. Nastavi da proveravaš nove vožnje
         checkForActiveRide();
     }
-
     private void showReportInconsistencyDialog() {
         if (activeRideId == null) return;
 
@@ -1809,6 +1831,105 @@ public class UserActivity extends BaseNavDrawerActivity {
         });
     }
 
+    private void showRatingDialog(Long rideId) {
+        View v = getLayoutInflater().inflate(R.layout.dialog_rate_ride, null);
+
+        RatingBar rbDriver = v.findViewById(R.id.rbDriver);
+        RatingBar rbVehicle = v.findViewById(R.id.rbVehicle);
+        EditText etComment = v.findViewById(R.id.etRatingComment);
+        MaterialButton btnCancel = v.findViewById(R.id.btnCancelRating);
+        MaterialButton btnSubmit = v.findViewById(R.id.btnSubmitRating);
+
+        AlertDialog dialog = new MaterialAlertDialogBuilder(this)
+                .setView(v)
+                .setCancelable(false) // Korisnik mora ili da oceni ili da klikne cancel
+                .create();
+
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        }
+
+        btnCancel.setOnClickListener(x -> dialog.dismiss());
+
+        btnSubmit.setOnClickListener(x -> {
+            RatingCreate dto = new RatingCreate();
+            dto.setRaterId(sessionManager.getUserId());
+            dto.setDriverGrade((int) rbDriver.getRating());
+            dto.setVehicleGrade((int) rbVehicle.getRating());
+            dto.setComment(etComment.getText().toString().trim());
+
+            // Provera da li je bar nešto ocenjeno (opciono)
+            if (dto.getDriverGrade() == 0 || dto.getVehicleGrade() == 0) {
+                Toast.makeText(this, "Please provide ratings for both driver and vehicle", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            sendRating(rideId, dto, dialog);
+        });
+
+        dialog.show();
+    }
+
+    private void sendRating(Long rideId, RatingCreate dto, AlertDialog dialog) {
+        // ratingService mora biti @Inject-ovan na vrhu klase
+        ratingService.createRating(rideId, dto).enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (response.isSuccessful()) {
+                    Toast.makeText(UserActivity.this, "Thank you for your feedback!", Toast.LENGTH_SHORT).show();
+                    dialog.dismiss();
+                } else {
+                    Toast.makeText(UserActivity.this, "Error sending rating", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                Toast.makeText(UserActivity.this, "Network error", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void updateDriverEstimatedTime(GeoPoint driverPos) {
+        if (geoRepo == null || destPoint == null) return;
+
+        // 1. Kreiramo listu svih tačaka rute
+        List<GeoPoint> points = new ArrayList<>();
+
+        // Prva tačka je trenutna lokacija vozača
+        points.add(driverPos);
+
+        // 2. DODAJEMO STANICE:
+        // Koristimo tvoju postojeću listu stationPoints.
+        // Napomena: Ovo pretpostavlja da vozač ide redom kroz stanice.
+        if (stationPoints != null && !stationPoints.isEmpty()) {
+            points.addAll(stationPoints);
+        }
+
+        // Posljednja tačka je finalna destinacija
+        points.add(destPoint);
+
+        // 3. Pozivamo tvoju postojeću metodu iz GeoRepository
+        geoRepo.routeMulti(points).enqueue(new Callback<OsrmRouteResponse>() {
+            @Override
+            public void onResponse(Call<OsrmRouteResponse> call, Response<OsrmRouteResponse> response) {
+                if (response.isSuccessful() && response.body() != null && !response.body().routes.isEmpty()) {
+                    // OSRM duration je suma vremena između svih tačaka u listi
+                    double durationSeconds = response.body().routes.get(0).duration;
+
+                    String timeText = formatDuration((long) durationSeconds) + " remaining";
+
+                    if (tvActiveEstimatedTime != null) {
+                        tvActiveEstimatedTime.setText(timeText);
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<OsrmRouteResponse> call, Throwable t) {
+            }
+        });
+    }
     @Override
     protected void onStart() {
         super.onStart();

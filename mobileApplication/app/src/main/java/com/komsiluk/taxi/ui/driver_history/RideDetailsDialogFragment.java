@@ -20,7 +20,9 @@ import androidx.fragment.app.DialogFragment;
 import com.komsiluk.taxi.R;
 import com.komsiluk.taxi.data.remote.driver_history.DriverService;
 import com.komsiluk.taxi.data.remote.inconsistency_report.InconsistencyReportResponse;
+import com.komsiluk.taxi.data.remote.inconsistency_report.InconsistencyService;
 import com.komsiluk.taxi.data.remote.rating.RatingResponse;
+import com.komsiluk.taxi.data.remote.rating.RatingService;
 import com.komsiluk.taxi.databinding.DialogRideDetailsBinding;
 
 import java.util.ArrayList;
@@ -38,7 +40,14 @@ public class RideDetailsDialogFragment extends DialogFragment {
 
     private DialogRideDetailsBinding b;
 
-    @Inject DriverService driverService;
+    @Inject
+    DriverService driverService;
+
+    @Inject
+    RatingService ratingService;
+
+    @Inject
+    InconsistencyService inconsistencyService;
 
     public static RideDetailsDialogFragment newInstance(DriverRide ride) {
         RideDetailsDialogFragment f = new RideDetailsDialogFragment();
@@ -131,7 +140,7 @@ public class RideDetailsDialogFragment extends DialogFragment {
         b.btnClose.setOnClickListener(v -> dismiss());
     }
     private void loadRatings(long rideId, int labelWhite, int valueYellow) {
-        driverService.getRideRatings(rideId).enqueue(new Callback<List<RatingResponse>>() {
+        ratingService.getRideRatings(rideId).enqueue(new Callback<List<RatingResponse>>() {
             @Override
             public void onResponse(Call<List<RatingResponse>> call, Response<List<RatingResponse>> response) {
                 if (isAdded() && response.isSuccessful() && response.body() != null) {
@@ -159,7 +168,7 @@ public class RideDetailsDialogFragment extends DialogFragment {
     }
 
     private void loadInconsistencies(long rideId, int labelWhite, int valueYellow) {
-        driverService.getRideInconsistencies(rideId).enqueue(new Callback<List<InconsistencyReportResponse>>() {
+        inconsistencyService.getRideInconsistencies(rideId).enqueue(new Callback<List<InconsistencyReportResponse>>() {
             @Override
             public void onResponse(Call<List<InconsistencyReportResponse>> call, Response<List<InconsistencyReportResponse>> response) {
                 if (isAdded() && response.isSuccessful() && response.body() != null) {

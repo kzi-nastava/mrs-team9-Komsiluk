@@ -15,6 +15,7 @@ import com.komsiluk.taxi.data.remote.edit_requests.EditRequestsService;
 import com.komsiluk.taxi.data.remote.favorite.FavoriteService;
 import com.komsiluk.taxi.data.remote.location.LocationService;
 import com.komsiluk.taxi.data.remote.profile.UserService;
+import com.komsiluk.taxi.data.remote.rating.RatingService;
 import com.komsiluk.taxi.data.remote.report.ReportService;
 import com.komsiluk.taxi.data.remote.ride.RideRepository;
 import com.komsiluk.taxi.data.remote.ride.RideService;
@@ -152,6 +153,12 @@ public class NetworkModule {
     @Singleton
     public static InconsistencyService provideInconsistencyService(Retrofit retrofit) {
         return retrofit.create(InconsistencyService.class);
+    }
+
+    @Provides
+    @Singleton
+    public static RatingService provideRatingService(Retrofit retrofit) {
+        return retrofit.create(RatingService.class);
     }
 }
 

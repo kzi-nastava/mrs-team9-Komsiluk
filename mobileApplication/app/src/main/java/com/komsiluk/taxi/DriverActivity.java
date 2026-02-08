@@ -43,6 +43,7 @@ import org.osmdroid.views.CustomZoomButtonsController;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -109,6 +110,12 @@ public class DriverActivity extends BaseNavDrawerActivity {
     private Handler animationHandler = new Handler(Looper.getMainLooper());
     private Runnable animationRunnable;
 
+    private Handler rideCheckHandler = new Handler(Looper.getMainLooper());
+    private Runnable rideCheckRunnable;
+    private boolean isFetchingRide = false;
+
+    private List<Marker> rideMarkers = new ArrayList<>();
+
     @Inject
     SessionManager sessionManager;
 
@@ -142,7 +149,7 @@ public class DriverActivity extends BaseNavDrawerActivity {
         map.getZoomController().setVisibility(CustomZoomButtonsController.Visibility.NEVER);
         map.setMultiTouchControls(true);
         map.getController().setZoom(13.5);
-        map.getController().setCenter(new GeoPoint(45.2671, 19.8335));
+        initializeMapPosition();
 
         BoundingBox nsBox = new BoundingBox(
                 45.35, 19.95,
@@ -197,78 +204,119 @@ public class DriverActivity extends BaseNavDrawerActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        fetchCurrentRideAndUpdateUi();
+        startRidePolling();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        stopRidePolling();
+    }
+
+    private void startRidePolling() {
+        rideCheckRunnable = new Runnable() {
+            @Override
+            public void run() {
+                fetchCurrentRideAndUpdateUi();
+                rideCheckHandler.postDelayed(this, 1500);
+            }
+        };
+        rideCheckHandler.post(rideCheckRunnable);
+    }
+
+    private void stopRidePolling() {
+        if (rideCheckHandler != null && rideCheckRunnable != null) {
+            rideCheckHandler.removeCallbacks(rideCheckRunnable);
+        }
     }
 
     private void fetchCurrentRideAndUpdateUi() {
+        if (isFetchingRide) return;
+
         Long driverId = sessionManager != null ? sessionManager.getUserId() : null;
-        if (driverId == null) {
-            sheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
-            return;
-        }
+        if (driverId == null) return;
 
-        if (rideService == null) {
-            sheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
-            return;
-        }
-
+        isFetchingRide = true;
         rideService.getDriverCurrentRide(driverId).enqueue(new Callback<RideResponse>() {
             @Override
             public void onResponse(Call<RideResponse> call, Response<RideResponse> resp) {
+                isFetchingRide = false;
 
-                currentRide = resp.body();
-
-                if (resp.code() == 204) {
-                    currentRide = null;
-                    rideStartedUi = false;
-                    sheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+                if (resp.code() == 204 || !resp.isSuccessful() || resp.body() == null) {
+                    // Ako nema vožnje, sakrij sheet i ugasi animacije
+                    if (currentRide != null) {
+                        currentRide = null;
+                        sheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+                        cleanupAnimation();
+                    }
                     return;
                 }
 
-                if (!resp.isSuccessful() || resp.body() == null) {
-                    currentRide = null;
-                    rideStartedUi = false;
-                    sheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
-                    return;
-                }
+                RideResponse newRide = resp.body();
 
-                if (currentRide != null && !isRideActiveStatus(currentRide.getStatus())) {
-                    if (myLocationMarker != null) {
+                // KLJUČNA PROVERA: Da li je ovo nova vožnja ili promena statusa?
+                if (currentRide == null || !currentRide.getId().equals(newRide.getId()) || !currentRide.getStatus().equals(newRide.getStatus())) {
+
+                    currentRide = newRide;
+                    rideStartedUi = isRideActiveStatus(currentRide.getStatus());
+
+                    // Popuni UI
+                    tvPickupValue.setText(safe(currentRide.getStartAddress()));
+                    tvDestinationValue.setText(safe(currentRide.getEndAddress()));
+                    bindCreatorProfile(currentRide.getCreatorId());
+                    applyRideButtonsUi();
+                    sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+
+                    // POKRENI ANIMACIJU samo ako vožnja NIJE aktivna (znači ide ka putniku)
+                    if (!rideStartedUi && myLocationMarker != null) {
+                        cleanupAnimation(); // Ugasi staru ako postoji
                         double myLat = myLocationMarker.getPosition().getLatitude();
                         double myLng = myLocationMarker.getPosition().getLongitude();
-                        String pickupAddress = currentRide.getStartAddress();
-
-                        getCoordinatesAndAnimate(pickupAddress, myLat, myLng);
-                    } else {
-                        new Handler(Looper.getMainLooper()).postDelayed(DriverActivity.this::fetchCurrentRideAndUpdateUi, 1000);
+                        getCoordinatesAndAnimate(currentRide.getStartAddress(), myLat, myLng);
                     }
                 }
-
-                currentRide = resp.body();
-
-                String pickup = safe(currentRide.getStartAddress());
-                String dest = safe(currentRide.getEndAddress());
-
-                tvPickupValue.setText(pickup);
-                tvDestinationValue.setText(dest);
-
-                bindCreatorProfile(currentRide.getCreatorId());
-
-                rideStartedUi = isRideActiveStatus(currentRide.getStatus());
-                applyRideButtonsUi();
-
-                sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
             }
 
             @Override
             public void onFailure(Call<RideResponse> call, Throwable t) {
-                currentRide = null;
-                rideStartedUi = false;
-                sheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+                isFetchingRide = false;
             }
         });
     }
 
+    private void initializeMapPosition() {
+        Long myId = sessionManager.getUserId();
+        if (myId == null) return;
+
+        locationService.getSpecificDriverLocation(myId).enqueue(new Callback<DriverLocationResponse>() {
+            @Override
+            public void onResponse(Call<DriverLocationResponse> call, Response<DriverLocationResponse> response) {
+                GeoPoint finalPoint;
+
+                if (response.isSuccessful() && response.body() != null) {
+                    DriverLocationResponse loc = response.body();
+                    finalPoint = new GeoPoint(loc.getLat(), loc.getLng());
+                } else {
+                    finalPoint = new GeoPoint(45.2671, 19.8335);
+                }
+
+                setMapCamera(finalPoint);
+            }
+
+            @Override
+            public void onFailure(Call<DriverLocationResponse> call, Throwable t) {
+                GeoPoint defaultPoint = new GeoPoint(45.2671, 19.8335);
+                setMapCamera(defaultPoint);
+            }
+        });
+    }
+
+    private void setMapCamera(GeoPoint point) {
+        firstTimeZoom = false;
+        map.getController().setZoom(15.5); // Postavi inicijalni zoom
+        map.getController().setCenter(point);
+        updateDriverMarkerOnMap(point.getLatitude(), point.getLongitude());
+    }
     private void bindCreatorProfile(Long creatorId) {
         if (rowPassenger != null) rowPassenger.setVisibility(View.GONE);
 
@@ -540,7 +588,6 @@ public class DriverActivity extends BaseNavDrawerActivity {
                     updateDriverMarkerOnMap(lat, lon);
                     updateRoutePolyline(points, currentPointIndex[0]);
 
-                    // PROVERA: Da li je trenutna tačka animacije blizu putnika?
                     if (isDriverCloseEnough(lat, lon, destLat, destLng)) {
                         btnStart.setEnabled(true);
                         btnStart.setAlpha(1.0f);
@@ -573,8 +620,8 @@ public class DriverActivity extends BaseNavDrawerActivity {
             routePolyline.addPoint(new GeoPoint(allPoints.get(i).get(1), allPoints.get(i).get(0)));
         }
 
-        routePolyline.getOutlinePaint().setColor(android.graphics.Color.BLUE);
-        routePolyline.getOutlinePaint().setStrokeWidth(10f);
+        routePolyline.getOutlinePaint().setColor(android.graphics.Color.BLACK);
+        routePolyline.getOutlinePaint().setStrokeWidth(12f);
 
         map.getOverlays().add(routePolyline);
         map.invalidate();
@@ -642,6 +689,16 @@ public class DriverActivity extends BaseNavDrawerActivity {
         map.invalidate();
     }
 
+    private void addRideMarker(GeoPoint point, int iconRes) {
+        Marker m = new Marker(map);
+        m.setPosition(point);
+        m.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+        m.setIcon(getDrawable(iconRes));
+        map.getOverlays().add(m);
+        rideMarkers.add(m);
+        map.invalidate();
+    }
+
     private void cleanupAnimation() {
         if (animationHandler != null && animationRunnable != null) {
             animationHandler.removeCallbacks(animationRunnable);
@@ -649,6 +706,10 @@ public class DriverActivity extends BaseNavDrawerActivity {
         if (routePolyline != null) {
             map.getOverlays().remove(routePolyline);
             routePolyline = null;
+        }
+
+        for (Marker m : rideMarkers) {
+            map.getOverlays().remove(m);
         }
         map.invalidate();
     }
@@ -687,7 +748,9 @@ public class DriverActivity extends BaseNavDrawerActivity {
                 @Override
                 public void onResponse(Call<List<com.komsiluk.taxi.ui.ride.map.NominatimPlace>> call, Response<List<com.komsiluk.taxi.ui.ride.map.NominatimPlace>> resp) {
                     if (resp.isSuccessful() && resp.body() != null && !resp.body().isEmpty()) {
-                        waypoints.add(new GeoPoint(Double.parseDouble(resp.body().get(0).lat), Double.parseDouble(resp.body().get(0).lon)));
+                        GeoPoint pt = new GeoPoint(Double.parseDouble(resp.body().get(0).lat), Double.parseDouble(resp.body().get(0).lon));
+                        waypoints.add(pt);
+                        addRideMarker(pt, R.drawable.station);
                     }
 
                     geocodeStopsRecursive(waypoints, stops, index + 1, end);
@@ -702,7 +765,9 @@ public class DriverActivity extends BaseNavDrawerActivity {
                 @Override
                 public void onResponse(Call<List<com.komsiluk.taxi.ui.ride.map.NominatimPlace>> call, Response<List<com.komsiluk.taxi.ui.ride.map.NominatimPlace>> resp) {
                     if (resp.isSuccessful() && resp.body() != null && !resp.body().isEmpty()) {
-                        waypoints.add(new GeoPoint(Double.parseDouble(resp.body().get(0).lat), Double.parseDouble(resp.body().get(0).lon)));
+                        GeoPoint pt = new GeoPoint(Double.parseDouble(resp.body().get(0).lat), Double.parseDouble(resp.body().get(0).lon));
+                        waypoints.add(pt);
+                        addRideMarker(pt, R.drawable.flag);
 
                         executeMultiRoute(waypoints);
                     }
