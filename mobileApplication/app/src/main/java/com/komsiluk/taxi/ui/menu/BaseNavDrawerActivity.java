@@ -33,6 +33,7 @@ import com.komsiluk.taxi.ui.about.AboutUsActivity;
 import com.komsiluk.taxi.ui.add_driver.AddDriverActivity;
 import com.komsiluk.taxi.ui.block.AdminBlockUserActivity;
 import com.komsiluk.taxi.ui.edit.AdminDriverChangeRequestsActivity;
+import com.komsiluk.taxi.ui.admin.ride_history.AdminRideHistoryActivity;
 import com.komsiluk.taxi.ui.passenger.ride_history.PassengerRideHistoryActivity;
 import com.komsiluk.taxi.ui.report.UsageReportsActivity;
 import com.komsiluk.taxi.ui.ride.FavoritesActivity;
@@ -237,6 +238,9 @@ public abstract class BaseNavDrawerActivity extends AppCompatActivity {
                 break;
             case PASSENGER:
                 startActivity(new Intent(this, PassengerRideHistoryActivity.class));
+                break;
+            case ADMIN:
+                startActivity(new Intent(this, AdminRideHistoryActivity.class));
                 break;
             default:
                 break;
