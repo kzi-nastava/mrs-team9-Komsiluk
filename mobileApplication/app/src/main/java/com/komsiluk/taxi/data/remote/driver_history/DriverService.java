@@ -30,12 +30,6 @@ public interface DriverService {
             @Query("to") String to
     );
 
-    @GET("rides/{rideId}/ratings")
-    Call<List<RatingResponse>> getRideRatings(@Path("rideId") Long rideId);
-
-    @GET("rides/{rideId}/inconsistencies")
-    Call<List<InconsistencyReportResponse>> getRideInconsistencies(@Path("rideId") Long rideId);
-
     @Multipart
     @POST("drivers")
     Call<DriverResponse> registerDriver(

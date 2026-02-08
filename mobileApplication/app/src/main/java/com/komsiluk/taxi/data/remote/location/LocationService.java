@@ -14,4 +14,7 @@ public interface LocationService {
 
     @PUT("drivers/{id}/location")
     Call<Void> updateLocation(@Path("id") Long id, @Body DriverLocationUpdate dto);
+
+    @GET("drivers/{id}/location")
+    Call<DriverLocationResponse> getSpecificDriverLocation(@Path("id") Long id);
 }

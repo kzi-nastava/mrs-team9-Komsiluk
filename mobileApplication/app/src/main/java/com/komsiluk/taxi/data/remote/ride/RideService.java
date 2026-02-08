@@ -20,4 +20,16 @@ public interface RideService {
 
     @POST("/api/rides/{id}/start")
     Call<RideResponse> startRide(@Path("id") Long rideId);
+
+    @POST("rides/{id}/finish")
+    Call<RideResponse> finishRide(@Path("id") Long rideId);
+
+    @GET("rides/passenger/active")
+    Call<RidePassengerActive> getPassengerActiveRide();
+
+    @GET("rides/{rideId}")
+    Call<AdminRideDetails> getRideDetails(@Path("rideId") Long rideId);
+
+    @GET("rides/user/{userId}/scheduled")
+    Call<List<RideResponse>> getScheduledRidesForUser(@Path("userId") Long userId);
 }
