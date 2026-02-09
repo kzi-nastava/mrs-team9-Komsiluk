@@ -3,6 +3,7 @@ import { Component, EventEmitter, HostListener, inject, Input, Output } from '@a
 import { Router } from '@angular/router';
 
 import { RideDetailsMapComponent } from '../../../../shared/components/ride-details-map/ride-details-map.component';
+import { DriverRatingModalComponent } from '../../../ride/components/driver-rating-modal/driver-raitng-modal';
 import { PassengerRideDetailsDTO } from '../../services/passenger-ride-history-api.service';
 import { BookRidePrefillService } from '../../../../shared/components/map/services/book-ride-prefill.service';
 import { FavoriteRouteResponseDTO, FavoriteRouteCreateDTO } from '../../../../shared/models/favorite-route.models';
@@ -18,7 +19,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 @Component({
   selector: 'app-passenger-ride-details-modal',
   standalone: true,
-  imports: [CommonModule, RideDetailsMapComponent],
+  imports: [CommonModule, RideDetailsMapComponent, DriverRatingModalComponent],
   templateUrl: './passenger-ride-details-modal.component.html',
   styleUrls: ['./passenger-ride-details-modal.component.css'],
 })
@@ -26,6 +27,8 @@ export class PassengerRideDetailsModalComponent {
   @Input() details: PassengerRideDetailsDTO | null = null;
   @Input() loading = false;
   @Output() close = new EventEmitter<void>();
+
+  
 
   private prefillService = inject(BookRidePrefillService);
   private router = inject(Router);
@@ -37,6 +40,9 @@ export class PassengerRideDetailsModalComponent {
 
   private readonly IMG_BASE = 'http://localhost:8081';
   saving = false;
+
+  showRatingModal = false;
+  authService = this.auth;
 
   onBackdropClick(): void {
     this.close.emit();

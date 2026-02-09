@@ -26,7 +26,9 @@
             </div>
           </div>
 
-          <h3 class="section-title section-title--spaced">Ratings</h3>
+          <h3 class="section-title section-title--spaced">Ratings
+            <button class="btn btn--primary" style="margin-left: 10px; vertical-align: middle;" (click)="showRatingModal = true">Leave rating</button>
+          </h3>
           @if (details.ratings && details.ratings.length > 0) {
             <div class="ratings-list">
               @for (rating of details.ratings; track rating.id) {
@@ -166,6 +168,16 @@
           Close
         </button>
       </div>
+
+      <!-- Driver Rating Modal -->
+      @if (showRatingModal && details) {
+        <app-driver-rating-modal
+          [rideId]="details.rideId"
+          [raterId]="authService.userId() ?? 0"
+          (close)="showRatingModal = false"
+          (submitted)="showRatingModal = false">
+        </app-driver-rating-modal>
+      }
     }
   </div>
 </div>
