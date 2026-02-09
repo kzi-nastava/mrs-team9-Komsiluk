@@ -59,10 +59,10 @@
                 Route {{ getSortIndicator('ROUTE') }}
               </th>
               <th (click)="onSort('START_TIME')" class="sortable">
-                Start {{ getSortIndicator('START_TIME') }}
+                Started {{ getSortIndicator('START_TIME') }}
               </th>
               <th (click)="onSort('END_TIME')" class="sortable">
-                End {{ getSortIndicator('END_TIME') }}
+                Ended {{ getSortIndicator('END_TIME') }}
               </th>
               <th (click)="onSort('CANCELLED_BY')" class="sortable">
                 Canceled {{ getSortIndicator('CANCELLED_BY') }}
@@ -90,9 +90,7 @@
             @for (ride of rides(); track ride.rideId) {
               <tr class="ride-row" (click)="onRowClick(ride)">
                 <td class="route-cell">
-                  <span class="route-from">{{ ride.startAddress }}</span>
-                  <span class="route-arrow">→</span>
-                  <span class="route-to">{{ ride.endAddress }}</span>
+                  {{ formatRoute(ride) }}
                 </td>
                 <td>{{ formatDateTime(ride.startTime) }}</td>
                 <td>{{ formatDateTime(ride.endTime) }}</td>
