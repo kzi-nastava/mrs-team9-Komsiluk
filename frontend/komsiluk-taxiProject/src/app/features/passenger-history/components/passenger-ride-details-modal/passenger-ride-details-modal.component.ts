@@ -53,28 +53,26 @@ export class PassengerRideDetailsModalComponent {
 
   get allLocations(): string[] {
     if (!this.details?.route) return [];
-    
-    // Handle stops - backend returns pipe-separated string
+    // Helper to extract street name
+    const street = (addr: string) => typeof addr === 'string' ? addr.split(',')[0].trim() : '';
     const stopsArr = this.stopsArray;
-    
     return [
-      this.details.route.startAddress,
+      street(this.details.route.startAddress),
       ...stopsArr,
-      this.details.route.endAddress
+      street(this.details.route.endAddress)
     ];
   }
 
   get stopsArray(): string[] {
     if (!this.details?.route) return [];
-    
+    const street = (addr: string) => typeof addr === 'string' ? addr.split(',')[0].trim() : '';
     const rawStops: any = this.details.route.stops;
-    
     if (rawStops == null) {
       return [];
     } else if (Array.isArray(rawStops)) {
-      return rawStops.filter((s: string) => !!s);
+      return rawStops.filter((s: string) => !!s).map(street);
     } else if (typeof rawStops === 'string') {
-      return rawStops.split('|').filter((s: string) => !!s.trim()).map((s: string) => s.trim());
+      return rawStops.split('|').filter((s: string) => !!s.trim()).map((s: string) => street(s));
     }
     return [];
   }
