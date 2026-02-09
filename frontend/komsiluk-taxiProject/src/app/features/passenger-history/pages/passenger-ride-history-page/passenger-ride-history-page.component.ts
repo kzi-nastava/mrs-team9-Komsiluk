@@ -1,3 +1,4 @@
+
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, signal, computed, effect, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
@@ -63,6 +64,26 @@ export class PassengerRideHistoryPageComponent implements OnInit {
     this.bootstrapUserId();
   }
 
+    /**
+   * Returns a formatted route string: Pickup: [start] → [station1] → ... → Destination: [end]
+   * Only street names are shown (first part before comma). Stations omitted if none.
+   */
+  formatRoute(ride: PassengerRideHistoryDTO): string {
+    // Capitalize for display
+    const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+    const start = cap(ride.startAddress.trim());
+    const end = cap(ride.endAddress.trim());
+    const stations = ride.route
+      ? ride.route.split(',').map(s => cap(s.trim())).filter(s => s.length > 0)
+      : [];
+    let result = `${start}`;
+    if (stations.length > 0) {
+      result += ' → ' + stations.join(' → ');
+    }
+    result += ` → ${end}`;
+    return result;
+  }
+
   private bootstrapUserId(): void {
     const trySet = () => {
       const raw = this.authService.userId();
@@ -123,7 +144,9 @@ export class PassengerRideHistoryPageComponent implements OnInit {
         case 'END_TIME':
           return dir * (new Date(a.endTime).getTime() - new Date(b.endTime).getTime());
         case 'START_ADDRESS':
-          return dir * a.startAddress.localeCompare(b.startAddress);
+        case 'ROUTE':
+          // Sort by processed route string
+          return dir * this.formatRoute(a).localeCompare(this.formatRoute(b));
         case 'END_ADDRESS':
           return dir * a.endAddress.localeCompare(b.endAddress);
         default:
