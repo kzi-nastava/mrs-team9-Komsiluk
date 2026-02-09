@@ -1,5 +1,6 @@
 package rs.ac.uns.ftn.iss.Komsiluk.services.exceptions;
 
+import java.util.Collections;
 import java.util.Map;
 
 import jakarta.validation.ConstraintViolationException;
@@ -41,7 +42,8 @@ public class GlobalExceptionHandler {
     
     @ExceptionHandler(AlreadyExistsException.class)
     public ResponseEntity<?> handleAlreadyExistsException(AlreadyExistsException ex) {
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("message", ex.getMessage()));
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(Collections.singletonMap("message", ex.getMessage()));
 	}
 
     @ExceptionHandler(ActivationAlreadySentException.class)

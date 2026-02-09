@@ -34,8 +34,8 @@
         <table class="rides-table">
           <thead>
             <tr>
-              <th class="sortable" (click)="onHeaderClick('START_ADDRESS')">
-                Route {{ getSortIcon('START_ADDRESS') }}
+              <th class="sortable" (click)="onHeaderClick('ROUTE')">
+                Route {{ getSortIcon('ROUTE') }}
               </th>
               <th class="sortable" (click)="onHeaderClick('START_TIME')">
                 Start {{ getSortIcon('START_TIME') }}
@@ -53,11 +53,7 @@
             }
             @for (ride of rides(); track ride.rideId) {
               <tr class="ride-row" (click)="onRowClick(ride)">
-                <td class="route-cell">
-                  <span class="route-from">{{ ride.startAddress }}</span>
-                  <span class="route-arrow">→</span>
-                  <span class="route-to">{{ ride.endAddress }}</span>
-                </td>
+                <td class="route-cell">{{ formatRoute(ride) }}</td>
                 <td>{{ formatDate(ride.startTime) }}</td>
                 <td>{{ formatDate(ride.endTime) }}</td>
               </tr>
