@@ -4,7 +4,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="24dp">
+    android:paddingHorizontal="24dp"
+    android:paddingVertical="16dp">
 
     <!-- Menu row -->
     <LinearLayout
@@ -32,7 +33,7 @@
                 android:layout_weight="1"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:paddingVertical="8dp"
+                android:paddingVertical="4dp"
                 android:clickable="true"
                 android:foreground="?attr/selectableItemBackground"
                 android:focusable="true">
@@ -51,7 +52,7 @@
                     android:text="@string/profile_menu_favorite_rides"
                     android:textColor="@color/white"
                     android:fontFamily="@font/roboto_serif_semibold"
-                    android:textSize="@dimen/fs_lg" />
+                    android:textSize="@dimen/fs_md" />
             </LinearLayout>
 
             <!-- Ride history -->
@@ -62,7 +63,7 @@
                 android:layout_weight="1"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:paddingVertical="8dp"
+                android:paddingVertical="4dp"
                 android:clickable="true"
                 android:foreground="?attr/selectableItemBackground"
                 android:focusable="true">
@@ -81,7 +82,7 @@
                     android:text="@string/profile_menu_ride_history"
                     android:textColor="@color/white"
                     android:fontFamily="@font/roboto_serif_semibold"
-                    android:textSize="@dimen/fs_lg" />
+                    android:textSize="@dimen/fs_md" />
             </LinearLayout>
         </LinearLayout>
 
@@ -90,7 +91,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginTop="8dp">
+            android:layout_marginTop="0dp">
 
             <!-- Usage report -->
             <LinearLayout
@@ -100,7 +101,7 @@
                 android:layout_weight="1"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:paddingVertical="8dp"
+                android:paddingVertical="0dp"
                 android:clickable="true"
                 android:foreground="?attr/selectableItemBackground"
                 android:focusable="true">
@@ -119,7 +120,7 @@
                     android:text="@string/profile_menu_usage_report"
                     android:textColor="@color/white"
                     android:fontFamily="@font/roboto_serif_semibold"
-                    android:textSize="@dimen/fs_lg" />
+                    android:textSize="@dimen/fs_md" />
             </LinearLayout>
 
             <!-- Support -->
@@ -130,7 +131,7 @@
                 android:layout_weight="1"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:paddingVertical="8dp"
+                android:paddingVertical="0dp"
                 android:clickable="true"
                 android:foreground="?attr/selectableItemBackground"
                 android:focusable="true">
@@ -149,7 +150,7 @@
                     android:text="@string/profile_menu_support"
                     android:textColor="@color/white"
                     android:fontFamily="@font/roboto_serif_semibold"
-                    android:textSize="@dimen/fs_lg" />
+                    android:textSize="@dimen/fs_md" />
             </LinearLayout>
         </LinearLayout>
 
