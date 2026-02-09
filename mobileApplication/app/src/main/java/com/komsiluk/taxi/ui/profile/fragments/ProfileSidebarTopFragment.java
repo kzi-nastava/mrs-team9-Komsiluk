@@ -99,17 +99,16 @@ public class ProfileSidebarTopFragment extends Fragment {
             tvName.setText(fullName.equals("- -") ? "-" : fullName);
             tvEmail.setText(safe(dto.getEmail()));
 
-            String url = buildImageUrl(dto.getProfileImageUrl());
-            if (url == null) {
-                imgAvatar.setImageResource(R.drawable.ic_launcher_foreground);
-                return;
-            }
+            renderAvatar(imgAvatar, dto.getProfileImageUrl(), false);
+        });
 
-            Glide.with(this)
-                    .load(url)
-                    .placeholder(R.drawable.ic_launcher_foreground)
-                    .error(R.drawable.ic_launcher_foreground)
-                    .into(imgAvatar);
+        viewModel.getImageVersion().observe(getViewLifecycleOwner(), v -> {
+            if (v == null || v == 0L) return;
+
+            var dto = viewModel.getProfile().getValue();
+            if (dto == null) return;
+
+            renderAvatar(imgAvatar, dto.getProfileImageUrl(), true);
         });
 
         viewModel.getImageUploadSuccess().observe(getViewLifecycleOwner(), event -> {
@@ -133,12 +132,18 @@ public class ProfileSidebarTopFragment extends Fragment {
         return (s == null || s.trim().isEmpty()) ? "-" : s.trim();
     }
 
-    private String buildImageUrl(String profileImageUrl) {
-        if (profileImageUrl == null || profileImageUrl.trim().isEmpty()) return null;
+    private void renderAvatar(ImageView imgAvatar, String relativeUrl, boolean bustCache) {
+        String url = viewModel.buildAbsoluteImageUrl(relativeUrl, bustCache);
 
-        String p = profileImageUrl.trim();
-        String base = "http://" + BuildConfig.IP_ADDR + ":8081";
+        if (url == null) {
+            imgAvatar.setImageResource(R.drawable.ic_launcher_foreground);
+            return;
+        }
 
-        return base + p;
+        Glide.with(this)
+                .load(url)
+                .placeholder(R.drawable.ic_launcher_foreground)
+                .error(R.drawable.ic_launcher_foreground)
+                .into(imgAvatar);
     }
 }

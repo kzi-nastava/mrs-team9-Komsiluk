@@ -29,6 +29,8 @@ public class ProfileActivity extends BaseNavDrawerActivity implements ProfileDet
 
     private ProfileViewModel viewModel;
 
+    private boolean shouldRefresh= false;
+
     @Override
     protected int getContentLayoutId() {
         return R.layout.activity_profile;
@@ -80,6 +82,7 @@ public class ProfileActivity extends BaseNavDrawerActivity implements ProfileDet
 
     @Override
     public void onEditProfileClicked(boolean isDriver) {
+        shouldRefresh= true;
         Intent intent = new Intent(this, EditProfileActivity.class);
         intent.putExtra(EditProfileActivity.EXTRA_IS_DRIVER, isDriver);
         startActivity(intent);
@@ -108,6 +111,9 @@ public class ProfileActivity extends BaseNavDrawerActivity implements ProfileDet
     @Override
     protected void onResume() {
         super.onResume();
-        viewModel.fetchProfile();
+        if(shouldRefresh){
+            viewModel.fetchProfile();
+            shouldRefresh= false;
+        }
     }
 }
