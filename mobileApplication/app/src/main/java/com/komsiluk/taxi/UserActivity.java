@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -137,6 +138,8 @@ public class UserActivity extends BaseNavDrawerActivity {
     private TextView tvActiveEstimatedTime;
 
     private static final GeoPoint NOVI_SAD_CENTER = new GeoPoint(45.2671, 19.8335);
+
+    private boolean hasRestoredRoute = false;
 
     private static final BoundingBox NS_BOX = new BoundingBox(
             45.35, 19.95,
@@ -410,6 +413,99 @@ public class UserActivity extends BaseNavDrawerActivity {
             processOrderAgain(rideJson);
         }
 
+
+    }
+
+
+    private void restoreRouteDataFromIntent() {
+        Intent intent = getIntent();
+        Log.e("UserActivity", "restoreRouteDataFromIntent called");
+
+        if (intent == null) {
+            Log.e("UserActivity", "Intent is null!");
+            return;
+        }
+
+        String pickupAddr = intent.getStringExtra(MainActivity.EXTRA_PICKUP_ADDRESS);
+        String destAddr = intent.getStringExtra(MainActivity.EXTRA_DEST_ADDRESS);
+
+        Log.e("UserActivity", "pickupAddr: " + pickupAddr);
+        Log.e("UserActivity", "destAddr: " + destAddr);
+
+        if (pickupAddr == null || destAddr == null) {
+            Log.e("UserActivity", "Route data is null - skipping restoration");
+            return;
+        }
+
+        // Restore addresses in UI
+        if (etPickup != null) {
+            etPickup.setText(pickupAddr);
+            Log.e("UserActivity", "Set pickup text");
+        } else {
+            Log.e("UserActivity", "etPickup is null!");
+        }
+
+        if (etDestination != null) {
+            etDestination.setText(destAddr);
+            Log.e("UserActivity", "Set destination text");
+        } else {
+            Log.e("UserActivity", "etDestination is null!");
+        }
+
+        // Restore coordinates
+        double pickupLat = intent.getDoubleExtra(MainActivity.EXTRA_PICKUP_LAT, 0);
+        double pickupLng = intent.getDoubleExtra(MainActivity.EXTRA_PICKUP_LNG, 0);
+        double destLat = intent.getDoubleExtra(MainActivity.EXTRA_DEST_LAT, 0);
+        double destLng = intent.getDoubleExtra(MainActivity.EXTRA_DEST_LNG, 0);
+
+        Log.e("UserActivity", String.format("Coords - Pickup: %.4f,%.4f Dest: %.4f,%.4f",
+                pickupLat, pickupLng, destLat, destLng));
+
+        if (pickupLat != 0 && pickupLng != 0) {
+            pickupPoint = new GeoPoint(pickupLat, pickupLng);
+            pickupSelected = true;
+
+            if (map != null) {
+                setMarker(true, pickupPoint);
+                Log.e("UserActivity", "Pickup marker set");
+            } else {
+                Log.e("UserActivity", "Map is null - cannot set pickup marker!");
+            }
+        }
+
+        if (destLat != 0 && destLng != 0) {
+            destPoint = new GeoPoint(destLat, destLng);
+            destSelected = true;
+
+            if (map != null) {
+                setMarker(false, destPoint);
+                Log.e("UserActivity", "Dest marker set");
+            } else {
+                Log.e("UserActivity", "Map is null - cannot set dest marker!");
+            }
+        }
+
+        // Draw route if both points exist
+        if (pickupPoint != null && destPoint != null) {
+            Log.e("UserActivity", "Drawing route...");
+
+            if (map != null && geoRepo != null) {
+                zoomToAllPoints();
+                drawRouteAndStatsMulti();
+
+                // Expand the bottom sheet
+                if (sheetBehavior != null) {
+                    sheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+                    Log.e("UserActivity", "Sheet expanded");
+                } else {
+                    Log.e("UserActivity", "sheetBehavior is null!");
+                }
+            } else {
+                Log.e("UserActivity", "Map or geoRepo is null! map=" + map + " geoRepo=" + geoRepo);
+            }
+        } else {
+            Log.e("UserActivity", "Points are null - not drawing route");
+        }
     }
 
     private void processOrderAgain(String json) {
@@ -487,7 +583,16 @@ public class UserActivity extends BaseNavDrawerActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (map != null) map.onResume();
+        if (map != null) {
+            map.onResume();
+
+            if (!hasRestoredRoute) {
+                hasRestoredRoute = true;
+                new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                    restoreRouteDataFromIntent();
+                }, 300);
+            }
+        }
     }
 
     @Override
@@ -724,64 +829,9 @@ public class UserActivity extends BaseNavDrawerActivity {
         if (cbPet != null) cbPet.setChecked(r.isPetFriendly());
         if (cbChild != null) cbChild.setChecked(r.isChildSeat());
 
-//        geocodeAndDrawFavorite(r);
         geocodeAndDrawRoute(r.getPickup(), r.getDestination(), r.getStations());
     }
 
-//    private void geocodeAndDrawFavorite(FavoriteRide fav) {
-//        pickupSelected = false;
-//        destSelected = false;
-//        pickupPoint = null;
-//        destPoint = null;
-//        stationPoints.clear();
-//        stationMarkers.clear();
-//        clearRouteAndStats();
-//        removeMarker(true);
-//        removeMarker(false);
-//
-//        String pickupAddr = fav.getPickup();
-//        String destAddr = fav.getDestination();
-//        List<String> stopsAddr = fav.getStations() != null ? fav.getStations() : new ArrayList<>();
-//
-//        geoRepo.searchNoviSad(pickupAddr, NS_VIEWBOX).enqueue(new Callback<List<NominatimPlace>>() {
-//            @Override public void onResponse(Call<List<NominatimPlace>> call, Response<List<NominatimPlace>> res) {
-//                if (!res.isSuccessful() || res.body() == null || res.body().isEmpty()) {
-//                    Toast.makeText(UserActivity.this, "Could not locate pickup.", Toast.LENGTH_LONG).show();
-//                    return;
-//                }
-//                NominatimPlace p = res.body().get(0);
-//                pickupPoint = new GeoPoint(parseDouble(p.lat), parseDouble(p.lon));
-//                pickupSelected = true;
-//                setMarker(true, pickupPoint);
-//
-//                geocodeStopsSequential(stopsAddr, 0, () -> {
-//                    geoRepo.searchNoviSad(destAddr, NS_VIEWBOX).enqueue(new Callback<List<NominatimPlace>>() {
-//                        @Override public void onResponse(Call<List<NominatimPlace>> call2, Response<List<NominatimPlace>> res2) {
-//                            if (!res2.isSuccessful() || res2.body() == null || res2.body().isEmpty()) {
-//                                Toast.makeText(UserActivity.this, "Could not locate destination.", Toast.LENGTH_LONG).show();
-//                                return;
-//                            }
-//                            NominatimPlace d = res2.body().get(0);
-//                            destPoint = new GeoPoint(parseDouble(d.lat), parseDouble(d.lon));
-//                            destSelected = true;
-//                            setMarker(false, destPoint);
-//
-//                            zoomToAllPoints();
-//                            drawRouteAndStatsMulti();
-//                        }
-//
-//                        @Override public void onFailure(Call<List<NominatimPlace>> call2, Throwable t) {
-//                            Toast.makeText(UserActivity.this, "Destination geocode failed.", Toast.LENGTH_LONG).show();
-//                        }
-//                    });
-//                });
-//            }
-//
-//            @Override public void onFailure(Call<List<NominatimPlace>> call, Throwable t) {
-//                Toast.makeText(UserActivity.this, "Pickup geocode failed.", Toast.LENGTH_LONG).show();
-//            }
-//        });
-//    }
 
     private void geocodeAndDrawRoute(String pickupAddr, String destAddr, List<String> stopsAddr) {
         pickupSelected = false;
@@ -850,7 +900,6 @@ public class UserActivity extends BaseNavDrawerActivity {
                     GeoPoint pt = new GeoPoint(parseDouble(p.lat), parseDouble(p.lon));
                     stationPoints.add(pt);
 
-                    // marker za stanicu
                     Marker m = new Marker(map);
                     m.setPosition(pt);
                     m.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
@@ -1035,38 +1084,57 @@ public class UserActivity extends BaseNavDrawerActivity {
         }
     }
 
+
     private void drawRouteAndStatsMulti() {
-        if (pickupPoint == null || destPoint == null) return;
+        Log.e("UserActivity", "drawRouteAndStatsMulti called");
+
+        if (pickupPoint == null || destPoint == null) {
+            Log.e("UserActivity", "Cannot draw route - points are null");
+            return;
+        }
 
         List<GeoPoint> pts = new ArrayList<>();
         pts.add(pickupPoint);
         pts.addAll(stationPoints);
         pts.add(destPoint);
 
+        Log.e("UserActivity", "Calling routeMulti with " + pts.size() + " points");
+
         geoRepo.routeMulti(pts).enqueue(new Callback<OsrmRouteResponse>() {
             @Override
             public void onResponse(Call<OsrmRouteResponse> call, Response<OsrmRouteResponse> response) {
-                if (!response.isSuccessful() || response.body() == null || response.body().routes == null || response.body().routes.isEmpty()) {
+                Log.e("UserActivity", "Route API response code: " + response.code());
+
+                if (!response.isSuccessful() || response.body() == null ||
+                        response.body().routes == null || response.body().routes.isEmpty()) {
+                    Log.e("UserActivity", "Route failed - unsuccessful or empty");
                     Toast.makeText(UserActivity.this, getString(R.string.error_route_failed), Toast.LENGTH_SHORT).show();
                     return;
                 }
 
                 OsrmRouteResponse.Route r = response.body().routes.get(0);
+                Log.e("UserActivity", "Route received - distance: " + r.distance + " duration: " + r.duration);
 
                 if (r.geometry != null) {
+                    Log.e("UserActivity", "Drawing polyline with " + r.geometry.coordinates.size() + " coordinates");
                     drawPolyline(r.geometry.coordinates);
+                } else {
+                    Log.e("UserActivity", "No geometry in route response");
                 }
 
                 double km = r.distance / 1000.0;
                 tvKm.setText(String.format(Locale.getDefault(), "%.1f km", km));
                 tvDriveTime.setText(formatDuration((long) r.duration));
 
-                lastDistanceKm= km;
+                lastDistanceKm = km;
                 lastDurationMin = (int) Math.round(r.duration / 60.0);
+
+                Log.e("UserActivity", "Route drawing complete!");
             }
 
             @Override
             public void onFailure(Call<OsrmRouteResponse> call, Throwable t) {
+                Log.e("UserActivity", "Route API failure: " + t.getMessage(), t);
                 Toast.makeText(UserActivity.this, getString(R.string.error_route_failed), Toast.LENGTH_SHORT).show();
             }
         });
@@ -1572,14 +1640,12 @@ public class UserActivity extends BaseNavDrawerActivity {
     }
 
     private void checkForActiveRide() {
-        // Ako već imamo aktivnu vožnju, ne pokrećemo proveru ponovo
         if (activeRideId != null) return;
 
         rideApi.getPassengerActiveRide().enqueue(new Callback<RidePassengerActive>() {
             @Override
             public void onResponse(Call<RidePassengerActive> call, Response<RidePassengerActive> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    // VOŽNJA JE DETEKTOVANA
                     activeRideId = response.body().getRideId();
                     assignedDriverId = response.body().getDriverId();
 
@@ -1594,7 +1660,6 @@ public class UserActivity extends BaseNavDrawerActivity {
 
             @Override
             public void onFailure(Call<RidePassengerActive> call, Throwable t) {
-                // Greška u mreži, pokušaj ponovo za 5 sekundi
                 activeRideHandler.postDelayed(() -> checkForActiveRide(), 2000);
             }
         });
@@ -1611,7 +1676,6 @@ public class UserActivity extends BaseNavDrawerActivity {
                     tvActivePickup.setText(details.getRoute().getStartAddress());
                     tvActiveDestination.setText(details.getRoute().getEndAddress());
 
-                    // 1. Izvlačenje stanica iz stringa "Adresa1|Adresa2"
                     List<String> stopsList = new ArrayList<>();
                     if (details.getRoute() != null && details.getRoute().getStops() != null
                             && !details.getRoute().getStops().isEmpty()) {
@@ -1623,7 +1687,6 @@ public class UserActivity extends BaseNavDrawerActivity {
                         }
                     }
 
-                    // 2. Crtanje rute koja sada UKLJUČUJE stanice
                     geocodeAndDrawRoute(
                             details.getRoute().getStartAddress(),
                             details.getRoute().getEndAddress(),
@@ -1668,18 +1731,15 @@ public class UserActivity extends BaseNavDrawerActivity {
             public void run() {
                 if (assignedDriverId == null) return;
 
-                // KORAK 1: Proveri da li je vožnja i dalje aktivna za mene (putnika)
                 rideApi.getPassengerActiveRide().enqueue(new Callback<RidePassengerActive>() {
                     @Override
                     public void onResponse(Call<RidePassengerActive> call, Response<RidePassengerActive> rideResp) {
 
-                        // Ako backend vrati 204 (No Content) ili response nije successful, vožnja je gotova
                         if (rideResp.code() == 204 || !rideResp.isSuccessful() || rideResp.body() == null) {
                             stopRideAndCleanup();
                             return;
                         }
 
-                        // KORAK 2: Ako je vožnja još aktivna, tek onda crtaj lokaciju vozača
                         locationApi.getSpecificDriverLocation(assignedDriverId).enqueue(new Callback<DriverLocationResponse>() {
                             @Override
                             public void onResponse(Call<DriverLocationResponse> call, Response<DriverLocationResponse> locResp) {
@@ -1721,21 +1781,17 @@ public class UserActivity extends BaseNavDrawerActivity {
     }
 
     private void stopRideAndCleanup() {
-        // 1. Prvo sačuvaj ID pre nego što ga obrišeš!
         Long rideIdForRating = activeRideId;
 
-        // 2. Zaustavi polling lokacije vozača
         if (activeRideHandler != null && activeRideRunnable != null) {
             activeRideHandler.removeCallbacks(activeRideRunnable);
         }
 
-        // 3. Ukloni marker vozača
         if (driverMarker != null) {
             map.getOverlays().remove(driverMarker);
             driverMarker = null;
         }
 
-        // 4. Očisti rutu i ostale markere
         clearRouteAndStats();
         removeMarker(true);
         removeMarker(false);
@@ -1745,17 +1801,14 @@ public class UserActivity extends BaseNavDrawerActivity {
         }
         stationMarkers.clear();
         stationPoints.clear();
-        layoutActiveStops.removeAllViews(); // Očisti dinamičke stanice iz panela
+        layoutActiveStops.removeAllViews();
 
-        // 5. Resetuj ID-eve (tek nakon što si sačuvao ID za rating gore)
         activeRideId = null;
         assignedDriverId = null;
 
-        // 6. Ponovo prikaži panel za naručivanje
         layoutOrderForm.setVisibility(View.VISIBLE);
         layoutActiveRide.setVisibility(View.GONE);
 
-        // Onemogući ponovo draggables dok ne bude nove vožnje
         sheetBehavior.setDraggable(false);
         sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
 
@@ -1763,12 +1816,10 @@ public class UserActivity extends BaseNavDrawerActivity {
 
         Toast.makeText(this, "Ride has finished successfully.", Toast.LENGTH_LONG).show();
 
-        // 7. Prikaži dijalog samo ako smo imali ID (sada će rideIdForRating imati vrednost)
         if (rideIdForRating != null) {
             showRatingDialog(rideIdForRating);
         }
 
-        // 8. Nastavi da proveravaš nove vožnje
         checkForActiveRide();
     }
     private void showReportInconsistencyDialog() {
@@ -1842,7 +1893,7 @@ public class UserActivity extends BaseNavDrawerActivity {
 
         AlertDialog dialog = new MaterialAlertDialogBuilder(this)
                 .setView(v)
-                .setCancelable(false) // Korisnik mora ili da oceni ili da klikne cancel
+                .setCancelable(false)
                 .create();
 
         if (dialog.getWindow() != null) {
@@ -1858,7 +1909,6 @@ public class UserActivity extends BaseNavDrawerActivity {
             dto.setVehicleGrade((int) rbVehicle.getRating());
             dto.setComment(etComment.getText().toString().trim());
 
-            // Provera da li je bar nešto ocenjeno (opciono)
             if (dto.getDriverGrade() == 0 || dto.getVehicleGrade() == 0) {
                 Toast.makeText(this, "Please provide ratings for both driver and vehicle", Toast.LENGTH_SHORT).show();
                 return;
@@ -1871,7 +1921,6 @@ public class UserActivity extends BaseNavDrawerActivity {
     }
 
     private void sendRating(Long rideId, RatingCreate dto, AlertDialog dialog) {
-        // ratingService mora biti @Inject-ovan na vrhu klase
         ratingService.createRating(rideId, dto).enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
@@ -1893,28 +1942,20 @@ public class UserActivity extends BaseNavDrawerActivity {
     private void updateDriverEstimatedTime(GeoPoint driverPos) {
         if (geoRepo == null || destPoint == null) return;
 
-        // 1. Kreiramo listu svih tačaka rute
         List<GeoPoint> points = new ArrayList<>();
 
-        // Prva tačka je trenutna lokacija vozača
         points.add(driverPos);
 
-        // 2. DODAJEMO STANICE:
-        // Koristimo tvoju postojeću listu stationPoints.
-        // Napomena: Ovo pretpostavlja da vozač ide redom kroz stanice.
         if (stationPoints != null && !stationPoints.isEmpty()) {
             points.addAll(stationPoints);
         }
 
-        // Posljednja tačka je finalna destinacija
         points.add(destPoint);
 
-        // 3. Pozivamo tvoju postojeću metodu iz GeoRepository
         geoRepo.routeMulti(points).enqueue(new Callback<OsrmRouteResponse>() {
             @Override
             public void onResponse(Call<OsrmRouteResponse> call, Response<OsrmRouteResponse> response) {
                 if (response.isSuccessful() && response.body() != null && !response.body().routes.isEmpty()) {
-                    // OSRM duration je suma vremena između svih tačaka u listi
                     double durationSeconds = response.body().routes.get(0).duration;
 
                     String timeText = formatDuration((long) durationSeconds) + " remaining";
