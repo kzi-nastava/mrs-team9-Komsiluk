@@ -69,4 +69,14 @@ export class ProfileSidebarComponent {
       }
     });
   }
+
+  goToRideHistory() {
+    if (this.isDriver) {
+      this.router.navigate(['/driver-history']);
+    } else if (this.isPassenger) {
+      this.router.navigate(['/passenger-history']);
+    } else {
+      this.router.navigate(['/admin/ride-history']);
+    }
+  }
 }

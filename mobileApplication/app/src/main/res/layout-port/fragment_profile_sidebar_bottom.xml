@@ -25,9 +25,9 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
-            <!-- Favorite rides -->
+            <!-- Top left -->
             <LinearLayout
-                android:id="@+id/btnFavoriteRides"
+                android:id="@+id/btnTopLeft"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -39,13 +39,14 @@
                 android:focusable="true">
 
                 <ImageView
-                    android:id="@+id/iconFavoriteRides"
+                    android:id="@+id/iconTopLeft"
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:src="@drawable/favorite"
                     app:tint="@color/secondary" />
 
                 <TextView
+                    android:id="@+id/tvTopLeft"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="12dp"
