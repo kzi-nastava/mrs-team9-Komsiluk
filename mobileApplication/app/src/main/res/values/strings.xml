@@ -389,4 +389,6 @@
     <string name="btn_report">Report</string>
     <string name="btn_panic">Panic</string>
     <string name="btn_stop">Stop</string>
+    <string name="update_price">Update price</string>
+    <string name="active_rides">Active rides</string>
 </resources>
