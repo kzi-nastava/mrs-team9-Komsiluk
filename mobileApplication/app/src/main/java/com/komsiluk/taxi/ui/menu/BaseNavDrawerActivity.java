@@ -35,6 +35,7 @@ import com.komsiluk.taxi.ui.block.AdminBlockUserActivity;
 import com.komsiluk.taxi.ui.edit.AdminDriverChangeRequestsActivity;
 import com.komsiluk.taxi.ui.admin.ride_history.AdminRideHistoryActivity;
 import com.komsiluk.taxi.ui.passenger.ride_history.PassengerRideHistoryActivity;
+import com.komsiluk.taxi.ui.price.UpdatePricingActivity;
 import com.komsiluk.taxi.ui.report.UsageReportsActivity;
 import com.komsiluk.taxi.ui.ride.FavoritesActivity;
 import com.komsiluk.taxi.ui.profile.ProfileActivity;
@@ -189,6 +190,8 @@ public abstract class BaseNavDrawerActivity extends AppCompatActivity {
             // ...
         } else if (itemId == R.id.nav_about) {
             navigateToAbout();
+        } else if (itemId == R.id.nav_update_price) { // NOVO
+        navigateToUpdatePrice();
         }
     }
 
@@ -277,5 +280,9 @@ public abstract class BaseNavDrawerActivity extends AppCompatActivity {
 
     protected void navigateToAddDriver() {
         startActivity(new Intent(this, AddDriverActivity.class));
+    }
+
+    protected void navigateToUpdatePrice() {
+        startActivity(new Intent(this, UpdatePricingActivity.class));
     }
 }

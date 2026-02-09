@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="8dp"
+    android:gravity="center_vertical">
+
+    <TextView
+        android:id="@+id/tvVehicleType"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="STANDARD"
+        android:textColor="@color/white"
+        android:textStyle="bold" />
+
+    <EditText
+        android:id="@+id/etStartPrice"
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:hint="Start"
+        android:gravity="center"
+        android:inputType="number"
+        android:textColor="@color/white"
+        android:textStyle="bold"/>
+
+
+    <EditText
+        android:id="@+id/etPricePerKm"
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:hint="/km"
+        android:inputType="number"
+        android:textColor="@color/white"
+        android:textStyle="bold"/>
+
+    <ImageButton
+        android:id="@+id/btnSavePrice"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:gravity="center"
+        android:src="@drawable/edit_white"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="Save" />
+</LinearLayout>

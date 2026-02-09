@@ -174,8 +174,8 @@ public class RideDetailsDialogFragment extends DialogFragment {
             m.setPosition(points.get(i));
             m.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
             if (i == 0) m.setIcon(ContextCompat.getDrawable(requireContext(), R.drawable.home));
-            else if (i == points.size() - 1) m.setIcon(ContextCompat.getDrawable(requireContext(), R.drawable.station));
-            else m.setIcon(ContextCompat.getDrawable(requireContext(), R.drawable.flag));
+            else if (i == points.size() - 1) m.setIcon(ContextCompat.getDrawable(requireContext(), R.drawable.flag));
+            else m.setIcon(ContextCompat.getDrawable(requireContext(), R.drawable.station));
             b.mapDetails.getOverlays().add(m);
         }
 
