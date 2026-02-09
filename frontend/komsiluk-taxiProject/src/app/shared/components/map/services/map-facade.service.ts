@@ -14,6 +14,13 @@ export type RideWaypoint = { lat: number; lon: number; label?: string };
 
 @Injectable({ providedIn: 'root' })
 export class MapFacadeService {
+    private resetMapSig = signal(false);
+    resetMap = computed(() => this.resetMapSig());
+
+    triggerResetMap() {
+      this.resetMapSig.set(true);
+      setTimeout(() => this.resetMapSig.set(false), 0);
+    }
   private stateSig = signal<RouteRenderState | null>(null);
   state = computed(() => this.stateSig());
 

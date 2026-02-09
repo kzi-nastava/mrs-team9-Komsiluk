@@ -91,6 +91,7 @@ private geocodingService = inject(GeocodingService);
     });
   }
 
+
   private initMap(): void {
     const noviSadBounds = L.latLngBounds([45.214, 19.764], [45.309, 19.929]);
 
@@ -150,6 +151,24 @@ ngAfterViewInit(): void {
         this.renderRoute(s.points, s.geometry);
       }
     });
+
+    effect(() => {
+        if (this.facade.resetMap()) {
+          this.driversLayer.clearLayers();
+          this.driverMarkers.clear();
+          this.selfMarker = null;
+          this.targetDriverId = null;
+          this.clearRoute();
+          this.clearLiveRideVisuals();
+          this.activePassengerMarkers.clearLayers();
+          this.stopSelfAnimation();
+          this.clearPreRideVisuals();
+          this.facade.activeDriverId.set(null);
+          if ((this.facade as any).clearDriveTo) {
+            (this.facade as any).clearDriveTo();
+          }
+        }
+      });
 
     //Driver (Drive to pickup)
     effect(() => {
@@ -392,7 +411,7 @@ private calculatePassengerPath(points: any[]) {
 
   // ===== LIVE RIDE =====
 
-  private clearLiveRideVisuals() {
+  public clearLiveRideVisuals() {
     if (this.liveRideLine) {
       this.map.removeLayer(this.liveRideLine);
       this.liveRideLine = null;

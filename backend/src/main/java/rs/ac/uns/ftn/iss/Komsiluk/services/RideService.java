@@ -7,6 +7,7 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.util.stream.Collectors;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.*;
@@ -27,6 +28,7 @@ import rs.ac.uns.ftn.iss.Komsiluk.services.exceptions.BadRequestException;
 import rs.ac.uns.ftn.iss.Komsiluk.services.exceptions.NotFoundException;
 import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.*;
 
+@Slf4j
 @Service
 public class RideService implements IRideService {
 
@@ -496,7 +498,7 @@ public class RideService implements IRideService {
             throw new BadRequestException("Ride cannot be cancelled");
         }
 
-        if (ride.getScheduledAt() == null) {
+        if (ride.getStatus() == RideStatus.SCHEDULED && ride.getScheduledAt() == null) {
             throw new BadRequestException("Ride cannot be cancelled");
         }
 
@@ -527,7 +529,7 @@ public class RideService implements IRideService {
             throw new BadRequestException("Ride cannot be cancelled");
         }
 
-        if (ride.getScheduledAt() == null) {
+        if (ride.getStatus() == RideStatus.SCHEDULED && ride.getScheduledAt() == null) {
             throw new BadRequestException("Ride cannot be cancelled");
         }
 
@@ -567,7 +569,7 @@ public class RideService implements IRideService {
         LocalDateTime endTime = LocalDateTime.now();
         ride.setEndTime(endTime);
 
-        long durationMinutes = java.time.Duration.between(ride.getStartTime(), endTime).toMinutes();
+        long durationMinutes = java.time.Duration.between(ride.getStartTime(), endTime).toMinutes() == 0 ? 1 : java.time.Duration.between(ride.getStartTime(), endTime).toMinutes();
         ride.setEstimatedDurationMin((int) durationMinutes);
         ride.setDistanceKm(dto.getDistanceTravelledKm());
 
