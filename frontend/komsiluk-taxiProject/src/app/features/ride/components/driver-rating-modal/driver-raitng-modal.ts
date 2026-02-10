@@ -1,4 +1,5 @@
 import { Component, ElementRef, EventEmitter, Input, Output, Renderer2, inject } from '@angular/core';
+import { ToastService } from '../../../../shared/components/toast/toast.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
@@ -19,6 +20,7 @@ export class DriverRatingModalComponent {
   private http = inject(HttpClient);
   private renderer = inject(Renderer2);
   private elementRef = inject(ElementRef);
+  private toast = inject(ToastService);
   driverGrade: number = 0;
   vehicleGrade: number = 0;
   comment: string = '';
@@ -35,14 +37,20 @@ export class DriverRatingModalComponent {
     };
 
     const url = `http://localhost:8081/api/rides/${this.rideId}/ratings`;
-    
     this.http.post(url, payload).subscribe({
       next: (response) => {
         console.log('Rating sent successfully', response);
         this.submitted.emit(response);
         this.close.emit();
       },
-      error: (err) => console.error('Failed to send rating', err)
+      error: (err) => {
+        let msg = 'Failed to send rating.';
+        if (err?.error?.message) msg = err.error.message;
+        else if (err?.error) msg = err.error;
+        else if (err?.message) msg = err.message;
+        this.toast.show(String(msg));
+        this.close.emit();
+      }
     });
   }
 }

@@ -61,9 +61,6 @@ public class LoginFragment extends Fragment {
         errorBg = requireContext().getDrawable(R.drawable.bg_input_error);
 
 
-        /**
-         * REGISTER FIELDS TO VIEWMODEL FIELDS AND VALIDATORS
-         * **/
         binding.etEmail.addTextChangedListener(new SimpleTextWatcher() {
             @Override
             public void afterTextChanged(Editable s) {
@@ -80,13 +77,11 @@ public class LoginFragment extends Fragment {
             }
         });
 
-        // injecting ViewModel and setting authActivity as it's owner
         viewModel = new ViewModelProvider(requireActivity())
                 .get(LoginViewModel.class);
 
 
 
-        /**  OBSERVING FOR REST RESPONSES **/
         viewModel.getLoginSuccess().observe(getViewLifecycleOwner(), event -> {
             UserRole role = event.getContentIfNotHandled();
             if (role == null) return;
@@ -102,26 +97,50 @@ public class LoginFragment extends Fragment {
             ).show();
 
             Context ctx = requireContext();
-            Intent intent;
+            Intent intent = null;
 
             switch (role) {
                 case PASSENGER:
+                    Intent currentIntent = requireActivity().getIntent();
+
+                    String pickupAddr = currentIntent.getStringExtra(MainActivity.EXTRA_PICKUP_ADDRESS);
+                    String destAddr = currentIntent.getStringExtra(MainActivity.EXTRA_DEST_ADDRESS);
+
                     intent = new Intent(ctx, UserActivity.class);
+
+                    if (pickupAddr != null && destAddr != null) {
+                        intent.putExtra(MainActivity.EXTRA_PICKUP_ADDRESS, pickupAddr);
+                        intent.putExtra(MainActivity.EXTRA_DEST_ADDRESS, destAddr);
+                        intent.putExtra(MainActivity.EXTRA_PICKUP_LAT,
+                                currentIntent.getDoubleExtra(MainActivity.EXTRA_PICKUP_LAT, 0));
+                        intent.putExtra(MainActivity.EXTRA_PICKUP_LNG,
+                                currentIntent.getDoubleExtra(MainActivity.EXTRA_PICKUP_LNG, 0));
+                        intent.putExtra(MainActivity.EXTRA_DEST_LAT,
+                                currentIntent.getDoubleExtra(MainActivity.EXTRA_DEST_LAT, 0));
+                        intent.putExtra(MainActivity.EXTRA_DEST_LNG,
+                                currentIntent.getDoubleExtra(MainActivity.EXTRA_DEST_LNG, 0));
+                    }
                     break;
+
                 case DRIVER:
                     intent = new Intent(ctx, DriverActivity.class);
                     break;
+
                 case ADMIN:
                     intent = new Intent(ctx, AdminActivity.class);
                     break;
+
                 default:
                     intent = new Intent(ctx, MainActivity.class);
                     break;
             }
 
-            intent.addFlags(android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP | android.content.Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(intent);
-            requireActivity().finish();
+            // Start the activity and clear the back stack
+            if (intent != null) {
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+                requireActivity().finish(); // Finish the AuthActivity
+            }
         });
 
         viewModel.getErrorMessage().observe(getViewLifecycleOwner(), event -> {

@@ -223,7 +223,19 @@ export class AdminRideHistoryPageComponent {
   }
 
   formatRoute(ride: AdminRideHistoryDTO): string {
-    return `${ride.startAddress} → ${ride.endAddress}`;
+    // Capitalize for display
+    const cap = (s: string) => s && s.length ? s.charAt(0).toUpperCase() + s.slice(1) : '';
+    const start = cap((ride.startAddress || '').trim());
+    const end = cap((ride.endAddress || '').trim());
+    const stations = ride.route
+      ? ride.route.split(',').map(s => cap(s.trim())).filter(s => s.length > 0)
+      : [];
+    let result = start;
+    if (stations.length > 0) {
+      result += ' → ' + stations.join(' → ');
+    }
+    result += ' → ' + end;
+    return result;
   }
 
   formatCanceled(ride: AdminRideHistoryDTO): string {

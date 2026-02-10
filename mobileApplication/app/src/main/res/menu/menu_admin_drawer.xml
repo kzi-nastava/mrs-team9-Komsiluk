@@ -22,9 +22,18 @@
         android:title="@string/menu_usage_report" />
 
     <item
+        android:id="@+id/nav_update_price"
+        android:icon="@drawable/price_change"
+        android:title="@string/update_price" />
+
+    <item
         android:id="@+id/nav_edit_requests"
         android:icon="@drawable/edit"
         android:title="@string/menu_edit_requests" />
+    <item
+        android:id="@+id/nav_active_rides"
+        android:icon="@drawable/car"
+        android:title="@string/active_rides" />
 
     <item
         android:id="@+id/nav_history"

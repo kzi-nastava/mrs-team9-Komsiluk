@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { GeoPoint } from './map-facade.service';
 import { GeocodingService } from './geocoding.service';
-import { lastValueFrom, timeout } from 'rxjs';
+import { filter, lastValueFrom, timeout } from 'rxjs';
 
 export interface LabeledPoint {
   lat: number;
@@ -60,6 +60,14 @@ export class RideProgressService {
   endIndex: number,
   stops: Array<LabeledPoint | null>
 ): Array<LabeledPoint | null> {
+  if (endIndex === 0) {
+    return [stops[0]].filter(stop => stop !== null);
+  } else if (endIndex === route.length - 1) {
+    return stops.slice(
+stops.length - 1
+    ).filter(stop => stop !== null);
+  }
+
   const visitedRoute = route.slice(0, endIndex + 1);
   const TOLERANCE_METERS = 70;
 

@@ -15,6 +15,8 @@ import { PanicModalService } from '../../../../../shared/components/modal-shell/
 import { StopRideService } from '../../../../../shared/components/modal-shell/services/stop-ride-service';
 import { ProfileService } from '../../../../../features/profile/services/profile.service';
 import { UserProfileResponseDTO } from '../../../../../shared/models/profile.models';
+import { CancelRideModalService } from '../../../../../shared/components/modal-shell/services/confirm-ride-modal-service';
+
 
 type Waypoint = { lat: number; lon: number; label?: string };
 
@@ -29,7 +31,8 @@ export class DriverCurrentRidePanelComponent implements OnInit {
   showReportModal = signal(false);
   loading = signal(false);
   ride = signal<RideResponseDTO | null>(null);
-
+  
+  private cancelModalSvc = inject(CancelRideModalService);
   private panicModalSvc = inject(PanicModalService);
   private stopRideSvc = inject(StopRideService);
 
@@ -85,6 +88,12 @@ export class DriverCurrentRidePanelComponent implements OnInit {
     });
 
     effect(() => {
+    const cancelledRide = this.cancelModalSvc.rideCancelledTrigger();
+    if (cancelledRide) {
+      this.cleanupAfterRideEnd(cancelledRide);
+      this.cancelModalSvc.rideCancelledTrigger.set(null);
+    }
+
     const stoppedRide = this.stopRideSvc.rideStoppedTrigger();
     if (stoppedRide) {
       this.cleanupAfterRideEnd(stoppedRide);
@@ -285,8 +294,13 @@ export class DriverCurrentRidePanelComponent implements OnInit {
   }
 
   cancel() {
-    this.toast.show('Not implemented.');
+  const ride = this.ride();
+  if (ride) {
+    this.cancelModalSvc.open(ride, 'driver');
+  } else {
+    this.toast.show('No ride found to cancel.');
   }
+}
 
 
 finish() {

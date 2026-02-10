@@ -389,6 +389,11 @@
     <string name="btn_report">Report</string>
     <string name="btn_panic">Panic</string>
     <string name="btn_stop">Stop</string>
+    <string name="update_price">Update price</string>
+    <string name="active_rides">Active rides</string>
+    <string name="login_to_book_a_ride">Log in required</string>
+    <string name="login_requirement_message">You need to log in in order to book a ride</string>
+    <string name="redirect_to_login_button">Go to login</string>
 
     <string name="driver_go_active_title">Go Active</string>
     <string name="driver_go_inactive_title">Go Inactive</string>

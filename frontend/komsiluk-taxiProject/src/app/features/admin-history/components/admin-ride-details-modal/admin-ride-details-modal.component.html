@@ -93,7 +93,7 @@
           <div class="route-details">
             <div class="detail-row">
               <span class="detail-label">Pickup:</span>
-              <span class="detail-value">{{ details.route.startAddress }}</span>
+              <span class="detail-value">{{ details.route.startAddress.split(',')[0].trim() }}</span>
             </div>
             @for (stop of stopsArray; track $index) {
               <div class="detail-row">
@@ -103,7 +103,7 @@
             }
             <div class="detail-row">
               <span class="detail-label">Destination:</span>
-              <span class="detail-value">{{ details.route.endAddress }}</span>
+              <span class="detail-value">{{ details.route.endAddress.split(',')[0].trim() }}</span>
             </div>
             
             <div class="detail-divider"></div>
@@ -117,12 +117,14 @@
               <span class="detail-value">{{ formatDateTime(details.endTime) }}</span>
             </div>
 
+            <div class="detail-divider"></div>
+            <div class="detail-row" [class.canceled-row]="isCanceled()">
+              <span class="detail-label">Status:</span>
+              <span class="detail-value" [class.status-canceled]="isCanceled()">
+                {{ details.status || (isCanceled() ? 'CANCELED' : 'ACTIVE') }}
+              </span>
+            </div>
             @if (isCanceled()) {
-              <div class="detail-divider"></div>
-              <div class="detail-row canceled-row">
-                <span class="detail-label">Status:</span>
-                <span class="detail-value status-canceled">CANCELED</span>
-              </div>
               @if (details.cancellationSource) {
                 <div class="detail-row">
                   <span class="detail-label">Canceled by:</span>
@@ -140,15 +142,15 @@
 
           <div class="stats-row">
             <div class="stat-item">
-              <img class="stat-icon" src="assets/icons/taxi.png" alt="" />
+              <img class="stat-icon" src="assets/icons/map-marker.svg" alt="Distance" />
               <span class="stat-value">{{ details.distanceKm | number:'1.1-1' }} km</span>
             </div>
             <div class="stat-item">
-              <img class="stat-icon" src="assets/icons/clock.png" alt="" />
+              <img class="stat-icon" src="assets/icons/timer.svg" alt="Estimated Time" />
               <span class="stat-value">{{ details.estimatedDurationMin }} min</span>
             </div>
             <div class="stat-item">
-              <img class="stat-icon" src="assets/icons/dollar.png" alt="" />
+              <img class="stat-icon" src="assets/icons/currency.svg" alt="Price" />
               <span class="stat-value">{{ details.price | number:'1.0-2' }} RSD</span>
             </div>
           </div>

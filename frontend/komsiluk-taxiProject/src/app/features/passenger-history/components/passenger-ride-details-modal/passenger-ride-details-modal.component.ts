@@ -3,6 +3,7 @@ import { Component, EventEmitter, HostListener, inject, Input, Output } from '@a
 import { Router } from '@angular/router';
 
 import { RideDetailsMapComponent } from '../../../../shared/components/ride-details-map/ride-details-map.component';
+import { DriverRatingModalComponent } from '../../../ride/components/driver-rating-modal/driver-raitng-modal';
 import { PassengerRideDetailsDTO } from '../../services/passenger-ride-history-api.service';
 import { BookRidePrefillService } from '../../../../shared/components/map/services/book-ride-prefill.service';
 import { FavoriteRouteResponseDTO, FavoriteRouteCreateDTO } from '../../../../shared/models/favorite-route.models';
@@ -18,7 +19,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 @Component({
   selector: 'app-passenger-ride-details-modal',
   standalone: true,
-  imports: [CommonModule, RideDetailsMapComponent],
+  imports: [CommonModule, RideDetailsMapComponent, DriverRatingModalComponent],
   templateUrl: './passenger-ride-details-modal.component.html',
   styleUrls: ['./passenger-ride-details-modal.component.css'],
 })
@@ -26,6 +27,8 @@ export class PassengerRideDetailsModalComponent {
   @Input() details: PassengerRideDetailsDTO | null = null;
   @Input() loading = false;
   @Output() close = new EventEmitter<void>();
+
+  
 
   private prefillService = inject(BookRidePrefillService);
   private router = inject(Router);
@@ -37,6 +40,9 @@ export class PassengerRideDetailsModalComponent {
 
   private readonly IMG_BASE = 'http://localhost:8081';
   saving = false;
+
+  showRatingModal = false;
+  authService = this.auth;
 
   onBackdropClick(): void {
     this.close.emit();
@@ -53,28 +59,26 @@ export class PassengerRideDetailsModalComponent {
 
   get allLocations(): string[] {
     if (!this.details?.route) return [];
-    
-    // Handle stops - backend returns pipe-separated string
+    // Helper to extract street name
+    const street = (addr: string) => typeof addr === 'string' ? addr.split(',')[0].trim() : '';
     const stopsArr = this.stopsArray;
-    
     return [
-      this.details.route.startAddress,
+      street(this.details.route.startAddress),
       ...stopsArr,
-      this.details.route.endAddress
+      street(this.details.route.endAddress)
     ];
   }
 
   get stopsArray(): string[] {
     if (!this.details?.route) return [];
-    
+    const street = (addr: string) => typeof addr === 'string' ? addr.split(',')[0].trim() : '';
     const rawStops: any = this.details.route.stops;
-    
     if (rawStops == null) {
       return [];
     } else if (Array.isArray(rawStops)) {
-      return rawStops.filter((s: string) => !!s);
+      return rawStops.filter((s: string) => !!s).map(street);
     } else if (typeof rawStops === 'string') {
-      return rawStops.split('|').filter((s: string) => !!s.trim()).map((s: string) => s.trim());
+      return rawStops.split('|').filter((s: string) => !!s.trim()).map((s: string) => street(s));
     }
     return [];
   }

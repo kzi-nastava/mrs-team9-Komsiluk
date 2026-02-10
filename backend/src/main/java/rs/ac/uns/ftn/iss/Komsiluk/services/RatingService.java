@@ -36,9 +36,9 @@ public class RatingService implements IRatingService {
 
     @Override
     public RatingResponseDTO createRating(Long rideId, RatingCreateDTO dto) {
-        if (rideId == null || dto == null) throw new BadRequestException();
-        if (dto.getRaterId() == null) throw new BadRequestException();
-        if (dto.getDriverGrade() == null || dto.getVehicleGrade() == null) throw new BadRequestException();
+        if (rideId == null || dto == null) throw new BadRequestException("Ride ID and rating data must be provided");
+        if (dto.getRaterId() == null) throw new BadRequestException("Rater ID must be provided");
+        if (dto.getDriverGrade() == null || dto.getVehicleGrade() == null) throw new BadRequestException("Grades must be provided");
 
         validateGrade(dto.getDriverGrade());
         validateGrade(dto.getVehicleGrade());
@@ -46,20 +46,20 @@ public class RatingService implements IRatingService {
         Ride ride = rideRepository.findById(rideId).orElseThrow(NotFoundException::new);
 
         if (ride.getStatus() != RideStatus.FINISHED) {
-            throw new BadRequestException();
+            throw new BadRequestException("Cannot rate a ride that is not finished");
         }
 
         if (ride.getEndTime() == null) throw new BadRequestException();
         if (LocalDateTime.now().isAfter(ride.getEndTime().plusDays(3))) {
-            throw new BadRequestException();
+            throw new BadRequestException("Rating period has expired. You can only rate within 3 days after the ride has ended.");
         }
 
         if (!isRaterOnRide(ride, dto.getRaterId())) {
-            throw new BadRequestException();
+            throw new BadRequestException("Rater must be a passenger or the driver of the ride");
         }
 
         if (ratingRepository.existsByRideIdAndRaterId(rideId, dto.getRaterId())) {
-            throw new AlreadyExistsException();
+            throw new AlreadyExistsException("Rating from this rater for this ride already exists");
         }
 
         Rating rating = new Rating();
