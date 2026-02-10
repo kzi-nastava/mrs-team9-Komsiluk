@@ -584,16 +584,6 @@ public class UserActivity extends BaseNavDrawerActivity {
     protected void onResume() {
         super.onResume();
         if (map != null) map.onResume();
-        if (sessionManager != null) {
-            Long pendingRideId = sessionManager.getPendingRatingRideId();
-            if (pendingRideId != null) {
-                // Pozivamo tvoj postojeći metod za otvaranje dijaloga
-                showRatingDialog(pendingRideId);
-
-                // OBAVEZNO: Obriši ID iz sesije da ne bi iskakao svaki put
-                sessionManager.setPendingRatingRideId(null);
-
-                android.util.Log.d("TAXI_DEEP_LINK", "Rating modal pokrenut za vožnju: " + pendingRideId);
         if (map != null) {
             map.onResume();
 
@@ -602,6 +592,16 @@ public class UserActivity extends BaseNavDrawerActivity {
                 new Handler(Looper.getMainLooper()).postDelayed(() -> {
                     restoreRouteDataFromIntent();
                 }, 300);
+            }
+        }
+        if (sessionManager != null) {
+            Long pendingRideId = sessionManager.getPendingRatingRideId();
+            if (pendingRideId != null) {
+                showRatingDialog(pendingRideId);
+
+                sessionManager.setPendingRatingRideId(null);
+
+                android.util.Log.d("TAXI_DEEP_LINK", "Rating modal pokrenut preko Deep Linka za vožnju: " + pendingRideId);
             }
         }
     }
