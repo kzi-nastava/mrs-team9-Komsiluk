@@ -3,6 +3,7 @@ package com.komsiluk.taxi.data.remote.ride;
 import com.komsiluk.taxi.data.remote.passenger_ride_history.DriverResponseDTO;
 import com.komsiluk.taxi.data.remote.passenger_ride_history.RouteResponseDTO;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public class AdminRideDetails {
@@ -15,10 +16,12 @@ public class AdminRideDetails {
     private DriverResponseDTO driver;
     private List<String> passengerEmails;
     private Long creatorId;
-
+    private String creatorEmail;
     private double distanceKm;
     private int estimatedDurationMin;
     private boolean panicTriggered;
+
+    private BigDecimal price;
 
     public Long getRideId() { return rideId; }
     public String getStatus() { return status; }
@@ -86,5 +89,21 @@ public class AdminRideDetails {
 
     public void setPanicTriggered(boolean panicTriggered) {
         this.panicTriggered = panicTriggered;
+    }
+
+    public String getCreatorEmail() {
+        return creatorEmail;
+    }
+
+    public void setCreatorEmail(String creatorEmail) {
+        this.creatorEmail = creatorEmail;
+    }
+
+    public BigDecimal getPrice() {
+        return price;
+    }
+
+    public void setPrice(BigDecimal price) {
+        this.price = price;
     }
 }

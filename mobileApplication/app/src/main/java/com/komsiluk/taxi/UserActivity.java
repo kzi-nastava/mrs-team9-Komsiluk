@@ -583,6 +583,7 @@ public class UserActivity extends BaseNavDrawerActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        if (map != null) map.onResume();
         if (map != null) {
             map.onResume();
 
@@ -591,6 +592,16 @@ public class UserActivity extends BaseNavDrawerActivity {
                 new Handler(Looper.getMainLooper()).postDelayed(() -> {
                     restoreRouteDataFromIntent();
                 }, 300);
+            }
+        }
+        if (sessionManager != null) {
+            Long pendingRideId = sessionManager.getPendingRatingRideId();
+            if (pendingRideId != null) {
+                showRatingDialog(pendingRideId);
+
+                sessionManager.setPendingRatingRideId(null);
+
+                android.util.Log.d("TAXI_DEEP_LINK", "Rating modal pokrenut preko Deep Linka za vožnju: " + pendingRideId);
             }
         }
     }

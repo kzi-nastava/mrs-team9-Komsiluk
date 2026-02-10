@@ -3,9 +3,10 @@ package com.komsiluk.taxi.data.remote.ride;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class RideResponse {
+public class RideResponse implements Serializable {
 
     @SerializedName("id") @Expose
     private Long id;
@@ -66,6 +67,16 @@ public class RideResponse {
     @Expose
     private Long creatorId;
 
+    @SerializedName("driverId")
+    @Expose
+    private Long driverId;
+
+    @SerializedName("creatorEmail")
+    @Expose
+    private String creatorEmail;
+
+    public String getCreatorEmail() { return creatorEmail; }
+
     public Long getId() { return id; }
     public String getStatus() { return status; }
     public String getStartTime() { return startTime; }
@@ -84,4 +95,20 @@ public class RideResponse {
     public boolean isPetFriendly() { return petFriendly; }
     public String getScheduledAt() { return scheduledAt; }
     public Long getCreatorId() { return creatorId; }
+
+    public Long getDriverId() {
+        return driverId;
+    }
+
+    public void setDriverId(Long driverId) {
+        this.driverId = driverId;
+    }
+
+    public void setCreatorEmail(String creatorEmail) {
+        this.creatorEmail = creatorEmail;
+    }
+
+    public void setPassengerEmails(List<String> passengerEmails) {
+        this.passengerEmails = passengerEmails;
+    }
 }
