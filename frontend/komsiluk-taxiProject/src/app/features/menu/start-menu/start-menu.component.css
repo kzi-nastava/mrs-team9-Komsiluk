@@ -1,10 +1,9 @@
 .home-map {
   position: relative;
-  height: calc(100vh - 64px); /* ispod navbara */
+  height: calc(100vh - 64px);
   overflow: hidden;
 }
 
-/* da mapa popuni wrapper */
 .home-map app-map {
   display: block;
   height: 100%;

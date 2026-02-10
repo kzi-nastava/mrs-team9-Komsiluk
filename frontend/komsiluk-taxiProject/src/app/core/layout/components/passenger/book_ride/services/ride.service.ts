@@ -5,6 +5,7 @@ import { RideCreateDTO, RidePassengerActiveDTO, RideResponseDTO, StopRideRequest
 import { ToastService } from '../../../../../../shared/components/toast/toast.service';
 import { NotificationService } from '../../../../../../features/menu/services/notification.service';
 import { AuthService } from '../../../../../../core/auth/services/auth.service';
+import { MapFacadeService } from '../../../../../../shared/components/map/services/map-facade.service';
 import { HttpResponse } from '@angular/common/http';
 
 @Injectable({ providedIn: 'root' })
@@ -15,7 +16,8 @@ export class RideService {
     private http: HttpClient,
     private toast: ToastService,
     private notification: NotificationService,
-    private auth: AuthService
+    private auth: AuthService,
+    private mapFacade: MapFacadeService
   ) { }
 
   orderRide(dto: RideCreateDTO): Observable<RideResponseDTO> {
@@ -63,10 +65,14 @@ export class RideService {
         tap((notifs) => {
           const cancelNotifs = notifs.filter(n => n.type === 'RIDE_CANCELLED');
           this.showToastsForInitiator(cancelNotifs);
+          // Reset the map after successful cancellation
+          this.mapFacade.triggerResetMap();
         })
       )
       .subscribe();
   }
+
+  
 
   private showToastsForInitiator(notifs: any[]) {
     if (!notifs?.length) {
@@ -109,7 +115,7 @@ export class RideService {
 
         catchError((err: HttpErrorResponse) => {
           if (err.status === 400) {
-            this.toast.show('Ride cannot be cancelled in its current state.');
+            this.toast.show(err.error?.message || 'Invalid cancellation request.');
             return EMPTY;
           }
 

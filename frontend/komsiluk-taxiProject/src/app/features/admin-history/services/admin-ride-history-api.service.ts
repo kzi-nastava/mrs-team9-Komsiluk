@@ -27,6 +27,7 @@ export interface AdminRideHistoryDTO {
   cancellationReason: string | null;
   price: number;
   panicTriggered: boolean;
+  route: string;
 }
 
 export interface AdminRideDetailsDTO {

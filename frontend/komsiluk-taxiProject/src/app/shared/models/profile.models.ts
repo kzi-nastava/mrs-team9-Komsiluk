@@ -30,7 +30,7 @@ export interface UserProfileResponseDTO {
   profileImageUrl: string;
   vehicle: VehicleResponseDTO | null;
   activeMinutesLast24h: number;
-    driverStatus?: DriverStatus;
+  driverStatus?: DriverStatus;
 }
 
 export interface UserProfileUpdateDTO {
