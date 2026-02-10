@@ -29,6 +29,7 @@ public class AuthInterceptor implements Interceptor {
         if (path.startsWith("/api/auth")
                 || path.startsWith("/api/tokens")
                 || path.equals("/api/drivers/locations")
+                || path.equals("api/drivers/basic")
         ) {
             return chain.proceed(original); // 🚫 bez tokena
         }

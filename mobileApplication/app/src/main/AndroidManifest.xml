@@ -104,6 +104,10 @@
             android:name=".ui.profile.ProfileActivity"
             android:exported="false" />
         <activity
+            android:name=".ui.active_ride.AdminActiveRidesActivity"
+            android:exported="false"
+            android:label="Active Rides" />
+        <activity
             android:name=".MainActivity"
             android:exported="true"
             android:theme="@style/Theme.KomsilukTaxi.Splash">

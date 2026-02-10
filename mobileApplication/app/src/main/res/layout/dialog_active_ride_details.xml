@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_dialog_panel"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <org.osmdroid.views.MapView
+            android:id="@+id/mapActiveDetail"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:layout_marginBottom="12dp"
+            android:clipToOutline="true" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Driver:"
+                android:textColor="@color/white"
+                android:textSize="@dimen/fs_md"
+                android:fontFamily="@font/roboto_serif_medium" />
+            <TextView
+                android:id="@+id/tvActiveDetailsDriverValue"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:textColor="@color/secondary"
+                android:textSize="@dimen/fs_md"
+                android:fontFamily="@font/roboto_serif_semibold" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal">
+            <TextView
+                android:id="@+id/tvActiveStartTime"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textColor="@color/white"
+                android:textSize="@dimen/fs_sm"
+                android:fontFamily="@font/roboto_serif_medium"
+                android:text="Start: --:--" />
+            <TextView
+                android:id="@+id/tvActiveEndTime"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textColor="@color/white"
+                android:textSize="@dimen/fs_sm"
+                android:fontFamily="@font/roboto_serif_medium"
+                android:text="End: --:--" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvActiveDetailsPickupValue"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/secondary"
+                android:textSize="@dimen/fs_md"
+                android:fontFamily="@font/roboto_serif_semibold"
+                android:text="Pickup address" />
+
+            <LinearLayout
+                android:id="@+id/containerActiveStops"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginStart="8dp">
+            </LinearLayout>
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_arrow_down"
+                android:layout_gravity="start"
+                android:layout_marginStart="8dp"
+                app:tint="@color/white" />
+
+            <TextView
+                android:id="@+id/tvActiveDetailsDestinationValue"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/secondary"
+                android:textSize="@dimen/fs_md"
+                android:fontFamily="@font/roboto_serif_semibold"
+                android:text="Destination address" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="Passengers:"
+            android:textColor="@color/white"
+            android:textSize="@dimen/fs_sm"
+            android:fontFamily="@font/roboto_serif_medium" />
+
+        <LinearLayout
+            android:id="@+id/containerPassengers"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/secondary"
+            android:orientation="vertical"
+            android:layout_marginTop="4dp">
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:orientation="horizontal"
+            android:gravity="center">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="horizontal">
+                <ImageView android:layout_width="16dp" android:layout_height="16dp"
+                    android:src="@drawable/route" app:tint="@color/secondary" android:layout_marginEnd="4dp"/>
+                <TextView android:id="@+id/tvActiveKm" android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" android:textColor="@color/white"
+                    android:textSize="@dimen/fs_md" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="horizontal">
+                <ImageView android:layout_width="16dp" android:layout_height="16dp"
+                    android:src="@drawable/clock" app:tint="@color/secondary" android:layout_marginEnd="4dp"/>
+                <TextView android:id="@+id/tvActiveTime" android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" android:textColor="@color/white"
+                    android:textSize="@dimen/fs_md" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="horizontal">
+                <ImageView android:layout_width="16dp" android:layout_height="16dp"
+                    android:src="@drawable/money" app:tint="@color/secondary" android:layout_marginEnd="4dp"/>
+                <TextView android:id="@+id/tvActivePrice" android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" android:textColor="@color/white"
+                    android:textSize="@dimen/fs_md" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Panic pressed:"
+                android:textColor="@color/white"
+                android:textSize="@dimen/fs_md"
+                android:fontFamily="@font/roboto_serif_medium" />
+
+            <TextView
+                android:id="@+id/tvActivePanicValue"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:text="No"
+                android:textColor="@color/secondary"
+                android:textSize="@dimen/fs_md"
+                android:fontFamily="@font/roboto_serif_semibold" />
+        </LinearLayout>
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnActiveDetailsClose"
+            style="@style/Widget.Button.Ghost"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Close" />
+
+    </LinearLayout>
+</ScrollView>
