@@ -14,19 +14,28 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.komsiluk.taxi.R;
 import com.komsiluk.taxi.auth.AuthManager;
+import com.komsiluk.taxi.auth.UserRole;
 import com.komsiluk.taxi.data.remote.block.BlockNoteResponse;
 import com.komsiluk.taxi.data.remote.block.BlockService;
 import com.komsiluk.taxi.data.remote.profile.UserBlockedResponse;
 import com.komsiluk.taxi.data.remote.profile.UserService;
 import com.komsiluk.taxi.data.session.SessionManager;
+import com.komsiluk.taxi.ui.admin.ride_history.AdminRideHistoryActivity;
 import com.komsiluk.taxi.ui.driver_history.DriverHistoryActivity;
+import com.komsiluk.taxi.ui.edit.AdminDriverChangeRequestsActivity;
+import com.komsiluk.taxi.ui.passenger.ride_history.PassengerRideHistoryActivity;
 import com.komsiluk.taxi.ui.profile.ProfileViewModel;
+import com.komsiluk.taxi.ui.report.UsageReportsActivity;
+import com.komsiluk.taxi.ui.ride.FavoritesActivity;
+import com.komsiluk.taxi.ui.ride.ScheduledActivity;
+import com.komsiluk.taxi.ui.ride.ScheduledRidesActivity;
 import com.komsiluk.taxi.ui.shared.InfoMessageActivity;
 
 import javax.inject.Inject;
@@ -91,10 +100,59 @@ public class ProfileSidebarBottomFragment extends Fragment {
         }
 
         view.findViewById(R.id.btnRideHistory)
-                .setOnClickListener(v -> {
+            .setOnClickListener(v -> {
+                if(authManager.getRole().equals(UserRole.PASSENGER))
+                {
+                    Intent i = new Intent(getContext(), PassengerRideHistoryActivity.class);
+                    startActivity(i);
+                }
+                else if(authManager.getRole().equals(UserRole.DRIVER))
+                {
                     Intent i = new Intent(getContext(), DriverHistoryActivity.class);
                     startActivity(i);
-                });
+                }
+                else
+                {
+                    Intent i = new Intent(getContext(), AdminRideHistoryActivity.class);
+                    startActivity(i);
+                }
+            });
+
+        View btnTopLeft = view.findViewById(R.id.btnTopLeft);
+        TextView tvTopLeft = btnTopLeft.findViewById(R.id.tvTopLeft);
+        ImageView ivTopLeft = view.findViewById(R.id.iconTopLeft);
+
+        UserRole role = authManager.getRole();
+
+        if (role == UserRole.PASSENGER) {
+            tvTopLeft.setText(getString(R.string.profile_menu_favorite_rides));
+            ivTopLeft.setImageResource(R.drawable.favorite);
+        } else if (role == UserRole.DRIVER) {
+            tvTopLeft.setText(getString(R.string.nav_scheduled_rides));
+            ivTopLeft.setImageResource(R.drawable.clock);
+        } else {
+            tvTopLeft.setText(getString(R.string.menu_edit_requests));
+            ivTopLeft.setImageResource(R.drawable.edit);
+        }
+
+        btnTopLeft.setOnClickListener(v -> {
+                if (role == UserRole.PASSENGER) {
+                    Intent i = new Intent(getContext(), FavoritesActivity.class);
+                    startActivity(i);
+                } else if (role == UserRole.DRIVER) {
+                    Intent i = new Intent(getContext(), ScheduledActivity.class);
+                    startActivity(i);
+                } else {
+                    Intent i = new Intent(getContext(), AdminDriverChangeRequestsActivity.class);
+                    startActivity(i);
+                }
+            });
+
+        view.findViewById(R.id.btnUsageReport)
+            .setOnClickListener(v -> {
+                Intent i = new Intent(getContext(), UsageReportsActivity.class);
+                startActivity(i);
+            });
 
         btnLogout.setOnClickListener(v -> {
             Intent i = InfoMessageActivity.createLogoutIntent(

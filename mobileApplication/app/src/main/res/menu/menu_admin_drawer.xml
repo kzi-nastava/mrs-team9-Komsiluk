@@ -41,11 +41,6 @@
         android:title="@string/menu_ride_history" />
 
     <item
-        android:id="@+id/nav_panic"
-        android:icon="@drawable/panic"
-        android:title="@string/menu_panic_history" />
-
-    <item
         android:id="@+id/nav_chat"
         android:icon="@drawable/support"
         android:title="@string/menu_chat" />

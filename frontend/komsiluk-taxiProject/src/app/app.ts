@@ -92,7 +92,6 @@ export class App implements OnInit {
   private panicSubscription?: Subscription;
   private seenPanicRideIds = new Set<number>();
 
-
   constructor(private notificationService: NotificationService, private authService: AuthService, public stopRideSvc: StopRideService, public panicModalSvc: PanicModalService, private schedRides: ScheduledRidesService, public filterSvc: RideHistoryFilterService, private router: Router, public confirmModal: ConfirmBookingModalService,
     public addFavModal: AddFavoriteModalService, public favDetailsModal: FavoriteDetailsModalService, public renameFavModal: RenameFavoriteModalService,
     public deleteFavModal: DeleteFavoriteModalService, public toastService: ToastService, private favoriteApi: FavoriteRouteService, private favBus: FavoritesBusService,
@@ -110,12 +109,11 @@ export class App implements OnInit {
     });
   }
   private startPanicMonitoring() {
-    if (this.panicSubscription) return; // Da ne pokrećemo dupli interval
+    if (this.panicSubscription) return;
 
-    // Provera svakih 10-15 sekundi
     this.panicSubscription = interval(10000).pipe(
       switchMap(() => this.notificationService.getUnreadPanicNotifications().pipe(
-        catchError(() => of([])) // Ako pukne API, nastavi dalje
+        catchError(() => of([]))
       ))
     ).subscribe((notifications: any[]) => {
       this.processPanics(notifications);
@@ -178,10 +176,6 @@ export class App implements OnInit {
       });
 
   }
-
-
-
-
 
   toggleLeftSidebar() { this.isLeftSidebarOpen = !this.isLeftSidebarOpen; }
   toggleRightSidebar(mode: 'profile' | 'admin') {

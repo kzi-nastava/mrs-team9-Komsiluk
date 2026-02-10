@@ -34,6 +34,10 @@ public class ProfileViewModel extends ViewModel {
     private final MutableLiveData<Event<String>> imageUploadError = new MutableLiveData<>();
     private final MutableLiveData<Event<String>> imageUploadSuccess = new MutableLiveData<>();
 
+    private final MutableLiveData<Long> imageVersion = new MutableLiveData<>(0L);
+    public LiveData<Long> getImageVersion() { return imageVersion; }
+
+
     @Inject
     public ProfileViewModel(UserService userService, SessionManager sessionManager) {
         this.userService = userService;
@@ -75,14 +79,24 @@ public class ProfileViewModel extends ViewModel {
         });
     }
 
-    public String buildAbsoluteImageUrl(String relativeOrFull) {
+    public String buildAbsoluteImageUrl(String relativeOrFull, boolean bustCache) {
         if (relativeOrFull == null || relativeOrFull.trim().isEmpty()) return null;
-        if (relativeOrFull.startsWith("http://") || relativeOrFull.startsWith("https://")) return relativeOrFull;
 
-        String base = "http://" + BuildConfig.IP_ADDR + ":8081";
-        if (relativeOrFull.startsWith("/")) return base + relativeOrFull;
-        return base + "/" + relativeOrFull;
+        String full;
+        if (relativeOrFull.startsWith("http://") || relativeOrFull.startsWith("https://")) {
+            full = relativeOrFull;
+        } else {
+            String base = "http://" + BuildConfig.IP_ADDR + ":8081";
+            if (relativeOrFull.startsWith("/")) full = base + relativeOrFull;
+            else full = base + "/" + relativeOrFull;
+        }
+
+        if (!bustCache) return full;
+
+        String sep = full.contains("?") ? "&" : "?";
+        return full + sep + "t=" + System.currentTimeMillis();
     }
+
 
     public void updateProfileImage(File imageFile) {
         Long userId = sessionManager.getUserId();
@@ -113,14 +127,12 @@ public class ProfileViewModel extends ViewModel {
                 public void onResponse(Call<UserProfileResponse> call, Response<UserProfileResponse> response) {
                     if (response.isSuccessful() && response.body() != null) {
 
-                        String newUrl = response.body().getProfileImageUrl();
-
                         UserProfileResponse current = profileLiveData.getValue();
                         if (current != null) {
-                            current.setProfileImageUrl(newUrl);
-                            profileLiveData.setValue(current);
+                            profileLiveData.setValue(response.body());
                         }
 
+                        imageVersion.setValue(System.currentTimeMillis());
                         imageUploadSuccess.setValue(new Event<>("Profile image updated."));
                     } else {
                         imageUploadError.setValue(new Event<>("Upload failed (" + response.code() + ")"));
