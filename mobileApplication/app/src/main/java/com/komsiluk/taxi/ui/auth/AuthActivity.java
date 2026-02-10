@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.komsiluk.taxi.R;
+import com.komsiluk.taxi.data.session.SessionManager;
 import com.komsiluk.taxi.databinding.ActivityAuthBinding;
 import com.komsiluk.taxi.ui.auth.login.LoginFragment;
 import com.komsiluk.taxi.ui.auth.login.ForgotPasswordFragment;
@@ -20,12 +21,16 @@ import com.komsiluk.taxi.ui.auth.rider_registration.RiderRegistrationFragment;
 import com.komsiluk.taxi.ui.auth.rider_registration.SuccessfulRegistrationFragment;
 import com.komsiluk.taxi.ui.menu.BaseNavDrawerActivity;
 
+import javax.inject.Inject;
+
 import dagger.hilt.android.AndroidEntryPoint;
 
 @AndroidEntryPoint
 public class AuthActivity extends BaseNavDrawerActivity {
 
     private ActivityAuthBinding binding;
+    @Inject
+    SessionManager sessionManager;
 
 
     @Override
@@ -81,6 +86,15 @@ public class AuthActivity extends BaseNavDrawerActivity {
                 authViewModel.activatePassenger(token);
                 startFragment = new LoginFragment();
             }
+        }else if (data != null && data.getPath() != null && data.getPath().startsWith("/login")) {
+            String rateRideId = data.getQueryParameter("rateRideId");
+
+            if (rateRideId != null) {
+                // Koristimo SessionManager da "zapamtimo" ID na nivou cele aplikacije
+                sessionManager.setPendingRatingRideId(Long.parseLong(rateRideId));
+                android.util.Log.d("TAXI_LINK", "ID sačuvan u sesiju: " + rateRideId);
+            }
+            startFragment = new LoginFragment();
         }
         else {
             // Normalna logika
