@@ -11,6 +11,7 @@
 
     <color name="error">#FF4444</color>
     <color name="red">#FF0000</color>
+    <color name="green">#0C5700</color>
 
     <color name="profile_sidebar_top">#E0FFEE02</color>
     <color name="profile_sidebar_bottom">#BEC1B300</color>

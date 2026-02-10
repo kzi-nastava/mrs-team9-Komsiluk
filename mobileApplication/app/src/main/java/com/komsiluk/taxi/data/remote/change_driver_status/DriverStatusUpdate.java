@@ -8,7 +8,7 @@ public class DriverStatusUpdate {
 
     @SerializedName("status")
     @Expose
-    private DriverStatus status; // ili DriverStatus ako imate enum
+    private DriverStatus status;
 
     public DriverStatusUpdate() {
     }

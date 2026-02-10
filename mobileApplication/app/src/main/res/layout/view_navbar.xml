@@ -16,8 +16,6 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent" />
 
-    <!-- Menu (hamburger) right -->
-
     <ImageButton
         android:id="@+id/btnFilter"
         android:layout_width="32dp"
@@ -27,9 +25,21 @@
         android:layout_marginEnd="12dp"
         android:visibility="gone" android:src="@drawable/filter"
         app:tint="@color/secondary"
-        app:layout_constraintEnd_toStartOf="@id/btnNavMenu"
+        app:layout_constraintEnd_toStartOf="@id/viewDriverStatusDot"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent" />
+
+    <View
+        android:id="@+id/viewDriverStatusDot"
+        android:layout_width="12dp"
+        android:layout_height="12dp"
+        android:layout_marginEnd="10dp"
+        android:background="@drawable/bg_status_dot"
+        android:visibility="gone"
+        app:layout_constraintEnd_toStartOf="@id/btnNavMenu"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
     <ImageButton
         android:id="@+id/btnNavMenu"
         android:layout_width="32dp"
