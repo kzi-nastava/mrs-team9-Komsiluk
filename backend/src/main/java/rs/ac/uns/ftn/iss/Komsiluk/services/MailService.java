@@ -123,7 +123,6 @@ public class MailService {
     }
 
     public void sendRideStartedMail(String to, Long rideId) {
-        // TODO: replace with real tracking link once the frontend route exists
         String trackingLink = frontendUrl + "/login" ;
         String devInbox = "komsiluk.tim@gmail.com";
         to = devInbox;

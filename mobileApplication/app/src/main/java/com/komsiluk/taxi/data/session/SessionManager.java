@@ -17,6 +17,8 @@ public class SessionManager {
     private static final String KEY_USER_ID = "user_id";
     private static final String KEY_ROLE = "role";
 
+    private static final String KEY_PENDING_RATING = "pending_rating_id";
+
     private final SharedPreferences prefs;
 
     @Inject
@@ -45,6 +47,19 @@ public class SessionManager {
         return UserRole.valueOf(
                 prefs.getString(KEY_ROLE, UserRole.GUEST.name())
         );
+    }
+
+    public void setPendingRatingRideId(Long id) {
+        if (id == null) {
+            prefs.edit().remove(KEY_PENDING_RATING).apply();
+        } else {
+            prefs.edit().putLong(KEY_PENDING_RATING, id).apply();
+        }
+    }
+
+    public Long getPendingRatingRideId() {
+        long id = prefs.getLong(KEY_PENDING_RATING, -1);
+        return id == -1 ? null : id;
     }
 
     public boolean isLoggedIn() {

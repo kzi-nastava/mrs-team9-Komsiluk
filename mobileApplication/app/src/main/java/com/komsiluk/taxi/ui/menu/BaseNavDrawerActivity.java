@@ -435,6 +435,8 @@ public abstract class BaseNavDrawerActivity extends AppCompatActivity {
             navigateToAbout();
         } else if (itemId == R.id.nav_update_price) { // NOVO
         navigateToUpdatePrice();
+        }else if (itemId == R.id.nav_active_rides) { // DODAJ OVO
+            navigateToActiveRides();
         }
     }
 
@@ -527,5 +529,9 @@ public abstract class BaseNavDrawerActivity extends AppCompatActivity {
 
     protected void navigateToUpdatePrice() {
         startActivity(new Intent(this, UpdatePricingActivity.class));
+    }
+
+    protected void navigateToActiveRides() {
+        startActivity(new Intent(this, com.komsiluk.taxi.ui.active_ride.AdminActiveRidesActivity.class));
     }
 }

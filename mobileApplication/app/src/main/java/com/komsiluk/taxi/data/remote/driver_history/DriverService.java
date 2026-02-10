@@ -42,4 +42,6 @@ public interface DriverService {
             @Path("id") Long userId,
             @Body DriverStatusUpdate statusUpdate
     );
+    @GET("drivers/basic")
+    Call<List<DriverBasic>> getDriversBasic();
 }
