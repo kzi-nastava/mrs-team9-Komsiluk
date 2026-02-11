@@ -48,6 +48,7 @@ import com.komsiluk.taxi.data.remote.profile.UserService;
 import com.komsiluk.taxi.data.remote.rating.RatingCreate;
 import com.komsiluk.taxi.data.remote.rating.RatingService;
 import com.komsiluk.taxi.data.remote.ride.AdminRideDetails;
+import com.komsiluk.taxi.data.remote.ride.PanicRequestDTO;
 import com.komsiluk.taxi.data.remote.ride.RideCreateRequest;
 import com.komsiluk.taxi.data.remote.ride.RidePassengerActive;
 import com.komsiluk.taxi.data.remote.ride.RideService;
@@ -318,6 +319,9 @@ public class UserActivity extends BaseNavDrawerActivity {
         ivActiveDriver = findViewById(R.id.ivActiveDriver);
         btnActiveReport = findViewById(R.id.btnActiveReport);
         tvActiveEstimatedTime = findViewById(R.id.tvActiveEstimatedTime);
+        MaterialButton btnConfirm = findViewById(R.id.btnActivePanic);
+
+        btnConfirm.setOnClickListener(v -> showPanicDialog());
 
         btnFavorite = findViewById(R.id.btnFavorite);
         btnActiveReport.setOnClickListener(v -> showReportInconsistencyDialog());
@@ -414,6 +418,72 @@ public class UserActivity extends BaseNavDrawerActivity {
         }
 
 
+    }
+
+    private void showPanicDialog() {
+        if (activeRideId == null) {
+            Toast.makeText(this, "No active ride found.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_panic_action, null);
+        MaterialButton btnCancel = dialogView.findViewById(R.id.btnCancelPanic);
+        MaterialButton btnConfirm = dialogView.findViewById(R.id.btnInitiatePanic);
+
+        AlertDialog dialog = new MaterialAlertDialogBuilder(this)
+                .setView(dialogView)
+                .setCancelable(true)
+                .create();
+
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        }
+
+        btnCancel.setOnClickListener(v -> dialog.dismiss());
+
+        btnConfirm.setOnClickListener(v -> {
+            dialog.dismiss();
+
+            Long userId = sessionManager.getUserId();
+            if (userId == null) {
+                Toast.makeText(this, "User session not found. Please login again.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            PanicRequestDTO panicDto = new PanicRequestDTO();
+            panicDto.setInitiatorId(userId);
+
+            rideApi.panic(activeRideId, panicDto).enqueue(new Callback<Void>() {
+                @Override
+                public void onResponse(Call<Void> call, Response<Void> response) {
+                    if (response.isSuccessful()) {
+                        Toast.makeText(
+                                UserActivity.this,
+                                "Panic signal sent! Emergency services notified.",
+                                Toast.LENGTH_LONG
+                        ).show();
+
+                    } else {
+                        Toast.makeText(
+                                UserActivity.this,
+                                "Failed to send panic signal. Code: " + response.code(),
+                                Toast.LENGTH_SHORT
+                        ).show();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<Void> call, Throwable t) {
+                    Toast.makeText(
+                            UserActivity.this,
+                            "Network error: " + t.getMessage(),
+                            Toast.LENGTH_SHORT
+                    ).show();
+                }
+            });
+        });
+
+        dialog.show();
     }
 
 

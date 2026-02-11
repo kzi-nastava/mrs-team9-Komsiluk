@@ -33,6 +33,9 @@ public interface RideService {
     @GET("rides/user/{userId}/scheduled")
     Call<List<RideResponse>> getScheduledRidesForUser(@Path("userId") Long userId);
 
+    @POST("rides/{id}/panic")
+    Call<Void> panic(@Path("id") Long rideId, @Body PanicRequestDTO panicDto);
+
     @GET("rides/active/all")
     Call<List<RideResponse>> getAllActiveRides();
 }
