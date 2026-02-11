@@ -70,6 +70,7 @@ public class RideService implements IRideService {
     private DriverService driverService;
     
     private static final long MAX_MINUTES_LAST_24H = 480;
+    private static final int BUFFER_MINUTES = 10;
 
     @Override
     public RideResponseDTO orderRide(RideCreateDTO dto) {
@@ -79,18 +80,12 @@ public class RideService implements IRideService {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime newStart = (dto.getScheduledAt() != null) ? dto.getScheduledAt() : now;
 
-        int bufferMinutes = 10;
-        LocalDateTime newEnd = newStart.plusMinutes(dto.getEstimatedDurationMin()).plusMinutes(bufferMinutes);
+        LocalDateTime newEnd = newStart.plusMinutes(dto.getEstimatedDurationMin()).plusMinutes(BUFFER_MINUTES);
 
-        boolean hasConflict = rideRepository.existsBlockingRideForCreator(creator.getId(), List.of("SCHEDULED", "ASSIGNED", "ACTIVE"), newStart, newEnd, bufferMinutes);
+        boolean hasConflict = rideRepository.existsBlockingRideForCreator(creator.getId(), List.of("SCHEDULED", "ASSIGNED", "ACTIVE"), newStart, newEnd, BUFFER_MINUTES);
 
         if (hasConflict) {
-            NotificationCreateDTO notificationDTOFail = new NotificationCreateDTO();
-            notificationDTOFail.setUserId(creator.getId());
-            notificationDTOFail.setType(NotificationType.RIDE_FAILED);
-            notificationDTOFail.setTitle("Ride Failed");
-            notificationDTOFail.setMessage("You already have a ride scheduled/active in that time window.");
-            notificationService.createNotification(notificationDTOFail);
+            makeNotification(creator, "Ride Failed", "You already have a ride scheduled/active in that time window.", NotificationType.RIDE_FAILED);
 
             throw new BadRequestException("You already have a ride scheduled/active in that time window.");
         }
@@ -111,17 +106,13 @@ public class RideService implements IRideService {
         BigDecimal price = calculatePrice(dto.getVehicleType(), dto.getDistanceKm());
 		
         List<User> passengers = new ArrayList<>();
-        List<User> linkedPassengers = new ArrayList<>();
 
         if (dto.getPassengerEmails() != null) {
             for (String email : dto.getPassengerEmails()) {
                 User passenger= userService.findByEmail(email);
                 if (passenger != null) {
                     passengers.add(passenger);
-                    linkedPassengers.add(passenger);
 				}
-                
-                //send email
             }
         }
 
@@ -143,17 +134,15 @@ public class RideService implements IRideService {
         ride.setPetFriendly(dto.isPetFriendly());
         ride.setDistanceKm(dto.getDistanceKm());
         ride.setEstimatedDurationMin(dto.getEstimatedDurationMin());
+        LocalDateTime start = (scheduledAt != null) ? scheduledAt : now;
+        ride.setStartTime(start);
+        ride.setEndTime(start.plusMinutes(dto.getEstimatedDurationMin() + BUFFER_MINUTES));
 
         if (maybeDriver.isEmpty()) { 
             ride.setStatus(RideStatus.REJECTED);
             ride = rideRepository.save(ride);
-
-            NotificationCreateDTO notificationDTOFail = new NotificationCreateDTO();
-			notificationDTOFail.setUserId(creator.getId());
-			notificationDTOFail.setType(NotificationType.RIDE_FAILED);
-			notificationDTOFail.setTitle("Ride Failed");
-			notificationDTOFail.setMessage("There are currently no available drivers.");
-            notificationService.createNotification(notificationDTOFail);
+            
+            makeNotification(creator, "Ride Failed", "There are currently no available drivers.", NotificationType.RIDE_FAILED);
 
             return rideMapper.toResponseDTO(ride);
         }
@@ -164,39 +153,25 @@ public class RideService implements IRideService {
 
         ride = rideRepository.save(ride);
 
-        for (User lp : linkedPassengers) {
-            if (lp.getEmail() != null) {
-                mailService.sendAddedToRideMail(lp.getEmail(), ride.getId());
-            }
-        }
+        makeNotification(driver, "New Ride Assigned", "You have been assigned a new ride from " + dto.getStartAddress() + " to " + dto.getEndAddress(), NotificationType.RIDE_ASSIGNED);
+        makeNotification(creator, "Ride Accepted", "Your ride has been successfully ordered.", NotificationType.RIDE_ASSIGNED);
 
-        NotificationCreateDTO notificationDTODriver = new NotificationCreateDTO();
-        notificationDTODriver.setUserId(driver.getId());
-        notificationDTODriver.setType(NotificationType.RIDE_ASSIGNED);
-        notificationDTODriver.setTitle("New Ride Assigned");
-        notificationDTODriver.setMessage("You have been assigned a new ride from " + dto.getStartAddress() + " to " + dto.getEndAddress());
-        notificationService.createNotification(notificationDTODriver);
-
-        NotificationCreateDTO notificationDTOCreator = new NotificationCreateDTO();
-        notificationDTOCreator.setUserId(creator.getId());
-        notificationDTOCreator.setType(NotificationType.RIDE_ASSIGNED);
-        notificationDTOCreator.setTitle("Ride Accepted");
-        notificationDTOCreator.setMessage("Your ride has been successfully ordered.");
-        notificationService.createNotification(notificationDTOCreator);
-
-        for (int i = 1; i < passengers.size(); i++) {
-            User p = passengers.get(i);
-            
-            NotificationCreateDTO notificationDTOPassenger = new NotificationCreateDTO();
-            notificationDTOPassenger.setUserId(p.getId());
-            notificationDTOPassenger.setType(NotificationType.INFO);
-            notificationDTOPassenger.setTitle("Added to Ride");
-            notificationDTOPassenger.setMessage("You have been added as a passenger to a ride from " + dto.getStartAddress() + " to " + dto.getEndAddress());
-            notificationService.createNotification(notificationDTOPassenger);
+        for (User p : passengers) {
+            makeNotification(p, "Added to Ride", "You have been added as a passenger to a ride from " + dto.getStartAddress() + " to " + dto.getEndAddress(), NotificationType.INFO);
+            mailService.sendAddedToRideMail(p.getEmail(), ride.getId());
         }
 
         return rideMapper.toResponseDTO(ride);
     }
+    
+    private void makeNotification(User user, String title, String message, NotificationType type) {
+		NotificationCreateDTO notificationDTO = new NotificationCreateDTO();
+		notificationDTO.setUserId(user.getId());
+		notificationDTO.setType(type);
+		notificationDTO.setTitle(title);
+		notificationDTO.setMessage(message);
+		notificationService.createNotification(notificationDTO);
+	}
     
     @Override
     public RideResponseDTO getCurrentRideForDriver(Long driverId) {
@@ -452,12 +427,21 @@ public class RideService implements IRideService {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime start = (dto.getScheduledAt() != null) ? dto.getScheduledAt() : now;
 
-        int bufferMin = 10;
-        LocalDateTime end = start.plusMinutes(dto.getEstimatedDurationMin() + bufferMin);
+        LocalDateTime end = start.plusMinutes(dto.getEstimatedDurationMin() + BUFFER_MINUTES);
 
-        List<User> candidates = userRepository.findAvailableDriversNoConflict(dto.getVehicleType().name(), passengerCount + 1, dto.isBabyFriendly(), dto.isPetFriendly(), start, end, bufferMin);
+        List<User> candidates = userRepository.findAvailableDriversNoConflict(dto.getVehicleType().name(), passengerCount + 1, dto.isBabyFriendly(), dto.isPetFriendly(), start, end);
 
-        if (candidates.isEmpty()) return Optional.empty();
+        if (candidates.isEmpty())
+        {
+        	if (dto.getScheduledAt() != null) {
+				return Optional.empty();
+        	}
+        	LocalDateTime finishBefore = now.plusMinutes(BUFFER_MINUTES);
+        	candidates=userRepository.findDriversFinishingSoon(dto.getVehicleType().name(), passengerCount+1, dto.isBabyFriendly(), dto.isPetFriendly(), now, finishBefore);
+        	if (candidates.isEmpty()) {
+				return Optional.empty();
+			}
+        }
         
         candidates = candidates.stream().filter(d -> driverActivityService.getWorkedMinutesLast24hAt(d, start) < MAX_MINUTES_LAST_24H).toList();
 
@@ -698,19 +682,6 @@ public class RideService implements IRideService {
         var reports = inconsistencyReportService.getByRideId(rideId);
 
         return adminRideDetailsMapper.toDto(ride, ratings, reports);
-    }
-
-    private boolean isUserOnRide(Ride ride, Long userId) {
-        if (ride.getCreatedBy() != null && ride.getCreatedBy().getId().equals(userId)) {
-            return true;
-        }
-
-        if (ride.getPassengers() != null) {
-            return ride.getPassengers().stream()
-                    .anyMatch(p -> p != null && p.getId().equals(userId));
-        }
-
-        return false;
     }
 
 

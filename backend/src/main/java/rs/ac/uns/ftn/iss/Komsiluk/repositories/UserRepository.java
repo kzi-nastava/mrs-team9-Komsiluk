@@ -35,36 +35,54 @@ public interface UserRepository extends JpaRepository<User, Long> {
             @Param("driverStatus") DriverStatus driverStatus
     );
 
-	@Query(value = """
-	        SELECT u.*
-	        FROM users u
-	        JOIN vehicles v ON v.id = u.vehicle_id
-	        WHERE u.role = 'DRIVER'
-	          AND u.driver_status = 'ACTIVE'
-	          AND u.blocked = false
-	          AND v.type = :vehicleType
-	          AND v.seat_count >= :minSeatCount
-	          AND (:babyFriendly = false OR v.baby_friendly = true)
-	          AND (:petFriendly  = false OR v.pet_friendly  = true)
+    @Query(value = """
+    	    SELECT u.*
+    	    FROM users u
+    	    JOIN vehicles v ON v.id = u.vehicle_id
+    	    WHERE u.role = 'DRIVER'
+    	      AND u.driver_status = 'ACTIVE'
+    	      AND u.active = true
+    	      AND u.blocked = false
+    	      AND v.type = :vehicleType
+    	      AND v.seat_count >= :minSeatCount
+    	      AND (:babyFriendly = FALSE OR v.baby_friendly = TRUE)
+    	      AND (:petFriendly  = FALSE OR v.pet_friendly  = TRUE)
 
-	          AND NOT EXISTS (
-	              SELECT 1
-	              FROM rides r
-	              WHERE r.driver_id = u.id
-	                AND r.status IN ('ACTIVE', 'ASSIGNED', 'SCHEDULED')
-	                AND (
-	                    -- overlap check:
-	                    -- existingStart < newEnd  AND  newStart < existingEnd
-	                    COALESCE(r.scheduled_at, r.start_time, r.created_at) < :newEnd
-	                    AND :newStart < (
-	                        COALESCE(r.scheduled_at, r.start_time, r.created_at)
-	                        + make_interval(mins => (r.estimated_duration_min + :bufferMin))
-	                    )
-	                )
-	          )
-	        """, nativeQuery = true)
-    List<User> findAvailableDriversNoConflict(@Param("vehicleType") String vehicleType, @Param("minSeatCount") int minSeatCount, @Param("babyFriendly") boolean babyFriendly, @Param("petFriendly") boolean petFriendly, @Param("newStart") LocalDateTime newStart, @Param("newEnd") LocalDateTime newEnd, @Param("bufferMin") int bufferMin);
+    	      AND NOT EXISTS (
+    	          SELECT 1
+    	          FROM rides r
+    	          WHERE r.driver_id = u.id
+    	            AND r.status IN ('ACTIVE', 'ASSIGNED', 'SCHEDULED')
+    	            AND (
+    	                COALESCE(r.scheduled_at, r.start_time, r.created_at) < :newEnd
+    	                AND :newStart < COALESCE(r.end_time, :newStart)
+    	            )
+    	      )
+    	""", nativeQuery = true)
+    List<User> findAvailableDriversNoConflict(@Param("vehicleType") String vehicleType, @Param("minSeatCount") int minSeatCount, @Param("babyFriendly") boolean babyFriendly, @Param("petFriendly") boolean petFriendly, @Param("newStart") LocalDateTime newStart, @Param("newEnd") LocalDateTime newEnd);
 
+    @Query(value = """
+    	    SELECT DISTINCT u.*
+    	    FROM users u
+    	    JOIN vehicles v ON v.id = u.vehicle_id
+    	    JOIN rides r ON r.driver_id = u.id
+    	    WHERE u.role = 'DRIVER'
+    	      AND u.active = true
+    	      AND u.blocked = false
+    	      AND u.driver_status IN ('ACTIVE', 'IN_RIDE')
+    	      AND v.type = :vehicleType
+    	      AND v.seat_count >= :minSeatCount
+    	      AND (:babyFriendly = FALSE OR v.baby_friendly = TRUE)
+    	      AND (:petFriendly  = FALSE OR v.pet_friendly  = TRUE)
+
+    	      AND r.status = 'ACTIVE'
+    	      AND r.end_time IS NOT NULL
+    	      AND r.end_time <= :finishBefore
+    	      AND r.end_time >= :now
+    	""", nativeQuery = true)
+		List<User> findDriversFinishingSoon(@Param("vehicleType") String vehicleType,@Param("minSeatCount") int minSeatCount,@Param("babyFriendly") boolean babyFriendly,@Param("petFriendly") boolean petFriendly,@Param("now") LocalDateTime now,@Param("finishBefore") LocalDateTime finishBefore);
+
+	
     @Query("""
    SELECT new rs.ac.uns.ftn.iss.Komsiluk.dtos.driver.DriverBasicDTO(u.id, u.firstName, u.lastName)
    FROM User u
