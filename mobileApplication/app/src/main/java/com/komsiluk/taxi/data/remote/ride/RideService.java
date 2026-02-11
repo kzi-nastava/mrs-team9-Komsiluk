@@ -35,4 +35,10 @@ public interface RideService {
 
     @GET("rides/active/all")
     Call<List<RideResponse>> getAllActiveRides();
+
+    @POST("rides/{id}/cancel/driver")
+    Call<Void> cancelByDriver(@Path("id") Long rideId, @Body CancelRideDTO cancelRideDTO);
+
+    @POST("rides/{id}/cancel/passenger")
+    Call<Void> cancelByPassenger(@Path("id") Long rideId, @Body CancelRideDTO cancelRideDTO);
 }

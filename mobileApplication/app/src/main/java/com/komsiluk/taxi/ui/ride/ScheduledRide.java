@@ -5,6 +5,8 @@ import java.util.ArrayList;
 
 public class ScheduledRide implements Serializable {
 
+
+    private final Long id;
     private final String name;
     private final String pickup;
     private final String destination;
@@ -17,7 +19,9 @@ public class ScheduledRide implements Serializable {
     private final String time;
     private final String scheduledTime;
 
+
     public ScheduledRide(
+            Long id,
             String name,
             String pickup,
             String destination,
@@ -30,6 +34,7 @@ public class ScheduledRide implements Serializable {
             String time,
             String scheduledTime
     ) {
+        this.id = id;
         this.name = name;
         this.pickup = pickup;
         this.destination = destination;
@@ -42,6 +47,7 @@ public class ScheduledRide implements Serializable {
         this.time = time;
         this.scheduledTime = scheduledTime;
     }
+    public Long getId() {return id;}
 
     public String getName() { return name; }
     public String getPickup() { return pickup; }

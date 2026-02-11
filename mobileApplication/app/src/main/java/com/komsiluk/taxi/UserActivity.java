@@ -137,6 +137,7 @@ public class UserActivity extends BaseNavDrawerActivity {
     private ImageView ivActiveDriver;
     private TextView tvActiveEstimatedTime;
 
+
     private static final GeoPoint NOVI_SAD_CENTER = new GeoPoint(45.2671, 19.8335);
 
     private boolean hasRestoredRoute = false;
@@ -396,6 +397,7 @@ public class UserActivity extends BaseNavDrawerActivity {
                 .build();
 
         geoRepo = new GeoRepository(geoClient);
+
 
         Object extra = getIntent().getSerializableExtra(FavoritesActivity.EXTRA_BOOK_FAVORITE);
         if (extra instanceof FavoriteRide) {
@@ -1747,6 +1749,17 @@ public class UserActivity extends BaseNavDrawerActivity {
                     public void onResponse(Call<RidePassengerActive> call, Response<RidePassengerActive> rideResp) {
 
                         if (rideResp.code() == 204 || !rideResp.isSuccessful() || rideResp.body() == null) {
+                            stopRideAndCleanup();
+                            return;
+                        }
+
+                        RidePassengerActive rideData = rideResp.body();
+                        String status = rideData.getStatus();
+
+                        if (status != null && (status.equals("CANCELLED") || status.equals("REJECTED"))) {
+                            Toast.makeText(UserActivity.this,
+                                    "Ride has been cancelled by driver.",
+                                    Toast.LENGTH_LONG).show();
                             stopRideAndCleanup();
                             return;
                         }
