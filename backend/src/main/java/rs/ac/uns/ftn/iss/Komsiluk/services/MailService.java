@@ -102,7 +102,7 @@ public class MailService {
     }
 
 
-    public void sendAddedToRideMail(String to, Long rideId) {
+    public void sendAddedToRideMail(String to) {
         String devInbox = "komsiluk.tim@gmail.com";
         to = devInbox;
         SimpleMailMessage message = new SimpleMailMessage();

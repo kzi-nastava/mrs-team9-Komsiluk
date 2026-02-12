@@ -158,7 +158,7 @@ public class RideService implements IRideService {
 
         for (User p : passengers) {
             makeNotification(p, "Added to Ride", "You have been added as a passenger to a ride from " + dto.getStartAddress() + " to " + dto.getEndAddress(), NotificationType.INFO);
-            mailService.sendAddedToRideMail(p.getEmail(), ride.getId());
+            mailService.sendAddedToRideMail(p.getEmail());
         }
 
         return rideMapper.toResponseDTO(ride);
