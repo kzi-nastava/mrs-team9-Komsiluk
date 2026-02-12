@@ -560,7 +560,6 @@ public class RideService implements IRideService {
         route.setEndAddress(dto.getStopAddress());
         String visitedStopsString = (dto.getVisitedStops() == null) ? "" :
                 dto.getVisitedStops().stream()
-                        .skip(1)
                         .filter(s -> s != null && !s.trim().isEmpty())
                         .collect(Collectors.joining("|"));
         route.setStops(visitedStopsString);

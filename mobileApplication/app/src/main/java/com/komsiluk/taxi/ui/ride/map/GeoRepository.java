@@ -27,6 +27,9 @@ public class GeoRepository {
         @GET("https://photon.komoot.io/api/")
         Call<PhotonResponse> searchLocation(@Query("q") String query, @Query("limit") int limit);
 
+        @GET("https://photon.komoot.io/reverse")
+        Call<PhotonResponse> reverseLocation(@Query("lat") double lat, @Query("lon") double lon);
+
         @GET("http://router.project-osrm.org/route/v1/driving/{coordinates}?overview=full&geometries=geojson")
         Call<OsrmRouteResponse> route(@Path(value = "coordinates", encoded = true) String coordinates);
     }
@@ -41,6 +44,11 @@ public class GeoRepository {
 
         this.api = retrofit.create(GeoApiService.class);
     }
+
+    public Call<String> getAddress(double lat, double lon) {
+        return new ReverseCallAdapter(api.reverseLocation(lat, lon));
+    }
+
 
     public Call<OsrmRouteResponse> routeMulti(List<GeoPoint> points) {
         if (points == null || points.isEmpty()) return null;
@@ -117,5 +125,69 @@ public class GeoRepository {
         @Override public Request request() { return originalCall.request(); }
         @Override public Timeout timeout() { return originalCall.timeout(); }
         @Override public Response<List<NominatimPlace>> execute() { return null; }
+    }
+
+    private static class ReverseCallAdapter implements Call<String> {
+        private final Call<PhotonResponse> originalCall;
+
+        ReverseCallAdapter(Call<PhotonResponse> originalCall) {
+            this.originalCall = originalCall;
+        }
+
+        @Override
+        public void enqueue(Callback<String> callback) {
+            originalCall.enqueue(new Callback<PhotonResponse>() {
+                @Override
+                public void onResponse(Call<PhotonResponse> call, Response<PhotonResponse> response) {
+                    String address = "Unknown Location";
+
+                    if (response.isSuccessful() && response.body() != null &&
+                            response.body().features != null && !response.body().features.isEmpty()) {
+
+                        PhotonFeature f = response.body().features.get(0);
+                        if (f.properties != null) {
+                            address = formatAddress(f.properties);
+                        }
+                    }
+                    callback.onResponse(ReverseCallAdapter.this, Response.success(address));
+                }
+
+                @Override
+                public void onFailure(Call<PhotonResponse> call, Throwable t) {
+                    callback.onFailure(ReverseCallAdapter.this, t);
+                }
+            });
+        }
+
+        private String formatAddress(PhotonFeature.Properties p) {
+            StringBuilder sb = new StringBuilder();
+
+            if (p.street != null) {
+                sb.append(p.street);
+            } else if (p.name != null) {
+                sb.append(p.name);
+            }
+
+            if (p.housenumber != null) {
+                if (sb.length() > 0) sb.append(" ");
+                sb.append(p.housenumber);
+            }
+
+            if (p.city != null) {
+                if (sb.length() > 0) sb.append(", ");
+                sb.append(p.city);
+            }
+
+            String result = sb.toString();
+            return result.isEmpty() ? "Unknown Street" : result;
+        }
+
+        @Override public boolean isExecuted() { return originalCall.isExecuted(); }
+        @Override public void cancel() { originalCall.cancel(); }
+        @Override public boolean isCanceled() { return originalCall.isCanceled(); }
+        @Override public Call<String> clone() { return new ReverseCallAdapter(originalCall.clone()); }
+        @Override public Request request() { return originalCall.request(); }
+        @Override public Timeout timeout() { return originalCall.timeout(); }
+        @Override public Response<String> execute() { return null; }
     }
 }
