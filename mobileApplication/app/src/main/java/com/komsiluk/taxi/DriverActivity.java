@@ -834,14 +834,20 @@ public class DriverActivity extends BaseNavDrawerActivity {
             routePolyline = null;
         }
 
-        for (Marker m : rideMarkers) {
-            map.getOverlays().remove(m);
+        if(rideMarkers != null && !rideMarkers.isEmpty()) {
+            for (Marker m : rideMarkers) {
+                map.getOverlays().remove(m);
+            }
+            rideMarkers.clear();
         }
 
         if (layoutActiveStops != null) {
             layoutActiveStops.removeAllViews();
         }
         map.invalidate();
+        rideStartedUi = false;
+        currentRide = null;
+        sheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
     }
 
     private void prepareAndStartMainRideSimulation() {

@@ -386,7 +386,7 @@ public class UserActivity extends BaseNavDrawerActivity {
         OkHttpClient geoClient = new OkHttpClient.Builder()
                 .addInterceptor(chain -> chain.proceed(
                         chain.request().newBuilder()
-                                .header("User-Agent", "KomsilukTaxiAndroid/1.0 (contact: komsiluktim@gmail.com)")
+                                .header("User-Agent", "MyApp/1.0 (contact: bane@gmail.com)")
                                 .header("Accept", "application/json")
                                 .build()
                 ))
@@ -1738,6 +1738,61 @@ public class UserActivity extends BaseNavDrawerActivity {
     }
 
 
+//    private void startDriverTracking() {
+//        activeRideRunnable = new Runnable() {
+//            @Override
+//            public void run() {
+//                if (assignedDriverId == null) return;
+//
+//                rideApi.getPassengerActiveRide().enqueue(new Callback<RidePassengerActive>() {
+//                    @Override
+//                    public void onResponse(Call<RidePassengerActive> call, Response<RidePassengerActive> rideResp) {
+//
+//                        if (rideResp.code() == 204 || !rideResp.isSuccessful() || rideResp.body() == null) {
+//                            stopRideAndCleanup();
+//                            return;
+//                        }
+//
+//                        RidePassengerActive rideData = rideResp.body();
+//                        String status = rideData.getStatus();
+//
+//                        if (status != null && (status.equals("CANCELLED") || status.equals("REJECTED"))) {
+//                            Toast.makeText(UserActivity.this,
+//                                    "Ride has been cancelled by driver.",
+//                                    Toast.LENGTH_LONG).show();
+//                            stopRideAndCleanup();
+//                            return;
+//                        }
+//
+//                        locationApi.getSpecificDriverLocation(assignedDriverId).enqueue(new Callback<DriverLocationResponse>() {
+//                            @Override
+//                            public void onResponse(Call<DriverLocationResponse> call, Response<DriverLocationResponse> locResp) {
+//                                if (locResp.isSuccessful() && locResp.body() != null) {
+//                                    GeoPoint currentDriverPos = new GeoPoint(locResp.body().getLat(), locResp.body().getLng());
+//
+//                                    updateDriverMarker(currentDriverPos);
+//
+//                                    updateDriverEstimatedTime(currentDriverPos);
+//
+//                                    activeRideHandler.postDelayed(activeRideRunnable, 3000);
+//                                }
+//                            }
+//                            @Override public void onFailure(Call<DriverLocationResponse> call, Throwable t) {
+//                                activeRideHandler.postDelayed(activeRideRunnable, 3000);
+//                            }
+//                        });
+//                    }
+//
+//                    @Override
+//                    public void onFailure(Call<RidePassengerActive> call, Throwable t) {
+//                        activeRideHandler.postDelayed(activeRideRunnable, 3000);
+//                    }
+//                });
+//            }
+//        };
+//        activeRideHandler.post(activeRideRunnable);
+//    }
+
     private void startDriverTracking() {
         activeRideRunnable = new Runnable() {
             @Override
@@ -1747,7 +1802,7 @@ public class UserActivity extends BaseNavDrawerActivity {
                 rideApi.getPassengerActiveRide().enqueue(new Callback<RidePassengerActive>() {
                     @Override
                     public void onResponse(Call<RidePassengerActive> call, Response<RidePassengerActive> rideResp) {
-
+                        // 204 No Content usually means the ride is gone (finished or cancelled)
                         if (rideResp.code() == 204 || !rideResp.isSuccessful() || rideResp.body() == null) {
                             stopRideAndCleanup();
                             return;
@@ -1756,22 +1811,19 @@ public class UserActivity extends BaseNavDrawerActivity {
                         RidePassengerActive rideData = rideResp.body();
                         String status = rideData.getStatus();
 
+                        // REACTION TO CANCELLATION
                         if (status != null && (status.equals("CANCELLED") || status.equals("REJECTED"))) {
-                            Toast.makeText(UserActivity.this,
-                                    "Ride has been cancelled by driver.",
-                                    Toast.LENGTH_LONG).show();
-                            stopRideAndCleanup();
+                            handleRideCancelledByDriver();
                             return;
                         }
 
+                        // If still active, continue tracking location
                         locationApi.getSpecificDriverLocation(assignedDriverId).enqueue(new Callback<DriverLocationResponse>() {
                             @Override
                             public void onResponse(Call<DriverLocationResponse> call, Response<DriverLocationResponse> locResp) {
                                 if (locResp.isSuccessful() && locResp.body() != null) {
                                     GeoPoint currentDriverPos = new GeoPoint(locResp.body().getLat(), locResp.body().getLng());
-
                                     updateDriverMarker(currentDriverPos);
-
                                     updateDriverEstimatedTime(currentDriverPos);
 
                                     activeRideHandler.postDelayed(activeRideRunnable, 3000);
@@ -1791,6 +1843,44 @@ public class UserActivity extends BaseNavDrawerActivity {
             }
         };
         activeRideHandler.post(activeRideRunnable);
+    }
+
+    private void handleRideCancelledByDriver() {
+        // 1. Stop the polling loop
+        if (activeRideHandler != null && activeRideRunnable != null) {
+            activeRideHandler.removeCallbacks(activeRideRunnable);
+        }
+
+        // 2. Clear Map overlays
+        if (driverMarker != null) {
+            map.getOverlays().remove(driverMarker);
+            driverMarker = null;
+        }
+        clearRouteAndStats();
+        removeMarker(true);
+        removeMarker(false);
+
+        // 3. Reset UI visibility
+        layoutOrderForm.setVisibility(View.VISIBLE);
+        layoutActiveRide.setVisibility(View.GONE);
+
+        // 4. Reset Sheet state
+        sheetBehavior.setHideable(true);
+        sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+        sheetBehavior.setDraggable(false);
+
+        // 5. Notify the user
+        new MaterialAlertDialogBuilder(this)
+                .setTitle("Ride Cancelled")
+                .setMessage("We are sorry, the driver has cancelled your ride. You can try booking again.")
+                .setPositiveButton("OK", (dialog, which) -> dialog.dismiss())
+                .show();
+
+        // 6. Reset IDs
+        activeRideId = null;
+        assignedDriverId = null;
+
+        map.invalidate();
     }
     private void updateDriverMarker(GeoPoint position) {
         if (driverMarker == null) {
