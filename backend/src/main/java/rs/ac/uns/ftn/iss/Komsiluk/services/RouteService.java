@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import rs.ac.uns.ftn.iss.Komsiluk.beans.Route;
@@ -48,7 +49,7 @@ public class RouteService implements IRouteService {
 
     @Override
     public RouteResponseDTO findOrCreate(RouteCreateDTO dto) {
-        return routeRepository.findBestByKey(dto.getStartAddress(), dto.getEndAddress(), dto.getStops()).map(mapper::toResponseDTO).orElseGet(() -> create(dto));
+        return routeRepository.findBestByKey(dto.getStartAddress(), dto.getEndAddress(), dto.getStops(), PageRequest.of(0, 1)).stream().findFirst().map(mapper::toResponseDTO).orElseGet(() -> create(dto));
     }
     
     @Override

@@ -82,7 +82,7 @@ public class RideService implements IRideService {
 
         LocalDateTime newEnd = newStart.plusMinutes(dto.getEstimatedDurationMin()).plusMinutes(BUFFER_MINUTES);
 
-        boolean hasConflict = rideRepository.existsBlockingRideForCreator(creator.getId(), List.of("SCHEDULED", "ASSIGNED", "ACTIVE"), newStart, newEnd, BUFFER_MINUTES);
+        boolean hasConflict = rideRepository.existsBlockingRideForCreator(creator.getId(), List.of("SCHEDULED", "ASSIGNED", "ACTIVE"), newStart, newEnd);
 
         if (hasConflict) {
             makeNotification(creator, "Ride Failed", "You already have a ride scheduled/active in that time window.", NotificationType.RIDE_FAILED);
@@ -413,8 +413,7 @@ public class RideService implements IRideService {
     }
 
     private BigDecimal calculatePrice(VehicleType type, double distanceKm) {
-        Pricing pricing = pricingRepository.findByVehicleType(type)
-                .orElseThrow(() -> new NotFoundException("Pricing not found for vehicle type " + type.name()));
+        Pricing pricing = pricingRepository.findByVehicleType(type).orElseThrow(() -> new NotFoundException("Pricing not found for vehicle type " + type.name()));
 
         BigDecimal base = BigDecimal.valueOf(pricing.getStartingPrice());
         BigDecimal perKm = BigDecimal.valueOf(pricing.getPricePerKm());
