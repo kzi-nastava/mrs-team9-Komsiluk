@@ -138,6 +138,7 @@ public class UserActivity extends BaseNavDrawerActivity {
     private ImageView ivActiveDriver;
     private TextView tvActiveEstimatedTime;
 
+
     private static final GeoPoint NOVI_SAD_CENTER = new GeoPoint(45.2671, 19.8335);
 
     private boolean hasRestoredRoute = false;
@@ -400,6 +401,7 @@ public class UserActivity extends BaseNavDrawerActivity {
                 .build();
 
         geoRepo = new GeoRepository(geoClient);
+
 
         Object extra = getIntent().getSerializableExtra(FavoritesActivity.EXTRA_BOOK_FAVORITE);
         if (extra instanceof FavoriteRide) {
@@ -727,6 +729,7 @@ public class UserActivity extends BaseNavDrawerActivity {
             }
         });
     }
+
 
     private void showPickDialog(List<NominatimPlace> items, boolean isPickup) {
         View view = getLayoutInflater().inflate(R.layout.dialog_place_picker, null);
@@ -1821,6 +1824,7 @@ public class UserActivity extends BaseNavDrawerActivity {
                             return;
                         }
 
+
                         locationApi.getSpecificDriverLocation(assignedDriverId).enqueue(new Callback<DriverLocationResponse>() {
                             @Override
                             public void onResponse(Call<DriverLocationResponse> call, Response<DriverLocationResponse> locResp) {
@@ -1849,6 +1853,7 @@ public class UserActivity extends BaseNavDrawerActivity {
         };
         activeRideHandler.post(activeRideRunnable);
     }
+
     private void updateDriverMarker(GeoPoint position) {
         if (driverMarker == null) {
             driverMarker = new Marker(map);

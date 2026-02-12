@@ -93,6 +93,7 @@ public class ScheduledRidesActivity extends BaseNavDrawerActivity {
             ArrayList<String> emails = dto.getPassengerEmails() != null ? new ArrayList<>(dto.getPassengerEmails()) : new ArrayList<>();
 
             ScheduledRide sr = new ScheduledRide(
+                    dto.getId(),
                     "Ride #" + dto.getId(),
                     dto.getStartAddress(),
                     dto.getEndAddress(),

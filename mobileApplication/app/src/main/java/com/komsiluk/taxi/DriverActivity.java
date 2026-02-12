@@ -29,6 +29,7 @@ import com.komsiluk.taxi.data.remote.location.DriverLocationUpdate;
 import com.komsiluk.taxi.data.remote.location.LocationService;
 import com.komsiluk.taxi.data.remote.profile.UserProfileResponse;
 import com.komsiluk.taxi.data.remote.profile.UserService;
+import com.komsiluk.taxi.data.remote.ride.CancelRideDTO;
 import com.komsiluk.taxi.data.remote.ride.PanicRequestDTO;
 import com.komsiluk.taxi.data.remote.ride.RideResponse;
 import com.komsiluk.taxi.data.remote.ride.RideService;
@@ -45,6 +46,7 @@ import org.osmdroid.views.CustomZoomButtonsController;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -190,9 +192,7 @@ public class DriverActivity extends BaseNavDrawerActivity {
         btnPanic = findViewById(R.id.btnPanicRide);
         layoutActiveStops = findViewById(R.id.layoutActiveStops);
 
-        btnCancel.setOnClickListener(v -> {
-            Toast.makeText(this, "Cancel not implemented yet.", Toast.LENGTH_SHORT).show();
-        });
+        btnCancel.setOnClickListener(v -> showCancelRideDialog());
 
         btnStart.setOnClickListener(v -> showConfirmStartDialog());
 
@@ -204,6 +204,90 @@ public class DriverActivity extends BaseNavDrawerActivity {
 
         geoRepository = new GeoRepository(okHttpClient);
         startSelfLocationTracking();
+    }
+
+    private void showCancelRideDialog() {
+        Long rideId = getCurrentRideId();
+        if (rideId == null) {
+            Toast.makeText(this, "No active ride found.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_cancel_ride, null);
+        EditText etReason = dialogView.findViewById(R.id.etCancelationReason);
+        MaterialButton btnCancel = dialogView.findViewById(R.id.btnCancel);
+        MaterialButton btnConfirm = dialogView.findViewById(R.id.btnCancelRide);
+
+        AlertDialog dialog = new MaterialAlertDialogBuilder(this)
+                .setView(dialogView)
+                .setCancelable(true)
+                .create();
+
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        }
+
+        btnCancel.setOnClickListener(v -> dialog.dismiss());
+
+        btnConfirm.setOnClickListener(v -> {
+            dialog.dismiss();
+
+            Long userId = sessionManager.getUserId();
+            if (userId == null) {
+                Toast.makeText(this, "User session not found. Please login again.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            String message = etReason.getText().toString().trim();
+
+            if (message.isEmpty()) {
+                Toast.makeText(this, "Reason cannot be empty", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if (message.length() > 200) {
+                Toast.makeText(this, "Message too long (max 200 chars)", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            CancelRideDTO cancelDTO = new CancelRideDTO();
+            cancelDTO.setReason(message);
+
+            rideService.cancelByDriver(rideId, cancelDTO).enqueue(new Callback<Void>() {
+                @Override
+                public void onResponse(Call<Void> call, Response<Void> response) {
+                    if (response.isSuccessful()) {
+                        Toast.makeText(
+                                DriverActivity.this,
+                                "Ride successfuly cancelled!",
+                                Toast.LENGTH_LONG
+                        ).show();
+                        // Clear the map overlays and UI after cancellation
+                        cleanupAnimation();
+                    } else {
+                        String message = response.message() != null
+                                ? response.message()
+                                : "Failed to cancel ride";
+                        if(message.isEmpty()) message = "Failed to cancel ride";
+                        Toast.makeText(
+                                DriverActivity.this,
+                                "Error: " + message,
+                                Toast.LENGTH_LONG
+                        ).show();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<Void> call, Throwable t) {
+                    Toast.makeText(
+                            DriverActivity.this,
+                            "Network error: " + t.getMessage(),
+                            Toast.LENGTH_SHORT
+                    ).show();
+                }
+            });
+        });
+
+        dialog.show();
     }
 
     private void showPanicDialog() {
@@ -751,7 +835,7 @@ public class DriverActivity extends BaseNavDrawerActivity {
     }
 
     private void getCoordinatesAndAnimate(String address, double startLat, double startLng) {
-        geoRepository.searchNoviSad(address, "19.75,45.20,19.95,45.35").enqueue(new Callback<List<com.komsiluk.taxi.ui.ride.map.NominatimPlace>>() {
+            geoRepository.searchNoviSad(address, "19.75,45.20,19.95,45.35").enqueue(new Callback<List<com.komsiluk.taxi.ui.ride.map.NominatimPlace>>() {
             @Override
             public void onResponse(Call<List<com.komsiluk.taxi.ui.ride.map.NominatimPlace>> call, Response<List<com.komsiluk.taxi.ui.ride.map.NominatimPlace>> response) {
                 if (response.isSuccessful() && response.body() != null && !response.body().isEmpty()) {
@@ -818,8 +902,11 @@ public class DriverActivity extends BaseNavDrawerActivity {
             routePolyline = null;
         }
 
-        for (Marker m : rideMarkers) {
-            map.getOverlays().remove(m);
+        if(rideMarkers != null && !rideMarkers.isEmpty()) {
+            for (Marker m : rideMarkers) {
+                map.getOverlays().remove(m);
+            }
+            rideMarkers.clear();
         }
 
         if (layoutActiveStops != null) {
