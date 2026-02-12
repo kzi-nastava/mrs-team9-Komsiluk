@@ -684,72 +684,52 @@ public class UserActivity extends BaseNavDrawerActivity {
         super.onPause();
     }
 
-//    private void searchAndPickLocation(boolean isPickup) {
-//        String q = isPickup
-//                ? safeTrim(etPickup.getText())
-//                : safeTrim(etDestination.getText());
-//
-//        if (q.isEmpty()) {
-//            Toast.makeText(this, getString(R.string.error_location_required), Toast.LENGTH_SHORT).show();
-//            return;
-//        }
-//
-//        geoRepo.searchNoviSad(q, NS_VIEWBOX).enqueue(new Callback<List<NominatimPlace>>() {
-//            @Override
-//            public void onResponse(Call<List<NominatimPlace>> call, Response<List<NominatimPlace>> response) {
-//                android.util.Log.d("NOMINATIM", "code=" + response.code());
-//
-//                if (!response.isSuccessful()) {
-//                    String err = "";
-//                    try { if (response.errorBody() != null) err = response.errorBody().string(); } catch (Exception ignored) {}
-//                    android.util.Log.d("NOMINATIM", "errorBody=" + err);
-//                    Toast.makeText(UserActivity.this, "Search failed (" + response.code() + ")", Toast.LENGTH_SHORT).show();
-//                    return;
-//                }
-//
-//                List<NominatimPlace> raw = response.body();
-//                if (raw == null) {
-//                    Toast.makeText(UserActivity.this, "Search failed (empty body)", Toast.LENGTH_SHORT).show();
-//                    return;
-//                }
-//
-//                List<NominatimPlace> filtered = filterDistinct(raw);
-//
-//                if (filtered.isEmpty()) {
-//                    Toast.makeText(UserActivity.this, getString(R.string.error_no_results), Toast.LENGTH_SHORT).show();
-//                    return;
-//                }
-//
-//                showPickDialog(filtered, isPickup);
-//            }
-//
-//            @Override
-//            public void onFailure(Call<List<NominatimPlace>> call, Throwable t) {
-//                Toast.makeText(UserActivity.this, getString(R.string.error_geocode_failed), Toast.LENGTH_SHORT).show();
-//            }
-//        });
-//    }
-
     private void searchAndPickLocation(boolean isPickup) {
-        // QUICK MOCK: Comment this block out when you want to go back to live requests
-        List<NominatimPlace> mockPlaces = new ArrayList<>();
+        String q = isPickup
+                ? safeTrim(etPickup.getText())
+                : safeTrim(etDestination.getText());
 
-        NominatimPlace p1 = new NominatimPlace();
-        p1.displayName = "Sutjeska 2, Novi Sad (Mock)";
-        p1.lat = "45.2491";
-        p1.lon = "19.8434";
+        if (q.isEmpty()) {
+            Toast.makeText(this, getString(R.string.error_location_required), Toast.LENGTH_SHORT).show();
+            return;
+        }
 
-        NominatimPlace p2 = new NominatimPlace();
-        p2.displayName = "Zmaj Jovina 4, Novi Sad (Mock)";
-        p2.lat = "45.2576";
-        p2.lon = "19.8447";
+        geoRepo.searchNoviSad(q, NS_VIEWBOX).enqueue(new Callback<List<NominatimPlace>>() {
+            @Override
+            public void onResponse(Call<List<NominatimPlace>> call, Response<List<NominatimPlace>> response) {
+                android.util.Log.d("NOMINATIM", "code=" + response.code());
 
-        mockPlaces.add(p1);
-        mockPlaces.add(p2);
+                if (!response.isSuccessful()) {
+                    String err = "";
+                    try { if (response.errorBody() != null) err = response.errorBody().string(); } catch (Exception ignored) {}
+                    android.util.Log.d("NOMINATIM", "errorBody=" + err);
+                    Toast.makeText(UserActivity.this, "Search failed (" + response.code() + ")", Toast.LENGTH_SHORT).show();
+                    return;
+                }
 
-        // Skip the geoRepo.searchNoviSad call and show the picker immediately
-        showPickDialog(mockPlaces, isPickup);
+                List<NominatimPlace> raw = response.body();
+                if (raw == null) {
+                    Toast.makeText(UserActivity.this, "Search failed (empty body)", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                List<NominatimPlace> filtered = filterDistinct(raw);
+
+                if (filtered.isEmpty()) {
+                    Toast.makeText(UserActivity.this, getString(R.string.error_no_results), Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                showPickDialog(filtered, isPickup);
+            }
+
+            @Override
+            public void onFailure(Call<List<NominatimPlace>> call, Throwable t) {
+                Toast.makeText(UserActivity.this, getString(R.string.error_geocode_failed), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
+
 
     private void showPickDialog(List<NominatimPlace> items, boolean isPickup) {
         View view = getLayoutInflater().inflate(R.layout.dialog_place_picker, null);
