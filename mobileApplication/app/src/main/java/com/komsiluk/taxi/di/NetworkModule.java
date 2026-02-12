@@ -22,7 +22,9 @@ import com.komsiluk.taxi.data.remote.report.ReportService;
 import com.komsiluk.taxi.data.remote.ride.RideRepository;
 import com.komsiluk.taxi.data.remote.ride.RideService;
 import com.komsiluk.taxi.data.remote.route.RouteService;
+import com.komsiluk.taxi.ui.ride.map.GeoRepository;
 
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import dagger.Module;
@@ -173,6 +175,37 @@ public class NetworkModule {
     @Singleton
     public static PriceService providePriceService(Retrofit retrofit) {
         return retrofit.create(PriceService.class);
+    }
+
+    @Provides
+    @Singleton
+    @Named("GeoClient")
+    OkHttpClient provideGeoHttpClient() {
+        okhttp3.Dispatcher dispatcher = new okhttp3.Dispatcher();
+        dispatcher.setMaxRequests(1);
+        dispatcher.setMaxRequestsPerHost(1);
+
+        return new OkHttpClient.Builder()
+                .dispatcher(dispatcher)
+                .addNetworkInterceptor(new RateLimitInterceptor()) // Naša kočnica
+                .addInterceptor(chain -> {
+                    okhttp3.Request newRequest = chain.request().newBuilder()
+                            .header("User-Agent", "Mozilla/5.0 (Linux; Android 13; SM-S908B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Mobile Safari/537.36")
+                            .header("Accept", "text/html,application/xhtml+xml,application/json,xml;q=0.9,*/*;q=0.8")
+                            .header("Accept-Language", "sr-RS,sr;q=0.9,en-US;q=0.8,en;q=0.7")
+                            .removeHeader("Referer") // Obavezno ukloni ovo
+                            .build();
+                    return chain.proceed(newRequest);
+                })
+                .connectTimeout(30, TimeUnit.SECONDS)
+                .readTimeout(30, TimeUnit.SECONDS)
+                .build();
+    }
+
+    @Provides
+    @Singleton
+    GeoRepository provideGeoRepository(@Named("GeoClient") OkHttpClient client) {
+        return new GeoRepository(client);
     }
 }
 

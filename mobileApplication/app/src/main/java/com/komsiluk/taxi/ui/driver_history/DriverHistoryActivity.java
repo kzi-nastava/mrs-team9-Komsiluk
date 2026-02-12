@@ -33,12 +33,11 @@ public class DriverHistoryActivity extends BaseNavDrawerActivity {
     @Inject
     SessionManager sessionManager;
 
-    @Inject
-    OkHttpClient okHttpClient; // DODATO za ručnu inicijalizaciju mape
 
     private DriverHistoryAdapter adapter;
     private List<DriverRide> rideList = new ArrayList<>();
-    private GeoRepository geoRepository; // DODATO
+    @Inject
+    public GeoRepository geoRepository;
 
     private String filterFrom = null;
     private String filterTo = null;
@@ -52,8 +51,6 @@ public class DriverHistoryActivity extends BaseNavDrawerActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // 0. Inicijalizacija mape (GeoRepository)
-        geoRepository = new GeoRepository(okHttpClient); // Inicijalizovano ovde
 
         View btnFilter = findViewById(R.id.btnFilter);
 

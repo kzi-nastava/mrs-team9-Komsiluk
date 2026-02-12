@@ -123,7 +123,8 @@ public class UserActivity extends BaseNavDrawerActivity {
 
     private TextView tvKm, tvDriveTime;
 
-    private GeoRepository geoRepo;
+    @Inject
+    GeoRepository geoRepo;
 
     private Marker pickupMarker;
     private Marker destMarker;
@@ -384,23 +385,6 @@ public class UserActivity extends BaseNavDrawerActivity {
         map.getController().setZoom(13.5);
         map.getController().setCenter(NOVI_SAD_CENTER);
 
-        okhttp3.logging.HttpLoggingInterceptor log = new okhttp3.logging.HttpLoggingInterceptor();
-        log.setLevel(okhttp3.logging.HttpLoggingInterceptor.Level.BODY);
-
-        OkHttpClient geoClient = new OkHttpClient.Builder()
-                .addInterceptor(chain -> chain.proceed(
-                        chain.request().newBuilder()
-                                .header("User-Agent", "KomsilukTaxiAndroid/1.0 (contact: komsiluktim@gmail.com)")
-                                .header("Accept", "application/json")
-                                .build()
-                ))
-                .addInterceptor(log)
-                .connectTimeout(10, java.util.concurrent.TimeUnit.SECONDS)
-                .readTimeout(10, java.util.concurrent.TimeUnit.SECONDS)
-                .writeTimeout(10, java.util.concurrent.TimeUnit.SECONDS)
-                .build();
-
-        geoRepo = new GeoRepository(geoClient);
 
 
         Object extra = getIntent().getSerializableExtra(FavoritesActivity.EXTRA_BOOK_FAVORITE);
