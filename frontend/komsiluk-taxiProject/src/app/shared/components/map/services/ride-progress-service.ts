@@ -132,7 +132,7 @@ stops.length - 1
     return {
       endPoint: { lat: currentPoint.lat, lon: currentPoint.lon, label: this.trimLabel(finalLabel) },
       distanceTravelledKm,
-      visitedStops
+      visitedStops: visitedStops.slice(1)
     };
   }
    private trimLabel(fullLabel: string): string {
