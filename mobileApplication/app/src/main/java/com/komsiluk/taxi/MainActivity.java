@@ -20,6 +20,7 @@ import androidx.core.content.ContextCompat;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.button.MaterialButton;
 import com.komsiluk.taxi.auth.AuthManager;
+import com.komsiluk.taxi.auth.UserRole;
 import com.komsiluk.taxi.data.remote.location.DriverLocationResponse;
 import com.komsiluk.taxi.data.remote.location.LocationService;
 import com.komsiluk.taxi.ui.about.AboutUsActivity;
@@ -118,6 +119,13 @@ public class MainActivity extends BaseNavDrawerActivity {
         super.onCreate(savedInstanceState);
 
 
+        if (authManager.isLoggedIn()) {
+            redirectToAppropriateActivity();
+            finish();
+            return;
+        }
+
+
         Configuration.getInstance().load(this, getSharedPreferences("osmdroid", MODE_PRIVATE));
 
         map = findViewById(R.id.map);
@@ -142,6 +150,26 @@ public class MainActivity extends BaseNavDrawerActivity {
 
         restoreStateIfNeeded();
     }
+
+    private void redirectToAppropriateActivity() {
+        Intent intent;
+        UserRole role = authManager.getRole();
+
+        if (role == UserRole.PASSENGER) {
+            intent = new Intent(this, UserActivity.class);
+        } else if (role == UserRole.DRIVER) {
+            intent = new Intent(this, DriverActivity.class);
+        } else if (role == UserRole.ADMIN ){
+            intent = new Intent(this, AdminActivity.class);
+        } else {
+            return;
+        }
+
+
+        startActivity(intent);
+    }
+
+
 
     private void setupMap() {
         map.setTileSource(TileSourceFactory.MAPNIK);
