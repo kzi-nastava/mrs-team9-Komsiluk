@@ -23,23 +23,17 @@ public interface RideRepository extends JpaRepository<Ride, Long> {
         """)
     Collection<Ride> findScheduledByUserId(@Param("userId") Long userId, @Param("status") RideStatus status);
 	
-	@Query(value = """
-		    SELECT CASE WHEN COUNT(*) > 0 THEN true ELSE false END
-		    FROM rides r
-		    WHERE
-		        r.created_by = :userId
-		        AND r.status IN (:statuses)
-		        AND (
-		            COALESCE(r.scheduled_at, r.created_at) < :newEnd
-		            AND
-		            :newStart < (
-		                COALESCE(r.scheduled_at, r.created_at)
-		                + (r.estimated_duration_min || ' minutes')::interval
-		                + (:bufferMinutes || ' minutes')::interval
-		            )
-		        )
-		""", nativeQuery = true)
-	boolean existsBlockingRideForCreator(@Param("userId") Long userId, @Param("statuses") Collection<String> statuses, @Param("newStart") LocalDateTime newStart, @Param("newEnd") LocalDateTime newEnd, @Param("bufferMinutes") int bufferMinutes);
+    @Query(value = """
+    	    SELECT CASE WHEN COUNT(*) > 0 THEN true ELSE false END
+    	    FROM rides r
+    	    WHERE r.created_by = :userId
+    	      AND r.status IN (:statuses)
+    	      AND (
+    	            r.start_time < :newEnd
+    	        AND :newStart < r.end_time
+    	      )
+    	""", nativeQuery = true)
+	boolean existsBlockingRideForCreator(@Param("userId") Long userId, @Param("statuses") Collection<String> statuses, @Param("newStart") LocalDateTime newStart, @Param("newEnd") LocalDateTime newEnd);
 
 	@Query("""
 			SELECT COUNT(r)
