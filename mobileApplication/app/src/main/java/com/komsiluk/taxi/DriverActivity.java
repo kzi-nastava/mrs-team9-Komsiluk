@@ -349,8 +349,8 @@ public class DriverActivity extends BaseNavDrawerActivity {
                     rideStartedUi = isRideActiveStatus(currentRide.getStatus());
 
                     // Popuni UI
-                    tvPickupValue.setText(safe(currentRide.getStartAddress()));
-                    tvDestinationValue.setText(safe(currentRide.getEndAddress()));
+                    tvPickupValue.setText(safe(newRide.getStartAddress()));
+                    tvDestinationValue.setText(safe(newRide.getEndAddress()));
 
                     if (layoutActiveStops != null) {
                         layoutActiveStops.removeAllViews();
@@ -362,7 +362,7 @@ public class DriverActivity extends BaseNavDrawerActivity {
                             }
                         }
                     }
-                    bindCreatorProfile(currentRide.getCreatorId());
+                    bindCreatorProfile(newRide.getCreatorId());
                     applyRideButtonsUi();
                     sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
 
@@ -371,7 +371,7 @@ public class DriverActivity extends BaseNavDrawerActivity {
                         cleanupAnimation(); // Ugasi staru ako postoji
                         double myLat = myLocationMarker.getPosition().getLatitude();
                         double myLng = myLocationMarker.getPosition().getLongitude();
-                        getCoordinatesAndAnimate(currentRide.getStartAddress(), myLat, myLng);
+                        getCoordinatesAndAnimate(newRide.getStartAddress(), myLat, myLng);
                     }
                 }
             }
@@ -767,23 +767,28 @@ public class DriverActivity extends BaseNavDrawerActivity {
     }
 
     private void getCoordinatesAndAnimate(String address, double startLat, double startLng) {
-        geoRepository.searchNoviSad(address, "19.75,45.20,19.95,45.35").enqueue(new Callback<List<com.komsiluk.taxi.ui.ride.map.NominatimPlace>>() {
-            @Override
-            public void onResponse(Call<List<com.komsiluk.taxi.ui.ride.map.NominatimPlace>> call, Response<List<com.komsiluk.taxi.ui.ride.map.NominatimPlace>> response) {
-                if (response.isSuccessful() && response.body() != null && !response.body().isEmpty()) {
-                    com.komsiluk.taxi.ui.ride.map.NominatimPlace place = response.body().get(0);
-                    double targetLat = Double.parseDouble(place.lat);
-                    double targetLng = Double.parseDouble(place.lon);
+        double targetLat = 45.2491;
+        double targetLng = 19.8434;
 
-                    startAnimationToPickup(startLat, startLng, targetLat, targetLng);
-                }
-            }
+        startAnimationToPickup(startLat,startLng,targetLat,targetLng);
 
-            @Override
-            public void onFailure(Call<List<com.komsiluk.taxi.ui.ride.map.NominatimPlace>> call, Throwable t) {
-                Log.e("GEOCODING", "Neuspešno pretvaranje adrese: " + address);
-            }
-        });
+        //        geoRepository.searchNoviSad(address, "19.75,45.20,19.95,45.35").enqueue(new Callback<List<com.komsiluk.taxi.ui.ride.map.NominatimPlace>>() {
+//            @Override
+//            public void onResponse(Call<List<com.komsiluk.taxi.ui.ride.map.NominatimPlace>> call, Response<List<com.komsiluk.taxi.ui.ride.map.NominatimPlace>> response) {
+//                if (response.isSuccessful() && response.body() != null && !response.body().isEmpty()) {
+//                    com.komsiluk.taxi.ui.ride.map.NominatimPlace place = response.body().get(0);
+//                    double targetLat = Double.parseDouble(place.lat);
+//                    double targetLng = Double.parseDouble(place.lon);
+//
+//                    startAnimationToPickup(startLat, startLng, targetLat, targetLng);
+//                }
+//            }
+//
+//            @Override
+//            public void onFailure(Call<List<com.komsiluk.taxi.ui.ride.map.NominatimPlace>> call, Throwable t) {
+//                Log.e("GEOCODING", "Neuspešno pretvaranje adrese: " + address);
+//            }
+//        });
     }
 
     private boolean isDriverCloseEnough(double driverLat, double driverLng, double pickupLat, double pickupLng) {
@@ -845,9 +850,6 @@ public class DriverActivity extends BaseNavDrawerActivity {
             layoutActiveStops.removeAllViews();
         }
         map.invalidate();
-        rideStartedUi = false;
-        currentRide = null;
-        sheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
     }
 
     private void prepareAndStartMainRideSimulation() {
@@ -862,19 +864,32 @@ public class DriverActivity extends BaseNavDrawerActivity {
         geocodeAndSimulateFullRoute(startAddr, stops, endAddr);
     }
     private void geocodeAndSimulateFullRoute(String start, List<String> stops, String end) {
-        List<GeoPoint> allWaypoints = new java.util.ArrayList<>();
+        List<GeoPoint> allWaypoints = new ArrayList<>();
 
-        geoRepository.searchNoviSad(start, "19.75,45.20,19.95,45.35").enqueue(new Callback<List<com.komsiluk.taxi.ui.ride.map.NominatimPlace>>() {
-            @Override
-            public void onResponse(Call<List<com.komsiluk.taxi.ui.ride.map.NominatimPlace>> call, Response<List<com.komsiluk.taxi.ui.ride.map.NominatimPlace>> resp) {
-                if (resp.isSuccessful() && resp.body() != null && !resp.body().isEmpty()) {
-                    allWaypoints.add(new GeoPoint(Double.parseDouble(resp.body().get(0).lat), Double.parseDouble(resp.body().get(0).lon)));
+        // Start Point
+        allWaypoints.add(new GeoPoint(45.2491, 19.8434));
 
-                    geocodeStopsRecursive(allWaypoints, stops, 0, end);
-                }
-            }
-            @Override public void onFailure(Call<List<com.komsiluk.taxi.ui.ride.map.NominatimPlace>> call, Throwable t) {}
-        });
+
+        // End Point
+        GeoPoint endPt = new GeoPoint(45.2576, 19.8447);
+        allWaypoints.add(endPt);
+        addRideMarker(endPt, R.drawable.flag);
+
+        // Jump straight to drawing the route and starting the animation
+        executeMultiRoute(allWaypoints);
+        //        List<GeoPoint> allWaypoints = new java.util.ArrayList<>();
+
+//        geoRepository.searchNoviSad(start, "19.75,45.20,19.95,45.35").enqueue(new Callback<List<com.komsiluk.taxi.ui.ride.map.NominatimPlace>>() {
+//            @Override
+//            public void onResponse(Call<List<com.komsiluk.taxi.ui.ride.map.NominatimPlace>> call, Response<List<com.komsiluk.taxi.ui.ride.map.NominatimPlace>> resp) {
+//                if (resp.isSuccessful() && resp.body() != null && !resp.body().isEmpty()) {
+//                    allWaypoints.add(new GeoPoint(Double.parseDouble(resp.body().get(0).lat), Double.parseDouble(resp.body().get(0).lon)));
+//
+//                    geocodeStopsRecursive(allWaypoints, stops, 0, end);
+//                }
+//            }
+//            @Override public void onFailure(Call<List<com.komsiluk.taxi.ui.ride.map.NominatimPlace>> call, Throwable t) {}
+//        });
     }
 
     private void geocodeStopsRecursive(List<GeoPoint> waypoints, List<String> stops, int index, String end) {
