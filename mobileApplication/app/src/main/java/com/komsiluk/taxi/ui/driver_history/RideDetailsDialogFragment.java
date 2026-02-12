@@ -48,7 +48,8 @@ import retrofit2.Response;
 public class RideDetailsDialogFragment extends DialogFragment {
 
     private DialogRideDetailsBinding b;
-    private static GeoRepository staticGeoRepo; // Drzimo repo ovdje jer ne ide u Bundle
+
+    private static GeoRepository staticGeoRepo;
 
     @Inject DriverService driverService;
     @Inject RatingService ratingService;

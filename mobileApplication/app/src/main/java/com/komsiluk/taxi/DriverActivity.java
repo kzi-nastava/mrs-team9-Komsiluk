@@ -109,7 +109,8 @@ public class DriverActivity extends BaseNavDrawerActivity {
 
     private boolean firstTimeZoom = true;
 
-    private GeoRepository geoRepository;
+    @Inject
+    public GeoRepository geoRepository;
 
     private Handler animationHandler = new Handler(Looper.getMainLooper());
     private Runnable animationRunnable;
@@ -129,8 +130,6 @@ public class DriverActivity extends BaseNavDrawerActivity {
     @Inject
     LocationService locationService;
 
-    @Inject
-    OkHttpClient okHttpClient;
     private View rowPassenger;
     private ImageView ivPassenger;
     private TextView tvPassengerName;
@@ -202,7 +201,6 @@ public class DriverActivity extends BaseNavDrawerActivity {
         btnReport.setOnClickListener(v -> showReportInconsistencyDialog());
         btnPanic.setOnClickListener(v -> showPanicDialog());
 
-        geoRepository = new GeoRepository(okHttpClient);
         startSelfLocationTracking();
     }
 
