@@ -7,7 +7,7 @@
 
         <!-- GUEST -->
         <ng-container *ngIf="userRole() === UserRole.GUEST">
-          <a class="rightmenu__item rightmenu__item--active" routerLink="/login">Login</a>
+          <a class="rightmenu__item rightmenu__item--active" id = "login_button_guest"routerLink="/login">Login</a>
           <a class="rightmenu__item" routerLink="/register-passenger">Register</a>
           <a class="rightmenu__item" routerLink="/about">About us</a>
         </ng-container>

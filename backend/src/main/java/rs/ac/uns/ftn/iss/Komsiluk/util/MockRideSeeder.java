@@ -94,9 +94,43 @@ public class MockRideSeeder implements CommandLineRunner {
         ride1.setPrice(BigDecimal.valueOf(1200));
         ride1 = rideRepository.save(ride1);
 
-        // Ratingi za prvu vožnju
-        createRating(ride1, passenger1, driver, 4, 5, "Odlična vožnja, vozač vrlo ljubazan!");
-        createRating(ride1, passenger2, driver, 5, 5, "Sve super, preporučujem!");
+        Route routeAlreadyRated = new Route();
+        routeAlreadyRated.setStartAddress("Futoska 5, Novi Sad");
+        routeAlreadyRated.setEndAddress("Bulevar Evrope 12, Novi Sad");
+        routeAlreadyRated.setStops(
+                "Brace Ribnikar 3, Novi Sad"
+        );
+        routeAlreadyRated.setDistanceKm(4.8);
+        routeAlreadyRated.setEstimatedDurationMin(12);
+        routeAlreadyRated = routeRepository.save(routeAlreadyRated);
+
+        Ride alreadyRatedRide = new Ride();
+        alreadyRatedRide.setStatus(RideStatus.FINISHED);
+        alreadyRatedRide.setCreatedAt(now.minusMinutes(120));
+        alreadyRatedRide.setStartTime(now.minusMinutes(110));
+        alreadyRatedRide.setEndTime(now.minusMinutes(95));
+        alreadyRatedRide.setRoute(routeAlreadyRated);
+        alreadyRatedRide.setDriver(driver);
+        alreadyRatedRide.setCreatedBy(passenger1);
+        alreadyRatedRide.setPassengers(List.of(passenger1));
+        alreadyRatedRide.setVehicleType(driver.getVehicle().getType());
+        alreadyRatedRide.setBabyFriendly(driver.getVehicle().isBabyFriendly());
+        alreadyRatedRide.setPetFriendly(driver.getVehicle().isPetFriendly());
+        alreadyRatedRide.setDistanceKm(routeAlreadyRated.getDistanceKm());
+        alreadyRatedRide.setEstimatedDurationMin(routeAlreadyRated.getEstimatedDurationMin());
+        alreadyRatedRide.setPanicTriggered(false);
+        alreadyRatedRide.setPrice(BigDecimal.valueOf(650));
+        alreadyRatedRide = rideRepository.save(alreadyRatedRide);
+
+        createRating(
+                alreadyRatedRide,
+                passenger1,   // rater
+                driver,
+                5,
+                5,
+                "Odlicna voznja."
+        );
+
 
         // Druga vožnja - 21.1.2026
         Route route2 = new Route();
@@ -131,7 +165,6 @@ public class MockRideSeeder implements CommandLineRunner {
         ride2 = rideRepository.save(ride2);
 
         // Ratingi za drugu vožnju
-        createRating(ride2, passenger1, driver3, 2, 3, "Vozač je bio nestrpljiv i vozio brzo.");
         createRating(ride2, passenger3, driver3, 3, 2, "Automobil nije bio čist.");
 
         // Inconsistency reporti za drugu vožnju (zbog panic alarma)
