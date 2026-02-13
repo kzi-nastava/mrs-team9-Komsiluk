@@ -82,7 +82,8 @@ public class MainActivity extends BaseNavDrawerActivity {
     private MaterialButton btnBookRide;
     private BottomSheetBehavior<View> sheetBehavior;
 
-    private GeoRepository geoRepo;
+    @Inject
+    public GeoRepository geoRepo;
 
     private Marker pickupMarker;
     private Marker destMarker;
@@ -138,7 +139,6 @@ public class MainActivity extends BaseNavDrawerActivity {
             return;
         }
 
-        setupGeoRepository();
 
         initializeUIElements();
 
@@ -183,25 +183,6 @@ public class MainActivity extends BaseNavDrawerActivity {
         map.setMaxZoomLevel(20.0);
     }
 
-    private void setupGeoRepository() {
-        okhttp3.logging.HttpLoggingInterceptor log = new okhttp3.logging.HttpLoggingInterceptor();
-        log.setLevel(okhttp3.logging.HttpLoggingInterceptor.Level.BODY);
-
-        OkHttpClient geoClient = new OkHttpClient.Builder()
-                .addInterceptor(chain -> chain.proceed(
-                        chain.request().newBuilder()
-                                .header("User-Agent", "KomsilukTaxiAndroid/1.0 (contact: komsiluktim@gmail.com)")
-                                .header("Accept", "application/json")
-                                .build()
-                ))
-                .addInterceptor(log)
-                .connectTimeout(10, java.util.concurrent.TimeUnit.SECONDS)
-                .readTimeout(10, java.util.concurrent.TimeUnit.SECONDS)
-                .writeTimeout(10, java.util.concurrent.TimeUnit.SECONDS)
-                .build();
-
-        geoRepo = new GeoRepository(geoClient);
-    }
 
     private void initializeUIElements() {
         etPickup = findViewById(R.id.etPickup);

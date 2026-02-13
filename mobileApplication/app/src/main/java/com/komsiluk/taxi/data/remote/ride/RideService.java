@@ -44,4 +44,7 @@ public interface RideService {
 
     @POST("rides/{id}/cancel/passenger")
     Call<Void> cancelByPassenger(@Path("id") Long rideId, @Body CancelRideDTO cancelRideDTO);
+
+    @POST("rides/{id}/stop")
+    Call<RideResponse> stopRide(@Path("id") Long id, @Body StopRideRequestDTO body);
 }

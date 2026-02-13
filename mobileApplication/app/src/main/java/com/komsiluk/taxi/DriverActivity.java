@@ -1,6 +1,7 @@
 package com.komsiluk.taxi;
 
 import android.graphics.drawable.Drawable;
+import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -33,9 +34,11 @@ import com.komsiluk.taxi.data.remote.ride.CancelRideDTO;
 import com.komsiluk.taxi.data.remote.ride.PanicRequestDTO;
 import com.komsiluk.taxi.data.remote.ride.RideResponse;
 import com.komsiluk.taxi.data.remote.ride.RideService;
+import com.komsiluk.taxi.data.remote.ride.StopRideRequestDTO;
 import com.komsiluk.taxi.data.session.SessionManager;
 import com.komsiluk.taxi.ui.menu.BaseNavDrawerActivity;
 import com.komsiluk.taxi.ui.ride.map.GeoRepository;
+import com.komsiluk.taxi.ui.ride.map.NominatimPlace;
 import com.komsiluk.taxi.ui.ride.map.OsrmRouteResponse;
 
 import org.osmdroid.config.Configuration;
@@ -109,7 +112,8 @@ public class DriverActivity extends BaseNavDrawerActivity {
 
     private boolean firstTimeZoom = true;
 
-    private GeoRepository geoRepository;
+    @Inject
+    public GeoRepository geoRepository;
 
     private Handler animationHandler = new Handler(Looper.getMainLooper());
     private Runnable animationRunnable;
@@ -129,8 +133,6 @@ public class DriverActivity extends BaseNavDrawerActivity {
     @Inject
     LocationService locationService;
 
-    @Inject
-    OkHttpClient okHttpClient;
     private View rowPassenger;
     private ImageView ivPassenger;
     private TextView tvPassengerName;
@@ -143,6 +145,10 @@ public class DriverActivity extends BaseNavDrawerActivity {
 
     @Inject
     InconsistencyService inconsistencyService;
+
+    private List<String> localVisitedStops = new ArrayList<>();
+    private GeoPoint startPointCoords;
+    private List<GeoPoint> stopsCoords = new ArrayList<>();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -198,12 +204,141 @@ public class DriverActivity extends BaseNavDrawerActivity {
 
         // U onCreate metodi
         btnFinish.setOnClickListener(v -> finishRideOnBackend());
-        btnStop.setOnClickListener(v -> Toast.makeText(this, "Stop not implemented yet.", Toast.LENGTH_SHORT).show());
+        btnStop.setOnClickListener(v -> showStopRideDialog());
         btnReport.setOnClickListener(v -> showReportInconsistencyDialog());
         btnPanic.setOnClickListener(v -> showPanicDialog());
 
-        geoRepository = new GeoRepository(okHttpClient);
         startSelfLocationTracking();
+    }
+
+    private void showStopRideDialog() {
+        Long rideId = getCurrentRideId();
+        if (rideId == null) {
+            Toast.makeText(this, "No active ride to stop.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_stop_ride, null);
+
+        MaterialButton btnCancel = dialogView.findViewById(R.id.btnCancelStopage);
+        MaterialButton btnConfirm = dialogView.findViewById(R.id.btnConfirmStopage);
+
+        AlertDialog dialog = new MaterialAlertDialogBuilder(this)
+                .setView(dialogView)
+                .setCancelable(true)
+                .create();
+
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        }
+
+        btnCancel.setOnClickListener(v -> dialog.dismiss());
+
+        btnConfirm.setOnClickListener(v -> {
+            btnConfirm.setEnabled(false);
+            handleStopConfirmation(dialog, rideId);
+        });
+
+        dialog.show();
+    }
+
+    private void handleStopConfirmation(AlertDialog dialog, Long rideId) {
+        if (myLocationMarker == null) {
+            Toast.makeText(this, "Location unknown, cannot stop ride yet.", Toast.LENGTH_SHORT).show();
+            dialog.dismiss();
+            return;
+        }
+
+        double currentLat = myLocationMarker.getPosition().getLatitude();
+        double currentLon = myLocationMarker.getPosition().getLongitude();
+
+        geoRepository.getAddress(currentLat, currentLon).enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                String stopAddress = "Unknown Location";
+                if (response.isSuccessful() && response.body() != null) {
+                    stopAddress = response.body();
+                }
+
+                double totalDistanceKm = calculateTravelledDistance(currentLat, currentLon);
+
+                StopRideRequestDTO requestDTO = new StopRideRequestDTO(
+                        stopAddress,
+                        localVisitedStops,
+                        totalDistanceKm == 0.0 ? 0.1 : totalDistanceKm
+                );
+
+                sendStopRideRequest(rideId, requestDTO, dialog);
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                Toast.makeText(DriverActivity.this, "Failed to get address. Check internet.", Toast.LENGTH_SHORT).show();
+                if(dialog.isShowing()) dialog.dismiss();
+            }
+        });
+    }
+
+    private double calculateTravelledDistance(double currentLat, double currentLon) {
+        double totalMeters = 0;
+
+        if (startPointCoords == null) return 0.0;
+
+        GeoPoint previousPoint = startPointCoords;
+
+        for (int i = 0; i < localVisitedStops.size(); i++) {
+            if (i < stopsCoords.size()) {
+                GeoPoint stopPoint = stopsCoords.get(i);
+
+                float[] results = new float[1];
+                Location.distanceBetween(
+                        previousPoint.getLatitude(), previousPoint.getLongitude(),
+                        stopPoint.getLatitude(), stopPoint.getLongitude(),
+                        results
+                );
+                totalMeters += results[0];
+                previousPoint = stopPoint;
+            }
+        }
+
+        float[] finalLeg = new float[1];
+        Location.distanceBetween(
+                previousPoint.getLatitude(), previousPoint.getLongitude(),
+                currentLat, currentLon,
+                finalLeg
+        );
+        totalMeters += finalLeg[0];
+
+        return totalMeters / 1000.0;
+    }
+
+    private void sendStopRideRequest(Long rideId, StopRideRequestDTO dto, AlertDialog dialog) {
+        rideService.stopRide(rideId, dto).enqueue(new Callback<RideResponse>() {
+            @Override
+            public void onResponse(Call<RideResponse> call, Response<RideResponse> response) {
+                if (response.isSuccessful()) {
+                    Toast.makeText(DriverActivity.this, "Ride stopped successfully!", Toast.LENGTH_LONG).show();
+
+                    rideStartedUi = false;
+                    currentRide = null;
+                    localVisitedStops.clear();
+                    cleanupAnimation();
+                    sheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+                    if (myLocationMarker != null) myLocationMarker.setIcon(iconFree);
+
+                    dialog.dismiss();
+                } else {
+                    Toast.makeText(DriverActivity.this, "Failed to stop ride: " + response.code(), Toast.LENGTH_SHORT).show();
+                    dialog.dismiss();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<RideResponse> call, Throwable t) {
+                Toast.makeText(DriverActivity.this, "Network error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                dialog.dismiss();
+            }
+        });
     }
 
     private void showCancelRideDialog() {
@@ -704,6 +839,7 @@ public class DriverActivity extends BaseNavDrawerActivity {
                 if (response.isSuccessful() && response.body() != null) {
                     DriverLocationResponse loc = response.body();
                     updateDriverMarkerOnMap(loc.getLat(), loc.getLng());
+                    checkStopProximity(loc.getLat(),loc.getLng());
                 }
             }
 
@@ -712,6 +848,50 @@ public class DriverActivity extends BaseNavDrawerActivity {
                 Log.e("SELF_TRACK", "Greška pri dohvatanju sopstvene lokacije");
             }
         });
+    }
+
+    private void checkStopProximity(double currentLat, double currentLng) {
+        if (currentRide == null || currentRide.getStops() == null) return;
+
+        if (stopsCoords.size() != currentRide.getStops().size()) return;
+
+        List<String> allStops = currentRide.getStops();
+
+        for (int i = 0; i < stopsCoords.size(); i++) {
+            String stopAddress = allStops.get(i);
+
+            if (localVisitedStops.contains(stopAddress)) continue;
+
+            GeoPoint stopLoc = stopsCoords.get(i);
+
+            if (isDriverCloseEnough(currentLat, currentLng, stopLoc.getLatitude(), stopLoc.getLongitude())) {
+
+                localVisitedStops.add(stopAddress);
+
+                markStopAsVisitedUi(i + 1);
+
+                Toast.makeText(this, "Arrived at stop: " + stopAddress, Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    private void markStopAsVisitedUi(int stopIndex) {
+        // layoutActiveStops sadrži TextView-ove.
+        // Struktura je: Label1, Value1, Label2, Value2...
+        // Stop 1 je na indeksima 0 i 1. Stop 2 na 2 i 3.
+        // Formula za Value View: (stopIndex - 1) * 2 + 1
+
+        int valueViewIndex = (stopIndex - 1) * 2 + 1;
+
+        if (layoutActiveStops != null && layoutActiveStops.getChildCount() > valueViewIndex) {
+            View v = layoutActiveStops.getChildAt(valueViewIndex);
+            if (v instanceof TextView) {
+                TextView tv = (TextView) v;
+                tv.setPaintFlags(tv.getPaintFlags() | android.graphics.Paint.STRIKE_THRU_TEXT_FLAG);
+                tv.setTextColor(android.graphics.Color.GREEN);
+                tv.setAlpha(0.6f);
+            }
+        }
     }
 
     private void updateDriverMarkerOnMap(double lat, double lng) {
@@ -933,7 +1113,9 @@ public class DriverActivity extends BaseNavDrawerActivity {
             @Override
             public void onResponse(Call<List<com.komsiluk.taxi.ui.ride.map.NominatimPlace>> call, Response<List<com.komsiluk.taxi.ui.ride.map.NominatimPlace>> resp) {
                 if (resp.isSuccessful() && resp.body() != null && !resp.body().isEmpty()) {
-                    allWaypoints.add(new GeoPoint(Double.parseDouble(resp.body().get(0).lat), Double.parseDouble(resp.body().get(0).lon)));
+                    GeoPoint startPoint = new GeoPoint(Double.parseDouble(resp.body().get(0).lat), Double.parseDouble(resp.body().get(0).lon));
+                    allWaypoints.add(startPoint);
+                    startPointCoords = startPoint;
 
                     geocodeStopsRecursive(allWaypoints, stops, 0, end);
                 }
@@ -952,6 +1134,7 @@ public class DriverActivity extends BaseNavDrawerActivity {
                         GeoPoint pt = new GeoPoint(Double.parseDouble(resp.body().get(0).lat), Double.parseDouble(resp.body().get(0).lon));
                         waypoints.add(pt);
                         addRideMarker(pt, R.drawable.station);
+                        stopsCoords.add(pt);
                     }
 
                     geocodeStopsRecursive(waypoints, stops, index + 1, end);
