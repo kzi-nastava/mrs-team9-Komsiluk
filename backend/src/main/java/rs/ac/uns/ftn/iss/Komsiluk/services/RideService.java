@@ -582,6 +582,7 @@ public class RideService implements IRideService {
         notificationDTODriver.setType(NotificationType.RIDE_STOPPED);
         notificationDTODriver.setTitle("Ride Stopped");
         notificationDTODriver.setMessage("Your ride from has stopped at " + dto.getStopAddress() + ".");
+        notificationService.createNotification(notificationDTODriver);
         notifyRideParticipants(ride, NotificationType.RIDE_STOPPED);
         return rideMapper.toResponseDTO(ride);
     }
@@ -639,9 +640,9 @@ public class RideService implements IRideService {
         for (User passenger : passengers) {
             NotificationCreateDTO notificationDTOPassenger = new NotificationCreateDTO();
             notificationDTOPassenger.setUserId(passenger.getId());
-            notificationDTOCreator.setType(type);
-            notificationDTOCreator.setTitle(title);
-            notificationDTOCreator.setMessage(message);
+            notificationDTOPassenger.setType(type);
+            notificationDTOPassenger.setTitle(title);
+            notificationDTOPassenger.setMessage(message);
             notificationService.createNotification(notificationDTOPassenger);
         }
     }
