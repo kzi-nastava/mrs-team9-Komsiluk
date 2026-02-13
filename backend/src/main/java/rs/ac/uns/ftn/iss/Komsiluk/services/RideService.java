@@ -301,17 +301,9 @@ public class RideService implements IRideService {
             }
         }
 
-        if (driver.getEmail() != null) {
-            emails.remove(driver.getEmail());
-        }
-
         for (String email : emails) {
             mailService.sendRideFinishedMail(email, ride.getId());
         }
-
-
-
-
         return rideMapper.toResponseDTO(ride);
     }
 
