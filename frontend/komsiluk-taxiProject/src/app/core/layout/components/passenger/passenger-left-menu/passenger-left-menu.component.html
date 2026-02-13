@@ -13,7 +13,7 @@
     </div>
   }
   @else {
-    <button class="p-item" type="button" (click)="toggle('book')">
+    <button id="bookButton" class="p-item" type="button" (click)="toggle('book')">
       <span class="p-left">
         <span class="material-symbols-outlined">local_taxi</span>
         <span class="p-text">Book a ride</span>
@@ -27,7 +27,7 @@
       </div>
     }
 
-    <button class="p-item" type="button" (click)="toggle('fav')">
+    <button id="favButton" class="p-item" type="button" (click)="toggle('fav')">
       <span class="p-left">
         <span class="material-symbols-outlined">star</span>
         <span class="p-text">Favorite rides</span>
@@ -41,7 +41,7 @@
       </div>
     }
 
-    <button class="p-item" type="button" (click)="toggle('sched')">
+    <button id="schedButton" class="p-item" type="button" (click)="toggle('sched')">
       <span class="p-left">
         <span class="material-symbols-outlined">calendar_month</span>
         <span class="p-text">Scheduled rides</span>

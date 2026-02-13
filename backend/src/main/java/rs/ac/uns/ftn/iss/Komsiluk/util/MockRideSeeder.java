@@ -12,13 +12,16 @@ import rs.ac.uns.ftn.iss.Komsiluk.beans.Ride;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.Route;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.User;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.Rating;
+import rs.ac.uns.ftn.iss.Komsiluk.beans.FavoriteRoute;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.InconsistencyReport;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.RideStatus;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.UserRole;
+import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.VehicleType;
 import rs.ac.uns.ftn.iss.Komsiluk.repositories.RideRepository;
 import rs.ac.uns.ftn.iss.Komsiluk.repositories.RouteRepository;
 import rs.ac.uns.ftn.iss.Komsiluk.repositories.UserRepository;
 import rs.ac.uns.ftn.iss.Komsiluk.repositories.RatingRepository;
+import rs.ac.uns.ftn.iss.Komsiluk.repositories.FavoriteRouteRepository;
 import rs.ac.uns.ftn.iss.Komsiluk.repositories.InconsistencyReportRepository;
 
 @Component
@@ -30,17 +33,20 @@ public class MockRideSeeder implements CommandLineRunner {
     private final UserRepository userRepository;
     private final RatingRepository ratingRepository;
     private final InconsistencyReportRepository inconsistencyReportRepository;
+    private final FavoriteRouteRepository favoriteRouteRepository;
 
     public MockRideSeeder(RideRepository rideRepository,
                           RouteRepository routeRepository,
                           UserRepository userRepository,
                           RatingRepository ratingRepository,
-                          InconsistencyReportRepository inconsistencyReportRepository) {
+                          InconsistencyReportRepository inconsistencyReportRepository,
+						  FavoriteRouteRepository favoriteRouteRepository) {
         this.rideRepository = rideRepository;
         this.routeRepository = routeRepository;
         this.userRepository = userRepository;
         this.ratingRepository = ratingRepository;
         this.inconsistencyReportRepository = inconsistencyReportRepository;
+		this.favoriteRouteRepository = favoriteRouteRepository;
     }
 
     @Override
@@ -65,6 +71,8 @@ public class MockRideSeeder implements CommandLineRunner {
         route1.setDistanceKm(7.5);
         route1.setEstimatedDurationMin(15);
         route1 = routeRepository.save(route1);
+        
+        createFavoriteRoute(route1, passenger1, passenger2);
 
         LocalDateTime now = LocalDateTime.now();
 
@@ -156,4 +164,16 @@ public class MockRideSeeder implements CommandLineRunner {
         report.setCreatedAt(ride.getEndTime().plusMinutes(2));
         inconsistencyReportRepository.save(report);
     }
+    
+    private void createFavoriteRoute(Route route, User user, User passenger) {
+		FavoriteRoute favoriteRoute = new FavoriteRoute();
+		favoriteRoute.setTitle("Omiljena ruta");
+		favoriteRoute.setRoute(route);
+		favoriteRoute.setUser(user);
+		favoriteRoute.setPassengers(List.of(passenger));
+		favoriteRoute.setVehicleType(VehicleType.STANDARD);
+		favoriteRoute.setPetFriendly(false);
+		favoriteRoute.setBabyFriendly(true);
+		favoriteRouteRepository.save(favoriteRoute);
+	}
 }

@@ -17,7 +17,15 @@ export class RenameFavoriteDialogComponent implements OnChanges {
   @Output() cancel = new EventEmitter<void>();
   @Output() confirm = new EventEmitter<string>();
 
-  nameCtrl = new FormControl<string>('', { nonNullable: true, validators: [Validators.required] });
+  nameCtrl = new FormControl<string>('', {
+    nonNullable: true,
+    validators: [
+      Validators.required,
+      Validators.minLength(2),
+      Validators.maxLength(500),
+      Validators.pattern(/.*\S.*/),
+    ],
+  });
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['open']?.currentValue === true) {
