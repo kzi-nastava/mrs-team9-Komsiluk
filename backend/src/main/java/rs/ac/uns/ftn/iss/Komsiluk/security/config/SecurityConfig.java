@@ -89,6 +89,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/drivers/locations").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/drivers/*/location").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/drivers/basic").permitAll()
+                        .requestMatchers("/error").permitAll()
 
                         .anyRequest().authenticated()
                 )
