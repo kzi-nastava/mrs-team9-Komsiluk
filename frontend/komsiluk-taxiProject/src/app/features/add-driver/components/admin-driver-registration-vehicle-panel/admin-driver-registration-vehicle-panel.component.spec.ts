@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { ReactiveFormsModule, FormControl, FormGroup } from '@angular/forms';
 import { AdminDriverRegistrationVehiclePanelComponent } from './admin-driver-registration-vehicle-panel.component';
 
 describe('AdminDriverRegistrationVehiclePanelComponent', () => {
@@ -8,13 +8,22 @@ describe('AdminDriverRegistrationVehiclePanelComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [AdminDriverRegistrationVehiclePanelComponent]
-    })
-    .compileComponents();
+      imports: [AdminDriverRegistrationVehiclePanelComponent, ReactiveFormsModule],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(AdminDriverRegistrationVehiclePanelComponent);
     component = fixture.componentInstance;
-    await fixture.whenStable();
+
+    (component as any).form = new FormGroup({
+      model: new FormControl(''),
+      type: new FormControl(''),
+      licencePlate: new FormControl(''),
+      seatCount: new FormControl(''),
+      petFriendly: new FormControl(false),
+      babyFriendly: new FormControl(false),
+    });
+
+    fixture.detectChanges();
   });
 
   it('should create', () => {

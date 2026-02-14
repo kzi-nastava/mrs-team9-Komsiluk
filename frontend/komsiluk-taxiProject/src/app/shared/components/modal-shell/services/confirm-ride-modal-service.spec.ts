@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { ConfirmRideModalService } from './confirm-ride-modal-service';
+import { CancelRideModalService } from './confirm-ride-modal-service';
 
 describe('ConfirmRideModalService', () => {
-  let service: ConfirmRideModalService;
+  let service: CancelRideModalService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(ConfirmRideModalService);
+    service = TestBed.inject(CancelRideModalService);
   });
 
   it('should be created', () => {

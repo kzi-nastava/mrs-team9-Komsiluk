@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { provideRouter } from '@angular/router';
 import { ActivationMessageComponent } from './activation-message.component';
 
 describe('ActivationMessageComponent', () => {
@@ -7,7 +7,8 @@ describe('ActivationMessageComponent', () => {
   let fixture: ComponentFixture<ActivationMessageComponent>;
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ActivationMessageComponent]
+      imports: [ActivationMessageComponent],
+      providers: [provideRouter([])]
     })
     .compileComponents();
 

@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { provideRouter } from '@angular/router';
 import { PassengerLeftMenuComponent } from './passenger-left-menu.component';
 
 describe('PassengerLeftMenuComponent', () => {
@@ -8,7 +8,8 @@ describe('PassengerLeftMenuComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [PassengerLeftMenuComponent]
+      imports: [PassengerLeftMenuComponent],
+      providers: [provideRouter([])]
     })
     .compileComponents();
 

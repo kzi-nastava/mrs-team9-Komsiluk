@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { provideRouter } from '@angular/router';
 import { ProfileSidebarComponent } from './profile-sidebar.component';
 
 describe('ProfileSidebarComponent', () => {
@@ -8,7 +8,8 @@ describe('ProfileSidebarComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ProfileSidebarComponent]
+      imports: [ProfileSidebarComponent],
+      providers: [provideRouter([])]
     })
     .compileComponents();
 

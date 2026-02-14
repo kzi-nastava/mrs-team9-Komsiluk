@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { provideRouter } from '@angular/router';
 import { SuccessfulRegistrationComponent } from './successful-registration.component';
 
 describe('SuccessfulRegistrationComponent', () => {
@@ -8,7 +8,8 @@ describe('SuccessfulRegistrationComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [SuccessfulRegistrationComponent]
+      imports: [SuccessfulRegistrationComponent],
+      providers: [provideRouter([])]
     })
     .compileComponents();
 

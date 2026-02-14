@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { provideRouter } from '@angular/router';
 import { MessagePageComponent } from './message-page.component';
 
 describe('MessagePageComponent', () => {
@@ -8,7 +8,8 @@ describe('MessagePageComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [MessagePageComponent]
+      imports: [MessagePageComponent],
+      providers: [provideRouter([])]
     })
     .compileComponents();
 
