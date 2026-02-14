@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { LeftSidebarCommandServiceService } from './left-sidebar-command-service.service';
+import { LeftSidebarCommandService } from './left-sidebar-command-service.service';
 
-describe('LeftSidebarCommandServiceService', () => {
-  let service: LeftSidebarCommandServiceService;
+describe('LeftSidebarCommandService', () => {
+  let service: LeftSidebarCommandService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(LeftSidebarCommandServiceService);
+    service = TestBed.inject(LeftSidebarCommandService);
   });
 
   it('should be created', () => {

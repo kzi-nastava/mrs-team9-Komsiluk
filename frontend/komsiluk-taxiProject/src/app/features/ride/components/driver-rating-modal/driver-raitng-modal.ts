@@ -40,7 +40,9 @@ export class DriverRatingModalComponent {
     this.http.post(url, payload).subscribe({
       next: (response) => {
         console.log('Rating sent successfully', response);
+        let msg = 'Rating submitted successfully.';
         this.submitted.emit(response);
+        this.toast.show(msg);
         this.close.emit();
       },
       error: (err) => {

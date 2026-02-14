@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { provideRouter } from '@angular/router';
 import { DriverCarViewComponent } from './driver-car-view.component';
 
 describe('DriverCarViewComponent', () => {
@@ -8,7 +8,8 @@ describe('DriverCarViewComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [DriverCarViewComponent]
+      imports: [DriverCarViewComponent],
+      providers: [provideRouter([])]
     })
     .compileComponents();
 
