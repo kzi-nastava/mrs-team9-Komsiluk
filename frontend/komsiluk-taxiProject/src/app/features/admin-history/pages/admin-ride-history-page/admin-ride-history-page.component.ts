@@ -110,6 +110,7 @@ export class AdminRideHistoryPageComponent {
 
     const sorted = [...data];
     const dir = sort.direction === 'asc' ? 1 : -1;
+    console.log('Sorting data:', data);
 
     sorted.sort((a, b) => {
       let cmp = 0;
@@ -136,6 +137,14 @@ export class AdminRideHistoryPageComponent {
           cmp = (a.panicTriggered ? 1 : 0) - (b.panicTriggered ? 1 : 0);
           break;
         case 'ROUTE':
+          const fullRouteA = `${a.startAddress || ''} | ${a.route || ''} | ${a.endAddress || ''}`;
+          const fullRouteB = `${b.startAddress || ''} | ${b.route || ''} | ${b.endAddress || ''}`;
+
+          cmp = fullRouteA.localeCompare(fullRouteB, undefined, {
+            numeric: true,
+            sensitivity: 'base'
+          });
+          break;
         case 'DATE':
         default:
           cmp = (a.startTime || '').localeCompare(b.startTime || '');
@@ -155,7 +164,7 @@ export class AdminRideHistoryPageComponent {
     }
 
     this.sortState.set({ column, direction });
-    this.loadRides();
+    this.rides.set(this.applySortDirection(this.rides(), { column, direction }));
   }
 
   getSortIndicator(column: AdminRideSortBy): string {
@@ -212,13 +221,13 @@ export class AdminRideHistoryPageComponent {
     if (!isoString) return '—';
     const d = new Date(isoString);
     if (isNaN(d.getTime())) return '—';
-    
+
     const dd = String(d.getDate()).padStart(2, '0');
     const mm = String(d.getMonth() + 1).padStart(2, '0');
     const yyyy = d.getFullYear();
     const hh = String(d.getHours()).padStart(2, '0');
     const min = String(d.getMinutes()).padStart(2, '0');
-    
+
     return `${dd}.${mm}.${yyyy} ${hh}:${min}`;
   }
 
