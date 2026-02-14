@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { RideHistoryCardComponent } from './ride-history-card.component.component';
+import { RideHistoryCardComponent } from './ride-history-card.component';
 
 describe('RideHistoryCardComponent', () => {
   let component: RideHistoryCardComponent;
@@ -12,7 +12,6 @@ describe('RideHistoryCardComponent', () => {
 
     fixture = TestBed.createComponent(RideHistoryCardComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
   });
 
   it('should create', () => {

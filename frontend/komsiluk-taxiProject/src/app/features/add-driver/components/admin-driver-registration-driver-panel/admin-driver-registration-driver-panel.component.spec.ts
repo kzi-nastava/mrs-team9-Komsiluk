@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
 import { AdminDriverRegistrationDriverPanelComponent } from './admin-driver-registration-driver-panel.component';
+import { FormControl, FormGroup } from '@angular/forms';
 
 describe('AdminDriverRegistrationDriverPanelComponent', () => {
   let component: AdminDriverRegistrationDriverPanelComponent;
@@ -14,7 +14,18 @@ describe('AdminDriverRegistrationDriverPanelComponent', () => {
 
     fixture = TestBed.createComponent(AdminDriverRegistrationDriverPanelComponent);
     component = fixture.componentInstance;
-    await fixture.whenStable();
+
+    (component as any).form = new FormGroup({
+      firstName: new FormControl(''),
+      lastName: new FormControl(''),
+      email: new FormControl(''),
+      address: new FormControl(''),
+      phoneNumber: new FormControl(''),
+      city: new FormControl(''),
+      profilePhoto: new FormControl(null)
+    });
+
+    fixture.detectChanges();
   });
 
   it('should create', () => {

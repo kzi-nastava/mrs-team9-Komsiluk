@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { provideRouter } from '@angular/router';
 import { RightsidebarComponent } from './rightsidebar.component';
 
 describe('RightsidebarComponent', () => {
@@ -8,7 +8,8 @@ describe('RightsidebarComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [RightsidebarComponent]
+      imports: [RightsidebarComponent],
+      providers: [provideRouter([])]
     })
     .compileComponents();
 
