@@ -45,14 +45,23 @@ export class DriverRatingModalComponent {
         this.toast.show(msg);
         this.close.emit();
       },
-      error: (err) => {
-        let msg = 'Failed to send rating.';
-        if (err?.error?.message) msg = err.error.message;
-        else if (err?.error) msg = err.error;
-        else if (err?.message) msg = err.message;
-        this.toast.show(String(msg));
-        this.close.emit();
-      }
+error: (err) => {
+  let msg = 'Failed to send rating.';
+
+  if (err?.error?.message) {
+    msg = err.error.message;
+  } 
+  else if (typeof err?.error === 'string' && err.error.trim() !== '') {
+    msg = err.error;
+  }
+  else if (err?.message) {
+    msg = err.message;
+  }
+
+  this.toast.show(msg);
+  this.close.emit();
+}
+
     });
   }
 }
