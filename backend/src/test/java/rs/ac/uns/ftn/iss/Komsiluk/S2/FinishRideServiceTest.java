@@ -21,6 +21,7 @@ import rs.ac.uns.ftn.iss.Komsiluk.services.MailService;
 import rs.ac.uns.ftn.iss.Komsiluk.mappers.RideDTOMapper;
 import rs.ac.uns.ftn.iss.Komsiluk.services.exceptions.NotFoundException;
 import rs.ac.uns.ftn.iss.Komsiluk.services.exceptions.BadRequestException;
+import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.INotificationService;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -33,6 +34,7 @@ class FinishRideServiceTest {
     @Mock private UserRepository userRepository;
     @Mock private MailService mailService;
     @Mock private RideDTOMapper rideMapper;
+    @Mock private INotificationService notificationService;
 
     @Captor private ArgumentCaptor<Ride> rideCaptor;
     @Captor private ArgumentCaptor<String> emailCaptor;
@@ -104,7 +106,7 @@ class FinishRideServiceTest {
     }
 
     @Test
-    @DisplayName("finishRide updates ride, driver and sends emails (happy path)")
+    @DisplayName("finishRide updates ride, driver and sends emails and notifications")
     void finishRide_success() {
 
         Long rideId = 1L;
@@ -121,6 +123,8 @@ class FinishRideServiceTest {
         when(rideMapper.toResponseDTO(any())).thenReturn(mapped);
 
         RideResponseDTO result = rideService.finishRide(rideId);
+
+        verify(notificationService, times(3)).createNotification(any());
 
         assertNotNull(result);
 
@@ -163,6 +167,8 @@ class FinishRideServiceTest {
 
         verify(mailService, never())
                 .sendRideFinishedMail(eq("p1@test.com"), anyLong());
+
+        verify(notificationService, times(1)).createNotification(any());
     }
 
     @Test

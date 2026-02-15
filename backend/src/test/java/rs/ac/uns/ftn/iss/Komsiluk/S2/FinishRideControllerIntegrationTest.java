@@ -30,7 +30,7 @@ import rs.ac.uns.ftn.iss.Komsiluk.security.jwt.JwtService;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureTestRestTemplate
 @ActiveProfiles("test")
-class FinishRideControllerTest {
+class FinishRideControllerIntegrationTest {
 
     private static final LocalDateTime FIXED_TIME =
             LocalDateTime.of(2026, 2, 12, 12, 0, 0);
@@ -51,6 +51,14 @@ class FinishRideControllerTest {
     private InconsistencyReportRepository inconsistencyReportRepository;
     @Autowired
     private NotificationRepository notificationRepository;
+    @Autowired
+    private FavoriteRouteRepository favoriteRouteRepository;
+
+    @Autowired
+    private VehicleRepository vehicleRepository;
+
+    @Autowired
+    private RouteRepository routeRepository;
 
     private User passenger;
     private String passengerToken;
@@ -61,7 +69,10 @@ class FinishRideControllerTest {
         inconsistencyReportRepository.deleteAll();
         rideRepository.deleteAll();
         notificationRepository.deleteAll();
+        favoriteRouteRepository.deleteAll();
+        routeRepository.deleteAll();
         userRepository.deleteAll();
+        vehicleRepository.deleteAll();
         pricingRepository.deleteAll();
 
         passenger = new User();
