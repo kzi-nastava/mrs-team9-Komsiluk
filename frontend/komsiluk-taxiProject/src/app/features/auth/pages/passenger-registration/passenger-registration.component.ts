@@ -19,6 +19,7 @@ import { finalize } from 'rxjs';
   imports: [AuthCardComponent, ReactiveFormsModule, RouterModule],
   templateUrl: './passenger-registration.component.html',
   styleUrl: './passenger-registration.component.css',
+  providers: [AuthService, ToastService],
 })
 export class PassengerRegistrationComponent {
   submitted = false;
