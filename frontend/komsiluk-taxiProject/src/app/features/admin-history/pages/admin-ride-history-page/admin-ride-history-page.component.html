@@ -1,5 +1,5 @@
 <div class="history-page app-bg-textured">
-  <h1 class="history-page__title">Ride History</h1>
+  <h1 class="history-page__title" id="page-title">Ride History</h1>
   
   <div class="toolbar">
     <div class="search-section">
@@ -7,10 +7,11 @@
         type="email"
         class="search-input"
         placeholder="Enter user email..."
+        id="search-input"
         [(ngModel)]="searchEmail"
         (keyup.enter)="onSearch()"
       />
-      <button class="search-btn" (click)="onSearch()">Search</button>
+      <button class="search-btn" id="search-button" (click)="onSearch()">Search</button>
     </div>
     <div class="filter-button-wrapper">
       <button 
@@ -55,22 +56,22 @@
         <table class="rides-table">
           <thead>
             <tr>
-              <th (click)="onSort('ROUTE')" class="sortable">
+              <th (click)="onSort('ROUTE')" class="sortable" id="route-sorter">
                 Route {{ getSortIndicator('ROUTE') }}
               </th>
-              <th (click)="onSort('START_TIME')" class="sortable">
+              <th (click)="onSort('START_TIME')" class="sortable" id="start-time-sorter">
                 Started {{ getSortIndicator('START_TIME') }}
               </th>
-              <th (click)="onSort('END_TIME')" class="sortable">
+              <th (click)="onSort('END_TIME')" class="sortable" id="end-time-sorter">
                 Ended {{ getSortIndicator('END_TIME') }}
               </th>
-              <th (click)="onSort('CANCELLED_BY')" class="sortable">
+              <th (click)="onSort('CANCELLED_BY')" class="sortable" id="canceled-sorter">
                 Canceled {{ getSortIndicator('CANCELLED_BY') }}
               </th>
-              <th (click)="onSort('PRICE')" class="sortable">
+              <th (click)="onSort('PRICE')" class="sortable" id="price-sorter">
                 Price ($) {{ getSortIndicator('PRICE') }}
               </th>
-              <th (click)="onSort('PANIC')" class="sortable">
+              <th (click)="onSort('PANIC')" class="sortable" id="panic-sorter">
                 Panic {{ getSortIndicator('PANIC') }}
               </th>
             </tr>
@@ -89,14 +90,14 @@
             }
             @for (ride of rides(); track ride.rideId) {
               <tr class="ride-row" (click)="onRowClick(ride)">
-                <td class="route-cell">
+                <td class="route-cell" id="route-cell">
                   {{ formatRoute(ride) }}
                 </td>
-                <td>{{ formatDateTime(ride.startTime) }}</td>
-                <td>{{ formatDateTime(ride.endTime) }}</td>
-                <td>{{ formatCanceled(ride) }}</td>
-                <td class="price-cell">{{ ride.price | number:'1.0-2' }}</td>
-                <td [class.panic-indicator]="ride.panicTriggered" [class.panic-no]="!ride.panicTriggered">
+                <td id="start-time-cell">{{ formatDateTime(ride.startTime) }}</td>
+                <td id="end-time-cell">{{ formatDateTime(ride.endTime) }}</td>
+                <td id="canceled-cell">{{ formatCanceled(ride) }}</td>
+                <td class="price-cell" id="price-cell">{{ ride.price | number:'1.0-2' }}</td>
+                <td [class.panic-indicator]="ride.panicTriggered" [class.panic-no]="!ride.panicTriggered" id="panic-cell">
                   {{ formatPanic(ride.panicTriggered) }}
                 </td>
               </tr>

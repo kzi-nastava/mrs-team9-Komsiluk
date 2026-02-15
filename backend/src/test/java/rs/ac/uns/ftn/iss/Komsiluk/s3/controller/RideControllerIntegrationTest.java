@@ -56,6 +56,8 @@ class RideControllerIntegrationTest {
     private InconsistencyReportRepository inconsistencyReportRepository;
     @Autowired
     private NotificationRepository notificationRepository;
+    @Autowired
+    private FavoriteRouteRepository favoriteRouteRepository;
 
     private User driver;
     private String driverToken;
@@ -66,6 +68,7 @@ class RideControllerIntegrationTest {
         inconsistencyReportRepository.deleteAll();
         rideRepository.deleteAll();
         notificationRepository.deleteAll();
+        favoriteRouteRepository.deleteAll();
         routeRepository.deleteAll();
         userRepository.deleteAll();
         vehicleRepository.deleteAll();

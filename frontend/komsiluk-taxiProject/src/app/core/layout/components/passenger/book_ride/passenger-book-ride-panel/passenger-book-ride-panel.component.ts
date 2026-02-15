@@ -1,5 +1,5 @@
 import { Component, signal, OnDestroy, OnInit, ChangeDetectorRef, ElementRef, ViewChild } from '@angular/core';
-import { Subscription, switchMap, catchError, of, tap, map, finalize, forkJoin } from 'rxjs';
+import { Subscription, switchMap, catchError, of, map, finalize, forkJoin } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { FormArray, FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { VehicleType } from '../../../../../../shared/models/profile.models';
@@ -11,7 +11,6 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { RideService } from '../services/ride.service';
 import { RideCreateDTO } from '../../../../../../shared/models/ride.models';
 import { AuthService } from '../../../../../auth/services/auth.service';
-import { NotificationService } from '../../../../../../features/menu/services/notification.service';
 import { AddFavoriteModalService } from '../../../../../../shared/components/modal-shell/services/add-favorite-modal.service';
 import { RouteService } from '../../favorite/services/route.service';
 import { FavoriteRouteService } from '../../favorite/services/favorite-route.service';
@@ -49,7 +48,7 @@ export class PassengerBookRidePanelComponent implements OnInit, OnDestroy {
 
   constructor(private fb: FormBuilder, private geocoding: GeocodingService, public ridePlanner: RidePlannerService,
     private cdr: ChangeDetectorRef, private toast: ToastService, public confirmModal: ConfirmBookingModalService,
-    private rideApi: RideService, private auth: AuthService, private notification: NotificationService,
+    private rideApi: RideService, private auth: AuthService,
     private addFavModal: AddFavoriteModalService, private routeApi: RouteService, private favoriteRouteApi: FavoriteRouteService,
     private prefill: BookRidePrefillService, private profileService: ProfileService, private blockNoteService: BlockNoteService, private blockedModal: AccountBlockedModalService) {
 
@@ -109,10 +108,6 @@ export class PassengerBookRidePanelComponent implements OnInit, OnDestroy {
 
     this.cdr.detectChanges();
   }
-
-  
-
-
 
   ngOnInit(): void {
     this.prefillFromPlanner();
@@ -378,49 +373,12 @@ export class PassengerBookRidePanelComponent implements OnInit, OnDestroy {
     const dto = this.buildRideDto();
 
     const requestStartedAt = new Date();
-    const windowStart = new Date(requestStartedAt.getTime() - 2000);
 
     this.rideApi.orderRide(dto).pipe(
-      switchMap(() => this.notification.getUnread(dto.creatorId)),
-
-      map((notifs) => {
-        const fresh = (notifs ?? []).filter(n => {
-          const created = new Date(n.createdAt);
-          return created >= windowStart;
-        });
-
-        if (fresh.length > 0) return fresh;
-
-        if ((notifs ?? []).length > 0) {
-          const sorted = [...notifs].sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt));
-          return sorted.slice(0, 1);
-        }
-
-        return [];
-      }),
-
-      tap((notifsToShow) => {
-        if (notifsToShow.length === 0) {
-          this.toast.show('No notification received from server.');
-          return;
-        }
-
-        for (const n of notifsToShow) {
-          this.toast.show(n.message);
-        }
-
-        for (const n of notifsToShow) {
-          this.notification.markRead(n.id, true).subscribe({ error: () => { } });
-        }
-      }),
-
       catchError((err: HttpErrorResponse) => {
-       this.toast.show(
-          err?.error?.message ||
-          err?.error ||
-          err?.message ||
-          'Failed to order ride.'
-        );
+
+        if(err.message === '')
+          this.toast.show('Failed to order ride.');
         return of(null);
       })
     ).subscribe();
