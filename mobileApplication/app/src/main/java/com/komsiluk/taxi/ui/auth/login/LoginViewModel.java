@@ -6,7 +6,10 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.komsiluk.taxi.BuildConfig;
 import com.komsiluk.taxi.auth.UserRole;
+import com.komsiluk.taxi.data.notification.FcmTokenStore;
+import com.komsiluk.taxi.data.notification.PushTokenService;
 import com.komsiluk.taxi.data.remote.auth.AuthService;
 import com.komsiluk.taxi.data.remote.auth.LoginRequest;
 import com.komsiluk.taxi.data.remote.auth.LoginResponse;
@@ -32,29 +35,33 @@ public class LoginViewModel extends ViewModel {
 
     private final MutableLiveData<Event<UserRole>> loginResultEvent = new MutableLiveData<>();
 
-
     private final MutableLiveData<Event<String>> errorMessageEvent = new MutableLiveData<>();
 
     public LiveData<Event<UserRole>> getLoginSuccess() { return loginResultEvent; }
 
     public LiveData<Event<String>> getErrorMessage() {return errorMessageEvent;}
 
-
     private AuthService authService;
-
     private SessionManager sessionManager;
-
     private  LocationService locationService;
+    private PushTokenService pushTokenService;
+    private FcmTokenStore fcmTokenStore;
+
+    private static final String BASE_URL = "http://"+ BuildConfig.IP_ADDR +":8081";
 
     @Inject
     public LoginViewModel(
             AuthService authService,
             SessionManager sessionManager,
-            LocationService locationService
+            LocationService locationService,
+            PushTokenService pushTokenService,
+            FcmTokenStore fcmTokenStore
     ) {
         this.authService = authService;
         this.sessionManager = sessionManager;
         this.locationService = locationService;
+        this.pushTokenService = pushTokenService;
+        this.fcmTokenStore = fcmTokenStore;
     }
 
     public void login(String email, String password) {
@@ -69,6 +76,14 @@ public class LoginViewModel extends ViewModel {
             public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
                 if (response.isSuccessful()) {
                     sessionManager.saveSession(response.body().getToken(),response.body().getId(),response.body().getRole());
+
+                    String fcm = fcmTokenStore.get();
+                    String jwt = sessionManager.getToken();
+
+                    if (fcm != null && jwt != null) {
+                        new Thread(() -> pushTokenService.register(BASE_URL, jwt, fcm)).start();
+                    }
+
                     loginResultEvent.setValue(new Event<>(response.body().getRole()));
                 } else {
                     errorMessageEvent.postValue(new Event<>("Login failed. Invalid credentials!"));
