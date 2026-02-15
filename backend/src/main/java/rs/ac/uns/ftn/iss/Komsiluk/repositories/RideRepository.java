@@ -2,6 +2,7 @@ package rs.ac.uns.ftn.iss.Komsiluk.repositories;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -85,4 +86,12 @@ public interface RideRepository extends JpaRepository<Ride, Long> {
 
     @Query("SELECT r FROM Ride r WHERE r.status = rs.ac.uns.ftn.iss.Komsiluk.beans.enums.RideStatus.ACTIVE")
     Collection<Ride> findAllActiveRides();
+    
+    @Query("""
+       select r from Ride r
+       where r.status = :status
+         and r.startTime > :now
+         and r.startTime <= :nowPlus15
+    """)
+    List<Ride> findScheduledStartingSoon(@Param("status") RideStatus status, @Param("now") LocalDateTime now, @Param("nowPlus15") LocalDateTime nowPlus15);
 }

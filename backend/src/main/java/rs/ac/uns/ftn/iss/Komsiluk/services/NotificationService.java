@@ -16,6 +16,7 @@ import rs.ac.uns.ftn.iss.Komsiluk.repositories.NotificationRepository;
 import rs.ac.uns.ftn.iss.Komsiluk.services.exceptions.NotFoundException;
 import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.INotificationService;
 import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.IUserService;
+import rs.ac.uns.ftn.iss.Komsiluk.socket.services.NotificationSocketPublisher;
 
 @Service
 public class NotificationService implements INotificationService {
@@ -26,6 +27,8 @@ public class NotificationService implements INotificationService {
     private NotificationDTOMapper mapper;
 	@Autowired
 	private IUserService userService;
+	@Autowired
+	private NotificationSocketPublisher socketPublisher;
 
     @Override
     public NotificationResponseDTO createNotification(NotificationCreateDTO dto) {
@@ -33,8 +36,12 @@ public class NotificationService implements INotificationService {
 
         Notification notification = mapper.fromCreateDto(dto, user);
         Notification saved = repository.save(notification);
+        
+        NotificationResponseDTO response = mapper.toResponseDTO(saved);
+        
+        socketPublisher.sendToUser(user.getEmail(), response);
 
-        return mapper.toResponseDTO(saved);
+        return response;
     }
 
     @Override
