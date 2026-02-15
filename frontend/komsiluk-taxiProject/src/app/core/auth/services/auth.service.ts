@@ -1,6 +1,7 @@
 import { Injectable, signal, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { tap } from 'rxjs';
+import { NotificationSocketService } from '../../services/notification-socket.service';
 
 export enum UserRole {
   GUEST = 'GUEST',
@@ -61,7 +62,7 @@ export class AuthService {
   userRole = computed(() => this.roleSig());
   userId = computed(() => this.userIdSig());
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private notificationSocketService: NotificationSocketService) {
     this.restoreAuthState();
 
     // Storage event only fires from OTHER tabs, but we add a guard just in case
@@ -98,6 +99,8 @@ export class AuthService {
 
   logout(): void {
     this.clearAuthState();
+
+    this.notificationSocketService.disconnect();
   }
 
   getToken(): string | null {
@@ -125,6 +128,8 @@ export class AuthService {
     localStorage.setItem('auth_token', token);
     localStorage.setItem('auth_role', role);
     localStorage.setItem('auth_user_id', userId.toString());
+
+    this.notificationSocketService.connect(token);
 
     // Reset flag after a short delay to allow any pending storage events to be ignored
     setTimeout(() => {

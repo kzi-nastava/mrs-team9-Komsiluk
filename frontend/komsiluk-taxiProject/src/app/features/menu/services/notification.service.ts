@@ -1,17 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-
-export interface NotificationResponseDTO {
-  id: number;
-  userId: number;
-  type: string;
-  title: string;
-  message: string;
-  metadata: string | null;
-  read: boolean;
-  createdAt: string;
-}
+import { NotificationResponseDTO } from '../../../shared/models/notification.models';
 
 @Injectable({ providedIn: 'root' })
 export class NotificationService {

@@ -38,6 +38,56 @@
   </div>
 
   <div class="app-navbar__slot app-navbar__slot--right">
+
+    <!-- Notifications bell (only when logged in) -->
+    <button
+      *ngIf="isLoggedIn()"
+      class="app-navbar__notif-btn"
+      aria-label="Notifications"
+      (click)="toggleNotifications($event)">
+
+      <svg viewBox="0 0 24 24" class="app-navbar__icon">
+        <path d="M12 22a2 2 0 0 0 2-2h-4a2 2 0 0 0 2 2zm6-6V11a6 6 0 1 0-12 0v5L4 18v1h16v-1l-2-2z"></path>
+      </svg>
+
+      <span *ngIf="unreadCount() > 0" class="app-navbar__notif-badge">
+        {{ unreadCount() > 99 ? '99+' : unreadCount() }}
+      </span>
+    </button>
+
+    <!-- Dropdown -->
+    <div *ngIf="notifOpen()" class="app-navbar__notif-menu" (click)="$event.stopPropagation()">
+      <div class="app-navbar__notif-header">
+        <span>Notifications</span>
+
+        <button
+          class="app-navbar__notif-clear"
+          type="button"
+          [disabled]="unreadCount() === 0"
+          (click)="markAllAsRead()">
+          Clear
+        </button>
+      </div>
+
+    <div class="app-navbar__notif-list">
+      <div *ngIf="loading()" class="app-navbar__notif-empty">Loading...</div>
+
+      <div *ngIf="!loading() && notifications().length === 0" class="app-navbar__notif-empty">
+        No unread notifications.
+      </div>
+
+      <button
+          *ngFor="let n of notifications()"
+          type="button"
+          class="app-navbar__notif-item"
+          (click)="openNotification(n)">
+          <div class="app-navbar__notif-title">{{ n.title }}</div>
+          <div class="app-navbar__notif-msg">{{ n.message }}</div>
+          <div class="app-navbar__notif-time">{{ formatTime(n.createdAt) }}</div>
+        </button>
+      </div>
+    </div>
+
     <!-- Filter button only shown in driver history page -->
     <button *ngIf="isDriverHistory" class="app-navbar__filter-btn" type="button" (click)="filterClick.emit()">
       FILTER
