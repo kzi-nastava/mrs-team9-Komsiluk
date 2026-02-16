@@ -23,6 +23,7 @@ import { AdminDriverChangeRequestsPageComponent } from './features/approve-edit/
 import { AdminDriverRegistrationPageComponent } from './features/add-driver/admin-driver-registration-page/admin-driver-registration-page.component';
 import { AdminPricingPageComponent } from './features/pricing-page/admin-pricing-page.component';
 import { AdminLiveRidesPageComponent } from './features/admin-live-ride/admin-live-rides-page/admin-live-rides-page.component';
+import { SupportComponent } from './features/support/support.component';
 
 export const routes: Routes = [
 
@@ -110,6 +111,7 @@ export const routes: Routes = [
      component: AdminLiveRidesPageComponent, 
      canActivate: [authGuard, roleGuard], data: { roles: [UserRole.ADMIN] } 
     },
+    { path: 'support', component: SupportComponent, canActivate: [authGuard] },
     
   // ===== AUTH (PUBLIC, lazy) =====
   {
