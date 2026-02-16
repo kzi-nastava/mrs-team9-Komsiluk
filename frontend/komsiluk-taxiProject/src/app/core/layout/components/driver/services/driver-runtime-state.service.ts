@@ -77,7 +77,7 @@ export class DriverRuntimeStateService {
         this.refreshFromBackend();
       },
       error: (err) => {
-        this.toast.show(err?.error?.message || 'Status update failed.');
+        this.toast.show(err?.error?.message || 'You can\'t change status right now.');
       }
     });
   }

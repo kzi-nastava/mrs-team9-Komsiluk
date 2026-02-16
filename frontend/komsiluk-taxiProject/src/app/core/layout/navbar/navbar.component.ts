@@ -9,7 +9,7 @@ import { NotificationService } from '../../../features/menu/services/notificatio
 import { NotificationSocketService } from '../../../core/services/notification-socket.service';
 import { ToastService } from '../../../shared/components/toast/toast.service';
 import { NotificationResponseDTO } from '../../../shared/models/notification.models';
-
+import { ChatService, ChatMessageDTO } from '../../../shared/components/modal-shell/services/chat.service';
 @Component({
   selector: 'app-navbar',
   standalone: true,
@@ -34,11 +34,12 @@ export class NavbarComponent implements OnInit, OnDestroy {
   unreadCount = signal(0);
 
   private wsSub?: Subscription;
+  private chatSub?: Subscription;
   private docClickHandler = (e: MouseEvent) => {
     if (this.notifOpen()) this.notifOpen.set(false);
   };
 
-  constructor(private router: Router, private authService: AuthService, public driverState: DriverRuntimeStateService, private notificationService: NotificationService, private notificationSocket: NotificationSocketService, private toast: ToastService) {
+  constructor(private router: Router, private authService: AuthService, public driverState: DriverRuntimeStateService, private notificationService: NotificationService, private notificationSocket: NotificationSocketService, private toast: ToastService,private chatService: ChatService) {
     this.router.events.pipe(filter(e => e instanceof NavigationEnd)).subscribe(() => {
       this.isDriverHistory = this.router.url.startsWith('/driver-history');
       this.driverHistoryChange.emit(this.isDriverHistory);
@@ -86,6 +87,20 @@ export class NavbarComponent implements OnInit, OnDestroy {
 
         this.toast.show(`${n.title}: ${n.message}`);
       });
+      this.chatService.connect();
+
+      this.chatSub = this.chatService.messages$.subscribe((msgs) => {
+          if (msgs.length > 0) {
+              const lastMsg = msgs[msgs.length - 1];
+              
+              const msgTime = new Date(lastMsg.sentAt).getTime();
+              const now = new Date().getTime();
+              
+              if ((now - msgTime < 5000) && lastMsg.senderId !== userId) {
+                  this.toast.show(`New message: ${lastMsg.content}`);
+              }
+          }
+      });
     }
 
     if (userId != null) {
@@ -98,6 +113,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
     this.wsSub?.unsubscribe();
     this.notifications.set([]);
     this.unreadCount.set(0);
+    this.chatSub?.unsubscribe();
   }
 
   toggleNotifications(e: MouseEvent) {

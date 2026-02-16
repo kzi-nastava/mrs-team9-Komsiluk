@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -12,10 +13,14 @@ import org.springframework.web.multipart.MultipartFile;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.User;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.Vehicle;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.DriverStatus;
+import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.NotificationType;
+import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.RideStatus;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.UserRole;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.driver.DriverBasicDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.driver.DriverCreateDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.driver.DriverResponseDTO;
+import rs.ac.uns.ftn.iss.Komsiluk.dtos.notification.NotificationCreateDTO;
+import rs.ac.uns.ftn.iss.Komsiluk.dtos.ride.RideResponseDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.userToken.UserTokenResponseDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.mappers.DriverDTOMapper;
 import rs.ac.uns.ftn.iss.Komsiluk.mappers.VehicleDTOMapper;
@@ -44,6 +49,11 @@ public class DriverService implements IDriverService {
     private VehicleDTOMapper vehicleMapper;
     @Autowired
     private IUserService userService;
+    @Autowired
+    private NotificationService notificationService;
+    @Autowired
+    @Lazy
+    private RideService rideService;
     @Value("${app.user.default-profile-image}")
     private String defaultProfileImageUrl;
 
@@ -101,9 +111,17 @@ public class DriverService implements IDriverService {
 
         DriverStatus oldStatus= driver.getDriverStatus();
 
+        RideResponseDTO rideDto = rideService.getCurrentRideForDriver(driverId);
+        RideStatus rideStatus = (rideDto != null) ? rideDto.getStatus() : null;
+
+        if(rideStatus == RideStatus.ASSIGNED && newStatus == DriverStatus.INACTIVE) {
+            throw new IllegalStateException("Cannot go INACTIVE while ASSIGNED to a ride. Please wait for the ride to start.");
+        }
+
         if (oldStatus == DriverStatus.IN_RIDE && newStatus == DriverStatus.INACTIVE) {
             driver.setLogoutPending(true);
             userRepository.save(driver);
+            makeNotification(driver.getId(), "Ride Stopped", "You will go INACTIVE once the current ride is finished.", NotificationType.INFO);
             return driverMapper.toResponseDTO(driver);
         }
 
@@ -125,6 +143,15 @@ public class DriverService implements IDriverService {
     @Override
     public Collection<DriverBasicDTO> getDriversBasic() {
         return userRepository.findDriverBasics();
+    }
+
+    private void makeNotification(Long userId, String title, String message, NotificationType type) {
+        NotificationCreateDTO notificationDTO = new NotificationCreateDTO();
+        notificationDTO.setUserId(userId);
+        notificationDTO.setType(type);
+        notificationDTO.setTitle(title);
+        notificationDTO.setMessage(message);
+        notificationService.createNotification(notificationDTO);
     }
 
 }

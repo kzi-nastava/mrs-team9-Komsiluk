@@ -21,8 +21,11 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.button.MaterialButton;
 import com.komsiluk.taxi.auth.AuthManager;
 import com.komsiluk.taxi.auth.UserRole;
+import com.komsiluk.taxi.data.remote.auth.AuthService;
+import com.komsiluk.taxi.data.remote.auth.UserResponse;
 import com.komsiluk.taxi.data.remote.location.DriverLocationResponse;
 import com.komsiluk.taxi.data.remote.location.LocationService;
+import com.komsiluk.taxi.data.session.SessionManager;
 import com.komsiluk.taxi.ui.about.AboutUsActivity;
 import com.komsiluk.taxi.ui.auth.AuthActivity;
 import com.komsiluk.taxi.ui.menu.BaseNavDrawerActivity;
@@ -59,6 +62,12 @@ public class MainActivity extends BaseNavDrawerActivity {
 
     @Inject AuthManager authManager;
     @Inject LocationService locationService;
+
+    @Inject
+    AuthService authService;
+
+    @Inject
+    SessionManager sessionManager;
 
     @Override
     protected int getContentLayoutId() {
@@ -121,11 +130,10 @@ public class MainActivity extends BaseNavDrawerActivity {
 
 
         if (authManager.isLoggedIn()) {
-            redirectToAppropriateActivity();
-            finish();
-            return;
+            checkTokenValidity();
         }
 
+        ensureNotifPermission();
 
         Configuration.getInstance().load(this, getSharedPreferences("osmdroid", MODE_PRIVATE));
 
@@ -149,6 +157,38 @@ public class MainActivity extends BaseNavDrawerActivity {
         startLocationRefresh();
 
         restoreStateIfNeeded();
+    }
+
+    private void checkTokenValidity() {
+        authService.getMyProfile().enqueue(new Callback<UserResponse>() {
+            @Override
+            public void onResponse(Call<UserResponse> call, Response<UserResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    UserResponse user = response.body();
+                    sessionManager.updateUserData(user.getId(), user.getRole());
+
+                    redirectToAppropriateActivity();
+                    finish();
+                } else {
+                    authManager.logout();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<UserResponse> call, Throwable t) {
+                authManager.logout();
+            }
+        });
+    }
+
+    private static final int REQ_NOTIF = 1001;
+
+    private void ensureNotifPermission() {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            if (checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[]{android.Manifest.permission.POST_NOTIFICATIONS}, REQ_NOTIF);
+            }
+        }
     }
 
     private void redirectToAppropriateActivity() {

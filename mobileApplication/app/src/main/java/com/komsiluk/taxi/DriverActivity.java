@@ -472,7 +472,7 @@ public class DriverActivity extends BaseNavDrawerActivity {
                     } else {
                         Toast.makeText(
                                 DriverActivity.this,
-                                "Failed to send panic signal. Code: " + response.code(),
+                                "Failed to send panic signal. " + response.message(),
                                 Toast.LENGTH_SHORT
                         ).show();
                     }

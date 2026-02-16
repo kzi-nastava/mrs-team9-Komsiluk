@@ -1,0 +1,78 @@
+<div class="support-container">
+  
+  <div class="chat-sidebar" *ngIf="userRole === UserRole.ADMIN">
+    <div class="sidebar-header">
+      <i class="fas fa-comments home-icon"></i>
+      <h2>Chats</h2>
+    </div>
+    
+    <div class="contact-list">
+      <div *ngFor="let contact of contacts" 
+           class="contact-item" 
+           [class.active]="selectedContact?.userId === contact.userId"
+           (click)="selectContact(contact)">
+        
+        <div class="avatar-circle">
+            <img *ngIf="contact.profilePicture" 
+                 [src]="getProfileImage(contact)" 
+                 class="avatar-img"
+                 (error)="handleImageError(contact)"
+                 alt="User">
+
+            <i *ngIf="!contact.profilePicture" class="fas fa-user default-icon"></i>
+        </div>
+        
+        <div class="contact-info">
+          <div class="contact-top">
+            <span class="contact-name">{{ contact.fullName }}</span>
+            <span class="contact-time">{{ contact.lastMessageTime | date:'shortTime' }}</span>
+          </div>
+          <div class="contact-bottom">
+            <span class="last-msg">{{ contact.lastMessage | slice:0:25 }}...</span>
+            
+            <div class="unread-badge" *ngIf="contact.unreadCount > 0">
+                {{ contact.unreadCount }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="chat-main-area app-bg-textured" [class.full-width]="userRole !== UserRole.ADMIN">
+    
+    <div class="chat-area-header">
+        
+        <div class="selected-user-info" *ngIf="selectedContact || userRole !== UserRole.ADMIN">
+             <i class="fas fa-user-circle fa-2x"></i>
+             <span class="username">
+                {{ userRole === UserRole.ADMIN ? selectedContact?.fullName : 'Support Team' }}
+             </span>
+        </div>
+    </div>
+
+    <div class="messages-container" #scrollContainer>
+    
+
+        <div *ngFor="let msg of messages" class="message-wrapper"
+             [ngClass]="{'my-wrapper': isMyMessage(msg), 'other-wrapper': !isMyMessage(msg)}">
+            
+            <div class="message-bubble">
+                {{ msg.content }}
+            </div>
+            <span class="msg-time">{{ msg.sentAt | date:'HH:mm' }}</span>
+        </div>
+    </div>
+
+    <div class="input-area" *ngIf="userRole !== UserRole.ADMIN || selectedContact">
+        <input type="text" 
+               [(ngModel)]="newMessage" 
+               (keyup.enter)="sendMessage()" 
+               placeholder="Type a message...">
+        <button (click)="sendMessage()">
+            <i class="fas fa-paper-plane"></i>
+        </button>
+    </div>
+
+  </div>
+</div>

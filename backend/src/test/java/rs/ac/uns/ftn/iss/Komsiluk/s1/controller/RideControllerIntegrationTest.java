@@ -24,11 +24,7 @@ import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.UserRole;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.VehicleType;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.ride.RideCreateDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.ride.RideResponseDTO;
-import rs.ac.uns.ftn.iss.Komsiluk.repositories.InconsistencyReportRepository;
-import rs.ac.uns.ftn.iss.Komsiluk.repositories.NotificationRepository;
-import rs.ac.uns.ftn.iss.Komsiluk.repositories.PricingRepository;
-import rs.ac.uns.ftn.iss.Komsiluk.repositories.RideRepository;
-import rs.ac.uns.ftn.iss.Komsiluk.repositories.UserRepository;
+import rs.ac.uns.ftn.iss.Komsiluk.repositories.*;
 import rs.ac.uns.ftn.iss.Komsiluk.security.jwt.JwtService;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -53,15 +49,27 @@ class RideControllerIntegrationTest {
     @Autowired
     private NotificationRepository notificationRepository;
 
+    @Autowired
+    private FavoriteRouteRepository favoriteRouteRepository;
+
+    @Autowired
+    private VehicleRepository vehicleRepository;
+
+    @Autowired
+    private  RouteRepository routeRepository;
+
     private User passenger;
     private String passengerToken;
 
     @BeforeEach
     void setup() {
-    	inconsistencyReportRepository.deleteAll();
+        inconsistencyReportRepository.deleteAll();
         rideRepository.deleteAll();
         notificationRepository.deleteAll();
+        favoriteRouteRepository.deleteAll();
+        routeRepository.deleteAll();
         userRepository.deleteAll();
+        vehicleRepository.deleteAll();
         pricingRepository.deleteAll();
 
         passenger = new User();

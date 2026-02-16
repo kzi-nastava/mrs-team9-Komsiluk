@@ -3,6 +3,7 @@ package rs.ac.uns.ftn.iss.Komsiluk.services;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +33,8 @@ public class NotificationService implements INotificationService {
 	private IUserService userService;
 	@Autowired
 	private NotificationSocketPublisher socketPublisher;
+	@Autowired
+	private PushNotificationService pushNotificationService;
 
     @Override
     public NotificationResponseDTO createNotification(NotificationCreateDTO dto) {
@@ -43,6 +46,7 @@ public class NotificationService implements INotificationService {
         NotificationResponseDTO response = mapper.toResponseDTO(saved);
         
         socketPublisher.sendToUser(user.getEmail(), response);
+        pushNotificationService.sendToUser(user.getId(), response.getTitle() , response.getMessage(), Map.of("type", response.getType().name()));
 
         return response;
     }
@@ -82,10 +86,15 @@ public class NotificationService implements INotificationService {
     public NotificationResponseDTO createAdminNotification(AdminNotificationCreateDTO dto) {
         Notification notification = mapper.fromAdminCreateDto(dto);
         Notification saved = repository.save(notification);
-
         NotificationResponseDTO response = mapper.toResponseDTO(saved);
 
         socketPublisher.sendToAdmins(response);
+
+        pushNotificationService.sendToAllAdmins(
+                response.getTitle(),
+                response.getMessage(),
+                Map.of("type", "PANIC")
+        );
 
         return response;
     }

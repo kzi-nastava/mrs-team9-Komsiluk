@@ -43,7 +43,7 @@ public class PassengerRideHistoryViewModel extends ViewModel {
 
     private String currentFromDate = null;
     private String currentToDate = null;
-    private PassengerRideSortBy currentSortBy = PassengerRideSortBy.DATE;
+    private PassengerRideSortBy currentSortBy = PassengerRideSortBy.START_TIME;
     private boolean sortAscending = false;
 
     @Inject
@@ -100,7 +100,6 @@ public class PassengerRideHistoryViewModel extends ViewModel {
                     case ROUTE:
                         result = compareStringsSafe(buildRouteString(r1), buildRouteString(r2));
                         break;
-                    case DATE:
                     case START_TIME:
                         result = compareStringsSafe(r1.getStartTime(), r2.getStartTime());
                         break;
@@ -193,6 +192,10 @@ public class PassengerRideHistoryViewModel extends ViewModel {
     public void setSortBy(PassengerRideSortBy sortBy) {
         this.currentSortBy = sortBy;
         applyLocalFilterAndSort();
+    }
+
+    public PassengerRideSortBy getSortBy() {
+        return this.currentSortBy;
     }
 
 

@@ -226,6 +226,22 @@ public class RideService implements IRideService {
         driver.setDriverStatus(DriverStatus.IN_RIDE);
         userRepository.save(driver);
 
+        if (createdBy != null) {
+            makeNotification(createdBy.getId(), "Ride Started",
+                    "Your ride has started!",
+                    NotificationType.INFO);
+        }
+
+        if (passengers != null) {
+            for (User p : passengers) {
+                if (p != null) {
+                    makeNotification(p.getId(), "Ride Started",
+                            "The ride has started.",
+                            NotificationType.INFO);
+                }
+            }
+        }
+
         Set<String> emails = new HashSet<>();
 
         if (createdBy != null && createdBy.getEmail() != null) {
@@ -279,6 +295,20 @@ public class RideService implements IRideService {
         }
 
         userRepository.save(driver);
+
+        makeNotification(createdBy.getId(), "Ride Finished",
+                "The ride has finished. Thank you for using Neighbourhood Taxi",
+                NotificationType.RIDE_FINISHED);
+
+        if (passengers != null) {
+            for (User p : passengers) {
+                if (p != null) {
+                    makeNotification(p.getId(), "Ride Finished",
+                            "The ride has finished. Thank you for using Neighbourhood Taxi!",
+                            NotificationType.RIDE_FINISHED);
+                }
+            }
+        }
 
         Set<String> emails = new HashSet<>();
 

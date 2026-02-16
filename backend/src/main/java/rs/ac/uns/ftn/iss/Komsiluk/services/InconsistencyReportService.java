@@ -45,7 +45,8 @@ public class InconsistencyReportService implements IInconsistencyReportService {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String email = auth.getName();
 
-        User reporter = userRepository.findByEmail(email);
+        User reporter = userRepository.findByEmail(email)
+                .orElseThrow(() -> new NotFoundException("Reporter not found"));
         Long reporterId = reporter.getId();
 
         boolean isDriver = auth.getAuthorities().stream()

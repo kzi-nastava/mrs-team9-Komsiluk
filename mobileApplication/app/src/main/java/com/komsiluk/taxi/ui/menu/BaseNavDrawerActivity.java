@@ -37,11 +37,15 @@ import com.komsiluk.taxi.UserActivity;
 import com.komsiluk.taxi.auth.AuthManager;
 import com.komsiluk.taxi.auth.UserRole;
 import com.komsiluk.taxi.data.remote.add_driver.DriverResponse;
+import com.komsiluk.taxi.data.remote.auth.AuthService;
+import com.komsiluk.taxi.data.remote.auth.UserResponse;
 import com.komsiluk.taxi.data.remote.change_driver_status.DriverStatus;
 import com.komsiluk.taxi.data.remote.change_driver_status.DriverStatusUpdate;
 import com.komsiluk.taxi.data.remote.driver_history.DriverService;
 import com.komsiluk.taxi.data.remote.profile.UserProfileResponse;
 import com.komsiluk.taxi.data.remote.profile.UserService;
+import com.komsiluk.taxi.data.remote.ride.RideResponse;
+import com.komsiluk.taxi.data.remote.ride.RideService;
 import com.komsiluk.taxi.data.session.SessionManager;
 import com.komsiluk.taxi.databinding.ActivityBaseNavDrawerBinding;
 import com.komsiluk.taxi.ui.driver_history.DriverHistoryActivity;
@@ -73,10 +77,16 @@ public abstract class BaseNavDrawerActivity extends AppCompatActivity {
     AuthManager authManager;
 
     @Inject
+    AuthService authService;
+
+    @Inject
     SessionManager sessionManager;
 
     @Inject
     UserService userService;
+
+    @Inject
+    RideService rideService;
 
     @Inject
     DriverService driverService;
@@ -110,6 +120,8 @@ public abstract class BaseNavDrawerActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        checkTokenValidity();
 
         EdgeToEdge.enable(this);
 
@@ -235,6 +247,25 @@ public abstract class BaseNavDrawerActivity extends AppCompatActivity {
         });
     }
 
+    private void checkTokenValidity() {
+        authService.getMyProfile().enqueue(new Callback<UserResponse>() {
+            @Override
+            public void onResponse(Call<UserResponse> call, Response<UserResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    UserResponse user = response.body();
+                    sessionManager.updateUserData(user.getId(), user.getRole());
+                } else {
+                    authManager.logout();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<UserResponse> call, Throwable t) {
+                authManager.logout();
+            }
+        });
+    }
+
     private void fetchDriverProfileAndUpdateStatusUi() {
         if (userService == null || sessionManager == null) return;
 
@@ -266,9 +297,6 @@ public abstract class BaseNavDrawerActivity extends AppCompatActivity {
                 if (swDriverActive != null) {
                     swDriverActive.setOnCheckedChangeListener(null);
                     swDriverActive.setOnClickListener(null);
-
-                    swDriverActive.setChecked(currentDriverActive);
-
                     swDriverActive.setOnClickListener(v -> {
                         if (statusToggleInFlight) {
                             swDriverActive.setChecked(currentDriverActive);
@@ -383,8 +411,11 @@ public abstract class BaseNavDrawerActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(Call<DriverResponse> call,Response<DriverResponse> resp) {
                         if (!resp.isSuccessful()) {
-                            onErr.accept("Failed (" + resp.code() + ")");
+                            onErr.accept("Cannot go INACTIVE while ASSIGNED to a ride. Please wait for the ride to start.");
                             return;
+                        }
+                        if(resp.body().isLogoutPending())  {
+                            onErr.accept("You will go INACTIVE once the current ride is finished.");
                         }
                         onOk.run();
                     }
@@ -399,7 +430,7 @@ public abstract class BaseNavDrawerActivity extends AppCompatActivity {
     private boolean isDriverActive(String driverStatus) {
         if (driverStatus == null) return false;
         String s = driverStatus.trim().toUpperCase();
-        return s.equals("ACTIVE");
+        return !s.equals("INACTIVE");
     }
 
     private void updateDriverDot(boolean isActive) {

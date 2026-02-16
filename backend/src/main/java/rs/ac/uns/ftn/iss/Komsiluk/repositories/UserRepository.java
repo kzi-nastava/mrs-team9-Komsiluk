@@ -12,6 +12,7 @@ import rs.ac.uns.ftn.iss.Komsiluk.dtos.driver.DriverBasicDTO;
 import java.util.Collection;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
@@ -20,7 +21,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     public User findByEmailIgnoreCase(String email);
 
-    User findByEmail(String email);
+    Optional<User> findByEmail(String email);
 
     @Query("""
         SELECT u.id
@@ -93,5 +94,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
     List<DriverBasicDTO> findDriverBasics();
 
     List<User> findByIdIn(Collection<Long> ids);
+
+    @Query("SELECT u.id FROM User u WHERE u.role = 'ADMIN'")
+    List<Long> findAllAdminIds();
 }
 
