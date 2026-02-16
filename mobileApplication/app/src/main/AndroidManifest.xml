@@ -4,6 +4,7 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
         android:name=".TaxiApp"
@@ -16,19 +17,29 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Taxi_Project">
+        <service
+            android:name=".data.notification.FcmService"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
 
         <activity
             android:name=".ui.add_driver.DriverActivationActivity"
             android:exported="true">
             <intent-filter android:autoVerify="true">
-                <action android:name="android.intent.action.VIEW"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
                 <data
-                    android:scheme="http"
                     android:host="localhost"
+                    android:pathPrefix="/driver-activation"
                     android:port="4200"
-                    android:pathPrefix="/driver-activation"/>
+                    android:scheme="http" />
             </intent-filter>
         </activity>
         <activity
@@ -69,6 +80,7 @@
             android:exported="true">
             <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
@@ -85,6 +97,7 @@
             </intent-filter>
             <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
@@ -120,6 +133,7 @@
             android:theme="@style/Theme.KomsilukTaxi.Splash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -129,10 +143,10 @@
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".ui.passenger.ride_history.PassengerRideHistoryActivity"
-            android:exported="false"/>
+            android:exported="false" />
         <activity
             android:name=".ui.admin.ride_history.AdminRideHistoryActivity"
-            android:exported="false"/>
+            android:exported="false" />
         <activity android:name=".ui.driver_history.DriverHistoryActivity" />
     </application>
 

@@ -126,6 +126,7 @@ public class MainActivity extends BaseNavDrawerActivity {
             return;
         }
 
+        ensureNotifPermission();
 
         Configuration.getInstance().load(this, getSharedPreferences("osmdroid", MODE_PRIVATE));
 
@@ -149,6 +150,16 @@ public class MainActivity extends BaseNavDrawerActivity {
         startLocationRefresh();
 
         restoreStateIfNeeded();
+    }
+
+    private static final int REQ_NOTIF = 1001;
+
+    private void ensureNotifPermission() {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            if (checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[]{android.Manifest.permission.POST_NOTIFICATIONS}, REQ_NOTIF);
+            }
+        }
     }
 
     private void redirectToAppropriateActivity() {
