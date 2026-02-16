@@ -1,5 +1,6 @@
 package rs.ac.uns.ftn.iss.Komsiluk.services;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -9,8 +10,10 @@ import org.springframework.stereotype.Service;
 
 import rs.ac.uns.ftn.iss.Komsiluk.beans.Notification;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.User;
+import rs.ac.uns.ftn.iss.Komsiluk.dtos.notification.AdminNotificationCreateDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.notification.NotificationCreateDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.notification.NotificationResponseDTO;
+import rs.ac.uns.ftn.iss.Komsiluk.mappers.AdminNotificationDTOMapper;
 import rs.ac.uns.ftn.iss.Komsiluk.mappers.NotificationDTOMapper;
 import rs.ac.uns.ftn.iss.Komsiluk.repositories.NotificationRepository;
 import rs.ac.uns.ftn.iss.Komsiluk.services.exceptions.NotFoundException;
@@ -73,5 +76,17 @@ public class NotificationService implements INotificationService {
         return panics.stream()
                 .map(mapper::toResponseDTO)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public NotificationResponseDTO createAdminNotification(AdminNotificationCreateDTO dto) {
+        Notification notification = mapper.fromAdminCreateDto(dto);
+        Notification saved = repository.save(notification);
+
+        NotificationResponseDTO response = mapper.toResponseDTO(saved);
+
+        socketPublisher.sendToAdmins(response);
+
+        return response;
     }
 }

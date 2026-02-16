@@ -16,6 +16,7 @@ import { StopRideService } from '../../../../../shared/components/modal-shell/se
 import { ProfileService } from '../../../../../features/profile/services/profile.service';
 import { UserProfileResponseDTO } from '../../../../../shared/models/profile.models';
 import { CancelRideModalService } from '../../../../../shared/components/modal-shell/services/confirm-ride-modal-service';
+import { DriverRuntimeStateService } from '../services/driver-runtime-state.service';
 
 
 type Waypoint = { lat: number; lon: number; label?: string };
@@ -35,6 +36,8 @@ export class DriverCurrentRidePanelComponent implements OnInit {
   private cancelModalSvc = inject(CancelRideModalService);
   private panicModalSvc = inject(PanicModalService);
   private stopRideSvc = inject(StopRideService);
+  private driverState = inject(DriverRuntimeStateService);
+
 
   form: FormGroup;
 
@@ -318,6 +321,10 @@ finish() {
       this.ride.set(updatedRide); 
       this.fillForm(updatedRide);
 
+      this.driverState.refreshFromBackend();
+
+      this.driverState.refreshFromBackend();
+
       this.mapFacade.clearFocusRide();
       
       this.mapFacade.clearRidePath?.();
@@ -354,6 +361,8 @@ finish() {
 private cleanupAfterRideEnd(stoppedRide: RideResponseDTO) {
   this.ride.set(stoppedRide);
   this.fillForm(stoppedRide);
+
+  this.driverState.refreshFromBackend();
   this.mapFacade.clearFocusRide?.();
   this.mapFacade.clearRidePath?.();
   

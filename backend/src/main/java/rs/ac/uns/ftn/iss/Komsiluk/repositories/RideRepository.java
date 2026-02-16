@@ -94,4 +94,6 @@ public interface RideRepository extends JpaRepository<Ride, Long> {
          and r.startTime <= :nowPlus15
     """)
     List<Ride> findScheduledStartingSoon(@Param("status") RideStatus status, @Param("now") LocalDateTime now, @Param("nowPlus15") LocalDateTime nowPlus15);
+
+    boolean existsByDriverIdAndStatusAndPanicTriggeredTrue(Long driverId, RideStatus status);
 }

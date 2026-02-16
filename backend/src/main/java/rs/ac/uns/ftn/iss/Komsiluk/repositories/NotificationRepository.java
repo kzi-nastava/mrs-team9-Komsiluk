@@ -19,7 +19,7 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
     // NotificationRepository.java
     @Query("""
     SELECT n FROM Notification n 
-    WHERE n.type = 'PANIC' 
+    WHERE n.type = 'PANIC_ADMIN' 
     AND n.read = false 
     ORDER BY n.createdAt DESC
 """)

@@ -62,20 +62,16 @@ export const jwtInterceptor: HttpInterceptorFn = (
       }
 
       if (error.status === 403) {
-        // Token might be invalid or user doesn't have permission
-        // Only logout if it's an auth-related 403, not a permission issue
         const token = auth.getToken();
         if (token) {
-          // Check if token is expired or invalid
           try {
             const payload = JSON.parse(atob(token.split('.')[1]));
-            const exp = payload.exp * 1000; // Convert to milliseconds
+            const exp = payload.exp * 1000;
             if (Date.now() > exp) {
               auth.logout();
               router.navigate(['/login']);
             }
           } catch {
-            // Invalid token format, logout
             auth.logout();
             router.navigate(['/login']);
           }

@@ -22,6 +22,7 @@ public class DriverResponseDTO {
 	private UserRole role;
 	private DriverStatus driverStatus;
 	private VehicleResponseDTO vehicle;
+    private boolean logoutPending;
 	
 	public DriverResponseDTO() {
 		super();
@@ -138,4 +139,12 @@ public class DriverResponseDTO {
 	public void setVehicle(VehicleResponseDTO vehicle) {
 		this.vehicle = vehicle;
 	}
+
+    public boolean isLogoutPending() {
+        return logoutPending;
+    }
+
+    public void setLogoutPending(boolean logoutPending) {
+        this.logoutPending = logoutPending;
+    }
 }

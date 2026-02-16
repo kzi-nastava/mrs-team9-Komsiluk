@@ -33,20 +33,16 @@ interface SortState {
   styleUrls: ['./passenger-ride-history-page.component.css'],
 })
 export class PassengerRideHistoryPageComponent implements OnInit {
-  // State
   rides = signal<PassengerRideHistoryDTO[]>([]);
   loading = signal(false);
   error = signal<string | null>(null);
   
-  // Filter state
   filterFrom = signal('');
   filterTo = signal('');
   showFilterPanel = signal(false);
   
-  // Sort state
   sortState = signal<SortState>({ column: 'DATE', direction: 'desc' });
   
-  // Details modal
   detailsOpen = signal(false);
   selectedRideDetails = signal<PassengerRideDetailsDTO | null>(null);
   detailsLoading = signal(false);
@@ -64,12 +60,7 @@ export class PassengerRideHistoryPageComponent implements OnInit {
     this.bootstrapUserId();
   }
 
-    /**
-   * Returns a formatted route string: Pickup: [start] → [station1] → ... → Destination: [end]
-   * Only street names are shown (first part before comma). Stations omitted if none.
-   */
   formatRoute(ride: PassengerRideHistoryDTO): string {
-    // Capitalize for display
     const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
     const start = cap(ride.startAddress.trim());
     const end = cap(ride.endAddress.trim());
@@ -117,7 +108,6 @@ export class PassengerRideHistoryPageComponent implements OnInit {
       sortBy
     ).subscribe({
       next: (data) => {
-        // Apply frontend sorting for direction (backend might not support direction)
         const sorted = this.applySortDirection(data, sort);
         this.rides.set(sorted);
         this.loading.set(false);
@@ -145,7 +135,6 @@ export class PassengerRideHistoryPageComponent implements OnInit {
           return dir * (new Date(a.endTime).getTime() - new Date(b.endTime).getTime());
         case 'START_ADDRESS':
         case 'ROUTE':
-          // Sort by processed route string
           return dir * this.formatRoute(a).localeCompare(this.formatRoute(b));
         case 'END_ADDRESS':
           return dir * a.endAddress.localeCompare(b.endAddress);
@@ -157,7 +146,6 @@ export class PassengerRideHistoryPageComponent implements OnInit {
     return sorted;
   }
 
-  // === UI Actions ===
 
   toggleFilterPanel(): void {
     this.showFilterPanel.update(v => !v);
@@ -174,13 +162,11 @@ export class PassengerRideHistoryPageComponent implements OnInit {
     const current = this.sortState();
     
     if (current.column === column) {
-      // Toggle direction
       this.sortState.set({
         column,
         direction: current.direction === 'asc' ? 'desc' : 'asc'
       });
     } else {
-      // New column, default to desc
       this.sortState.set({ column, direction: 'desc' });
     }
     
@@ -215,7 +201,6 @@ export class PassengerRideHistoryPageComponent implements OnInit {
     this.selectedRideDetails.set(null);
   }
 
-  // === Formatting helpers ===
 
   formatDate(isoString: string): string {
     if (!isoString) return '—';

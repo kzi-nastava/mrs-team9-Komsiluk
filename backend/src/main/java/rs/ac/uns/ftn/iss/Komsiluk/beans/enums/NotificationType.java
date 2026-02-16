@@ -9,5 +9,6 @@ public enum NotificationType {
     RIDE_FINISHED,
     RIDE_CANCELLED,
     RIDE_STOPPED,
-    PANIC
+    PANIC,
+    PANIC_ADMIN
 }

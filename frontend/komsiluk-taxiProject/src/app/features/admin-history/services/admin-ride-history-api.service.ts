@@ -106,10 +106,6 @@ export class AdminRideHistoryApiService {
 
   constructor(private http: HttpClient) {}
 
-  /**
-   * Get rides for a user by their email
-   * Endpoint: GET /api/admin/rides/by-user-email?email=...
-   */
   getRidesByEmail(
     email: string,
     from?: string,
@@ -127,10 +123,6 @@ export class AdminRideHistoryApiService {
     );
   }
 
-  /**
-   * Get detailed information about a specific ride
-   * Endpoint: GET /api/rides/{rideId}
-   */
   getRideDetails(rideId: number): Observable<AdminRideDetailsDTO> {
     return this.http.get<AdminRideDetailsDTO>(
       `${this.API_BASE}/rides/${rideId}`

@@ -100,17 +100,23 @@ public class DriverService implements IDriverService {
         User driver = userRepository.findById(driverId).orElseThrow(() -> new NotFoundException("Driver not found"));
 
         DriverStatus oldStatus= driver.getDriverStatus();
-        
+
+        if (oldStatus == DriverStatus.IN_RIDE && newStatus == DriverStatus.INACTIVE) {
+            driver.setLogoutPending(true);
+            userRepository.save(driver);
+            return driverMapper.toResponseDTO(driver);
+        }
+
         if (oldStatus == DriverStatus.INACTIVE && newStatus != DriverStatus.INACTIVE) {
             driverActivityService.startActivity(driver);
         }
 
         if (oldStatus != DriverStatus.INACTIVE && newStatus == DriverStatus.INACTIVE) {
             driverActivityService.endActivity(driver);
+            driver.setLogoutPending(false);
         }
-            
-        driver.setDriverStatus(newStatus);
 
+        driver.setDriverStatus(newStatus);
         userRepository.save(driver);
 
         return driverMapper.toResponseDTO(driver);

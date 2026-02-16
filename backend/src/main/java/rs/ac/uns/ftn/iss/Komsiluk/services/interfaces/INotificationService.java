@@ -2,6 +2,7 @@ package rs.ac.uns.ftn.iss.Komsiluk.services.interfaces;
 
 import java.util.Collection;
 
+import rs.ac.uns.ftn.iss.Komsiluk.dtos.notification.AdminNotificationCreateDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.notification.NotificationCreateDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.notification.NotificationResponseDTO;
 
@@ -18,4 +19,6 @@ public interface INotificationService {
     NotificationResponseDTO markAsRead(Long id, boolean read);
 
     public Collection<NotificationResponseDTO> getUnreadPanics();
+
+    NotificationResponseDTO createAdminNotification(AdminNotificationCreateDTO dto);
 }

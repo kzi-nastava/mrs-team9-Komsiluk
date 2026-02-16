@@ -101,14 +101,4 @@ export class AdminRideDetailsModalComponent {
   fmtText(v?: string | null): string {
     return v && v.trim().length ? v : 'N/A';
   }
-
-  // === Actions (disabled for admin - placeholder only) ===
-
-  onOrderAgain(): void {
-    // Not implemented for admin view
-  }
-
-  onSaveAsFavorite(): void {
-    // Not implemented for admin view
-  }
 }
