@@ -4,6 +4,7 @@ export interface DriverLocation {
   lng: number;
   updatedAt: string;
   busy: boolean;
+  panic: boolean;
 }
 
 export interface DriverBasicDto {

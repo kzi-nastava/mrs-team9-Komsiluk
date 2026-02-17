@@ -90,51 +90,13 @@ export class App implements OnInit {
   rightMode: 'profile' | 'admin' = 'profile';
 
   private panicSubscription?: Subscription;
-  private seenPanicRideIds = new Set<number>();
 
   constructor(private notificationService: NotificationService, private authService: AuthService, public stopRideSvc: StopRideService, public panicModalSvc: PanicModalService, private schedRides: ScheduledRidesService, public filterSvc: RideHistoryFilterService, private router: Router, public confirmModal: ConfirmBookingModalService,
     public addFavModal: AddFavoriteModalService, public favDetailsModal: FavoriteDetailsModalService, public renameFavModal: RenameFavoriteModalService,
     public deleteFavModal: DeleteFavoriteModalService, public toastService: ToastService, private favoriteApi: FavoriteRouteService, private favBus: FavoritesBusService,
     public schedDetailsModal: ScheduledDetailsModalService, public blockUserModal: BlockUserConfirmModalService, public blockedModal: AccountBlockedModalService,
     private leftCmd: LeftSidebarCommandService, private route: ActivatedRoute, private location: Location, public modal: DriverActivityConfirmModalService,
-    public driverActModal: DriverActivityConfirmModalService, private driverRuntimeState: DriverRuntimeStateService, public startRideModal: DriverStartRideConfirmModalService, public rideService: RideService, public cancelModalSvc: CancelRideModalService) {
-    effect(() => {
-      const role = this.authService.userRole();
-
-      if (role === UserRole.ADMIN) {
-        this.startPanicMonitoring();
-      } else {
-        this.stopPanicMonitoring();
-      }
-    });
-  }
-  private startPanicMonitoring() {
-    if (this.panicSubscription) return;
-
-    this.panicSubscription = interval(10000).pipe(
-      switchMap(() => this.notificationService.getUnreadPanicNotifications().pipe(
-        catchError(() => of([]))
-      ))
-    ).subscribe((notifications: any[]) => {
-      this.processPanics(notifications);
-    });
-  }
-
-  private processPanics(notifications: any[]) {
-    for (const notification of notifications) {
-      this.toastService.show(`Recieved ${notification.title} notification. ${notification.message}`);
-      this.notificationService.markRead(notification.id).subscribe();
-    }
-  }
-
-  private stopPanicMonitoring() {
-    this.panicSubscription?.unsubscribe();
-    this.panicSubscription = undefined;
-  }
-
-  ngOnDestroy() {
-    this.stopPanicMonitoring();
-  }
+    public driverActModal: DriverActivityConfirmModalService, private driverRuntimeState: DriverRuntimeStateService, public startRideModal: DriverStartRideConfirmModalService, public rideService: RideService, public cancelModalSvc: CancelRideModalService) {}
 
   ngOnInit(): void {
 

@@ -62,6 +62,10 @@ public class DriverResponse {
     @Expose
     private VehicleResponse vehicle;
 
+    @SerializedName("logoutPending")
+    @Expose
+    private boolean logoutPending;
+
     public DriverResponse() {}
 
     public Long getId() { return id; }
@@ -105,4 +109,7 @@ public class DriverResponse {
 
     public VehicleResponse getVehicle() { return vehicle; }
     public void setVehicle(VehicleResponse vehicle) { this.vehicle = vehicle; }
+
+    public boolean isLogoutPending() {return logoutPending;}
+    public void setLogoutPending(boolean logoutPending) {this.logoutPending = logoutPending;}
 }

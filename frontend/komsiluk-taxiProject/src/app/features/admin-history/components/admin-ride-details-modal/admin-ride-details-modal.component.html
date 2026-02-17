@@ -9,7 +9,6 @@
     } @else if (details) {
       <div class="modal-content">
         
-        <!-- Left section: Driver info, Passengers, Ratings -->
         <section class="modal-left">
           <h3 class="section-title">Driver</h3>
           <div class="driver-card">
@@ -83,12 +82,10 @@
           }
         </section>
 
-        <!-- Center section: Map -->
         <section class="modal-center">
           <app-ride-details-map [locations]="allLocations"></app-ride-details-map>
         </section>
 
-        <!-- Right section: Route details -->
         <section class="modal-right">
           <div class="route-details">
             <div class="detail-row">
@@ -157,7 +154,6 @@
         </section>
       </div>
 
-      <!-- Bottom row: Panic status -->
       <div class="modal-bottom">
         <div class="panic-status">
           <span class="panic-label">Panic button pressed:</span>
@@ -167,14 +163,7 @@
         </div>
       </div>
 
-      <!-- Actions -->
       <div class="modal-actions">
-        <button class="btn btn--secondary" (click)="onSaveAsFavorite()">
-          Save as Favorite
-        </button>
-        <button class="btn btn--primary" (click)="onOrderAgain()">
-          Order Again
-        </button>
         <button class="btn btn--close" (click)="close.emit()">
           Close
         </button>

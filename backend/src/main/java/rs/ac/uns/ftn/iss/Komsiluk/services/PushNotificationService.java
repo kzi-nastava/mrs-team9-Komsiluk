@@ -60,4 +60,12 @@ public class PushNotificationService {
             repo.deleteByToken(token);
         }
     }
+
+    public void sendToAllAdmins(String title, String message, Map<String, String> data) {
+        List<String> adminTokens = repo.findAllAdminTokens(); // Ili prosledi listu iz servisa
+
+        for (String token : adminTokens) {
+            sendToToken(token, title, message, data);
+        }
+    }
 }

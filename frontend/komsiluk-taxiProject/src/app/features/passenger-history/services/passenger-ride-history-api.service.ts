@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-// Matches backend AdminRideSortBy enum
 export type PassengerRideSortBy = 
   | 'DATE'
   | 'ROUTE' 
@@ -11,17 +10,15 @@ export type PassengerRideSortBy =
   | 'START_ADDRESS' 
   | 'END_ADDRESS';
 
-// Matches backend AdminRideHistoryDTO
 export interface PassengerRideHistoryDTO {
   rideId: number;
   startAddress: string;
   endAddress: string;
-  startTime: string;       // LocalDateTime as ISO string
-  endTime: string;         // LocalDateTime as ISO string
+  startTime: string;
+  endTime: string;
   route: string;
 }
 
-// Matches backend AdminRideDetailsDTO
 export interface PassengerRideDetailsDTO {
   rideId: number;
   status: string;
@@ -57,7 +54,7 @@ export interface RouteResponseDTO {
   id: number;
   startAddress: string;
   endAddress: string;
-  stops: string;  // pipe-separated string from backend
+  stops: string;
 }
 
 export interface DriverResponseDTO {

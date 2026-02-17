@@ -31,6 +31,7 @@ export interface UserProfileResponseDTO {
   vehicle: VehicleResponseDTO | null;
   activeMinutesLast24h: number;
   driverStatus?: DriverStatus;
+  logoutPending?: boolean;
 }
 
 export interface UserProfileUpdateDTO {

@@ -11,6 +11,8 @@ import org.springframework.web.multipart.MultipartFile;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.auth.*;
 import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.IAuthService;
 
+import java.security.Principal;
+
 
 @RestController
 @RequestMapping("/api/auth")
@@ -65,5 +67,13 @@ public class AuthController {
 
         authService.forgotPassword(dto.getEmail());
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<?> getMyProfile(Principal principal) {
+        if (principal == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        return ResponseEntity.ok(authService.getWhoAmI(principal.getName()));
     }
 }

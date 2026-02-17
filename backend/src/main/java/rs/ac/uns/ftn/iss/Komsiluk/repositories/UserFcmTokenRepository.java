@@ -16,4 +16,7 @@ public interface UserFcmTokenRepository extends JpaRepository<UserFcmToken, Long
     List<String> findTokensByUserId(Long userId);
 
     void deleteByToken(String token);
+
+    @Query("SELECT t.token FROM UserFcmToken t WHERE t.user.role = 'ADMIN'")
+    List<String> findAllAdminTokens();
 }

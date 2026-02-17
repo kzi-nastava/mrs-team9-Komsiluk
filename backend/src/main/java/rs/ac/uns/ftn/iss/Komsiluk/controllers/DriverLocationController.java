@@ -9,8 +9,10 @@ import org.springframework.web.bind.annotation.*;
 
 import rs.ac.uns.ftn.iss.Komsiluk.beans.DriverLocation;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.DriverStatus;
+import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.RideStatus;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.location.DriverLocationResponseDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.location.DriverLocationUpdateDTO;
+import rs.ac.uns.ftn.iss.Komsiluk.repositories.RideRepository;
 import rs.ac.uns.ftn.iss.Komsiluk.repositories.UserRepository;
 import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.IDriverLocationService;
 
@@ -22,6 +24,8 @@ public class DriverLocationController {
 
     @Autowired
     private IDriverLocationService driverLocationService;
+    @Autowired
+    private RideRepository rideRepository;
 
     @Autowired
     private UserRepository userRepository;
@@ -61,6 +65,15 @@ public class DriverLocationController {
         var driver = userRepository.findById(loc.getDriverId()).orElse(null);
         boolean busy = driver != null && driver.getDriverStatus() == DriverStatus.IN_RIDE;
         dto.setBusy(busy);
+
+        boolean panic = false;
+        if (busy) {
+            panic = rideRepository.existsByDriverIdAndStatusAndPanicTriggeredTrue(
+                    loc.getDriverId(),
+                    RideStatus.ACTIVE
+            );
+        }
+        dto.setPanic(panic);
 
         return dto;
     }

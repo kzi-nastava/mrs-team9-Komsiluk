@@ -584,11 +584,17 @@ private renderPassengerActiveRide(points: { lat: number; lon: number; label?: st
     iconAnchor: [13, 13],
   });
 
+  private driverPanicIcon = L.divIcon({
+    className: 'km-driver km-driver--panic',
+    html: `<span class="material-symbols-outlined km-driver__icon">local_taxi</span>`,
+    iconSize: [26, 26],
+    iconAnchor: [13, 13],
+  });
   // ===== DRIVERS (home map) =====
 
 
 private renderDrivers(
-  locations: { driverId: number; lat: number; lng: number; busy: boolean }[]
+  locations: { driverId: number; lat: number; lng: number; busy: boolean; panic: boolean }[]
 ): void {
   if (!this.map) return;
 
@@ -601,6 +607,7 @@ private renderDrivers(
     if (role === 'PASSENGER') {
       return this.targetDriverId ? l.driverId === this.targetDriverId : false;
     }
+    if(role === 'ADMIN') return true;
     return false;
   });
 
@@ -618,7 +625,14 @@ private renderDrivers(
     if (loc.driverId === myId && this.animTimer) continue; 
 
     let marker = this.driverMarkers.get(loc.driverId);
-    const icon = loc.busy ? this.driverBusyIcon : this.driverFreeIcon;
+    
+    
+    let icon = loc.busy ? this.driverBusyIcon : this.driverFreeIcon;
+    if (role === 'ADMIN' && loc.panic) {
+      icon = this.driverPanicIcon;
+    } else {
+      icon = loc.busy ? this.driverBusyIcon : this.driverFreeIcon;
+    }
 
     if (marker) {
       marker.setLatLng([loc.lat, loc.lng]);

@@ -59,7 +59,6 @@ export class PassengerRideDetailsModalComponent {
 
   get allLocations(): string[] {
     if (!this.details?.route) return [];
-    // Helper to extract street name
     const street = (addr: string) => typeof addr === 'string' ? addr.split(',')[0].trim() : '';
     const stopsArr = this.stopsArray;
     return [
@@ -125,19 +124,16 @@ export class PassengerRideDetailsModalComponent {
     return v && v.trim().length ? v : 'N/A';
   }
 
-  // === Actions ===
 
   onOrderAgain(): void {
     if (!this.details?.route) return;
 
     const d = this.details;
     
-    // Parse stops - backend returns pipe-separated string
     const stopsArr = this.stopsArray;
 
-    // Map to FavoriteRouteResponseDTO format for prefill service
     const fakeFavorite: FavoriteRouteResponseDTO = {
-      id: 0, // Not used for prefill
+      id: 0,
       title: 'Order Again',
       routeId: d.route.id,
       startAddress: d.route.startAddress,

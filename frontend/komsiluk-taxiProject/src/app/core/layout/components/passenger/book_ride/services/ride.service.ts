@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { catchError, EMPTY, map, Observable, of, switchMap, tap, throwError } from 'rxjs';
 import { RideCreateDTO, RidePassengerActiveDTO, RideResponseDTO, StopRideRequestDTO } from '../../../../../../shared/models/ride.models';
@@ -11,6 +11,7 @@ import { HttpResponse } from '@angular/common/http';
 @Injectable({ providedIn: 'root' })
 export class RideService {
   private readonly API = 'http://localhost:8081/api/rides';
+
 
   constructor(
     private http: HttpClient,
@@ -65,7 +66,6 @@ export class RideService {
         tap((notifs) => {
           const cancelNotifs = notifs.filter(n => n.type === 'RIDE_CANCELLED');
           this.showToastsForInitiator(cancelNotifs);
-          // Reset the map after successful cancellation
           this.mapFacade.triggerResetMap();
         })
       )
@@ -143,7 +143,7 @@ export class RideService {
           this.toast.show('PANIC button activated. Authorities have been notified.');
         }),
         catchError((err) => {
-          this.toast.show('Failed to activate PANIC button.');
+          this.toast.show('Failed to activate PANIC button.' + (err.error?.message ? ` ${err.error.message}` : ''));
           return EMPTY;
         })
       )
@@ -152,7 +152,7 @@ export class RideService {
 
   stopRide(rideId: number, dto: StopRideRequestDTO): Observable<RideResponseDTO> {
     return this.http.post<RideResponseDTO>(`${this.API}/${rideId}/stop`, dto).pipe(
-      tap(() => this.toast.show('Ride stopped and recorded.')),
+      tap(() => {}),
       catchError(err => {
         this.toast.show('Failed to stop ride properly.');
         return throwError(() => err);

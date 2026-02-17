@@ -97,7 +97,9 @@ public class RideHistoryPage {
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
 
-        List<Ride> rides = rideRows.stream().map(row -> {
+        List<WebElement> freshRows = driver.findElements(By.cssSelector(".ride-row"));
+
+        return freshRows.stream().map(row -> {
             Ride ride = new Ride();
 
             ride.setRoute(row.findElement(By.id("route-cell")).getText());
@@ -118,7 +120,6 @@ public class RideHistoryPage {
 
             return ride;
         }).collect(Collectors.toList());
-        return rides;
     }
 
     public int getInitialRideCount() {
@@ -189,7 +190,7 @@ public class RideHistoryPage {
     }
 
     public void resetFilters() {
-        resetFilterButton.click();
+        wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".filter-btn--reset"))).click();
         wait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(By.cssSelector(".ride-row")));
     }
 

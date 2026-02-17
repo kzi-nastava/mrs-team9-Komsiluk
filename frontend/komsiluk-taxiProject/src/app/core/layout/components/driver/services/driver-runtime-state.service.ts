@@ -12,6 +12,9 @@ export class DriverRuntimeStateService {
   private statusSig = signal<DriverStatus>('INACTIVE');
   status = computed(() => this.statusSig());
 
+  private logoutPendingSig = signal<boolean>(false);
+  isLogoutPending = computed(() => this.logoutPendingSig());
+
   private minutesSig = signal<number>(0);
   activeMinutes = computed(() => this.minutesSig());
 
@@ -48,6 +51,7 @@ export class DriverRuntimeStateService {
     this.profileSvc.getMyProfile().subscribe({
       next: (p) => {
         this.minutesSig.set(p.activeMinutesLast24h ?? 0);
+        this.logoutPendingSig.set(p.logoutPending ?? false);
         const s = (p.driverStatus ?? 'INACTIVE') as DriverStatus;
         this.setStatus(s);
       },
@@ -59,6 +63,12 @@ export class DriverRuntimeStateService {
     const id = Number(this.auth.userId());
     if (!id) return;
 
+    if (this.isLogoutPending()) {
+      this.toast.show('You will go INACTIVE once the current ride is finished.');
+      return;
+    }
+    
+
     const current = this.statusSig();
     const next: DriverStatus = (current === 'INACTIVE') ? 'ACTIVE' : 'INACTIVE';
 
@@ -67,7 +77,7 @@ export class DriverRuntimeStateService {
         this.refreshFromBackend();
       },
       error: (err) => {
-        this.toast.show(err?.error?.message || 'Status update failed.');
+        this.toast.show(err?.error?.message || 'You can\'t change status right now.');
       }
     });
   }

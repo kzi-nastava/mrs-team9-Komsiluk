@@ -578,17 +578,7 @@ public class AdminRideDetailsDialogFragment extends DialogFragment {
     private void setupButtons() {
         binding.btnClose.setOnClickListener(v -> dismiss());
 
-        // Order Again button - no-op for admin
-        binding.btnBookAgain.setOnClickListener(v -> {
-            Toast.makeText(getContext(), "Feature coming soon!", Toast.LENGTH_SHORT).show();
-        });
 
-        // Favorite button - no-op for admin
-        binding.btnFavorite.setOnClickListener(v -> {
-            Toast.makeText(getContext(), "Feature coming soon!", Toast.LENGTH_SHORT).show();
-        });
-
-        // Hide the add rating button for admin view
         binding.btnAddRating.setVisibility(View.GONE);
     }
 

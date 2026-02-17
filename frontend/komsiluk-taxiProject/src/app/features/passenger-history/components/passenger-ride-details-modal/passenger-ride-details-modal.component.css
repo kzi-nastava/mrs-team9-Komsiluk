@@ -52,7 +52,6 @@
   padding: 24px;
 }
 
-/* Sections */
 .modal-left,
 .modal-center,
 .modal-right {
@@ -66,7 +65,6 @@
   padding-right: 8px;
 }
 
-/* Custom scrollbar for left section */
 .modal-left::-webkit-scrollbar {
   width: 6px;
 }
@@ -91,7 +89,6 @@
   padding-left: 8px;
 }
 
-/* Custom scrollbar for right section */
 .modal-right::-webkit-scrollbar {
   width: 6px;
 }
@@ -123,7 +120,6 @@
   margin-top: 20px;
 }
 
-/* Driver card */
 .driver-card {
   display: flex;
   align-items: center;
@@ -166,7 +162,6 @@
   font-weight: 600;
 }
 
-/* Ratings */
 .ratings-list,
 .reports-list {
   display: flex;
@@ -212,7 +207,6 @@
   margin-top: 6px;
 }
 
-/* Reports */
 .report-header {
   display: flex;
   justify-content: space-between;
@@ -236,7 +230,6 @@
   margin: 0;
 }
 
-/* Route details */
 .route-details {
   display: flex;
   flex-direction: column;
@@ -271,7 +264,6 @@
   font-weight: 600;
 }
 
-/* Stats row */
 .stats-row {
   display: flex;
   justify-content: space-around;
@@ -299,7 +291,6 @@
   font-weight: 600;
 }
 
-/* Bottom section */
 .modal-bottom {
   padding: 16px 24px;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
@@ -326,7 +317,6 @@
   color: #ff6b6b;
 }
 
-/* Actions */
 .modal-actions {
   display: flex;
   justify-content: flex-end;
@@ -374,7 +364,6 @@
   background: rgba(255, 255, 255, 0.2);
 }
 
-/* Responsive */
 @media (max-width: 900px) {
   .modal-content {
     grid-template-columns: 1fr;

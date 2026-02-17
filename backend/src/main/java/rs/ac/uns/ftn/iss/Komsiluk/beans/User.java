@@ -58,6 +58,9 @@ public class User implements UserDetails {
 	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
 	@JoinColumn(name = "vehicle_id")
 	private Vehicle vehicle;
+
+    @Column(nullable = false, columnDefinition = "boolean default false")
+    private boolean logoutPending = false;
 	
 	public User() {
 		super();
@@ -245,5 +248,13 @@ public class User implements UserDetails {
     @Override
     public boolean isEnabled() {
         return active;
+    }
+
+    public boolean isLogoutPending() {
+        return logoutPending;
+    }
+
+    public void setLogoutPending(boolean logoutPending) {
+        this.logoutPending = logoutPending;
     }
 }

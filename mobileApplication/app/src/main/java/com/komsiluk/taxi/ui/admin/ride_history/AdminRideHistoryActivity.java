@@ -44,10 +44,13 @@ public class AdminRideHistoryActivity extends BaseNavDrawerActivity {
 
         setupRecyclerView();
         setupSearchBar();
+        binding.chipStartTime.setChecked(true);
+        binding.chipDesc.setChecked(true);
         setupSortChips();
         setupSortDirectionChips();
         setupFilterButton();
         observeViewModel();
+
     }
 
     @Override
@@ -157,15 +160,15 @@ public class AdminRideHistoryActivity extends BaseNavDrawerActivity {
         if (chipId == R.id.chipPanic) return AdminRideSortBy.PANIC;
         if (chipId == R.id.chipCanceled) return AdminRideSortBy.CANCELED;
         if (chipId == R.id.chipPrice) return AdminRideSortBy.PRICE;
-        return AdminRideSortBy.DATE;
+        return AdminRideSortBy.START_TIME;
     }
 
     private void setupSortDirectionChips() {
         binding.chipGroupSortDirection.setOnCheckedStateChangeListener((group, checkedIds) -> {
             if (checkedIds.isEmpty()) return;
             int checkedId = checkedIds.get(0);
-            boolean desc = (checkedId == R.id.chipDesc);
-            viewModel.setSortDirection(desc);
+            boolean isAscending = (checkedId == R.id.chipAsc);
+            viewModel.setSortDirection(isAscending);
         });
     }
 

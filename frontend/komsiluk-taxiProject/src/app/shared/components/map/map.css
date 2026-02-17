@@ -56,3 +56,12 @@
 .km-driver {
   transition: all 0.1s linear !important;
 }
+
+.km-driver--panic {
+  background: #ff0000 !important; 
+  animation: blinker 1s linear infinite;
+}
+
+@keyframes blinker {
+  50% { opacity: 0; }
+}

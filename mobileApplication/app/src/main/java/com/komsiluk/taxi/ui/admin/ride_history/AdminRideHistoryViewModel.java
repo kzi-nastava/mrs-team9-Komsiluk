@@ -46,7 +46,7 @@ public class AdminRideHistoryViewModel extends ViewModel {
 
     private String currentFromDate = null;
     private String currentToDate = null;
-    private AdminRideSortBy currentSortBy = AdminRideSortBy.START_ADDRESS;
+    private AdminRideSortBy currentSortBy = AdminRideSortBy.START_TIME;
     private boolean sortAscending = false;
     private String currentEmail = null;
 
@@ -127,7 +127,7 @@ public class AdminRideHistoryViewModel extends ViewModel {
                         result = compareStringsIgnoreCaseSafe(r1.getStartAddress(), r2.getStartAddress());
                         break;
                     case END_ADDRESS:
-                        result = compareStringsIgnoreCaseSafe(r2.getEndAddress(), r2.getEndAddress());
+                        result = compareStringsIgnoreCaseSafe(r1.getEndAddress(), r2.getEndAddress());
                         break;
                     case DATE:
                     case START_TIME:

@@ -22,4 +22,8 @@ public class NotificationSocketPublisher {
     		);
 
     }
+
+    public void sendToAdmins(NotificationResponseDTO dto) {
+        messagingTemplate.convertAndSend("/topic/admin/panic", dto);
+    }
 }

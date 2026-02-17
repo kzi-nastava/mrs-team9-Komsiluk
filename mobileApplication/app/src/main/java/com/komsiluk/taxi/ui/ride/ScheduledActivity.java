@@ -249,8 +249,8 @@ public class ScheduledActivity extends BaseNavDrawerActivity implements Schedule
                     String message = response.message() != null
                             ? response.message()
                             : "Failed to cancel ride";
-                    if(message.isEmpty()) message = "Failed to cancel ride";
-                    showToast("Error: " + message);
+                    if(message.isEmpty()) message = "Ride is due in less then 10 minutes.";
+                    showToast(message);
                 }
             }
 

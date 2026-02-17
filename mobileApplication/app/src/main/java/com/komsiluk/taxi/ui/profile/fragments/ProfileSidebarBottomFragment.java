@@ -10,13 +10,16 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.komsiluk.taxi.R;
@@ -26,6 +29,8 @@ import com.komsiluk.taxi.data.remote.block.BlockNoteResponse;
 import com.komsiluk.taxi.data.remote.block.BlockService;
 import com.komsiluk.taxi.data.remote.profile.UserBlockedResponse;
 import com.komsiluk.taxi.data.remote.profile.UserService;
+import com.komsiluk.taxi.data.remote.ride.RideResponse;
+import com.komsiluk.taxi.data.remote.ride.RideService;
 import com.komsiluk.taxi.data.session.SessionManager;
 import com.komsiluk.taxi.ui.admin.ride_history.AdminRideHistoryActivity;
 import com.komsiluk.taxi.ui.driver_history.DriverHistoryActivity;
@@ -37,6 +42,8 @@ import com.komsiluk.taxi.ui.ride.FavoritesActivity;
 import com.komsiluk.taxi.ui.ride.ScheduledActivity;
 import com.komsiluk.taxi.ui.ride.ScheduledRidesActivity;
 import com.komsiluk.taxi.ui.shared.InfoMessageActivity;
+
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -58,6 +65,9 @@ public class ProfileSidebarBottomFragment extends Fragment {
     @Inject
     BlockService blockService;
 
+    @Inject
+    RideService rideService;
+
     public static ProfileSidebarBottomFragment newInstance(boolean isDriver) {
         ProfileSidebarBottomFragment f = new ProfileSidebarBottomFragment();
         Bundle args = new Bundle();
@@ -73,6 +83,8 @@ public class ProfileSidebarBottomFragment extends Fragment {
 
     private boolean isBlocked = false;
     private String lastBlockReason = null;
+
+    private boolean hasAssignedRide = false;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -155,6 +167,10 @@ public class ProfileSidebarBottomFragment extends Fragment {
             });
 
         btnLogout.setOnClickListener(v -> {
+            if(hasAssignedRide) {
+                Toast.makeText(getContext(), "Cannot logout while you have a ride.", Toast.LENGTH_LONG).show();
+                return;
+            }
             Intent i = InfoMessageActivity.createLogoutIntent(
                     this.getContext(),
                     getString(R.string.logout_title),
@@ -192,6 +208,7 @@ public class ProfileSidebarBottomFragment extends Fragment {
         super.onStart();
         if (!isDriver) return;
         checkBlockedAndUpdateUi();
+        checkIfInRide();
     }
 
     private void checkBlockedAndUpdateUi() {
@@ -296,6 +313,30 @@ public class ProfileSidebarBottomFragment extends Fragment {
 
         btnClose.setOnClickListener(x -> dialog.dismiss());
         btnOk.setOnClickListener(x -> dialog.dismiss());
+    }
+
+    private void checkIfInRide() {
+        Long driverId = sessionManager != null ? sessionManager.getUserId() : null;
+        if(driverId == null) {
+            hasAssignedRide = false;
+            return;
+        }
+
+        rideService.getDriverCurrentRide(driverId).enqueue(new Callback<RideResponse>() {
+            @Override
+            public void onResponse(Call<RideResponse> call, Response<RideResponse> resp) {
+                if (resp.code() == 204 || !resp.isSuccessful() || resp.body() == null) {
+                    hasAssignedRide = false;
+                    return;
+                }
+                hasAssignedRide = true;
+            }
+
+            @Override
+            public void onFailure(Call<RideResponse> call, Throwable t) {
+                hasAssignedRide = false;
+            }
+        });
     }
 
     private String formatMinutes(long totalMin) {

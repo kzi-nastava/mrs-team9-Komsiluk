@@ -42,8 +42,8 @@ public class Notification {
 	@Column(columnDefinition = "TEXT")
     private String metadata;
 	
-	@ManyToOne(fetch = FetchType.EAGER, optional = false)
-	@JoinColumn(name = "user_id", nullable = false)
+	@ManyToOne(fetch = FetchType.EAGER, optional = true)
+	@JoinColumn(name = "user_id", nullable = true)
     private User user;
     
     public Notification() {

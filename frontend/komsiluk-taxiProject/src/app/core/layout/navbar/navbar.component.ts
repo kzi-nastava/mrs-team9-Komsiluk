@@ -1,11 +1,11 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, effect, EventEmitter, Output } from '@angular/core';
 import { Router, NavigationEnd, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService, UserRole } from '../../../core/auth/services/auth.service';
 import { DriverRuntimeStateService } from '../components/driver/services/driver-runtime-state.service';
 import { OnInit, OnDestroy, signal, Signal } from '@angular/core';
 import { Subscription, filter } from 'rxjs';
-import { NotificationService} from '../../../features/menu/services/notification.service';
+import { NotificationService } from '../../../features/menu/services/notification.service';
 import { NotificationSocketService } from '../../../core/services/notification-socket.service';
 import { ToastService } from '../../../shared/components/toast/toast.service';
 import { NotificationResponseDTO } from '../../../shared/models/notification.models';
@@ -51,6 +51,14 @@ export class NavbarComponent implements OnInit, OnDestroy {
         this.isHome = path === '/' || path === '';
       });
     this.userRole = this.authService.userRole;
+
+    effect(() => {
+    if (!this.authService.isLoggedIn()) {
+      this.notifications.set([]);
+      this.unreadCount.set(0);
+      this.notificationSocket.disconnect();
+    }
+  });
   }
 
   goHome() {
@@ -66,7 +74,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
     const userId = this.getUserId();
 
     if (token) {
-      this.notificationSocket.connect(token);
+      this.notificationSocket.connect(token,this.userRole());
 
       this.wsSub = this.notificationSocket.lastNotification$.subscribe((n) => {
         if (!n) return;
@@ -103,6 +111,8 @@ export class NavbarComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     document.removeEventListener('click', this.docClickHandler);
     this.wsSub?.unsubscribe();
+    this.notifications.set([]);
+    this.unreadCount.set(0);
     this.chatSub?.unsubscribe();
   }
 
@@ -125,13 +135,29 @@ export class NavbarComponent implements OnInit, OnDestroy {
 
     this.notificationService.getUnread(userId).subscribe({
       next: (list) => {
-        this.unreadCount.set(list.length);
+        this.unreadCount.set(list.length); 
         if (!onlyCount) this.notifications.set(list);
+        
+        if (this.userRole() === UserRole.ADMIN) {
+          this.fetchAdminPanics(onlyCount);
+        } else {
+          this.loading.set(false);
+        }
+      },
+      error: () => this.loading.set(false)
+    });
+  }
+
+  private fetchAdminPanics(onlyCount: boolean) {
+    this.notificationService.getUnreadPanicNotifications().subscribe({
+      next: (list) => {
+        this.unreadCount.update(c => c + list.length);
+        if (!onlyCount) {
+          this.notifications.update(old => [...list, ...old]);
+        }
         this.loading.set(false);
       },
-      error: () => {
-        this.loading.set(false);
-      }
+      error: () => this.loading.set(false)
     });
   }
 

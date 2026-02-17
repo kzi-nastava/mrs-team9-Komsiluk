@@ -9,6 +9,7 @@ public class DriverLocationResponseDTO {
     private double lng;
     private LocalDateTime updatedAt;
     private boolean busy;
+    private boolean panic;
 
     public DriverLocationResponseDTO() {
         super();
@@ -45,5 +46,13 @@ public class DriverLocationResponseDTO {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public boolean isPanic() {
+        return panic;
+    }
+
+    public void setPanic(boolean panic) {
+        this.panic = panic;
     }
 }

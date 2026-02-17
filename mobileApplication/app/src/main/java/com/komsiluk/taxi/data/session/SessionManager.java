@@ -62,6 +62,13 @@ public class SessionManager {
         return id == -1 ? null : id;
     }
 
+    public void updateUserData(Long userId, UserRole role) {
+        prefs.edit()
+                .putLong(KEY_USER_ID, userId)
+                .putString(KEY_ROLE, role.name())
+                .apply();
+    }
+
     public boolean isLoggedIn() {
         return getToken() != null;
     }

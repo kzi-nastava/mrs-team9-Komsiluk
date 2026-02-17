@@ -9,7 +9,6 @@
     } @else if (details) {
       <div class="modal-content">
         
-        <!-- Left section: Driver info & Ratings -->
         <section class="modal-left">
           <h3 class="section-title">Driver</h3>
           <div class="driver-card">
@@ -146,7 +145,6 @@
         </section>
       </div>
 
-      <!-- Bottom row: Panic status -->
       <div class="modal-bottom">
         <div class="panic-status">
           <span class="panic-label">Panic button pressed:</span>
@@ -156,7 +154,6 @@
         </div>
       </div>
 
-      <!-- Actions -->
       <div class="modal-actions">
         <button class="btn btn--secondary" (click)="onSaveAsFavorite()">
           Save as Favorite
@@ -169,7 +166,6 @@
         </button>
       </div>
 
-      <!-- Driver Rating Modal -->
       @if (showRatingModal && details) {
         <app-driver-rating-modal
           [rideId]="details.rideId"

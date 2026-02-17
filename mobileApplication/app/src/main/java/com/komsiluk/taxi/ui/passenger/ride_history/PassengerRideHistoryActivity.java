@@ -114,6 +114,10 @@ public class PassengerRideHistoryActivity extends BaseNavDrawerActivity {
         directionAdapter.setDropDownViewResource(R.layout.item_spinner_dropdown);
         binding.spinnerSortDirection.setAdapter(directionAdapter);
 
+        binding.spinnerSortField.setSelection(1, false);
+
+        binding.spinnerSortDirection.setSelection(0, false);
+
         binding.spinnerSortDirection.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -133,7 +137,7 @@ public class PassengerRideHistoryActivity extends BaseNavDrawerActivity {
             case 0: return PassengerRideSortBy.ROUTE;
             case 1: return PassengerRideSortBy.START_TIME;
             case 2: return PassengerRideSortBy.END_TIME;
-            default: return PassengerRideSortBy.DATE;
+            default: return PassengerRideSortBy.START_TIME;
         }
     }
 

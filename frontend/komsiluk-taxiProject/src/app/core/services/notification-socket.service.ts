@@ -3,6 +3,7 @@ import { Client, IMessage } from '@stomp/stompjs';
 import { BehaviorSubject } from 'rxjs';
 import { NotificationResponseDTO } from '../../shared/models/notification.models';
 import { NgZone } from '@angular/core';
+import { UserRole } from '../auth/services/auth.service';
 
 @Injectable({ providedIn: 'root' })
 export class NotificationSocketService {
@@ -11,9 +12,15 @@ export class NotificationSocketService {
 
   public readonly lastNotification$ = new BehaviorSubject<NotificationResponseDTO | null>(null);
 
-  constructor(private zone: NgZone) {}
+  private normalAudio = new Audio('assets/sounds/notification.mp3');
+  private panicAudio = new Audio('assets/sounds/panic.mp3');
 
-  async connect(token: string) {
+  constructor(private zone: NgZone) {
+    this.normalAudio.volume = 0.5;
+    this.panicAudio.volume = 0.7;
+  }
+
+  async connect(token: string, role: UserRole) {
     if (this.connected) return;
     if (!token) return;
 
@@ -34,11 +41,22 @@ export class NotificationSocketService {
           const payload = JSON.parse(message.body) as NotificationResponseDTO;
           this.zone.run(() => {
             console.log('[WS] notification received', payload);
+            this.playNotificationSound(false);
             this.lastNotification$.next(payload);
           });
         } catch (e) {
         }
       });
+
+      if (role === UserRole.ADMIN) {
+        this.client?.subscribe('/topic/admin/panic', (message: IMessage) => {
+          const payload = JSON.parse(message.body);
+          this.zone.run(() => {
+            this.playNotificationSound(true);
+            this.lastNotification$.next(payload);
+          });
+        });
+      }
     };
 
     this.client.onStompError = (frame) => {
@@ -49,6 +67,16 @@ export class NotificationSocketService {
     };
 
     this.client.activate();
+  }
+
+  private playNotificationSound(isPanic: boolean = false) {
+    const sound = isPanic ? this.panicAudio : this.normalAudio;
+    
+    sound.pause();
+    sound.currentTime = 0;
+    sound.play().catch(err => {
+      console.warn('Audio play failed:', err);
+    });
   }
 
   disconnect() {

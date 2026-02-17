@@ -21,29 +21,30 @@ public class AuthInterceptor implements Interceptor {
         this.sessionManager = sessionManager;
     }
 
+
     @Override
     public Response intercept(Chain chain) throws IOException {
         Request original = chain.request();
         String path = original.url().encodedPath();
 
-        if (path.startsWith("/api/auth")
-                || path.startsWith("/api/tokens")
+        boolean isPublicPath = (path.contains("/api/auth/login")
+                || path.contains("/api/auth/registration")
+                || path.contains("/api/auth/forgot-password")
+                || path.contains("/api/tokens")
                 || path.equals("/api/drivers/locations")
-                || path.equals("api/drivers/basic")
-        ) {
-            return chain.proceed(original); // 🚫 bez tokena
+                || path.equals("/api/drivers/basic"));
+
+        if (!isPublicPath) {
+            String token = sessionManager.getToken();
+            if (token != null) {
+                Request request = original.newBuilder()
+                        .addHeader("Authorization", "Bearer " + token)
+                        .build();
+                return chain.proceed(request);
+            }
         }
 
-        String token = sessionManager.getToken();
-        if (token == null) {
-            return chain.proceed(original);
-        }
-
-        Request request = original.newBuilder()
-                .addHeader("Authorization", "Bearer " + token)
-                .build();
-
-        return chain.proceed(request);
+        return chain.proceed(original);
     }
 
 }

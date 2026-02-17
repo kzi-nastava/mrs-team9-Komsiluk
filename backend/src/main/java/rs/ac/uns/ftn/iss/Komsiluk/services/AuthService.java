@@ -16,12 +16,14 @@ import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.UserRole;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.auth.LoginRequestDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.auth.LoginResponseDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.auth.RegisterPassengerRequestDTO;
+import rs.ac.uns.ftn.iss.Komsiluk.dtos.auth.UserResponseDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.userToken.UserTokenResponseDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.mappers.RegisterPassengerMapper;
 import rs.ac.uns.ftn.iss.Komsiluk.repositories.UserRepository;
 import rs.ac.uns.ftn.iss.Komsiluk.security.jwt.JwtService;
 import rs.ac.uns.ftn.iss.Komsiluk.services.exceptions.AccountNotActivatedException;
 import rs.ac.uns.ftn.iss.Komsiluk.services.exceptions.EmailAlreadyExistsException;
+import rs.ac.uns.ftn.iss.Komsiluk.services.exceptions.NotFoundException;
 import rs.ac.uns.ftn.iss.Komsiluk.services.exceptions.PasswordsDoNotMatchException;
 import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.IAuthService;
 import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.IUserService;
@@ -173,6 +175,12 @@ public class AuthService implements IAuthService {
                 user.getEmail(),
                 token.getToken()
         );
+    }
+
+    public UserResponseDTO getWhoAmI(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new NotFoundException("User not found"));
+        return new UserResponseDTO(user);
     }
 
 }
