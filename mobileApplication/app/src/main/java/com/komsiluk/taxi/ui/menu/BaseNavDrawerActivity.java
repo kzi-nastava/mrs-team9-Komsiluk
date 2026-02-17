@@ -429,14 +429,15 @@ public abstract class BaseNavDrawerActivity extends AppCompatActivity {
             navigateToEditRequests();
         }else if (itemId == R.id.nav_history) {
             navigateToRideHistory();
-        } else if (itemId == R.id.nav_chat) {
-            // ...
-        } else if (itemId == R.id.nav_about) {
+        }  else if (itemId == R.id.nav_about) {
             navigateToAbout();
-        } else if (itemId == R.id.nav_update_price) { // NOVO
+        } else if (itemId == R.id.nav_update_price) {
         navigateToUpdatePrice();
-        }else if (itemId == R.id.nav_active_rides) { // DODAJ OVO
+        }else if (itemId == R.id.nav_active_rides) {
             navigateToActiveRides();
+        }
+        else if (itemId == R.id.nav_support) { // Proveri tačan ID iz XML-a
+            navigateToSupport();
         }
     }
 
@@ -516,7 +517,16 @@ public abstract class BaseNavDrawerActivity extends AppCompatActivity {
     }
 
     protected void navigateToSupport() {
-        // Placeholder for support navigation
+        UserRole role = authManager.getRole();
+        Intent intent;
+
+        if (role == UserRole.ADMIN) {
+            intent = new Intent(this, com.komsiluk.taxi.ui.chat.AdminInboxActivity.class);
+        } else {
+            intent = new Intent(this, com.komsiluk.taxi.ui.chat.ChatActivity.class);
+        }
+
+        startActivity(intent);
     }
 
     protected void navigateToUsageReports() {

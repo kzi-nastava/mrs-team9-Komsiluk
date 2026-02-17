@@ -8,6 +8,7 @@ import com.komsiluk.taxi.auth.TokenAuthenticator;
 import com.komsiluk.taxi.data.remote.add_driver.UserTokenService;
 import com.komsiluk.taxi.data.remote.admin_ride_history.AdminRideHistoryService;
 import com.komsiluk.taxi.data.remote.auth.AuthService;
+import com.komsiluk.taxi.data.remote.chat.ChatService;
 import com.komsiluk.taxi.data.remote.inconsistency_report.InconsistencyService;
 import com.komsiluk.taxi.data.remote.passenger_ride_history.PassengerRideHistoryService;
 import com.komsiluk.taxi.data.remote.block.BlockService;
@@ -206,6 +207,12 @@ public class NetworkModule {
     @Singleton
     GeoRepository provideGeoRepository(@Named("GeoClient") OkHttpClient client) {
         return new GeoRepository(client);
+    }
+
+    @Provides
+    @Singleton
+    public static ChatService provideChatService(Retrofit retrofit) {
+        return retrofit.create(ChatService.class);
     }
 }
 
