@@ -33,6 +33,8 @@ import com.komsiluk.taxi.data.remote.ride.RideResponse;
 import com.komsiluk.taxi.data.remote.ride.RideService;
 import com.komsiluk.taxi.data.session.SessionManager;
 import com.komsiluk.taxi.ui.admin.ride_history.AdminRideHistoryActivity;
+import com.komsiluk.taxi.ui.chat.AdminInboxActivity;
+import com.komsiluk.taxi.ui.chat.ChatActivity;
 import com.komsiluk.taxi.ui.driver_history.DriverHistoryActivity;
 import com.komsiluk.taxi.ui.edit.AdminDriverChangeRequestsActivity;
 import com.komsiluk.taxi.ui.passenger.ride_history.PassengerRideHistoryActivity;
@@ -179,6 +181,18 @@ public class ProfileSidebarBottomFragment extends Fragment {
             );
             startActivity(i);
         });
+        view.findViewById(R.id.btnSupport).setOnClickListener(v -> {
+            Intent intent;
+
+            if (role == UserRole.ADMIN) {
+                intent = new Intent(requireContext(), AdminInboxActivity.class);
+            } else {
+                intent = new Intent(requireContext(), ChatActivity.class);
+            }
+
+            startActivity(intent);
+        });
+
 
         viewModel = new ViewModelProvider(requireActivity()).get(ProfileViewModel.class);
 

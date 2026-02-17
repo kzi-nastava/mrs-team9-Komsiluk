@@ -9,7 +9,7 @@
     <application
         android:name=".TaxiApp"
         android:allowBackup="true"
-        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:usesCleartextTraffic="true" android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher_taxi"
         android:label="@string/company_name"
@@ -148,6 +148,13 @@
             android:name=".ui.admin.ride_history.AdminRideHistoryActivity"
             android:exported="false" />
         <activity android:name=".ui.driver_history.DriverHistoryActivity" />
+        <activity
+            android:name=".ui.chat.ChatActivity"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".ui.chat.AdminInboxActivity"
+            android:windowSoftInputMode="adjustResize" />
     </application>
 
 </manifest>
