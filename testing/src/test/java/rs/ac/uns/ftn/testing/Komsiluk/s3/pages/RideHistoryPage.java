@@ -161,7 +161,7 @@ public class RideHistoryPage {
             wait.until(ExpectedConditions.not(ExpectedConditions.textToBePresentInElement(sorter, currentText)));
         }
 
-        wait.until(ExpectedConditions.visibilityOfAllElements(rideRows));
+        wait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(By.cssSelector(".ride-row")));
     }
 
     /**
@@ -190,7 +190,11 @@ public class RideHistoryPage {
     }
 
     public void resetFilters() {
+        List<WebElement> oldRows = driver.findElements(By.cssSelector(".ride-row"));
         wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".filter-btn--reset"))).click();
+        if (!oldRows.isEmpty()) {
+            wait.until(ExpectedConditions.stalenessOf(oldRows.get(0)));
+        }
         wait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(By.cssSelector(".ride-row")));
     }
 
