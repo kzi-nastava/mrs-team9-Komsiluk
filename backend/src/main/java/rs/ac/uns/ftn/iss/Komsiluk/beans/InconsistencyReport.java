@@ -28,7 +28,7 @@ public class InconsistencyReport {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "reporter_role", nullable = false, length = 20)
-    private UserRole reporterRole; // DRIVER / PASSENGER
+    private UserRole reporterRole;
 
     @Column(nullable = false, length = 1000)
     private String message;

@@ -12,14 +12,14 @@ import rs.ac.uns.ftn.iss.Komsiluk.mappers.ChatMapper;
 import rs.ac.uns.ftn.iss.Komsiluk.repositories.ChatRepository;
 import rs.ac.uns.ftn.iss.Komsiluk.repositories.UserRepository;
 import rs.ac.uns.ftn.iss.Komsiluk.services.exceptions.NotFoundException;
-import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.IChatService; // Import interfejsa
+import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.IChatService;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class ChatService implements IChatService { // Implementira interfejs
+public class ChatService implements IChatService {
 
     @Autowired
     private ChatRepository chatRepository;
@@ -45,7 +45,6 @@ public class ChatService implements IChatService { // Implementira interfejs
         User receiver = userRepository.findById(receiverId)
                 .orElseThrow(() -> new NotFoundException("Receiver not found"));
 
-        // Logika za conversationId: Uvek je ID "običnog" korisnika.
         Long conversationId = (sender.getRole() == UserRole.ADMIN) ? receiverId : senderId;
 
         Chat message = new Chat();
@@ -69,7 +68,6 @@ public class ChatService implements IChatService { // Implementira interfejs
                 dto
         );
 
-        // Opciono: Slanje i pošiljaocu (za sinhronizaciju više tabova)
         messagingTemplate.convertAndSendToUser(
                 sender.getEmail(),
                 "/queue/messages",
@@ -80,10 +78,8 @@ public class ChatService implements IChatService { // Implementira interfejs
     }
     @Override
     public List<ChatInboxDTO> getAdminInbox() {
-        // 1. Izvuci poslednju poruku za svaku konverzaciju
         List<Chat> latestMessages = chatRepository.findLatestMessagesPerConversation();
 
-        // 2. Mapiraj u DTO i dodaj BROJAČ
         return latestMessages.stream().map(msg -> {
                     Long userId = msg.getConversationId();
                     User user = userRepository.findById(userId).orElse(null);
@@ -98,7 +94,6 @@ public class ChatService implements IChatService { // Implementira interfejs
                         profilePicture = user.getProfileImageUrl();
                     }
 
-                    // --- NOVO: BROJANJE NEPROČITANIH ---
                     long unreadCount = chatRepository.countUnreadMessages(userId);
 
                     return new ChatInboxDTO(
@@ -108,13 +103,12 @@ public class ChatService implements IChatService { // Implementira interfejs
                             msg.getContent(),
                             msg.getSentAt(),
                             profilePicture,
-                            (int) unreadCount // Dodajemo u DTO
+                            (int) unreadCount
                     );
                 }).sorted((a, b) -> b.getLastMessageTime().compareTo(a.getLastMessageTime()))
                 .collect(Collectors.toList());
     }
 
-    // --- NOVA METODA: Markiraj kao pročitano ---
     public void markAsRead(Long userId) {
         chatRepository.markAllAsRead(userId);
     }

@@ -28,17 +28,13 @@ public class AdminInboxActivity extends BaseNavDrawerActivity implements InboxAd
 
     @Override
     protected int getContentLayoutId() {
-        // Ovo govori bazi koji XML da ubaci u sredinu (contentContainer)
         return R.layout.fragment_admin_inbox;
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        // super.onCreate će uraditi setContentView i ubaciti tvoj XML u FrameLayout
         super.onCreate(savedInstanceState);
 
-        // Pošto baza već ima svoj binding, mi pravimo lokalni za unutrašnji sadržaj
-        // Vežemo se za koren unutrašnjeg layout-a
         View contentView = findViewById(R.id.inboxContentRoot);
         inboxBinding = FragmentAdminInboxBinding.bind(contentView);
 

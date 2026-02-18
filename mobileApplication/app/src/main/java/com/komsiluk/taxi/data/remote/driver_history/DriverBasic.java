@@ -44,7 +44,6 @@ public class DriverBasic implements java.io.Serializable {
         this.lastName = lastName;
     }
 
-    // Pomoćna metoda za spajanje imena i prezimena
     public String getFullName() {
         return firstName + " " + lastName;
     }

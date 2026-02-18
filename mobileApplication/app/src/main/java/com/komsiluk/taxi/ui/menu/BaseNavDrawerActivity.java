@@ -156,16 +156,13 @@ public abstract class BaseNavDrawerActivity extends AppCompatActivity {
             return insets;
         });
 
-        // --- bind drawer stuff ---
         drawerLayout = binding.drawerLayout;
         navigationView = binding.navigationView;
         bottomNav = binding.bottomNav;
 
-        // --- inflate child content into container ---
         FrameLayout contentContainer = binding.contentContainer;
         getLayoutInflater().inflate(getContentLayoutId(), contentContainer, true);
 
-        // --- NEW NAVBAR ONLY: btnNavMenu ---
         View topBar = findViewById(R.id.topAppBar);
         if (topBar != null) {
             btnNavMenu = topBar.findViewById(R.id.btnNavMenu);
@@ -210,7 +207,6 @@ public abstract class BaseNavDrawerActivity extends AppCompatActivity {
         if(isDriver)
                 fetchDriverProfileAndUpdateStatusUi();
 
-        // Bottom nav show/hide
         if (bottomNav != null) {
             bottomNav.setVisibility(shouldShowBottomNav() ? View.VISIBLE : View.GONE);
 
@@ -467,7 +463,7 @@ public abstract class BaseNavDrawerActivity extends AppCompatActivity {
         }else if (itemId == R.id.nav_active_rides) {
             navigateToActiveRides();
         }
-        else if (itemId == R.id.nav_support) { // Proveri tačan ID iz XML-a
+        else if (itemId == R.id.nav_support) {
             navigateToSupport();
         }
     }

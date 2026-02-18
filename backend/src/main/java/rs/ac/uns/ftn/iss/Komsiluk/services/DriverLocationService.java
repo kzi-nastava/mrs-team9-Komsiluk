@@ -51,7 +51,6 @@ public class DriverLocationService implements IDriverLocationService {
         List<Long> activeIds = userRepository.findDriverIdsByStatus(UserRole.DRIVER, DriverStatus.ACTIVE);
         List<Long> inRideIds = userRepository.findDriverIdsByStatus(UserRole.DRIVER, DriverStatus.IN_RIDE);
 
-        // spoji + ukloni duplikate
         List<Long> ids = new ArrayList<>();
         ids.addAll(activeIds);
         ids.addAll(inRideIds);
@@ -59,10 +58,8 @@ public class DriverLocationService implements IDriverLocationService {
         ids = ids.stream().distinct().toList();
         if (ids.isEmpty()) return List.of();
 
-        // uzmi postojeće lokacije
         List<DriverLocation> existing = (List<DriverLocation>) locationRepository.findByDriverIdIn(ids);
 
-        // ako neki aktivan driver nema lokaciju u tabeli -> ubaci default (da se vidi na mapi)
         Set<Long> existingIds = existing.stream().map(DriverLocation::getDriverId).collect(Collectors.toSet());
         List<DriverLocation> toCreate = new ArrayList<>();
         for (Long id : ids) {
@@ -90,7 +87,6 @@ public class DriverLocationService implements IDriverLocationService {
     public Collection<DriverLocationResponseDTO> getAllLiveLocationsDto() {
         Collection<DriverLocation> locs = getAllLiveLocations();
 
-        // za svaki driverId proveri status i mapiraj
         return locs.stream().map(loc -> {
             User driver = userRepository.findById(loc.getDriverId()).orElse(null);
             boolean busy = driver != null && driver.getDriverStatus() == DriverStatus.IN_RIDE;

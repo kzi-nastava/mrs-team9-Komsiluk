@@ -148,7 +148,7 @@ public class ScheduledActivity extends BaseNavDrawerActivity implements Schedule
                 String hhmm = raw.replace('T', ' ');
                 int idx = hhmm.indexOf(' ');
                 if (idx != -1 && hhmm.length() >= idx + 6) {
-                    scheduled = hhmm.substring(idx + 1, idx + 6); // "09:00"
+                    scheduled = hhmm.substring(idx + 1, idx + 6);
                 } else {
                     scheduled = raw;
                 }

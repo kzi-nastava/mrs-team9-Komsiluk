@@ -25,16 +25,12 @@ public class UpdatePricingActivity extends BaseNavDrawerActivity {
 
     @Override
     protected int getContentLayoutId() {
-        // Ovo je bitno - tvoj BaseNavDrawerActivity ce ovo ubaciti u contentContainer
         return R.layout.activity_update_pricing;
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        // Postavi naslov u Navbaru ako tvoj BaseActivity ima tu metodu
-        // setToolbarTitle("Pricing Management");
 
         RecyclerView rv = findViewById(R.id.rvPricing);
         rv.setLayoutManager(new LinearLayoutManager(this));

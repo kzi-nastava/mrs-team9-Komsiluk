@@ -26,9 +26,6 @@ public class Chat {
     @Column(nullable = false)
     private LocalDateTime sentAt;
 
-    // Ovo polje nam pomaže da znamo kojoj "konverzaciji" poruka pripada.
-    // Za chat sa podrškom, konverzacija se uvek vodi ID-jem običnog korisnika (Driver/Passenger).
-    // Čak i kad Admin odgovara, on odgovara u "session" tog korisnika.
     @Column(nullable = false)
     private Long conversationId;
     @Column(nullable = false)

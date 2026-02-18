@@ -100,7 +100,6 @@ onDetails(rideId: string | number) {
       if (dto.creatorEmail) emails.push(dto.creatorEmail);
       if (dto.passengerEmails) emails.push(...dto.passengerEmails);
 
-      // REŠENJE ZA STANICE: Splitujemo string po karakteru '|'
       let stopsArray: string[] = [];
       if (dto.route?.stops && typeof dto.route.stops === 'string') {
         stopsArray = dto.route.stops.split('|').map((s: string) => s.trim()).filter((s: string) => s.length > 0);
@@ -112,7 +111,6 @@ onDetails(rideId: string | number) {
       let estimatedEndTime = 'Pending';
     if (dto.startTime && dto.estimatedDurationMin) {
     const start = new Date(dto.startTime);
-    // Dodajemo minute na startno vreme
     const end = new Date(start.getTime() + dto.estimatedDurationMin * 60000);
     estimatedEndTime = end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     }
@@ -128,7 +126,7 @@ onDetails(rideId: string | number) {
         
         pickupLocation: dto.route?.startAddress || 'N/A', 
         destination: dto.route?.endAddress || 'N/A',
-        stops: stopsArray, // Sada je ovo sigurno niz celih adresa
+        stops: stopsArray,
         
         kilometers: dto.distanceKm,
         durationText: `${dto.estimatedDurationMin || 0} min`,

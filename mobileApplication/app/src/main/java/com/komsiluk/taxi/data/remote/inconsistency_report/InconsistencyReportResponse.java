@@ -19,7 +19,6 @@ public class InconsistencyReportResponse {
     @SerializedName("createdAt") @Expose
     private String createdAt;
 
-    // Getteri
     public Long getId() { return id; }
     public Long getRideId() { return rideId; }
 

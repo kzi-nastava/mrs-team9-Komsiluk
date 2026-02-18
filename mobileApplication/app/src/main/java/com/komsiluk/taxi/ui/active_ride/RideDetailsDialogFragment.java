@@ -51,7 +51,7 @@ public class RideDetailsDialogFragment extends DialogFragment {
 
     @Inject LocationService locationService;
     private static GeoRepository staticGeoRepo;
-    private static AdminRideDetails staticDetails; // Direktno koristimo bogatiji DTO
+    private static AdminRideDetails staticDetails;
 
     private DialogActiveRideDetailsBinding b;
     private Marker driverMarker;
@@ -90,7 +90,6 @@ public class RideDetailsDialogFragment extends DialogFragment {
     }
 
     private void setupUI() {
-        // 1. OSNOVNI PODACI (Driver, Pickup, Destination)
         if (staticDetails.getDriver() != null) {
             b.tvActiveDetailsDriverValue.setText(staticDetails.getDriver().getFirstName() + " " + staticDetails.getDriver().getLastName());
         }
@@ -98,7 +97,6 @@ public class RideDetailsDialogFragment extends DialogFragment {
         b.tvActiveDetailsPickupValue.setText(staticDetails.getRoute().getStartAddress());
         b.tvActiveDetailsDestinationValue.setText(staticDetails.getRoute().getEndAddress());
 
-        // 2. FORMATIRANJE VREMENA
         SimpleDateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault());
         SimpleDateFormat prettyFormat = new SimpleDateFormat("dd.MM. HH:mm", Locale.getDefault());
 
@@ -115,7 +113,6 @@ public class RideDetailsDialogFragment extends DialogFragment {
             }
         } catch (Exception e) { e.printStackTrace(); }
 
-        // 3. DINAMIČKE STANICE (STOPS)
         b.containerActiveStops.removeAllViews();
         List<String> stops = Collections.singletonList(staticDetails.getRoute().getStops());
         if (stops != null && !stops.isEmpty()) {
@@ -124,10 +121,8 @@ public class RideDetailsDialogFragment extends DialogFragment {
             }
         }
 
-        // 4. DINAMIČKI PUTNICI (Svi u jednoj listi)
         b.containerPassengers.removeAllViews();
 
-        // Pravimo listu u koju ubacujemo prvo kreatora, pa ostale
         List<String> allEmails = new ArrayList<>();
         if (staticDetails.getCreatorEmail() != null) {
             allEmails.add(staticDetails.getCreatorEmail());
@@ -144,20 +139,15 @@ public class RideDetailsDialogFragment extends DialogFragment {
             }
         }
 
-        // 5. METRIKA
         b.tvActiveKm.setText(String.format(Locale.US, "%.1f km", staticDetails.getDistanceKm()));
         b.tvActiveTime.setText(staticDetails.getEstimatedDurationMin() + " min");
-        b.tvActivePrice.setText(staticDetails.getPrice() + " $"); // Dodaj ako DTO ima cenu
+        b.tvActivePrice.setText(staticDetails.getPrice() + " $");
 
-        // 6. PANIC STATUS
         boolean isPanic = staticDetails.isPanicTriggered();
         b.tvActivePanicValue.setText(isPanic ? "Yes" : "No");
         b.tvActivePanicValue.setTextColor(isPanic ? Color.RED : ContextCompat.getColor(requireContext(), R.color.secondary));
     }
 
-    /**
-     * Samo običan TextView za svakog putnika, bez ikonica i labela.
-     */
     private void addSimplePassengerText(String text) {
         TextView tv = new TextView(requireContext());
         tv.setText(text);

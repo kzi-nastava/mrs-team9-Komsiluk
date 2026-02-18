@@ -493,7 +493,6 @@ public class UserActivity extends BaseNavDrawerActivity {
             return;
         }
 
-        // Restore addresses in UI
         if (etPickup != null) {
             etPickup.setText(pickupAddr);
             Log.e("UserActivity", "Set pickup text");
@@ -508,7 +507,6 @@ public class UserActivity extends BaseNavDrawerActivity {
             Log.e("UserActivity", "etDestination is null!");
         }
 
-        // Restore coordinates
         double pickupLat = intent.getDoubleExtra(MainActivity.EXTRA_PICKUP_LAT, 0);
         double pickupLng = intent.getDoubleExtra(MainActivity.EXTRA_PICKUP_LNG, 0);
         double destLat = intent.getDoubleExtra(MainActivity.EXTRA_DEST_LAT, 0);
@@ -541,7 +539,6 @@ public class UserActivity extends BaseNavDrawerActivity {
             }
         }
 
-        // Draw route if both points exist
         if (pickupPoint != null && destPoint != null) {
             Log.e("UserActivity", "Drawing route...");
 
@@ -549,7 +546,6 @@ public class UserActivity extends BaseNavDrawerActivity {
                 zoomToAllPoints();
                 drawRouteAndStatsMulti();
 
-                // Expand the bottom sheet
                 if (sheetBehavior != null) {
                     sheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
                     Log.e("UserActivity", "Sheet expanded");
@@ -1306,7 +1302,7 @@ public class UserActivity extends BaseNavDrawerActivity {
                     freq.setVehicleType(mapVehicleType(actCarType.getText() == null ? "" : actCarType.getText().toString()));
                     freq.setPetFriendly(((CheckBox) findViewById(R.id.cbPetFriendly)).isChecked());
                     freq.setBabyFriendly(((CheckBox) findViewById(R.id.cbChildSeat)).isChecked());
-                    freq.setPassengersEmails(readPassengerEmails()); // može null
+                    freq.setPassengersEmails(readPassengerEmails());
 
                     favoriteApi.addFavorite(userId, freq).enqueue(new retrofit2.Callback<com.komsiluk.taxi.data.remote.favorite.FavoriteRouteResponse>() {
                         @Override
@@ -1841,7 +1837,7 @@ public class UserActivity extends BaseNavDrawerActivity {
     private void updateDriverMarker(GeoPoint position) {
         if (driverMarker == null) {
             driverMarker = new Marker(map);
-            driverMarker.setIcon(getDrawable(R.drawable.taxi_busy)); // Plava/zauzeta ikonica
+            driverMarker.setIcon(getDrawable(R.drawable.taxi_busy));
             driverMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
             driverMarker.setTitle("Vaš vozač");
             map.getOverlays().add(driverMarker);
@@ -1914,7 +1910,6 @@ public class UserActivity extends BaseNavDrawerActivity {
         btnSend.setOnClickListener(v -> {
             String message = etMessage.getText().toString().trim();
 
-            // Validacija prema DTO ograničenjima
             if (message.isEmpty()) {
                 Toast.makeText(this, "Message cannot be empty", Toast.LENGTH_SHORT).show();
                 return;

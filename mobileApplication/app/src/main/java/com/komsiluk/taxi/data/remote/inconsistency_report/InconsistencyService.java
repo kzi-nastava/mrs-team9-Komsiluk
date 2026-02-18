@@ -10,7 +10,6 @@ import retrofit2.http.POST;
 import retrofit2.http.Path;
 
 public interface InconsistencyService {
-    // U RideService.java ili novom InconsistencyService.java
     @POST("rides/{rideId}/inconsistencies")
     Call<ResponseBody> reportInconsistency(
             @Path("rideId") Long rideId,

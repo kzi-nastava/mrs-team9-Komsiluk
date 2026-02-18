@@ -393,16 +393,13 @@ public class RideService implements IRideService {
                     driverId, RideStatus.FINISHED, fromDt, toDt);
         }
 
-        // --------- (1) all  userIds ----------
         Set<Long> ids = new HashSet<>();
 
         for (Ride r : rides) {
-            // creator
             if (r.getCreatedBy() != null && r.getCreatedBy().getId() != null) {
                 ids.add(r.getCreatedBy().getId());
             }
 
-            // passengers
             if (r.getPassengers() != null) {
                 for (User p : r.getPassengers()) {
                     if (p != null && p.getId() != null) ids.add(p.getId());
@@ -410,23 +407,19 @@ public class RideService implements IRideService {
             }
         }
 
-        // --------- (2) batch fetch email map ----------
         Map<Long, String> emailById = ids.isEmpty()
                 ? Map.of()
                 : userRepository.findByIdIn(ids).stream()
                 .collect(Collectors.toMap(User::getId, User::getEmail));
 
-        // --------- (3) filling  DTO ----------
         return rides.stream()
                 .map(ride -> {
                     RideResponseDTO dto = rideMapper.toResponseDTO(ride);
 
-                    // creatorEmail
                     Long creatorId = dto.getCreatorId();
                     String creatorEmail = (creatorId == null) ? null : emailById.get(creatorId);
                     dto.setCreatorEmail(creatorEmail);
 
-                    // passengerEmails
                     List<Long> pids = dto.getPassengerIds();
                     List<String> passengerEmails;
 
@@ -774,15 +767,14 @@ public class RideService implements IRideService {
     @Override
     public Optional<RidePassengerActiveDTO> getActiveRideForPassenger(Long userId) {
         return rideRepository.findActiveRideForPassenger(userId)
-                .map(rideDTOMapper::toActiveResponseDTO); // Samo pozoveš maper
+                .map(rideDTOMapper::toActiveResponseDTO);
     }
 
     @Override
     public Collection<RideResponseDTO> getAllActiveRides() {
-        // Pozivamo tvoj novi repository metod za status ACTIVE
         return rideRepository.findAllActiveRides()
                 .stream()
-                .map(rideDTOMapper::toResponseDTO) // Koristimo tvoj postojeći maper
+                .map(rideDTOMapper::toResponseDTO)
                 .collect(Collectors.toList());
     }
 

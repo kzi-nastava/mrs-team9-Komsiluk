@@ -25,7 +25,6 @@ public class PricingService implements IPricingService {
 
     @Override
     public List<PricingResponseDTO> getAll() {
-        // Pretvaramo listu Pricing entiteta u listu PricingResponseDTO rekorda
         return repo.findAll(Sort.by("vehicleType")).stream()
                 .map(p -> new PricingResponseDTO(
                         p.getVehicleType(),
@@ -39,7 +38,6 @@ public class PricingService implements IPricingService {
     public PricingResponseDTO update(VehicleType type, PricingUpdateDTO dto) {
         Pricing p = repo.findByVehicleType(type).orElseThrow(NotFoundException::new);
 
-        // Tvoja validacija za Integer (veće od nule)
         if (dto.startingPrice() == null || dto.startingPrice() <= 0) {
             throw new BadRequestException();
         }

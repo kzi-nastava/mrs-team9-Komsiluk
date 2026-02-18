@@ -47,8 +47,6 @@ public class WebSocketClient {
 
     @SuppressLint("CheckResult")
     public void connect() {
-        // OBAVEZNO: Ako postoji stara konekcija, zatvori je.
-        // Ovo rešava problem kada se drugi korisnik uloguje na istom uređaju.
         if (mStompClient != null) {
             Log.d(TAG, "Čišćenje stare konekcije pre novog povezivanja...");
             disconnect();
@@ -65,7 +63,6 @@ public class WebSocketClient {
 
         Log.d(TAG, "Povezivanje na: " + connectionUrl);
 
-        // Kreiramo novi CompositeDisposable jer je disconnect() verovatno ugasio stari
         if (compositeDisposable == null || compositeDisposable.isDisposed()) {
             compositeDisposable = new CompositeDisposable();
         }
@@ -103,7 +100,6 @@ public class WebSocketClient {
 
     @SuppressLint("CheckResult")
     private void subscribeToMessages() {
-        // Pretplata na personalizovani kanal
         Disposable dispTopic = mStompClient.topic("/user/queue/messages")
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -150,10 +146,10 @@ public class WebSocketClient {
         Log.d(TAG, "Gasim WebSocket resurse...");
         if (mStompClient != null) {
             mStompClient.disconnect();
-            mStompClient = null; // Resetujemo klijenta
+            mStompClient = null;
         }
         if (compositeDisposable != null) {
-            compositeDisposable.clear(); // Brišemo pretplate, ali ne ubijamo sam objekat skroz
+            compositeDisposable.clear();
         }
     }
 

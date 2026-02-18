@@ -46,7 +46,7 @@ public class InboxAdapter extends RecyclerView.Adapter<InboxAdapter.InboxViewHol
         ChatInbox item = items.get(position);
         holder.name.setText(item.getFullName());
         holder.lastMsg.setText(item.getLastMessage());
-        String rawTime = item.getLastMessageTime(); // npr. "2026-02-16T14:30:00"
+        String rawTime = item.getLastMessageTime();
         if (rawTime != null && rawTime.contains("T")) {
             try {
                 String timeOnly = rawTime.split("T")[1].substring(0, 5);
@@ -71,9 +71,9 @@ public class InboxAdapter extends RecyclerView.Adapter<InboxAdapter.InboxViewHol
             Glide.with(holder.itemView.getContext())
                     .load(imageUrl)
                     .circleCrop()
-                    .diskCacheStrategy(DiskCacheStrategy.ALL) // Keširanje da ne bi stalno vukao sa mreže
-                    .placeholder(R.drawable.ic_profile)          // Dok se učitava
-                    .error(R.drawable.ic_profile)                // Ako pukne učitavanje
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .placeholder(R.drawable.ic_profile)
+                    .error(R.drawable.ic_profile)
                     .into(holder.avatar);
         } else {
             Glide.with(holder.itemView.getContext())

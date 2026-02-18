@@ -20,7 +20,6 @@ public class RatingResponse {
     @SerializedName("comment") @Expose
     private String comment;
 
-    // Getteri
     public Long getId() { return id; }
     public String getRaterMail() { return raterMail; }
     public Integer getDriverGrade() { return driverGrade; }

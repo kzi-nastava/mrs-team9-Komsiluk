@@ -21,7 +21,6 @@ export class AdminLiveRideDetailsModalComponent implements OnInit, OnChanges {
     this.checkAndLoad();
   }
 
-  // OVO JE KLJUČNO: Ako se data promeni, ponovo učitaj reporte
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['data'] && this.data) {
       console.log('MODAL PRIMIO PODATKE:', this.data);

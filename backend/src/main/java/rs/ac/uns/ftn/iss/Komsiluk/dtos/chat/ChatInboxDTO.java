@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 public class ChatInboxDTO {
     private Long userId;
     private String email;
-    private String fullName; // Ime i prezime
+    private String fullName;
     private String lastMessage;
     private LocalDateTime lastMessageTime;
     private String profilePicture;
