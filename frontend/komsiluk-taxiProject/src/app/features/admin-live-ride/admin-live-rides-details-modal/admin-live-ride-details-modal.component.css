@@ -45,7 +45,6 @@
   border-radius: 12px;
 }
 
-/* Pregazi fiksnu visinu iz ride-details-map.component.css */
 .rh-map-container ::ng-deep .ride-details-map {
   height: 100% !important;
 }

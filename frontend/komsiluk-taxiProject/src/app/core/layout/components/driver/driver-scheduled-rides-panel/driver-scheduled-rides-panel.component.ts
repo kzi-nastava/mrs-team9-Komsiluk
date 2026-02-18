@@ -41,7 +41,6 @@ export class DriverScheduledRidesPanelComponent implements OnInit {
     this.rideService.cancelRideDriver(event.rideId, event.reason);
     this.closeCancelDialog();
     
-    // Opciono: Osveži listu odmah ili sačekaj reakciju servisa
     setTimeout(() => this.loadScheduledData(), 500); 
   }
 

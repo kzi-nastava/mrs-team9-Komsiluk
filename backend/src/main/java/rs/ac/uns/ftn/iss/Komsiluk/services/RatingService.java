@@ -80,7 +80,6 @@ public class RatingService implements IRatingService {
 
         ratingRepository.save(rating);
 
-        // Mapiranje i popunjavanje email-a
         RatingResponseDTO responseDTO = ratingMapper.toResponseDTO(rating);
         responseDTO.setRaterMail(findRaterEmail(ride, dto.getRaterId()));
 
@@ -96,7 +95,6 @@ public class RatingService implements IRatingService {
         return ratings.stream()
                 .map(rating -> {
                     RatingResponseDTO dto = ratingMapper.toResponseDTO(rating);
-                    // Popunjavamo email za svaki rating u listi
                     dto.setRaterMail(findRaterEmail(ride, rating.getRaterId()));
                     return dto;
                 })
@@ -134,7 +132,6 @@ public class RatingService implements IRatingService {
         return false;
     }
 
-    // Pomoćna metoda za pronalaženje emaila na osnovu raterId unutar vožnje
     private String findRaterEmail(Ride ride, Long raterId) {
         if (ride.getPassengers() != null) {
             for (User u : ride.getPassengers()) {

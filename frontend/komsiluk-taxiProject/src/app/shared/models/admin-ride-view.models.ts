@@ -1,15 +1,15 @@
-import { VehicleType } from "./profile.models"; // Pretpostavka da je VehicleType ovde
+import { VehicleType } from "./profile.models";
 
 export interface AdminLiveRideCard {
   id: string;
-  driverId: string; // Dodali smo ID vozača za pretragu
+  driverId: string; 
   driverName: string;
-  date: string; // npr. 'LIVE' ili 'Active since 12:30'
+  date: string; 
   startTime: string;
-  endTime: string; // 'Pending' ili 'Expected XX:XX'
+  endTime: string; 
   pickup: string;
   destination: string;
-  status: 'active' | 'pending' | 'in-progress' | 'finished' | 'cancelled'; // Pojednostavljeni statusi za prikaz
+  status: 'active' | 'pending' | 'in-progress' | 'finished' | 'cancelled';
   passengers: number;
   kilometers: number;
   durationText: string;
@@ -18,7 +18,6 @@ export interface AdminLiveRideCard {
 }
 
 export interface AdminLiveRideDetailsVm {
-  // Osnovno - ID mora biti Long (number) kao na backu
   id: number;
   driverId: number | null;
   driverName: string;
@@ -26,24 +25,20 @@ export interface AdminLiveRideDetailsVm {
   vehicleType: string;
   status: string;
 
-  // PUTNICI - Promeni u string[] jer backend šalje emailove!
   passengers: string[]; 
 
-  // RUTA - Koristi imena polja koja tvoj modal HTML već traži
-  pickupLocation: string; // Umesto startAddress
-  destination: string;    // Umesto endAddress
-  stops: string[];        // Waypoints/Stops sa backenda
+  pickupLocation: string; 
+  destination: string;   
+  stops: string[];      
   currentAddress?: string;
 
-  // STATISTIKA
   kilometers: number;
   durationText: string;
   price: number;
 
-  // PANIC & TIMES
   panicPressed: boolean;
   panicReason?: string;
-  startTime: string; // Umesto startedAt
-  endTime: string;   // Umesto finishedAt
+  startTime: string; 
+  endTime: string;  
 
 }

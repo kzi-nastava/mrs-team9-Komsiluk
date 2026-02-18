@@ -135,18 +135,15 @@ ngAfterViewInit(): void {
   setTimeout(() => this.map.invalidateSize(), 0);
 
   runInInjectionContext(this.injector, () => {
-    //Search route
     effect(() => {
       const s = this.facade.state();
       if (!this.map) return;
       
-      // If there is no state, clear route
       if (!s) {
         this.clearRoute();
         return;
       }
       
-      // When there is a target driver (active ride), do not render search route
       if (!this.targetDriverId) {
         this.renderRoute(s.points, s.geometry);
       }
@@ -170,7 +167,6 @@ ngAfterViewInit(): void {
         }
       });
 
-    //Driver (Drive to pickup)
     effect(() => {
       const d = (this.facade as any).driveTo?.();
       if (!this.map || !d) return;
@@ -179,30 +175,25 @@ ngAfterViewInit(): void {
       this.driveSelfTo(d.target.lat, d.target.lon);
     });
 
-    //Synchronization of active driver
     effect(() => {
       const pts = (this.facade as any).ridePath?.();
       const activeDriverId = (this.facade as any).activeDriverId?.(); 
       const role = this.authService.userRole();
       if (role === 'DRIVER') {
-      // Start animation if user is driver
       this.startLiveRide(pts);
     } 
     else if (role === 'PASSENGER' && activeDriverId) {
-      // If user is passenger set ID so renderDrivers shows the vehicle
       this.targetDriverId = activeDriverId;
     }
     });
   });
 
-  // POLLING LOCATIONS (For displaying drivers on the map)
   this.driverLocService.pollLocations()
     .pipe(takeUntilDestroyed(this.destroyRef))
     .subscribe((locations) => {
       this.renderDrivers(locations);
     });
 
-  // Polling for active ride (Transition from search to ride)
   
   if (this.authService.userRole() === 'PASSENGER') {
     interval(500)
@@ -215,10 +206,8 @@ ngAfterViewInit(): void {
           this.facade.activeDriverId.set(ride.driverId);
           this.targetDriverId = ride.driverId;
          
-          //Delete previous visuals
           this.clearRoute();
 
-          //Geocoding and drawing active route
           const addressQueries = [ride.startAddress, ...ride.stops, ride.endAddress];
           
           import('rxjs').then(({ forkJoin }) => {
@@ -226,15 +215,13 @@ ngAfterViewInit(): void {
               .subscribe(results => {
                 const validPoints = results.filter(res => res !== null) as any[];
                 if (validPoints.length >= 2) {
-                  // Draw route from active ride
                   this.calculatePassengerPath(validPoints);
                 }
               });
           });
         }
         else {
-          // Ride is finished (or does not exist)
-          if (this.targetDriverId !== null) { // Check if the ride was just active
+          if (this.targetDriverId !== null) {
             this.handleRideFinish();
           }
         }
@@ -250,12 +237,10 @@ private handleRideFinish() {
   this.clearLiveRideVisuals();
   this.activePassengerMarkers.clearLayers();
   
-  // If user is passenger, clear all driver markers from the map
   if (this.authService.userRole() === 'PASSENGER') {
     this.driversLayer.clearLayers();
     this.driverMarkers.clear();
   }
-  // If user is driver, don't clear own marker
 }
 private calculatePassengerPath(points: any[]) {
   if (this.liveRideLine) return;

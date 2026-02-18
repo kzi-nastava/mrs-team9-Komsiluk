@@ -16,7 +16,6 @@ import { ChatInboxDTO, ChatService } from '../../shared/components/modal-shell/s
 export class SupportComponent implements OnInit, OnDestroy, AfterViewChecked {
   @ViewChild('scrollContainer') private scrollContainer!: ElementRef;
 
-  // --- 1. URL SERVERA ZA SLIKE ---
   readonly SERVER_URL = 'http://localhost:8081'; 
 
   userRole: UserRole | null = null;
@@ -44,23 +43,17 @@ export class SupportComponent implements OnInit, OnDestroy, AfterViewChecked {
     if (!this.myId) return;
 
     if (this.userRole === UserRole.ADMIN) {
-      // --- ADMIN LOGIKA ---
       this.loadInbox();
 
       this.msgSub = this.chatService.messages$.subscribe(msgs => {
-        // AŽURIRAJ CHAT PROZOR
         if (this.selectedContact) {
             const relevantMsgs = msgs.filter(m => 
                 (m.senderId === this.selectedContact!.userId) || 
                 (m.receiverId === this.selectedContact!.userId)
             );
             
-            // Ako ima novih poruka ili promena
             if (relevantMsgs.length !== this.messages.length || relevantMsgs.length > 0) {
                 
-                // --- 2. READ STATUS LOGIKA (Live) ---
-                // Ako stigne nova poruka OD korisnika koga trenutno gledamo,
-                // odmah je označi kao pročitanu u bazi.
                 const lastMsg = relevantMsgs[relevantMsgs.length - 1];
                 if (lastMsg && lastMsg.senderId === this.selectedContact.userId) {
                     this.chatService.markAsRead(this.selectedContact.userId).subscribe();
@@ -72,7 +65,6 @@ export class SupportComponent implements OnInit, OnDestroy, AfterViewChecked {
             }
         }
 
-        // AŽURIRAJ LISTU KONTAKATA
         const latestMsg = msgs[msgs.length - 1];
         if (latestMsg) {
             this.updateInboxList(latestMsg);
@@ -81,7 +73,6 @@ export class SupportComponent implements OnInit, OnDestroy, AfterViewChecked {
       });
 
     } else {
-      // --- USER LOGIKA ---
       this.chatService.loadHistory(this.myId);
       
       this.msgSub = this.chatService.messages$.subscribe(msgs => {
@@ -92,31 +83,24 @@ export class SupportComponent implements OnInit, OnDestroy, AfterViewChecked {
     }
   }
 
-  // --- 3. IMAGE HANDLING METODE (Rešavaju problem sa slikama) ---
-
   getProfileImage(contact: ChatInboxDTO): string {
       if (!contact.profilePicture) return '';
 
-      // A) Ako je Base64 sa prefixom
       if (contact.profilePicture.startsWith('data:')) {
           return contact.profilePicture;
       }
 
-      // B) Ako je putanja sa servera (npr. /images/...)
       if (contact.profilePicture.startsWith('/')) {
           return `${this.SERVER_URL}${contact.profilePicture}`;
       }
 
-      // C) Ako je čist Base64 string bez prefixa (najčešći slučaj kod tebe)
       return `data:image/jpeg;base64,${contact.profilePicture}`;
   }
 
   handleImageError(contact: ChatInboxDTO) {
-      // Ako slika pukne, setujemo na undefined da bi HTML prikazao <i> ikonicu
       contact.profilePicture = undefined; 
   }
 
-  // -------------------------------------------------------------
 
   loadInbox() {
     this.chatService.getInbox().subscribe({
@@ -138,9 +122,7 @@ export class SupportComponent implements OnInit, OnDestroy, AfterViewChecked {
            contact.lastMessage = msg.content;
            contact.lastMessageTime = msg.sentAt;
 
-           // LOGIKA ZA BROJAČ (Samo Admin)
            if (this.userRole === UserRole.ADMIN && msg.senderId !== this.myId) {
-               // Povećaj broj SAMO ako taj chat NIJE trenutno otvoren
                if (this.selectedContact?.userId !== otherId) {
                    contact.unreadCount = (contact.unreadCount || 0) + 1;
                }
@@ -168,11 +150,8 @@ export class SupportComponent implements OnInit, OnDestroy, AfterViewChecked {
   selectContact(contact: ChatInboxDTO) {
     this.selectedContact = contact;
     
-    // Vizuelno resetuj broj
     contact.unreadCount = 0;
     
-    // --- 4. READ STATUS (Na klik) ---
-    // Javi backendu da je sve pročitano
     this.chatService.markAsRead(contact.userId).subscribe({
         error: (err) => console.error('Error marking read', err)
     });
@@ -189,7 +168,7 @@ export class SupportComponent implements OnInit, OnDestroy, AfterViewChecked {
       if (!this.selectedContact) return;
       receiverId = this.selectedContact.userId;
     } else {
-      receiverId = 7; // ID Admina
+      receiverId = 7; 
     }
 
     this.chatService.sendMessage(this.newMessage, this.myId, receiverId);

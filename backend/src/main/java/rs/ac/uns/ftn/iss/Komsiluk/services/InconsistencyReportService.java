@@ -56,12 +56,11 @@ public class InconsistencyReportService implements IInconsistencyReportService {
 
         if (!isDriver && !isPassenger) throw new BadRequestException();
 
-        // autorizacija nad vožnjom
         if (isDriver) {
             if (ride.getDriver() == null || !ride.getDriver().getId().equals(reporterId)) {
                 throw new org.springframework.security.access.AccessDeniedException("Not your ride.");
             }
-        } else { // passenger
+        } else {
             boolean isCreator = ride.getCreatedBy() != null && ride.getCreatedBy().getId().equals(reporterId);
             boolean isLinkedPassenger = ride.getPassengers() != null &&
                     ride.getPassengers().stream().anyMatch(u -> u != null && u.getId().equals(reporterId));
