@@ -52,7 +52,7 @@ public class AdminActiveRidesActivity extends BaseNavDrawerActivity {
         super.onCreate(savedInstanceState);
         recyclerView = findViewById(R.id.rvActiveRides);
         tvEmpty = findViewById(R.id.tvActiveRidesEmpty);
-        etSearch = findViewById(R.id.etDriverSearch); // ID iz tvog novog layouta
+        etSearch = findViewById(R.id.etDriverSearch);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 

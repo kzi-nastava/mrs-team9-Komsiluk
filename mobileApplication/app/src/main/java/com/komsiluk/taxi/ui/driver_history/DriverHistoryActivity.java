@@ -12,7 +12,7 @@ import com.komsiluk.taxi.data.remote.driver_history.DriverService;
 import com.komsiluk.taxi.data.remote.ride.RideResponse;
 import com.komsiluk.taxi.data.session.SessionManager;
 import com.komsiluk.taxi.ui.menu.BaseNavDrawerActivity;
-import com.komsiluk.taxi.ui.ride.map.GeoRepository; // DODATO
+import com.komsiluk.taxi.ui.ride.map.GeoRepository;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -20,7 +20,6 @@ import java.util.List;
 
 import dagger.hilt.android.AndroidEntryPoint;
 import javax.inject.Inject;
-import okhttp3.OkHttpClient; // DODATO
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -59,12 +58,10 @@ public class DriverHistoryActivity extends BaseNavDrawerActivity {
             btnFilter.setOnClickListener(v -> showDateRangePicker());
         }
 
-        // 1. Inicijalizacija liste (RecyclerView)
         RecyclerView rv = findViewById(R.id.rvHistory);
         rv.setLayoutManager(new LinearLayoutManager(this));
 
         adapter = new DriverHistoryAdapter(rideList, ride -> {
-            // PROSLEĐUJEMO geoRepository u newInstance metodu
             RideDetailsDialogFragment.newInstance(ride, geoRepository)
                     .show(getSupportFragmentManager(), "ride_details");
         });
@@ -72,8 +69,6 @@ public class DriverHistoryActivity extends BaseNavDrawerActivity {
 
         loadHistory();
     }
-
-    // ... ostatak koda (loadHistory, showDateRangePicker, mapDtoToModel) ostaje nepromenjen ...
 
     private void loadHistory() {
         Long driverId = sessionManager.getUserId();

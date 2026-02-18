@@ -100,11 +100,9 @@ public class RideDetailsDialogFragment extends DialogFragment {
 
         long rideId = args.getLong("id");
 
-        // --- INICIJALIZACIJA MAPE ---
         b.mapDetails.setTileSource(TileSourceFactory.MAPNIK);
         b.mapDetails.setMultiTouchControls(true);
 
-        // --- POPUNJAVANJE PODATAKA (Tvoj originalni kod) ---
         List<String> emails = args.getStringArrayList("passengerEmails");
         b.tvPassengers.setText(emails != null && !emails.isEmpty() ? String.join("\n", emails) : "No passengers");
 
@@ -128,7 +126,6 @@ public class RideDetailsDialogFragment extends DialogFragment {
         b.tvPrice.setText(labelValue("Price: ", args.getString("price"), android.R.color.white, R.color.secondary));
         b.tvPanicFlag.setText(labelValue("Panic button pressed: ", args.getBoolean("panic") ? "True" : "False", android.R.color.white, R.color.secondary));
 
-        // --- LOGIKA ZA RUTU ---
         prepareAndDrawRoute(args.getString("pickup"), stops, args.getString("dest"));
 
         loadRatings(rideId, android.R.color.white, R.color.secondary);
@@ -197,9 +194,6 @@ public class RideDetailsDialogFragment extends DialogFragment {
             @Override public void onFailure(Call<OsrmRouteResponse> call, Throwable t) {}
         });
     }
-
-    // --- Tvoje postojeće metode za loadRatings, loadInconsistencies, labelValue, colorize ---
-    // (Zadrži ih točno onakvima kakve si ih poslao)
 
     private void loadRatings(long rideId, int labelWhite, int valueYellow) {
         ratingService.getRideRatings(rideId).enqueue(new Callback<List<RatingResponse>>() {

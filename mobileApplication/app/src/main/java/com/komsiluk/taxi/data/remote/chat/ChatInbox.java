@@ -25,7 +25,7 @@ public class ChatInbox implements Serializable {
 
     @SerializedName("lastMessageTime")
     @Expose
-    private String lastMessageTime; // String zbog JSON serijalizacije
+    private String lastMessageTime;
 
     @SerializedName("profilePicture")
     @Expose
@@ -36,8 +36,6 @@ public class ChatInbox implements Serializable {
     private int unreadCount;
 
     public ChatInbox() {}
-
-    // Getters and Setters
 
     public Long getUserId() {
         return userId;

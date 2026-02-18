@@ -67,7 +67,6 @@ public class DriverHistoryAdapter extends RecyclerView.Adapter<RecyclerView.View
         return rides.size();
     }
 
-    // ---------- helper: label/value in two colors ----------
     private static SpannableString labelValue(View view, String label, String value,
                                               int labelColorRes, int valueColorRes) {
         String full = label + value;
@@ -96,19 +95,16 @@ public class DriverHistoryAdapter extends RecyclerView.Adapter<RecyclerView.View
         int labelColor = ContextCompat.getColor(view.getContext(), labelColorRes);
         int valueColor = ContextCompat.getColor(view.getContext(), valueColorRes);
 
-        // Line 1
         ss.setSpan(new ForegroundColorSpan(labelColor), 0, label1.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         ss.setSpan(new ForegroundColorSpan(valueColor), label1.length(), line1.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
 
-        // Line 2
-        int offset = line1.length() + 1; // + '\n'
+        int offset = line1.length() + 1;
         ss.setSpan(new ForegroundColorSpan(labelColor), offset, offset + label2.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         ss.setSpan(new ForegroundColorSpan(valueColor), offset + label2.length(), offset + line2.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
 
         return ss;
     }
 
-    // ---------------- ViewHolders ----------------
 
     static class BigVH extends RecyclerView.ViewHolder {
         final ItemDriverRideBinding b;
@@ -119,10 +115,8 @@ public class DriverHistoryAdapter extends RecyclerView.Adapter<RecyclerView.View
         }
 
         void bind(DriverRide r, OnRideClickListener listener) {
-            // Datum ostaje žut (boja iz XML-a)
             b.tvDate.setText(r.date);
 
-            // Start/End jedno ispod drugog: label belo, value žuto
             b.tvTimes.setText(twoLineLabelValue(
                     b.getRoot(),
                     "Start: ", r.startTime,
@@ -130,7 +124,6 @@ public class DriverHistoryAdapter extends RecyclerView.Adapter<RecyclerView.View
                     android.R.color.white, R.color.secondary
             ));
 
-            // Ostalo: label belo, value žuto
             b.tvPickup.setText(labelValue(b.getRoot(), "Pickup: ", r.pickup, android.R.color.white, R.color.secondary));
             b.tvDestination.setText(labelValue(b.getRoot(), "Destination: ", r.destination, android.R.color.white, R.color.secondary));
             b.tvStatus.setText(labelValue(b.getRoot(), "Status: ", r.status, android.R.color.white, R.color.secondary));
@@ -154,7 +147,6 @@ public class DriverHistoryAdapter extends RecyclerView.Adapter<RecyclerView.View
         }
 
         void bind(DriverRide r, OnRideClickListener listener) {
-            // SMALL (žuta): label crna, value tamno-siva (ako nemaš, može primary/crna)
             int labelColor = android.R.color.white;
             int valueColor = R.color.black;
 

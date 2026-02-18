@@ -80,7 +80,6 @@ public class DriverActivity extends BaseNavDrawerActivity {
 
     private org.osmdroid.views.overlay.Polyline routePolyline;
 
-    // Bottom sheet
     private BottomSheetBehavior<View> sheetBehavior;
     private View currentRideSheet;
 
@@ -202,7 +201,6 @@ public class DriverActivity extends BaseNavDrawerActivity {
 
         btnStart.setOnClickListener(v -> showConfirmStartDialog());
 
-        // U onCreate metodi
         btnFinish.setOnClickListener(v -> finishRideOnBackend());
         btnStop.setOnClickListener(v -> showStopRideDialog());
         btnReport.setOnClickListener(v -> showReportInconsistencyDialog());
@@ -396,7 +394,6 @@ public class DriverActivity extends BaseNavDrawerActivity {
                                 "Ride successfuly cancelled!",
                                 Toast.LENGTH_LONG
                         ).show();
-                        // Clear the map overlays and UI after cancellation
                         cleanupAnimation();
                     } else {
                         String message = response.message() != null
@@ -534,7 +531,6 @@ public class DriverActivity extends BaseNavDrawerActivity {
                 isFetchingRide = false;
 
                 if (resp.code() == 204 || !resp.isSuccessful() || resp.body() == null) {
-                    // Ako nema vožnje, sakrij sheet i ugasi animacije
                     if (currentRide != null) {
                         currentRide = null;
                         sheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
@@ -545,13 +541,11 @@ public class DriverActivity extends BaseNavDrawerActivity {
 
                 RideResponse newRide = resp.body();
 
-                // KLJUČNA PROVERA: Da li je ovo nova vožnja ili promena statusa?
                 if (currentRide == null || !currentRide.getId().equals(newRide.getId()) || !currentRide.getStatus().equals(newRide.getStatus())) {
 
                     currentRide = newRide;
                     rideStartedUi = isRideActiveStatus(currentRide.getStatus());
 
-                    // Popuni UI
                     tvPickupValue.setText(safe(currentRide.getStartAddress()));
                     tvDestinationValue.setText(safe(currentRide.getEndAddress()));
 
@@ -559,9 +553,8 @@ public class DriverActivity extends BaseNavDrawerActivity {
                         layoutActiveStops.removeAllViews();
                         List<String> stops = newRide.getStops();
                         if (stops != null) {
-                            // Dodajemo brojač za oznake
                             for (int i = 0; i < stops.size(); i++) {
-                                addStopToActivePanel(stops.get(i), i + 1); // Prosleđujemo redni broj
+                                addStopToActivePanel(stops.get(i), i + 1);
                             }
                         }
                     }
@@ -569,9 +562,8 @@ public class DriverActivity extends BaseNavDrawerActivity {
                     applyRideButtonsUi();
                     sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
 
-                    // POKRENI ANIMACIJU samo ako vožnja NIJE aktivna (znači ide ka putniku)
                     if (!rideStartedUi && myLocationMarker != null) {
-                        cleanupAnimation(); // Ugasi staru ako postoji
+                        cleanupAnimation();
                         double myLat = myLocationMarker.getPosition().getLatitude();
                         double myLng = myLocationMarker.getPosition().getLongitude();
                         getCoordinatesAndAnimate(currentRide.getStartAddress(), myLat, myLng);
@@ -593,7 +585,6 @@ public class DriverActivity extends BaseNavDrawerActivity {
         }
 
         TextView label = new TextView(this);
-        // Postavljamo dinamički tekst: Stop 1, Stop 2...
         label.setText("Stop " + stopNumber);
         label.setTextColor(android.graphics.Color.WHITE);
         label.setPadding(0, 10, 0, 0);
@@ -642,7 +633,7 @@ public class DriverActivity extends BaseNavDrawerActivity {
 
     private void setMapCamera(GeoPoint point) {
         firstTimeZoom = false;
-        map.getController().setZoom(15.5); // Postavi inicijalni zoom
+        map.getController().setZoom(15.5);
         map.getController().setCenter(point);
         updateDriverMarkerOnMap(point.getLatitude(), point.getLongitude());
     }
@@ -713,7 +704,7 @@ public class DriverActivity extends BaseNavDrawerActivity {
             rowStartCancel.setVisibility(View.VISIBLE);
             rowInRide.setVisibility(View.GONE);
             btnStart.setEnabled(false);
-            btnStart.setAlpha(0.5f); // Vizuelni feedback da je dugme zaključano
+            btnStart.setAlpha(0.5f);
         }
     }
 
@@ -764,13 +755,10 @@ public class DriverActivity extends BaseNavDrawerActivity {
                         rideStartedUi = true;
                         applyRideButtonsUi();
 
-                        // 1. Prvo ugasi staru animaciju (ka pickup-u)
                         if (animationHandler != null) animationHandler.removeCallbacks(animationRunnable);
 
-                        // 2. Pokreni novu simulaciju ka destinaciji
                         prepareAndStartMainRideSimulation();
 
-                        // 3. OBAVEZNO zatvori dijalog ovde
                         dialog.dismiss();
                         Toast.makeText(this, "Ride started successfully!", Toast.LENGTH_SHORT).show();
                     },
@@ -876,10 +864,6 @@ public class DriverActivity extends BaseNavDrawerActivity {
     }
 
     private void markStopAsVisitedUi(int stopIndex) {
-        // layoutActiveStops sadrži TextView-ove.
-        // Struktura je: Label1, Value1, Label2, Value2...
-        // Stop 1 je na indeksima 0 i 1. Stop 2 na 2 i 3.
-        // Formula za Value View: (stopIndex - 1) * 2 + 1
 
         int valueViewIndex = (stopIndex - 1) * 2 + 1;
 
@@ -937,10 +921,8 @@ public class DriverActivity extends BaseNavDrawerActivity {
                 if (response.isSuccessful() && response.body() != null && !response.body().routes.isEmpty()) {
                     List<List<Double>> pathPoints = response.body().routes.get(0).geometry.coordinates;
 
-                    // Prosleđujemo i listu tačaka i krajnji cilj
                     animateStepByStep(pathPoints, targetLat, targetLng);
 
-                    // Crtanje plave linije (ostaje isto)
                     drawRoutePolyline(pathPoints);
                 }
             }
@@ -1045,14 +1027,12 @@ public class DriverActivity extends BaseNavDrawerActivity {
     private void drawRoutePolyline(List<List<Double>> pathPoints) {
         if (map == null) return;
 
-        // Uklanjamo staru liniju ako postoji
         if (routePolyline != null) {
             map.getOverlays().remove(routePolyline);
         }
 
         routePolyline = new org.osmdroid.views.overlay.Polyline();
         for (List<Double> coord : pathPoints) {
-            // OSRM: [lon, lat] -> osmdroid: [lat, lon]
             routePolyline.addPoint(new GeoPoint(coord.get(1), coord.get(0)));
         }
 
@@ -1140,7 +1120,7 @@ public class DriverActivity extends BaseNavDrawerActivity {
                     geocodeStopsRecursive(waypoints, stops, index + 1, end);
                 }
                 @Override public void onFailure(Call<List<com.komsiluk.taxi.ui.ride.map.NominatimPlace>> call, Throwable t) {
-                    geocodeStopsRecursive(waypoints, stops, index + 1, end); // Nastavi čak i ako jedna stanica fail-uje
+                    geocodeStopsRecursive(waypoints, stops, index + 1, end);
                 }
             });
         } else {
@@ -1208,7 +1188,6 @@ public class DriverActivity extends BaseNavDrawerActivity {
     }
 
     private void showReportInconsistencyDialog() {
-        // Provera ID-a vožnje pomoću tvoje postojeće pomoćne metode
         Long rideId = getCurrentRideId();
         if (rideId == null) {
             Toast.makeText(this, "No active ride found.", Toast.LENGTH_SHORT).show();

@@ -41,13 +41,11 @@ public class ChatActivity extends BaseNavDrawerActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Povezivanje sa unutrašnjim layoutom
         View contentView = findViewById(R.id.chatContentRoot);
         chatBinding = FragmentChatBinding.bind(contentView);
 
         viewModel = new ViewModelProvider(this).get(ChatViewModel.class);
 
-        // Redosled je bitan: prvo setupReceiver da izvučemo putanju slike
         setupReceiver();
         setupRecyclerView();
         setupKeyboardHandling();
@@ -77,7 +75,6 @@ public class ChatActivity extends BaseNavDrawerActivity {
             int bottomMenuPx = (int) (40 * getResources().getDisplayMetrics().density);
 
             if (imeInsets.bottom > 0) {
-                // TASTATURA OTVORENA: Skloni padding sa inputa, podigni ceo ekran
                 chatBinding.layoutInput.setPadding(
                         chatBinding.layoutInput.getPaddingLeft(),
                         chatBinding.layoutInput.getPaddingTop(),
@@ -86,7 +83,6 @@ public class ChatActivity extends BaseNavDrawerActivity {
                 );
                 v.setPadding(systemBars.left, systemBars.top, systemBars.right, imeInsets.bottom);
             } else {
-                // TASTATURA ZATVORENA: Vrati padding da input "leži" na meniju
                 chatBinding.layoutInput.setPadding(
                         chatBinding.layoutInput.getPaddingLeft(),
                         chatBinding.layoutInput.getPaddingTop(),
@@ -105,7 +101,6 @@ public class ChatActivity extends BaseNavDrawerActivity {
 
     private void setupReceiver() {
         long idFromIntent = getIntent().getLongExtra(EXTRA_RECEIVER_ID, -1);
-        // IZVLAČIMO PUTANJU SLIKE IZ INTENTA
         otherProfilePath = getIntent().getStringExtra(EXTRA_PROFILE_PATH);
 
         if (idFromIntent != -1) {
@@ -120,7 +115,6 @@ public class ChatActivity extends BaseNavDrawerActivity {
 
     private void setupRecyclerView() {
         adapter = new ChatAdapter(sessionManager.getUserId());
-        // PROSLEĐUJEMO PUTANJU ADAPTERU DA BI MOGAO DA UČITA SLIKU
         adapter.setOtherProfilePath(otherProfilePath);
 
         chatBinding.rvChatMessages.setLayoutManager(new LinearLayoutManager(this));

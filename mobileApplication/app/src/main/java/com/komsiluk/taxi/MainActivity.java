@@ -571,7 +571,6 @@ public class MainActivity extends BaseNavDrawerActivity {
         Intent intent = new Intent(this, AuthActivity.class);
         intent.putExtra("AUTH_DESTINATION", "LOGIN");
 
-        // Pass route data as extras
         intent.putExtra(EXTRA_PICKUP_ADDRESS, safeTrim(etPickup.getText()));
         intent.putExtra(EXTRA_DEST_ADDRESS, safeTrim(etDestination.getText()));
 
@@ -597,11 +596,9 @@ public class MainActivity extends BaseNavDrawerActivity {
 
         if (pickupAddr == null || destAddr == null) return;
 
-        // Restore addresses
         etPickup.setText(pickupAddr);
         etDestination.setText(destAddr);
 
-        // Restore coordinates
         double pickupLat = intent.getDoubleExtra(EXTRA_PICKUP_LAT, 0);
         double pickupLng = intent.getDoubleExtra(EXTRA_PICKUP_LNG, 0);
         double destLat = intent.getDoubleExtra(EXTRA_DEST_LAT, 0);
@@ -623,7 +620,6 @@ public class MainActivity extends BaseNavDrawerActivity {
             zoomToPoints();
             drawRouteAndStats();
 
-            // Expand the bottom sheet
             if (sheetBehavior != null) {
                 sheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
             }
@@ -759,7 +755,6 @@ public class MainActivity extends BaseNavDrawerActivity {
         }
         map.getOverlays().removeAll(toRemove);
 
-        // Add driver markers
         for (DriverLocationResponse loc : locations) {
             Marker marker = new Marker(map);
             marker.setPosition(new GeoPoint(loc.getLat(), loc.getLng()));

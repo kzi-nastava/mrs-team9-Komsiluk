@@ -58,8 +58,6 @@ public class ChatViewModel extends ViewModel {
     }
 
     public void connect() {
-        // Povezujemo se samo ako već nismo.
-        // Singleton WebSocketClient će unutra odlučiti da li treba novi handshake.
         webSocketClient.connect();
     }
 

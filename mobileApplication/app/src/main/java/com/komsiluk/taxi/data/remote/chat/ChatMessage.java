@@ -29,16 +29,13 @@ public class ChatMessage implements Serializable {
 
     @SerializedName("sentAt")
     @Expose
-    private String sentAt; // String zbog JSON serijalizacije
+    private String sentAt;
 
     @SerializedName("type")
     @Expose
     private String type;
 
-    // Prazan konstruktor
     public ChatMessage() {}
-
-    // Getters and Setters
 
     public Long getId() {
         return id;

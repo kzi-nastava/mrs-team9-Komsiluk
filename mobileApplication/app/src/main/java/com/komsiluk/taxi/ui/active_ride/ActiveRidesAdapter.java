@@ -15,8 +15,8 @@ import java.util.Map;
 
 public class ActiveRidesAdapter extends RecyclerView.Adapter<ActiveRidesAdapter.ViewHolder> {
 
-    private List<RideResponse> rides; // Lista koja se menja (filtrirana)
-    private final List<RideResponse> fullList; // Originalna kopija svih podataka
+    private List<RideResponse> rides;
+    private final List<RideResponse> fullList;
     private final OnRideClickListener listener;
     private final java.util.HashMap<Long, String> driverNames;
 
@@ -26,14 +26,11 @@ public class ActiveRidesAdapter extends RecyclerView.Adapter<ActiveRidesAdapter.
 
     public ActiveRidesAdapter(List<RideResponse> rides, java.util.HashMap<Long, String> driverNames, OnRideClickListener listener) {
         this.rides = rides;
-        this.fullList = new ArrayList<>(rides); // Inicijalizujemo kopiju
+        this.fullList = new ArrayList<>(rides);
         this.driverNames = driverNames;
         this.listener = listener;
     }
 
-    /**
-     * Metoda za filtriranje vožnji po imenu ili prezimenu vozača
-     */
     public void filter(String text, java.util.HashMap<Long, String> driverMap) {
         List<RideResponse> filteredList = new ArrayList<>();
         String query = text.toLowerCase().trim();
@@ -43,7 +40,6 @@ public class ActiveRidesAdapter extends RecyclerView.Adapter<ActiveRidesAdapter.
         } else {
             for (RideResponse ride : fullList) {
                 String name = driverMap.get(ride.getDriverId());
-                // Proveravamo da li drajver postoji u mapi i da li njegovo ime sadrži uneti tekst
                 if (name != null && name.toLowerCase().contains(query)) {
                     filteredList.add(ride);
                 }

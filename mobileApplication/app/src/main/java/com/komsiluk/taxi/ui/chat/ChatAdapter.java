@@ -88,7 +88,6 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         }
     }
 
-    // ViewHolder za MOJE poruke (Samo tekst i vreme)
     static class MyMessageViewHolder extends RecyclerView.ViewHolder {
         TextView content, time;
         MyMessageViewHolder(View v) {
@@ -102,7 +101,6 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         }
     }
 
-    // ViewHolder za TUĐE poruke (Tekst, vreme i AVATAR)
     static class OtherMessageViewHolder extends RecyclerView.ViewHolder {
         TextView content, time;
         ImageView avatar;
@@ -118,7 +116,6 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             content.setText(m.getContent());
             time.setText(formatSentAt(m.getSentAt()));
 
-            // Učitavanje slike sagovornika
             if (avatar != null) {
                 if (profilePath != null && !profilePath.trim().isEmpty()) {
                     String cleanPath = profilePath.trim();
