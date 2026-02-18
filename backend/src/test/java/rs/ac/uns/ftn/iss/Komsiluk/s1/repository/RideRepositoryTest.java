@@ -73,7 +73,7 @@ class RideRepositoryTest {
         persistRideForCreator(creator, RideStatus.SCHEDULED, existingStart, existingEnd);
 
         LocalDateTime newStart = existingStart.plusMinutes(10);
-        LocalDateTime newEnd   = newStart.plusMinutes(30);
+        LocalDateTime newEnd   = newStart.plusMinutes(40);
 
         boolean hasConflict = rideRepository.existsBlockingRideForCreator(creator.getId(), STATUS_FILTER, newStart, newEnd);
 

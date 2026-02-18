@@ -2,8 +2,7 @@ package rs.ac.uns.ftn.iss.Komsiluk.util;
 
 import org.springframework.core.annotation.Order;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional; // OBAVEZNO
+import org.springframework.transaction.annotation.Transactional;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.DriverLocation;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.User;
 import rs.ac.uns.ftn.iss.Komsiluk.repositories.DriverLocationRepository;

@@ -1,6 +1,5 @@
 package rs.ac.uns.ftn.iss.Komsiluk.services;
 
-import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -14,7 +13,6 @@ import rs.ac.uns.ftn.iss.Komsiluk.beans.User;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.notification.AdminNotificationCreateDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.notification.NotificationCreateDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.notification.NotificationResponseDTO;
-import rs.ac.uns.ftn.iss.Komsiluk.mappers.AdminNotificationDTOMapper;
 import rs.ac.uns.ftn.iss.Komsiluk.mappers.NotificationDTOMapper;
 import rs.ac.uns.ftn.iss.Komsiluk.repositories.NotificationRepository;
 import rs.ac.uns.ftn.iss.Komsiluk.services.exceptions.NotFoundException;

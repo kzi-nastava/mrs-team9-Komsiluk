@@ -3,7 +3,6 @@ package rs.ac.uns.ftn.iss.Komsiluk.mappers;
 import org.springframework.stereotype.Component;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.Ride;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.Route;
-import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.RideStatus;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.ride.AdminRideHistoryDTO;
 
 @Component

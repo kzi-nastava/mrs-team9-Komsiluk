@@ -110,8 +110,8 @@ class UserRepositoryTest {
 
     @Test
     void findAvailableDriversNoConflict_excludesDriver_whenBlockedOrInactiveOrWrongStatus() {
-        persistDriver("driver4@test.com", DriverStatus.ACTIVE, true, true, persistVehicle(VehicleType.STANDARD, 4, false, false, "TT-444-TT"));
-        persistDriver("driver5@test.com", DriverStatus.ACTIVE, false, false, persistVehicle(VehicleType.STANDARD, 4, false, false, "TT-555-TT"));
+        persistDriver("driver4@test.com", DriverStatus.ACTIVE, false, true, persistVehicle(VehicleType.STANDARD, 4, false, false, "TT-444-TT"));
+        persistDriver("driver5@test.com", DriverStatus.INACTIVE, true, false, persistVehicle(VehicleType.STANDARD, 4, false, false, "TT-555-TT"));
         persistDriver("driver6@test.com", DriverStatus.IN_RIDE, true, false, persistVehicle(VehicleType.STANDARD, 4, false, false, "TT-666-TT"));
 
         LocalDateTime newStart = BASE.plusMinutes(30);
@@ -288,9 +288,9 @@ class UserRepositoryTest {
 
     @Test
     void findDriversFinishingSoon_excludesDriver_whenDriverIsBlockedOrInactiveOrWrongDriverStatus() {
-        User blocked = persistDriver("finish9@test.com", DriverStatus.IN_RIDE, true, true, persistVehicle(VehicleType.STANDARD, 4, false, false, "FS-999"));
-        User inactive = persistDriver("finish10@test.com", DriverStatus.IN_RIDE, false, false, persistVehicle(VehicleType.STANDARD, 4, false, false, "FS-101"));
-        User wrongStatus = persistDriver("finish11@test.com", DriverStatus.INACTIVE, true, false, persistVehicle(VehicleType.STANDARD, 4, false, false, "FS-102")); // ako imaš BLOCKED u enumu; ako nema, stavi neki status koji nije ACTIVE/IN_RIDE
+        User blocked = persistDriver("finish9@test.com", DriverStatus.ACTIVE, false, true, persistVehicle(VehicleType.STANDARD, 4, false, false, "FS-999"));
+        User inactive = persistDriver("finish10@test.com", DriverStatus.INACTIVE, true, false, persistVehicle(VehicleType.STANDARD, 4, false, false, "FS-101"));
+        User wrongStatus = persistDriver("finish11@test.com", DriverStatus.IN_RIDE, false, false, persistVehicle(VehicleType.STANDARD, 4, false, false, "FS-102"));
 
         LocalDateTime now = BASE;
         LocalDateTime finishBefore = now.plusMinutes(10);

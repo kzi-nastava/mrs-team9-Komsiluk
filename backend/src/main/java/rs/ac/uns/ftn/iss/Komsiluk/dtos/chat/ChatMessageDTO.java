@@ -1,12 +1,24 @@
 package rs.ac.uns.ftn.iss.Komsiluk.dtos.chat;
 import java.time.LocalDateTime;
 
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+
 public class ChatMessageDTO {
+	
     private Long id;
+	
+	@NotNull
     private Long senderId;
+	
     private String senderEmail;
+    
+    @NotNull
     private Long receiverId;
+    
+    @Size(min = 1, max = 1000)
     private String content;
+    
     private LocalDateTime sentAt;
     private String type;
 

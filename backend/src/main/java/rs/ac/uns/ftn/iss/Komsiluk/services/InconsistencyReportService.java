@@ -82,22 +82,6 @@ public class InconsistencyReportService implements IInconsistencyReportService {
         return toResponseDTO(report);
     }
 
-    private boolean isValidReporter(Ride ride, User reporter) {
-        if (ride.getDriver().equals(reporter)) {
-            return true;
-        }
-
-        if (ride.getCreatedBy().equals(reporter)) {
-            return true;
-        }
-
-        if (ride.getPassengers().contains(reporter)) {
-            return true;
-        }
-
-        return false;
-    }
-
 
     @Override
     public Collection<InconsistencyReportResponseDTO> getByRideId(Long rideId) {
@@ -105,16 +89,6 @@ public class InconsistencyReportService implements IInconsistencyReportService {
                 .stream()
                 .map(this::toResponseDTO)
                 .toList();
-    }
-
-    private boolean isPassengerOnRide(Ride ride, Long passengerId) {
-        if (ride.getPassengers() == null) return false;
-        for (User u : ride.getPassengers()) {
-            if (u != null && u.getId() != null && u.getId().equals(passengerId)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     private InconsistencyReportResponseDTO toResponseDTO(InconsistencyReport report) {

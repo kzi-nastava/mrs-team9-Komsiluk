@@ -6,6 +6,8 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import jakarta.validation.Valid;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.chat.ChatInboxDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.dtos.chat.ChatMessageDTO;
 import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.IChatService;
@@ -16,7 +18,7 @@ import java.util.List;
 public class ChatController {
 
     @Autowired
-    private IChatService chatService; // Ubrizgavanje interfejsa
+    private IChatService chatService;
 
     @GetMapping("/api/chat/history/{userId}")
     @PreAuthorize("hasAnyRole('ADMIN', 'DRIVER', 'PASSENGER')")
@@ -25,7 +27,7 @@ public class ChatController {
     }
 
     @MessageMapping("/chat/send")
-    public void processMessage(@Payload ChatMessageDTO chatMessage) {
+    public void processMessage(@Valid @Payload ChatMessageDTO chatMessage) {
         chatService.sendMessage(
                 chatMessage.getSenderId(),
                 chatMessage.getReceiverId(),

@@ -9,7 +9,8 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 public class HomePage {
 
-    private WebDriver driver;
+    @SuppressWarnings("unused")
+	private WebDriver driver;
     private WebDriverWait wait;
 
     public HomePage(WebDriver driver, WebDriverWait wait) {

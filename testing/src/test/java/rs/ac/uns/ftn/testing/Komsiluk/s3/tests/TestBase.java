@@ -1,7 +1,5 @@
 package rs.ac.uns.ftn.testing.Komsiluk.s3.tests;
 
-import java.util.concurrent.TimeUnit;
-
 import org.junit.jupiter.api.*;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;

@@ -29,8 +29,6 @@ import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.IAuthService;
 import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.IUserService;
 import rs.ac.uns.ftn.iss.Komsiluk.services.interfaces.IUserTokenService;
 
-import javax.management.relation.Role;
-
 @Service
 public class AuthService implements IAuthService {
 

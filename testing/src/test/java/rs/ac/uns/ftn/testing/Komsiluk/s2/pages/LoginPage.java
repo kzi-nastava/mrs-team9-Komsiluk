@@ -9,7 +9,8 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 public class LoginPage {
 
-    private WebDriver driver;
+    @SuppressWarnings("unused")
+	private WebDriver driver;
     private WebDriverWait wait;
 
     public LoginPage(WebDriver driver, WebDriverWait wait) {

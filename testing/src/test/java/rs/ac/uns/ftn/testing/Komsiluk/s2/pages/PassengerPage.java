@@ -12,7 +12,8 @@ import java.util.List;
 
 public class PassengerPage {
 
-    private WebDriver driver;
+    @SuppressWarnings("unused")
+	private WebDriver driver;
     private WebDriverWait wait;
 
     public PassengerPage(WebDriver driver, WebDriverWait wait) {

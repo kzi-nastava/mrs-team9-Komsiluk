@@ -1,6 +1,5 @@
 package rs.ac.uns.ftn.testing.Komsiluk.s2.tests;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import rs.ac.uns.ftn.testing.Komsiluk.s1.tests.TestBase;
 import rs.ac.uns.ftn.testing.Komsiluk.s2.pages.HomePage;

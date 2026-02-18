@@ -1,6 +1,5 @@
 package rs.ac.uns.ftn.iss.Komsiluk.dtos.ride;
 
-import rs.ac.uns.ftn.iss.Komsiluk.beans.Route;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.CancellationSource;
 
 import java.math.BigDecimal;

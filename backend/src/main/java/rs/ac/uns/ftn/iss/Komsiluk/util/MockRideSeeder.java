@@ -14,7 +14,6 @@ import rs.ac.uns.ftn.iss.Komsiluk.beans.User;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.Rating;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.FavoriteRoute;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.InconsistencyReport;
-import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.CancellationSource;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.RideStatus;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.UserRole;
 import rs.ac.uns.ftn.iss.Komsiluk.beans.enums.VehicleType;

@@ -67,8 +67,6 @@ public class RideService implements IRideService {
     private PricingRepository pricingRepository;
     @Autowired
     private RideDTOMapper  rideDTOMapper;
-    @Autowired
-    private DriverService driverService;
     
     private static final long MAX_MINUTES_LAST_24H = 480;
     private static final int BUFFER_MINUTES = 10;
