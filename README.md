@@ -1,4 +1,5 @@
 # Neighbourhood Taxi - Complete Ride-Hailing Ecosystem
+# (Fullstack + Mobile App)
 
 Neighbourhood Taxi is a robust, enterprise-grade taxi service solution featuring a centralized **Spring Boot** backend, an interactive **Angular** web dashboard, and a feature-rich **Android** mobile application. The system provides a seamless experience for passengers, drivers, and administrators, utilizing real-time communication to bridge the gap between service demand and supply.
 
